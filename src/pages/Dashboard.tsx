@@ -1,8 +1,14 @@
-import React from "react";
-
 const Dashboard = () => {
 	return (
-		<div>
+		<div className="">
+			<p>Halaman Dashboard</p>
+			<p>Halaman Dashboard</p>
+			<p>Halaman Dashboard</p>
+			<p>Halaman Dashboard</p>
+			<p>Halaman Dashboard</p>
+			<p>Halaman Dashboard</p>
+			<p>Halaman Dashboard</p>
+			<p>Halaman Dashboard</p>
 			<p>Halaman Dashboard</p>
 		</div>
 	);

@@ -11,4 +11,9 @@ export default defineConfig({
 			"@": path.resolve(__dirname, "./src"),
 		},
 	},
+	server: {
+		port: 3000, // ⬅️ Tambahkan ini
+		host: true, // opsional, biar bisa diakses dari network
+		open: true, // opsional, auto buka browser
+	},
 });
