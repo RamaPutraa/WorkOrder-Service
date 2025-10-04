@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
-import AppSidebar from "../organisms/Sidebar";
-import { SidebarProvider } from "../ui/sidebar";
-import Navbar from "../organisms/Navbar";
+import AppSidebar from "../organism/sidebar";
+import { SidebarProvider } from "../../components/ui/sidebar";
+import Navbar from "../organism/navbar";
 
 const AppLayout = () => {
 	return (

@@ -1,5 +1,5 @@
 import loginImage from "@/assets/images/auth_image.webp";
-import RegisterForm from "@/features/auth/components/RegisterForm";
+import RegisterForm from "@/features/auth/components/client-reg-form";
 
 const RegisterPage = () => {
 	return (
@@ -18,14 +18,12 @@ const RegisterPage = () => {
 					{/* Right side */}
 					<div className="flex flex-col justify-center p-12 ">
 						<div className="mb-4">
-							<h3 className="text-2xl font-bold text-blue-500 dark:text-blue-50">
-								Register
+							<h3 className="text-2xl font-bold text-blue-500 dark:text-blue-500">
+								Daftar Akun
 							</h3>
-							<p className="mt-7 ">
-								Welcome back! Please register to your account.
-							</p>
+							<p className="mt-7 ">Selamat Datang! Daftarkan akun anda.</p>
 						</div>
-						<div className="mt-7 text-sm  text-center">
+						<div className="mt-4 text-sm  text-center">
 							<RegisterForm />
 						</div>
 					</div>

@@ -1,4 +1,3 @@
-import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
 	DropdownMenu,
@@ -8,8 +7,12 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import useAuth from "@/features/auth/hooks/useAuth";
+import { useDialogStore } from "@/store/dialogStore";
 
 const AvatarDropdown = () => {
+	const { logout } = useAuth();
+	const { showDialog } = useDialogStore();
 	return (
 		<div>
 			<DropdownMenu>
@@ -30,7 +33,16 @@ const AvatarDropdown = () => {
 						Settings
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />
-					<DropdownMenuItem onClick={() => console.log("Logout clicked")}>
+					<DropdownMenuItem
+						onClick={() =>
+							showDialog({
+								title: "Konfirmasi Logout",
+								description: "Apakah kamu yakin ingin keluar dari aplikasi?",
+								confirmText: "Logout",
+								cancelText: "Batal",
+								onConfirm: logout,
+							})
+						}>
 						Logout
 					</DropdownMenuItem>
 				</DropdownMenuContent>

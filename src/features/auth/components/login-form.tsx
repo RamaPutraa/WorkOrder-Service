@@ -1,5 +1,5 @@
 import { LoaderCircle } from "lucide-react";
-import FormFields from "@/components/molecules/FormFields";
+import FormFields from "@/shared/molecules/form-fields";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 
@@ -24,7 +24,7 @@ const LoginForm = () => {
 	const loginFields: FieldConfig[] = [
 		{
 			name: "email",
-			label: "Email",
+			label: "Alamat Email",
 			type: "email",
 			placeholder: "johndoe@gmail.com",
 		},
@@ -47,12 +47,12 @@ const LoginForm = () => {
 					<div className="flex items-center justify-between text-sm py-3">
 						<label className="flex items-center gap-2">
 							<input type="checkbox" className="rounded border-gray-300" />
-							Remember Me
+							Ingat Saya
 						</label>
 						<a
 							href="/"
 							className="text-blue-500 dark:text-blue-300 hover:underline">
-							Forgot Password?
+							Lupa Password?
 						</a>
 					</div>
 
@@ -61,14 +61,14 @@ const LoginForm = () => {
 						className="w-full p-6 bg-blue-500"
 						disabled={loading}>
 						{loading && <LoaderCircle className="h-4 w-4 animate-spin" />}
-						Login
+						Masuk
 					</Button>
 					<div className="flex items-center text-sm">
-						<p className="pr-2">New User?</p>
+						<p className="pr-2">Pengguna Baru?</p>
 						<a
 							href="/register"
 							className="text-blue-500 dark:text-blue-300 hover:underline">
-							Create an account
+							Daftar
 						</a>
 					</div>
 				</form>

@@ -1,8 +1,8 @@
 const DashboardStaff = () => {
 	return (
-		<div>
-			<h1>Halaman staff</h1>
-		</div>
+		<>
+			<p>asd</p>
+		</>
 	);
 };
 
