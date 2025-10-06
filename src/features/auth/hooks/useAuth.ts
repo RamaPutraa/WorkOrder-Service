@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type {
 	LoginRequest,
@@ -22,14 +22,9 @@ const useAuth = () => {
 	const navigate = useNavigate();
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	const { setAuth, logout, loadFromStorage, user, token, isAuthenticated } =
-		useAuthStore();
+	const { setAuth, logout, user, token, isAuthenticated } = useAuthStore();
 
-	useEffect(() => {
-		loadFromStorage();
-	}, [loadFromStorage]);
-
-	// fungsi login
+	// 🔹 fungsi login
 	const login = async (data: LoginRequest) => {
 		setLoading(true);
 		setError(null);
@@ -43,15 +38,15 @@ const useAuth = () => {
 				setError("Token tidak ditemukan");
 				return;
 			}
+
 			setAuth(token, user);
 			notifySuccess("Login berhasil", `Selamat datang ${user.name}`);
-			console.log("Login berhasil:", user);
 			navigate(redirectToRoleDashboard(user.role));
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				setError(error.response?.data.message || "Terjadi kesalahan");
 				notifyError(
-					"Gagal registrasi",
+					"Gagal login",
 					error.response?.data.message || "Terjadi kesalahan"
 				);
 			}
@@ -60,7 +55,7 @@ const useAuth = () => {
 		}
 	};
 
-	// fungsi client register
+	// 🔹 fungsi client register
 	const clientRegister = async (data: RegisterRequest) => {
 		setLoading(true);
 		setError(null);
@@ -90,6 +85,7 @@ const useAuth = () => {
 		}
 	};
 
+	// 🔹 fungsi register perusahaan
 	const registerCompany = async (data: RegisterCompanyRequest) => {
 		setLoading(true);
 		setError(null);
@@ -102,7 +98,7 @@ const useAuth = () => {
 				notifyError("Gagal registrasi", "Token atau data user tidak ditemukan");
 				return;
 			}
-			console.log(user);
+
 			setAuth(token, user);
 			notifySuccess("Registrasi berhasil", `Selamat datang ${user.name}`);
 			navigate(redirectToRoleDashboard(user.role));

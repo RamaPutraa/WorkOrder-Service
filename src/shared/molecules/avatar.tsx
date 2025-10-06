@@ -11,17 +11,20 @@ import useAuth from "@/features/auth/hooks/useAuth";
 import { useDialogStore } from "@/store/dialogStore";
 
 const AvatarDropdown = () => {
-	const { logout } = useAuth();
+	const { user, logout } = useAuth();
 	const { showDialog } = useDialogStore();
 	return (
 		<div>
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
-					<Avatar className="cursor-pointer">
-						{/* Avatar image */}
-						<AvatarImage src="https://i.pravatar.cc/40" alt="User" />
-						<AvatarFallback>U</AvatarFallback>
-					</Avatar>
+					<div className="flex items-center gap-2 cursor-pointer">
+						<Avatar className="cursor-pointer">
+							<AvatarImage src="https://i.pravatar.cc/40" alt={user?.name} />
+							<AvatarFallback>U</AvatarFallback>
+						</Avatar>
+						{/* Nama user */}
+						<span className="text-sm font-medium">{user?.name || "User"}</span>
+					</div>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end" className="w-48">
 					<DropdownMenuLabel>My Account</DropdownMenuLabel>

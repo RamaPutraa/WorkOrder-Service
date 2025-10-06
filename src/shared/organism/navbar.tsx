@@ -8,12 +8,15 @@ import {
 	// NavigationMenuContent,
 	NavigationMenuLink,
 } from "@/components/ui/navigation-menu";
+import useAuth from "@/features/auth/hooks/useAuth";
+import { Button } from "@/components/ui/button";
 
 type NavbarProps = {
 	showMenu?: boolean;
 };
 
 const Navbar = ({ showMenu = false }: NavbarProps) => {
+	const { user } = useAuth();
 	return (
 		<header className="flex items-center justify-between px-6 h-18 border-b bg-background shadow-sm">
 			{/* Left section */}
@@ -47,9 +50,20 @@ const Navbar = ({ showMenu = false }: NavbarProps) => {
 
 			{/* Right section */}
 			<div className="flex items-center gap-4">
-				{/* Dark/Light toggle */}
 				<ToogleTheme />
-				<AvatarDropdown />
+
+				{user ? (
+					<AvatarDropdown />
+				) : (
+					<div className="flex gap-2">
+						<Button asChild size="sm" className="">
+							<a href="/login">Login</a>
+						</Button>
+						<Button asChild variant="outline" size="sm">
+							<a href="/register">Register</a>
+						</Button>
+					</div>
+				)}
 			</div>
 		</header>
 	);

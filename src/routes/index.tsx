@@ -15,9 +15,11 @@ import LandingPage from "@/features/public/landing-page";
 import ProtectedRoute from "./ProtectedRoute";
 import GuestRoute from "./GuestRoute";
 import CompanyRegis from "@/features/auth/pages/company-reg-page";
+import FormPage from "@/features/auth/form/form-page";
 
 const router = createBrowserRouter([
 	{
+		path: "/dashboard/owner",
 		element: <ProtectedRoute allowedRoles={["owner_company"]} />,
 		children: [
 			{
@@ -26,7 +28,16 @@ const router = createBrowserRouter([
 						<AppLayout />
 					</RootLayout>
 				),
-				children: [{ path: "/dashboard/owner", element: <DashboardOwner /> }],
+				children: [
+					{
+						path: "",
+						element: <DashboardOwner />,
+					},
+					{
+						path: "form",
+						element: <FormPage />,
+					},
+				],
 			},
 		],
 	},
