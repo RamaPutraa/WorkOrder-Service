@@ -3,8 +3,6 @@ import FormFields from "@/shared/molecules/form-fields";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 
-import type { FieldConfig } from "@/types/";
-
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";

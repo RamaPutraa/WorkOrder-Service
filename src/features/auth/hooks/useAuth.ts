@@ -1,13 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type {
-	LoginRequest,
-	LoginResponse,
-	RegisterCompanyRequest,
-	RegisterCompanyResponse,
-	RegisterRequest,
-	RegisterResponse,
-} from "@/types/";
+
 import {
 	loginApi,
 	clientRegisterApi,

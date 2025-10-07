@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import type { DialogConfig } from "@/types/dialog";
 
 type DialogState = {
 	isOpen: boolean;

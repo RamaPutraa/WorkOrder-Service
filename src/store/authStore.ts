@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import type { User } from "@/types";
 
 type AuthState = {
 	token: string | null;

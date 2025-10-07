@@ -15,7 +15,7 @@ import LandingPage from "@/features/public/landing-page";
 import ProtectedRoute from "./ProtectedRoute";
 import GuestRoute from "./GuestRoute";
 import CompanyRegis from "@/features/auth/pages/company-reg-page";
-import FormPage from "@/features/auth/form/form-page";
+import FormPage from "@/features/form/pages/form-page";
 
 const router = createBrowserRouter([
 	{

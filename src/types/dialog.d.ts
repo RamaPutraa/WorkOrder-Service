@@ -1,4 +1,4 @@
-export type DialogConfig = {
+type DialogConfig = {
 	title: string;
 	description?: string;
 	confirmText?: string;

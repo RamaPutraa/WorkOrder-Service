@@ -6,16 +6,19 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import type { Control } from "react-hook-form";
-import type { FieldConfig } from "@/types/";
+import { Textarea } from "@/components/ui/textarea";
+import type { Control, FieldValues } from "react-hook-form";
+import type { FieldConfig } from "@/types/form";
 
-type Props = {
-	fields: FieldConfig[];
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	control: Control<any>;
+type Props<T extends FieldValues> = {
+	fields: FieldConfig<T>[];
+	control: Control<T>;
 };
 
-export default function FormFields({ fields, control }: Props) {
+export default function FormFields<T extends FieldValues>({
+	fields,
+	control,
+}: Props<T>) {
 	return (
 		<>
 			{fields.map((field) => (
@@ -27,13 +30,17 @@ export default function FormFields({ fields, control }: Props) {
 						<FormItem>
 							<FormLabel>{field.label}</FormLabel>
 							<FormControl>
-								<Input
-									{...inputField}
-									placeholder={field.placeholder || ""}
-									type={field.type || "text"}
-								/>
+								{field.type === "textarea" ? (
+									<Textarea {...inputField} placeholder={field.placeholder} />
+								) : (
+									<Input
+										{...inputField}
+										type={field.type}
+										placeholder={field.placeholder}
+									/>
+								)}
 							</FormControl>
-							<FormMessage className="text-right" />
+							<FormMessage />
 						</FormItem>
 					)}
 				/>

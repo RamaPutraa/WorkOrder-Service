@@ -1,4 +1,6 @@
-export type FieldType =
+import type { FieldValues, Path } from "react-hook-form";
+
+type FieldType =
 	| "text"
 	| "email"
 	| "password"
@@ -10,8 +12,8 @@ export type FieldType =
 	| "date"
 	| "file";
 
-export type FieldConfig = {
-	name: string;
+type FieldConfig<T extends FieldValues = FieldValues> = {
+	name: Path<T>;
 	label: string;
 	placeholder?: string;
 	type: FieldType;

@@ -1,5 +1,4 @@
 import { useDialogStore } from "@/store/dialogStore";
-import type { DialogConfig } from "@/types/dialog";
 import {
 	AlertDialog,
 	AlertDialogAction,
