@@ -8,10 +8,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { Control, FieldValues } from "react-hook-form";
-import type { FieldConfig } from "@/types/form";
 
 type Props<T extends FieldValues> = {
-	fields: FieldConfig<T>[];
+	fields: FieldConfig[];
 	control: Control<T>;
 };
 

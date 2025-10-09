@@ -1,11 +1,9 @@
-import type { FieldType } from "@/types/form";
-
-export type FieldOption = {
+type FieldOption = {
 	key?: string;
 	value: string;
 };
 
-export type Field = {
+type Field = {
 	order: number | null;
 	label: string;
 	type: FieldType;
@@ -13,10 +11,10 @@ export type Field = {
 	placeholder?: string | null;
 	min?: number | null;
 	max?: number | null;
-	options: FieldOption[];
+	options?: FieldOption[];
 };
 
-export type FormPayload = {
+type CreateFormRequest = {
 	title: string;
 	description: string;
 	accessType: string;
@@ -24,3 +22,7 @@ export type FormPayload = {
 	allowedPositions: string[];
 	fields: Field[];
 };
+
+type FormResponse = ApiResponse<{
+	form: Form;
+}>;

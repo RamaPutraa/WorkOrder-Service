@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { FieldItem } from "./field-types/field-item";
-import type { Field } from "../types/form";
+import { Card } from "@/components/ui/card";
+import { FieldItem } from "./field-item";
 
 type Props = {
 	fields: Field[];
@@ -17,20 +17,34 @@ export const DynamicFields: React.FC<Props> = ({
 	onUpdate,
 }) => {
 	return (
-		<div className="space-y-4">
-			<h3 className="font-semibold text-lg">Dynamic Fields</h3>
+		<div className="space-y-6">
 			{fields.map((field, index) => (
-				<FieldItem
+				<Card
 					key={index}
-					index={index}
-					field={field}
-					onRemove={() => onRemove(index)}
-					onUpdate={(updated) => onUpdate(index, updated)}
-				/>
+					className="rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition overflow-hidden relative">
+					{/* Garis biru di kiri */}
+					<div className="absolute left-0 top-0 h-full w-1 bg-blue-500 rounded-l-lg" />
+
+					<div className="p-6">
+						<FieldItem
+							field={field}
+							onRemove={() => onRemove(index)}
+							onUpdate={(updated) => onUpdate(index, updated)}
+						/>
+					</div>
+				</Card>
 			))}
-			<Button type="button" variant="secondary" onClick={onAdd}>
-				+ Tambah Field
-			</Button>
+
+			{/* Tombol Tambah */}
+			<div className="flex justify-center pt-4">
+				<Button
+					type="button"
+					variant="outline"
+					className="rounded-full px-6 py-2 text-blue-600 border-blue-500 hover:bg-blue-50"
+					onClick={onAdd}>
+					+ Tambah Pertanyaan
+				</Button>
+			</div>
 		</div>
 	);
 };

@@ -1,10 +1,6 @@
 import React from "react";
-import { FormBuilder } from "../components/field-builder";
-import type { FormSchema } from "../schemas/formSchema";
+import { FormBuilder } from "../components/form-builder";
 const FormCreatePage: React.FC = () => {
-	const handleCreateForm = async (data: FormSchema) => {
-		console.log("Form data:", data);
-	};
 	return (
 		<div className="container py-8 space-y-6">
 			<div className="flex flex-col space-y-2">
@@ -13,7 +9,7 @@ const FormCreatePage: React.FC = () => {
 					Lengkapi detail form dan tambahkan field secara dinamis di bawah.
 				</p>
 			</div>
-			<FormBuilder onSubmitForm={handleCreateForm} />
+			<FormBuilder />
 		</div>
 	);
 };

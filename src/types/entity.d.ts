@@ -28,3 +28,14 @@ type Position = {
 	name: string;
 	companyId: number;
 };
+
+// forms
+type Form = {
+	_id: number;
+	title: string;
+	description: string;
+	accessType: string;
+	accessibleBy: string[];
+	allowedPositions: { _id: string; name: string }[];
+	fields: Field[];
+};

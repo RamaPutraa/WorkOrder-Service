@@ -7,7 +7,6 @@ import { useForm } from "react-hook-form";
 import { clientRegisterSchema } from "../schemas/authSchema";
 import { z } from "zod";
 import { LoaderCircle } from "lucide-react";
-import type { FieldConfig } from "@/types/form";
 const RegisterForm = () => {
 	const { clientRegister, loading } = useAuth();
 	const form = useForm<z.infer<typeof clientRegisterSchema>>({
@@ -20,7 +19,7 @@ const RegisterForm = () => {
 		},
 	});
 
-	const registerFields: FieldConfig<z.infer<typeof clientRegisterSchema>>[] = [
+	const registerFields: FieldConfig[] = [
 		{
 			name: "name",
 			label: "Nama Pengguna",
