@@ -1,101 +1,111 @@
-import React from "react";
-import { useForm, useFieldArray } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Form } from "@/components/ui/form";
-import { formSchema, type FormSchema } from "../schemas/formSchema";
-import { DynamicFields } from "./dyanamic-fields";
-import FormFields from "@/shared/molecules/form-fields";
-import type { FieldConfig } from "@/types/form";
-type Props = { onSubmitForm?: (data: FormSchema) => Promise<void> | void };
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { DynamicFields } from "./dynamic-fields";
+import type { FormPayload, Field } from "../types/form";
 
-export const FormBuilder: React.FC<Props> = ({ onSubmitForm }) => {
-	const form = useForm<FormSchema>({
-		resolver: zodResolver(formSchema),
-		defaultValues: {
-			title: "",
-			description: "",
-			accessType: "",
-			accessibleBy: [],
-			allowedPositions: [],
-			fields: [],
-		},
+export const FormBuilder = () => {
+	const [formData, setFormData] = useState<FormPayload>({
+		title: "",
+		description: "",
+		accessType: "",
+		accessibleBy: [],
+		allowedPositions: [],
+		fields: [],
 	});
-	const { control, handleSubmit, setValue, reset } = form;
-	const { fields, append, remove, update } = useFieldArray({
-		control,
-		name: "fields",
-	});
-	const staticFields: FieldConfig<FormSchema>[] = [
-		{ name: "title", label: "Judul Form", type: "text" },
-		{ name: "description", label: "Deskripsi", type: "textarea" },
-		{ name: "accessType", label: "Tipe Akses", type: "text" },
-	];
-	const handleSubmitForm = async (data: FormSchema) => {
-		if (onSubmitForm) {
-			await onSubmitForm(data);
-			return;
-		}
-		try {
-			const res = await fetch("/api/form", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(data),
-			});
-			const result = await res.json();
-			if (!res.ok) throw new Error(result.message);
-			alert("Form berhasil disimpan!");
-			reset();
-		} catch (err) {
-			console.error(err);
-			alert("Terjadi kesalahan saat menyimpan form");
-		}
+
+	const handleAddField = () => {
+		const newField: Field = {
+			order: formData.fields.length + 1,
+			label: "",
+			type: "text",
+			required: false,
+			placeholder: "",
+			min: null,
+			max: null,
+			options: [],
+		};
+		setFormData((prev) => ({
+			...prev,
+			fields: [...prev.fields, newField],
+		}));
 	};
+
+	const handleRemoveField = (index: number) => {
+		setFormData((prev) => ({
+			...prev,
+			fields: prev.fields.filter((_, i) => i !== index),
+		}));
+	};
+
+	const handleUpdateField = (index: number, updatedField: Partial<Field>) => {
+		setFormData((prev) => {
+			const newFields = [...prev.fields];
+			newFields[index] = { ...newFields[index], ...updatedField };
+			return { ...prev, fields: newFields };
+		});
+	};
+
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
+		console.log("Form Data:", formData);
+		alert("Form dikirim! Cek console.log untuk hasilnya");
+	};
+
 	return (
-		<Form {...form}>
-			<form
-				onSubmit={handleSubmit(handleSubmitForm)}
-				className="space-y-6 p-6 bg-background rounded-lg shadow-sm">
-				{/* ✅ Static fields */}
-				<FormFields fields={staticFields} control={control} />
-				<div>
-					<label className="">Accessible By (pisahkan koma)</label>
-					<input
-						className="w-full border rounded px-3 py-2 mt-1"
-						onChange={(e) =>
-							setValue(
-								"accessibleBy",
-								e.target.value.split(",").map((s) => s.trim())
-							)
-						}
-					/>
-				</div>
-				<div>
-					<label className="">Allowed Positions (pisahkan koma)</label>
-					<input
-						className="w-full border rounded px-3 py-2 mt-1"
-						onChange={(e) =>
-							setValue(
-								"allowedPositions",
-								e.target.value.split(",").map((s) => s.trim())
-							)
-						}
-					/>
-				</div>
-				<Separator />
-				<DynamicFields
-					fields={fields}
-					append={append}
-					remove={remove}
-					update={update}
-					control={control}
+		<form
+			onSubmit={handleSubmit}
+			className="space-y-6 p-6 bg-background rounded-lg shadow-sm border">
+			{/* --- Input utama --- */}
+			<div className="space-y-2">
+				<Label>Judul Form</Label>
+				<Input
+					value={formData.title}
+					onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+					placeholder="Masukkan judul form"
 				/>
-				<Separator />
-				<Button type="submit" className="w-full">
-					Simpan Form
-				</Button>
-			</form>
-		</Form>
+			</div>
+
+			<div className="space-y-2">
+				<Label>Deskripsi</Label>
+				<Textarea
+					value={formData.description}
+					onChange={(e) =>
+						setFormData({ ...formData, description: e.target.value })
+					}
+					placeholder="Tuliskan deskripsi form"
+				/>
+			</div>
+
+			<div className="space-y-2">
+				<Label>Tipe Akses</Label>
+				<Input
+					value={formData.accessType}
+					onChange={(e) =>
+						setFormData({ ...formData, accessType: e.target.value })
+					}
+					placeholder="Contoh: publik, privat, internal"
+				/>
+			</div>
+
+			<Separator />
+
+			{/* --- Field Dinamis --- */}
+			<DynamicFields
+				fields={formData.fields}
+				onAdd={handleAddField}
+				onRemove={handleRemoveField}
+				onUpdate={handleUpdateField}
+			/>
+
+			<Separator />
+
+			<Button type="submit" className="w-full">
+				Simpan Form
+			</Button>
+		</form>
 	);
 };

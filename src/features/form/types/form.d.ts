@@ -1,14 +1,21 @@
-export type FieldOption = { key: string; value: string };
+import type { FieldType } from "@/types/form";
+
+export type FieldOption = {
+	key?: string;
+	value: string;
+};
+
 export type Field = {
 	order: number | null;
 	label: string;
 	type: FieldType;
 	required: boolean;
-	placeholder: string | null;
-	min: number | null;
-	max: number | null;
+	placeholder?: string | null;
+	min?: number | null;
+	max?: number | null;
 	options: FieldOption[];
 };
+
 export type FormPayload = {
 	title: string;
 	description: string;

@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "../schemas/authSchema";
 
 import useAuth from "../hooks/useAuth";
+import type { FieldConfig } from "@/types/form";
 const LoginForm = () => {
 	const { login, loading } = useAuth();
 	const form = useForm<z.infer<typeof loginSchema>>({
@@ -19,7 +20,7 @@ const LoginForm = () => {
 		},
 	});
 
-	const loginFields: FieldConfig[] = [
+	const loginFields: FieldConfig<z.infer<typeof loginSchema>>[] = [
 		{
 			name: "email",
 			label: "Alamat Email",
