@@ -86,7 +86,7 @@ export const FieldItem: React.FC<Props> = ({ field, onRemove, onUpdate }) => {
 			<div className="border-t-1 flex items-center justify-end mt-20 pt-5 space-x-2">
 				{/* Toggle Wajib diisi */}
 				<div className="flex items-center gap-2">
-					<Label className="text-sm text-gray-700">Wajib diisi</Label>
+					<Label className="text-sm text-muted-foreground">Wajib diisi</Label>
 					<Switch
 						checked={field.required}
 						onCheckedChange={(checked) =>

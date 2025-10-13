@@ -19,7 +19,7 @@ type CreateFormRequest = {
 	description: string;
 	accessType: string;
 	accessibleBy: string[];
-	allowedPositions: string[];
+	allowedPositions: { _id: string; name: string }[];
 	fields: Field[];
 };
 
