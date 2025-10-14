@@ -27,6 +27,8 @@ type Position = {
 	_id: number;
 	name: string;
 	companyId: number;
+	createAt: string;
+	updateAt: string;
 };
 
 // forms

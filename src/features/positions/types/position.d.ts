@@ -1,1 +1,6 @@
-type PositionResponse = ApiResponse<Position[]>;
+type PositionRequest = {
+	name: string;
+};
+type GetAllPosition = ApiResponse<Position[]>;
+
+type SinglePositionResponse = ApiResponse<Position>;
