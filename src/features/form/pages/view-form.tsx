@@ -38,7 +38,7 @@ const ViewForm: React.FC = () => {
 	}
 
 	return (
-		<div className="container py-8 px-10">
+		<div className="container">
 			<div className="flex items-center justify-between mb-8">
 				<div className="flex flex-col space-y-2">
 					<h1 className="text-2xl font-bold">List Data Form</h1>

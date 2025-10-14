@@ -12,7 +12,7 @@ const AppLayout = () => {
 					{/* Navbar */}
 					<Navbar />
 					{/* Main content */}
-					<main className="flex-1 px-15 py-5">
+					<main className="flex-1 px-20 py-5 mt-10">
 						<Outlet />
 					</main>
 				</div>

@@ -14,7 +14,7 @@ const FormCreatePage: React.FC = () => {
 	const isSubmitting = formRef.current?.isSubmitting;
 	const navigate = useNavigate();
 	return (
-		<div className="container py-8 px-10">
+		<div className="container">
 			<div className="flex items-center justify-between mb-8">
 				<div className="flex flex-col space-y-2">
 					<h1 className="text-2xl font-bold">Buat Form Baru</h1>
