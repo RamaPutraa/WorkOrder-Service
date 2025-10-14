@@ -58,7 +58,7 @@ const AppSidebar = () => {
 									<SidebarMenu className="pl-6 mt-1 space-y-1">
 										<SidebarMenuItem>
 											<SidebarMenuButton asChild>
-												<a href="/dashboard/owner/forms">
+												<a href="/dashboard/owner/company">
 													<List className="w-4 h-4" />
 													<span>Company</span>
 												</a>
@@ -90,7 +90,7 @@ const AppSidebar = () => {
 										</SidebarMenuItem>
 										<SidebarMenuItem>
 											<SidebarMenuButton asChild>
-												<a href="/dashboard/owner/form/create">
+												<a href="/dashboard/owner/services">
 													<List className="w-4 h-4" />
 													<span>Work Order</span>
 												</a>
