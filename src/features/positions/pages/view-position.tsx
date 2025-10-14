@@ -9,12 +9,15 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { Plus } from "lucide-react";
 
 const PositionView: React.FC = () => {
 	const [positions, setPositions] = useState<Position[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
-
+	const navigate = useNavigate();
 	useEffect(() => {
 		const fetchPositions = async (): Promise<void> => {
 			try {
@@ -50,13 +53,21 @@ const PositionView: React.FC = () => {
 
 	return (
 		<div className="container py-10 px-6">
-			<div className="flex flex-col space-y-2 mb-8">
-				<h1 className="text-3xl font-bold tracking-tight">
-					List Data Posisi Pegawai
-				</h1>
-				<p className="text-muted-foreground">
-					Berikut merupakan daftar posisi pegawai yang dimiliki oleh perusahaan.
-				</p>
+			<div className="flex items-center justify-between mb-8">
+				<div className="flex flex-col space-y-2">
+					<h1 className="text-2xl font-bold">List Data Posisi Pegawai</h1>
+					<p className="text-muted-foreground">
+						Berikut merupakan daftar posisi pegawai yang dimiliki oleh
+						perusahaan.
+					</p>
+				</div>
+
+				<Button
+					className="bg-primary hover:bg-primary/90"
+					onClick={() => navigate("/dashboard/owner/positions/create")}>
+					<Plus className="h-4 w-4" />
+					Tambah Posisi
+				</Button>
 			</div>
 
 			<Card className="p-6 border shadow-md rounded-2xl bg-white">

@@ -18,6 +18,7 @@ import CompanyRegis from "@/features/auth/pages/company-reg-page";
 import CreateFormPage from "@/features/form/pages/create-form";
 import FormPage from "@/features/form/pages/view-form";
 import PositionPage from "@/features/positions/pages/view-position";
+import CreatePositionPage from "@/features/positions/pages/create-position";
 
 const router = createBrowserRouter([
 	{
@@ -46,6 +47,10 @@ const router = createBrowserRouter([
 					{
 						path: "positions",
 						element: <PositionPage />,
+					},
+					{
+						path: "positions/create",
+						element: <CreatePositionPage />,
 					},
 				],
 			},

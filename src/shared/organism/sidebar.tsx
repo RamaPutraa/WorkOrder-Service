@@ -1,12 +1,4 @@
-import {
-	Home,
-	Inbox,
-	Search,
-	Settings,
-	User,
-	PlusCircle,
-	List,
-} from "lucide-react";
+import { Home, Inbox, Settings, List } from "lucide-react";
 
 import {
 	Sidebar,
@@ -44,12 +36,22 @@ const AppSidebar = () => {
 								</SidebarMenuButton>
 							</SidebarMenuItem>
 
-							{/* ====== Form ====== */}
+							{/* ====== Work Order ====== */}
+							<SidebarMenuItem>
+								<SidebarMenuButton asChild>
+									<a href="#">
+										<Settings className="w-4 h-4" />
+										<span>Work Order</span>
+									</a>
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+
+							{/* ====== Master Data ====== */}
 							<Collapsible defaultOpen>
 								<CollapsibleTrigger asChild>
 									<SidebarMenuButton>
 										<Inbox className="w-4 h-4" />
-										<span>Form</span>
+										<span>Master Data</span>
 									</SidebarMenuButton>
 								</CollapsibleTrigger>
 								<CollapsibleContent>
@@ -58,91 +60,45 @@ const AppSidebar = () => {
 											<SidebarMenuButton asChild>
 												<a href="/dashboard/owner/forms">
 													<List className="w-4 h-4" />
-													<span>Lihat Form</span>
+													<span>Company</span>
+												</a>
+											</SidebarMenuButton>
+										</SidebarMenuItem>
+										<SidebarMenuItem>
+											<SidebarMenuButton asChild>
+												<a href="/dashboard/owner/positions">
+													<List className="w-4 h-4" />
+													<span>Position</span>
+												</a>
+											</SidebarMenuButton>
+										</SidebarMenuItem>
+										<SidebarMenuItem>
+											<SidebarMenuButton asChild>
+												<a href="/dashboard/owner/forms">
+													<List className="w-4 h-4" />
+													<span>Form</span>
 												</a>
 											</SidebarMenuButton>
 										</SidebarMenuItem>
 										<SidebarMenuItem>
 											<SidebarMenuButton asChild>
 												<a href="/dashboard/owner/form/create">
-													<PlusCircle className="w-4 h-4" />
-													<span>Tambah Form</span>
-												</a>
-											</SidebarMenuButton>
-										</SidebarMenuItem>
-									</SidebarMenu>
-								</CollapsibleContent>
-							</Collapsible>
-
-							{/* ====== Pegawai ====== */}
-							<Collapsible>
-								<CollapsibleTrigger asChild>
-									<SidebarMenuButton>
-										<User className="w-4 h-4" />
-										<span>Pegawai</span>
-									</SidebarMenuButton>
-								</CollapsibleTrigger>
-								<CollapsibleContent>
-									<SidebarMenu className="pl-6 mt-1 space-y-1">
-										<SidebarMenuItem>
-											<SidebarMenuButton asChild>
-												<a href="/dashboard/owner/pegawai">
 													<List className="w-4 h-4" />
-													<span>Lihat Pegawai</span>
+													<span>Service</span>
 												</a>
 											</SidebarMenuButton>
 										</SidebarMenuItem>
 										<SidebarMenuItem>
 											<SidebarMenuButton asChild>
-												<a href="/dashboard/owner/pegawai/create">
-													<PlusCircle className="w-4 h-4" />
-													<span>Tambah Pegawai</span>
-												</a>
-											</SidebarMenuButton>
-										</SidebarMenuItem>
-									</SidebarMenu>
-								</CollapsibleContent>
-							</Collapsible>
-
-							{/* ====== Posisi ====== */}
-							<Collapsible>
-								<CollapsibleTrigger asChild>
-									<SidebarMenuButton>
-										<Search className="w-4 h-4" />
-										<span>Posisi</span>
-									</SidebarMenuButton>
-								</CollapsibleTrigger>
-								<CollapsibleContent>
-									<SidebarMenu className="pl-6 mt-1 space-y-1">
-										<SidebarMenuItem>
-											<SidebarMenuButton asChild>
-												<a href="/dashboard/owner/positions">
+												<a href="/dashboard/owner/form/create">
 													<List className="w-4 h-4" />
-													<span>Lihat Posisi</span>
-												</a>
-											</SidebarMenuButton>
-										</SidebarMenuItem>
-										<SidebarMenuItem>
-											<SidebarMenuButton asChild>
-												<a href="/dashboard/owner/posisi/create">
-													<PlusCircle className="w-4 h-4" />
-													<span>Tambah Posisi</span>
+													<span>Work Order</span>
 												</a>
 											</SidebarMenuButton>
 										</SidebarMenuItem>
 									</SidebarMenu>
 								</CollapsibleContent>
 							</Collapsible>
-
-							{/* ====== Settings ====== */}
-							<SidebarMenuItem>
-								<SidebarMenuButton asChild>
-									<a href="#">
-										<Settings className="w-4 h-4" />
-										<span>Settings</span>
-									</a>
-								</SidebarMenuButton>
-							</SidebarMenuItem>
 						</SidebarMenu>
 					</SidebarGroupContent>
 				</SidebarGroup>

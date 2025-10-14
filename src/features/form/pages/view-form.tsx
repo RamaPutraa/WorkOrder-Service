@@ -2,11 +2,14 @@ import React, { useEffect, useState } from "react";
 import { getFormsApi } from "../services/formService";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const ViewForm: React.FC = () => {
 	const [forms, setForms] = useState<Form[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		const fetchForms = async (): Promise<void> => {
@@ -43,11 +46,20 @@ const ViewForm: React.FC = () => {
 
 	return (
 		<div className="container py-8 px-10">
-			<div className="flex flex-col space-y-2 mb-8">
-				<h1 className="text-2xl font-bold">List Data Form</h1>
-				<p className="text-muted-foreground">
-					Berikut merupakan list form yang dimiliki oleh perusahaan.
-				</p>
+			<div className="flex items-center justify-between mb-8">
+				<div className="flex flex-col space-y-2">
+					<h1 className="text-2xl font-bold">List Data Form</h1>
+					<p className="text-muted-foreground">
+						Berikut merupakan list form yang dimiliki oleh perusahaan.
+					</p>
+				</div>
+
+				<Button
+					className="bg-primary hover:bg-primary/90"
+					onClick={() => navigate("/dashboard/owner/form/create")}>
+					<Plus className="h-4 w-4" />
+					Tambah Form
+				</Button>
 			</div>
 
 			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

@@ -6,18 +6,28 @@ import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 const FormCreatePage: React.FC = () => {
 	const formRef = useRef<FormBuilderRef>(null);
 	const [fields, setFields] = useState<Field[]>([]);
 	const isSubmitting = formRef.current?.isSubmitting;
+	const navigate = useNavigate();
 	return (
 		<div className="container py-8 px-10">
-			<div className="flex flex-col space-y-2 mb-8">
-				<h1 className="text-2xl font-bold">Buat Form Baru</h1>
-				<p className="text-muted-foreground">
-					Lengkapi detail form dan tambahkan field secara dinamis di bawah.
-				</p>
+			<div className="flex items-center justify-between mb-8">
+				<div className="flex flex-col space-y-2">
+					<h1 className="text-2xl font-bold">Buat Form Baru</h1>
+					<p className="text-muted-foreground">
+						Lengkapi detail form dan tambahkan field secara dinamis di bawah.
+					</p>
+				</div>
+				<Button
+					onClick={() => navigate(-1)}
+					className="bg-primary hover:bg-primary/90">
+					<ArrowLeft className="h-4 w-4" />
+					Kembali
+				</Button>
 			</div>
 
 			<div className="flex items-start gap-8">
