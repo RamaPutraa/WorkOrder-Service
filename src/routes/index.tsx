@@ -15,7 +15,9 @@ import LandingPage from "@/features/public/landing-page";
 import ProtectedRoute from "./ProtectedRoute";
 import GuestRoute from "./GuestRoute";
 import CompanyRegis from "@/features/auth/pages/company-reg-page";
-import FormPage from "@/features/form/pages/form-page";
+import CreateFormPage from "@/features/form/pages/create-form";
+import FormPage from "@/features/form/pages/view-form";
+import PositionPage from "@/features/positions/pages/view-position";
 
 const router = createBrowserRouter([
 	{
@@ -34,8 +36,16 @@ const router = createBrowserRouter([
 						element: <DashboardOwner />,
 					},
 					{
-						path: "form",
+						path: "forms",
 						element: <FormPage />,
+					},
+					{
+						path: "form/create",
+						element: <CreateFormPage />,
+					},
+					{
+						path: "positions",
+						element: <PositionPage />,
 					},
 				],
 			},

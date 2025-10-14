@@ -1,0 +1,1 @@
+type PositionResponse = ApiResponse<Position[]>;

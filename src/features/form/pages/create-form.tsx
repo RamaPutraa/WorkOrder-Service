@@ -35,7 +35,7 @@ const FormCreatePage: React.FC = () => {
 						<div className="space-y-2 mb-">
 							<Button
 								variant="outline"
-								className="rounded-full px-6 py-2 text-blue-600 border-blue-500 hover:bg-blue-50 w-full"
+								className="rounded-full px-6 py-2 text-primary border-primary hover:bg-blue-50 w-full"
 								onClick={() => formRef.current?.addField()}
 								disabled={isSubmitting}>
 								+ Tambah Pertanyaan

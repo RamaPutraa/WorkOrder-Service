@@ -24,5 +24,5 @@ type CreateFormRequest = {
 };
 
 type FormResponse = ApiResponse<{
-	form: Form;
+	forms: Form[];
 }>;
