@@ -21,6 +21,7 @@ import PositionPage from "@/features/positions/pages/view-position";
 import CreatePositionPage from "@/features/positions/pages/create-position";
 import ViewCompany from "@/features/company/pages/view-company";
 import ViewService from "@/features/services-wo/pages/view-service";
+import CreateService from "@/features/services-wo/pages/create-service";
 
 const router = createBrowserRouter([
 	{
@@ -61,6 +62,10 @@ const router = createBrowserRouter([
 					{
 						path: "services",
 						element: <ViewService />,
+					},
+					{
+						path: "services/create",
+						element: <CreateService />,
 					},
 				],
 			},

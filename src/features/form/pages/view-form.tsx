@@ -90,7 +90,7 @@ const ViewForm: React.FC = () => {
 											{form.description}
 										</p>
 										<p className="text-xs text-muted-foreground mt-2">
-											Access: {form.accessType}
+											Access: {form.formType}
 										</p>
 									</div>
 

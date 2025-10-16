@@ -17,9 +17,7 @@ type Field = {
 type CreateFormRequest = {
 	title: string;
 	description: string;
-	accessType: string;
-	accessibleBy: string[];
-	allowedPositions: { _id: string; name: string }[];
+	formType: string;
 	fields: Field[];
 };
 

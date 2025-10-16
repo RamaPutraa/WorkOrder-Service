@@ -1,0 +1,143 @@
+{
+	"title": "Perawatan Taman dan Lanskap Bulanan",
+	"description": "Layanan pemeliharaan taman, termasuk pemotongan rumput, pemupukan, dan penataan tanaman.",
+	"accessType": "public",
+	"isActive": true,
+	"requiredStaff": [
+		{
+			"positionId": "650f1d3c2f1b2c7f2d333333",
+			"minimumStaff": 2,
+			"maximumStaff": 4
+		}
+	],
+	"workOrderForms": [
+		{
+			"order": 1,
+			"formId": "f002",
+			"fillableByRoles": ["staff", "manager"],
+			"viewableByRoles": ["staff", "manager"],
+			"fillableByPositionIds": ["650f1d3c2f1b2c7f2d333333"],
+			"viewableByPositionIds": ["650f1d3c2f1b2c7f2d333333"]
+		}
+	],
+	"reportForms": [
+		{
+			"order": 1,
+			"formId": "f002",
+			"fillableByRoles": ["staff", "manager", "client"],
+			"viewableByRoles": ["staff", "manager", "client"],
+			"fillableByPositionIds": ["650f1d3c2f1b2c7f2d333333"],
+			"viewableByPositionIds": ["650f1d3c2f1b2c7f2d333333"]
+		}
+	]
+}
+
+{
+    "_id": "671ca951fa8f4a001b22a101",
+    "companyId": "671ca951fa8f4a001b22a111",
+    "title": "Cleaning Service",
+    "description": "Daily building and office cleaning service.",
+    "accessType": "public",
+    "isActive": true,
+    "requiredStaff": [
+      {
+        "position": {
+          "_id": "p001",
+          "name": "Cleaner"
+        },
+        "minimumStaff": 2,
+        "maximumStaff": 5
+      },
+      {
+        "position": {
+          "_id": "p002",
+          "name": "Wowww"
+        },
+        "minimumStaff": 2,
+        "maximumStaff": 5
+      }
+    ],
+    "workOrderForms": [
+      {
+        "order": 1,
+        "fillableByRoles": [
+          "staff",
+          "manager"
+        ],
+        "viewableByRoles": [
+          "staff",
+          "manager"
+        ],
+        "fillableByPositions": [
+          {
+            "_id": "p001",
+            "name": "Cleaner"
+          },
+          {
+            "_id": "p002",
+            "name": "Wowww"
+          }
+        ],
+        "viewableByPositions": [
+          {
+            "_id": "p001",
+            "name": "Cleaner"
+          },
+          {
+            "_id": "p002",
+            "name": "Wowww"
+          }
+        ],
+        "form": {
+          "_id": "fee6a8c5-b38e-4056-a05a-48c87937824c",
+          "title": "Inspeksi lokasi",
+          "description": "isi form ini",
+          "formType": "report"
+        }
+      }
+    ],
+    "reportForms": [
+      {
+        "order": 1,
+        "fillableByRoles": [
+          "staff",
+          "manager",
+          "client"
+        ],
+        "viewableByRoles": [
+          "staff",
+          "manager",
+          "client"
+        ],
+        "fillableByPositions": [
+          {
+            "_id": "p001",
+            "name": "Cleaner"
+          },
+          {
+            "_id": "p002",
+            "name": "Wowww"
+          }
+        ],
+        "viewableByPositions": [
+          {
+            "_id": "p001",
+            "name": "Cleaner"
+          },
+          {
+            "_id": "p002",
+            "name": "Wowww"
+          }
+        ],
+        "form": {
+          "_id": "b12f9e3a-4c1d-4b25-b1df-9e3216f50aaf",
+          "title": "Laporan Inspeksi Gedung Kantor",
+          "description": "Form ini digunakan untuk mencatat hasil inspeksi rutin terhadap kondisi fasilitas gedung kantor.",
+          "formType": "report"
+        }
+      }
+    ],
+    "createdAt": "2025-10-07T08:00:00Z",
+    "updatedAt": "2025-10-07T08:00:00Z"
+  },
+

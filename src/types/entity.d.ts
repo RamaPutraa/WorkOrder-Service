@@ -33,11 +33,9 @@ type Position = {
 
 // forms
 type Form = {
-	_id: number;
+	_id: string;
 	title: string;
 	description: string;
-	accessType: string;
-	accessibleBy: string[];
-	allowedPositions: { _id: string; name: string }[];
+	formType: string;
 	fields: Field[];
 };

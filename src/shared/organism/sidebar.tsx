@@ -82,7 +82,7 @@ const AppSidebar = () => {
 										</SidebarMenuItem>
 										<SidebarMenuItem>
 											<SidebarMenuButton asChild>
-												<a href="/dashboard/owner/form/create">
+												<a href="/dashboard/owner/services">
 													<List className="w-4 h-4" />
 													<span>Service</span>
 												</a>
@@ -90,7 +90,7 @@ const AppSidebar = () => {
 										</SidebarMenuItem>
 										<SidebarMenuItem>
 											<SidebarMenuButton asChild>
-												<a href="/dashboard/owner/services">
+												<a href="/dashboard/owner/service">
 													<List className="w-4 h-4" />
 													<span>Work Order</span>
 												</a>

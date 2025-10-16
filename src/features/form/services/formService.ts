@@ -21,11 +21,3 @@ export const getPositions = async (): Promise<GetPositionsResponse> => {
 	const response = await apiCLient.get<GetPositionsResponse>("/positions");
 	return response.data;
 };
-
-// Dummy untuk akses user
-export const getAccessTypes = async () => {
-	return [
-		{ key: "manager", name: "Manager" },
-		{ key: "staff", name: "Staff" },
-	];
-};
