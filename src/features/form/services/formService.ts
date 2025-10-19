@@ -7,10 +7,10 @@ export const getFormsApi = async () => {
 	return response.data;
 };
 
-// export const getFormByIdApi = async (id: string) => {
-// 	const response = await api.get<GetFormByIdResponse>(`/forms/${id}`);
-// 	return response.data;
-// };
+export const getFormByIdApi = async (id: string) => {
+	const response = await apiCLient.get<GetFormByIdResponse>(`/forms/${id}`);
+	return response.data;
+};
 
 export const createFormApi = async (data: CreateFormRequest) => {
 	const response = await apiCLient.post<FormResponse>("/forms", data);

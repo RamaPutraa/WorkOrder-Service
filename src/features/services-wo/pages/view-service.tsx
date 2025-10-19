@@ -18,6 +18,7 @@ const ViewService: React.FC = () => {
 				setLoading(true);
 				const res = await getServicesWoApi();
 				setServices(res.data || []);
+				console.log("📋 Semua services:", res.data);
 			} catch {
 				setError("Gagal memuat data service");
 			} finally {

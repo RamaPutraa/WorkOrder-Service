@@ -24,7 +24,7 @@ type Company = CompanyMinimal & {
 
 // potisions
 type Position = {
-	_id: number;
+	_id: string;
 	name: string;
 	companyId: number;
 	createAt: string;

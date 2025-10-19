@@ -86,7 +86,13 @@ const ViewForm: React.FC = () => {
 								<Card className="p-4 flex flex-col justify-between border shadow-sm transition-all">
 									<div>
 										<h2 className="text-lg font-semibold">{form.title}</h2>
-										<p className="text-sm text-muted-foreground mt-1">
+										<p
+											className="text-sm text-muted-foreground mt-1 overflow-hidden text-ellipsis"
+											style={{
+												display: "-webkit-box",
+												WebkitLineClamp: 2,
+												WebkitBoxOrient: "vertical",
+											}}>
 											{form.description}
 										</p>
 										<p className="text-xs text-muted-foreground mt-2">

@@ -4,9 +4,8 @@ type FieldType =
 	| "password"
 	| "number"
 	| "textarea"
-	| "select"
-	| "checkbox"
-	| "radio"
+	| "single_select"
+	| "multi_select"
 	| "date"
 	| "file";
 

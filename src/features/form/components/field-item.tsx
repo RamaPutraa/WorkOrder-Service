@@ -35,11 +35,9 @@ export const FieldItem: React.FC<Props> = ({ field, onRemove, onUpdate }) => {
 				return <FieldNumber field={field} onUpdate={onUpdate} />;
 			case "date":
 				return <FieldOption field={field} onUpdate={onUpdate} />;
-			case "select":
+			case "multi_select":
 				return <FieldOption field={field} onUpdate={onUpdate} />;
-			case "checkbox":
-				return <FieldOption field={field} onUpdate={onUpdate} />;
-			case "radio":
+			case "single_select":
 				return <FieldOption field={field} onUpdate={onUpdate} />;
 			default:
 				return null;
@@ -72,9 +70,8 @@ export const FieldItem: React.FC<Props> = ({ field, onRemove, onUpdate }) => {
 							<SelectItem value="textarea">Paragraf</SelectItem>
 							<SelectItem value="number">Angka</SelectItem>
 							<SelectItem value="date">Tanggal</SelectItem>
-							<SelectItem value="select">Dropdown</SelectItem>
-							<SelectItem value="checkbox">Pilihan Ganda</SelectItem>
-							<SelectItem value="radio">Pilihan Tunggal</SelectItem>
+							<SelectItem value="multi_select">Pilihan Ganda</SelectItem>
+							<SelectItem value="single_select">Pilihan Tunggal</SelectItem>
 						</SelectContent>
 					</Select>
 				</div>
