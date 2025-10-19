@@ -1,116 +1,347 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { notifyError, notifySuccess } from "@/lib/toast-helper";
 
-export type RoleConfig = {
+// API services
+import { getPositionsApi } from "@/features/positions/services/positionService";
+import {
+	getFormsApi,
+	getFormByIdApi,
+} from "@/features/form/services/formService";
+import { createServiceApi } from "@/features/services-wo/services/servicesWo";
+
+// === Types ===
+type Status = {
+	value: string;
+	label: string;
+};
+
+type RoleConfig = {
 	fillableByRoles: string[];
 	fillableByPositionIds: string[];
 	viewableByRoles: string[];
 	viewableByPositionIds: string[];
 };
 
-type FormAccessConfig = Record<string, RoleConfig>;
+export const useCreateService = () => {
+	const navigate = useNavigate();
 
-const emptyConfig: RoleConfig = {
-	fillableByRoles: [],
-	fillableByPositionIds: [],
-	viewableByRoles: [],
-	viewableByPositionIds: [],
-};
+	// === States dasar ===
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
+	const [creating, setCreating] = useState(false);
 
-export const useFormAccessConfig = () => {
-	const [formAccessConfig, setFormAccessConfig] = useState<FormAccessConfig>(
-		{}
-	);
+	const [title, setTitle] = useState("");
+	const [description, setDescription] = useState("");
+	const [accessType, setAccessType] = useState("public");
+	const [selectedStatus, setSelectedStatus] = useState<Status | null>(null);
+	const [openStatus, setOpenStatus] = useState(false);
 
-	// 🔹 Pastikan formId punya entry di state
-	const ensureForm = (prev: FormAccessConfig, formId: string): RoleConfig =>
-		prev[formId] || { ...emptyConfig };
+	// === Data dropdown ===
+	const [positions, setPositions] = useState<Position[]>([]);
+	const [forms, setForms] = useState<Form[]>([]);
+	const [availableRoles, setAvailableRoles] = useState<string[]>([]);
+	const loadingPositions = loading;
+	const errorPositions = error;
 
-	// 🔹 Toggle role yang bisa mengisi
-	const toggleRoleFill = (formId: string, role: string) => {
-		setFormAccessConfig((prev) => {
-			const c = ensureForm(prev, formId);
+	// === Staff dan form ===
+	const [selectedStaff, setSelectedStaff] = useState<Staff[]>([]);
+	const [selectedForms, setSelectedForms] = useState<Form[]>([]);
+	const [selectedReportForms, setSelectedReportForms] = useState<Form[]>([]);
+
+	// === Config akses form ===
+	const [formAccessConfig, setFormAccessConfig] = useState<
+		Record<string, RoleConfig>
+	>({});
+	const [formAccessConfigReport, setFormAccessConfigReport] = useState<
+		Record<string, RoleConfig>
+	>({});
+
+	// === Status options ===
+	const statuses: Status[] = [
+		{ value: "true", label: "Aktif" },
+		{ value: "false", label: "Non-Aktif" },
+	];
+
+	// === Fetch data ===
+	const fetchPositions = async () => {
+		try {
+			setLoading(true);
+			const res = await getPositionsApi();
+			setPositions(res.data ?? []);
+		} catch {
+			setError("Gagal memuat data posisi");
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const fetchForms = async () => {
+		try {
+			setLoading(true);
+			const res = await getFormsApi();
+			setForms(res.data?.forms || []);
+		} catch {
+			setError("Gagal memuat data form");
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		void fetchPositions();
+		void fetchForms();
+		setAvailableRoles([
+			"owner_company",
+			"manager_company",
+			"staff_company",
+			"client",
+		]);
+	}, []);
+
+	// === Staff handler ===
+	const toggleStaff = (pos: Position) => {
+		setSelectedStaff((prev) => {
+			const exists = prev.some((s) => s.positionId === pos._id);
+			if (exists) return prev.filter((s) => s.positionId !== pos._id);
+			return [
+				...prev,
+				{ positionId: pos._id, minimumStaff: 1, maximumStaff: 1 },
+			];
+		});
+	};
+
+	// === Form handler ===
+	const toggleForm = async (form: Form) => {
+		const alreadySelected = selectedForms.some((f) => f._id === form._id);
+		if (alreadySelected) {
+			setSelectedForms((prev) => prev.filter((f) => f._id !== form._id));
+			return;
+		}
+
+		try {
+			setLoading(true);
+			const res = await getFormByIdApi(form._id);
+			const detailedForm = res.data?.form;
+			if (!detailedForm) return;
+			setSelectedForms((prev) => [...prev, detailedForm]);
+		} catch {
+			setError("Gagal memuat detail form");
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const toggleReportForm = async (form: Form) => {
+		const alreadySelected = selectedReportForms.some((f) => f._id === form._id);
+		if (alreadySelected) {
+			setSelectedReportForms((prev) => prev.filter((f) => f._id !== form._id));
+			return;
+		}
+
+		try {
+			setLoading(true);
+			const res = await getFormByIdApi(form._id);
+			const detailedForm = res.data?.form;
+			if (!detailedForm) return;
+			setSelectedReportForms((prev) => [...prev, detailedForm]);
+		} catch {
+			setError("Gagal memuat detail report form");
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	// === Role toggle (form & report) ===
+	const toggleRoleFill = (formId: string, role: string, isReport = false) => {
+		const setter = isReport ? setFormAccessConfigReport : setFormAccessConfig;
+		setter((prev) => {
+			const current = prev[formId] || {
+				fillableByRoles: [],
+				fillableByPositionIds: [],
+				viewableByRoles: [],
+				viewableByPositionIds: [],
+			};
 			const updated = {
-				...c,
-				fillableByRoles: c.fillableByRoles.includes(role)
-					? c.fillableByRoles.filter((r) => r !== role)
-					: [...c.fillableByRoles, role],
+				...current,
+				fillableByRoles: current.fillableByRoles.includes(role)
+					? current.fillableByRoles.filter((r) => r !== role)
+					: [...current.fillableByRoles, role],
 			};
 			return { ...prev, [formId]: updated };
 		});
 	};
 
-	// 🔹 Toggle role yang bisa melihat
-	const toggleRoleView = (formId: string, role: string) => {
-		setFormAccessConfig((prev) => {
-			const c = ensureForm(prev, formId);
+	const toggleRoleView = (formId: string, role: string, isReport = false) => {
+		const setter = isReport ? setFormAccessConfigReport : setFormAccessConfig;
+		setter((prev) => {
+			const current = prev[formId] || {
+				fillableByRoles: [],
+				fillableByPositionIds: [],
+				viewableByRoles: [],
+				viewableByPositionIds: [],
+			};
 			const updated = {
-				...c,
-				viewableByRoles: c.viewableByRoles.includes(role)
-					? c.viewableByRoles.filter((r) => r !== role)
-					: [...c.viewableByRoles, role],
+				...current,
+				viewableByRoles: current.viewableByRoles.includes(role)
+					? current.viewableByRoles.filter((r) => r !== role)
+					: [...current.viewableByRoles, role],
 			};
 			return { ...prev, [formId]: updated };
 		});
 	};
 
-	// 🔹 Toggle posisi yang bisa mengisi
-	const toggleFillablePosition = (formId: string, posId: string) => {
-		setFormAccessConfig((prev) => {
-			const c = ensureForm(prev, formId);
+	const toggleFillablePosition = (
+		formId: string,
+		posId: string,
+		isReport = false
+	) => {
+		const setter = isReport ? setFormAccessConfigReport : setFormAccessConfig;
+		setter((prev) => {
+			const current = prev[formId]!;
 			const updated = {
-				...c,
-				fillableByPositionIds: c.fillableByPositionIds.includes(posId)
-					? c.fillableByPositionIds.filter((id) => id !== posId)
-					: [...c.fillableByPositionIds, posId],
+				...current,
+				fillableByPositionIds: current.fillableByPositionIds.includes(posId)
+					? current.fillableByPositionIds.filter((id) => id !== posId)
+					: [...current.fillableByPositionIds, posId],
 			};
 			return { ...prev, [formId]: updated };
 		});
 	};
 
-	// 🔹 Toggle posisi yang bisa melihat
-	const toggleViewablePosition = (formId: string, posId: string) => {
-		setFormAccessConfig((prev) => {
-			const c = ensureForm(prev, formId);
+	const toggleViewablePosition = (
+		formId: string,
+		posId: string,
+		isReport = false
+	) => {
+		const setter = isReport ? setFormAccessConfigReport : setFormAccessConfig;
+		setter((prev) => {
+			const current = prev[formId]!;
 			const updated = {
-				...c,
-				viewableByPositionIds: c.viewableByPositionIds.includes(posId)
-					? c.viewableByPositionIds.filter((id) => id !== posId)
-					: [...c.viewableByPositionIds, posId],
+				...current,
+				viewableByPositionIds: current.viewableByPositionIds.includes(posId)
+					? current.viewableByPositionIds.filter((id) => id !== posId)
+					: [...current.viewableByPositionIds, posId],
 			};
 			return { ...prev, [formId]: updated };
 		});
 	};
 
-	// 🔹 Ambil config form tertentu (atau default kosong)
-	const getConfig = (formId: string): RoleConfig => {
-		return formAccessConfig[formId] || { ...emptyConfig };
-	};
+	// === Submit ===
+	const createService = async () => {
+		setCreating(true);
+		setError(null);
 
-	// 🔹 Inisialisasi config kosong (misalnya saat form baru dipilih)
-	const initConfig = (formId: string) => {
-		setFormAccessConfig((prev) => {
-			if (prev[formId]) return prev;
-			return { ...prev, [formId]: { ...emptyConfig } };
-		});
-	};
+		try {
+			if (!title.trim() || !description.trim()) {
+				notifyError("Gagal menyimpan", "Judul dan deskripsi wajib diisi");
+				return;
+			}
+			if (selectedStaff.length === 0) {
+				notifyError("Gagal menyimpan", "Pilih minimal satu staff");
+				return;
+			}
 
-	// 🔹 Hapus config form tertentu (saat form dihapus)
-	const removeConfig = (formId: string) => {
-		setFormAccessConfig((prev) => {
-			const updated = { ...prev };
-			delete updated[formId];
-			return updated;
-		});
+			const payload: CreateServiceRequest = {
+				title,
+				description,
+				isActive: selectedStatus?.value === "true",
+				accessType,
+				requiredStaff: selectedStaff.map((s) => ({
+					positionId: s.positionId,
+					minimumStaff: s.minimumStaff,
+					maximumStaff: s.maximumStaff,
+				})),
+				workOrderForms: selectedForms.map((form, i) => {
+					const cfg = formAccessConfig[form._id] || {
+						fillableByRoles: [],
+						viewableByRoles: [],
+						fillableByPositionIds: [],
+						viewableByPositionIds: [],
+					};
+					return {
+						order: i + 1,
+						formId: form._id,
+						...cfg,
+					};
+				}),
+				reportForms: selectedReportForms.map((form, i) => {
+					const cfg = formAccessConfigReport[form._id] || {
+						fillableByRoles: [],
+						viewableByRoles: [],
+						fillableByPositionIds: [],
+						viewableByPositionIds: [],
+					};
+					return {
+						order: i + 1,
+						formId: form._id,
+						...cfg,
+					};
+				}),
+			};
+
+			const res = await createServiceApi(payload);
+			console.log("✅ Response:", res.data);
+
+			notifySuccess("Berhasil", "Layanan berhasil dibuat");
+			navigate("/dashboard/owner/services");
+		} catch (err) {
+			if (axios.isAxiosError(err)) {
+				const msg =
+					err.response?.data?.error ||
+					err.response?.data?.message ||
+					"Terjadi kesalahan tak terduga";
+				setError(msg);
+				notifyError("Gagal membuat layanan", msg);
+			} else {
+				setError("Terjadi kesalahan internal");
+				notifyError("Gagal membuat layanan", "Terjadi kesalahan internal");
+			}
+		} finally {
+			setCreating(false);
+		}
 	};
 
 	return {
+		// === STATE ===
+		loading,
+		error,
+		title,
+		description,
+		accessType,
+		selectedStatus,
+		openStatus,
+		statuses,
+		positions,
+		forms,
+		selectedForms,
+		selectedReportForms,
+		selectedStaff,
+		availableRoles,
 		formAccessConfig,
-		getConfig,
-		initConfig,
-		removeConfig,
+		formAccessConfigReport,
+		loadingPositions,
+		errorPositions,
+		creating,
+
+		// === SETTERS ===
+		setTitle,
+		setDescription,
+		setAccessType,
+		setSelectedStatus,
+		setOpenStatus,
+		setSelectedStaff,
+
+		// === HANDLERS ===
+		fetchPositions,
+		toggleStaff,
+		toggleForm,
+		toggleReportForm,
 		toggleRoleFill,
 		toggleRoleView,
 		toggleFillablePosition,
 		toggleViewablePosition,
+		createService,
 	};
 };
