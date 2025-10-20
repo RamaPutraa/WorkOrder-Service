@@ -27,7 +27,7 @@ type CardReportFormProps = {
 	positions: Position[];
 	selectedReportForms: Form[];
 	selectedStaff: Staff[];
-	availableRoles: string[];
+	availableRoles: { value: string; label: string }[];
 	formAccessConfigReport: Record<string, RoleConfig>;
 	loading: boolean;
 
@@ -141,7 +141,14 @@ export const CardReportForm: React.FC<CardReportFormProps> = ({
 															variant="outline"
 															className="w-full justify-between">
 															{config.fillableByRoles.length > 0
-																? config.fillableByRoles.join(", ")
+																? config.fillableByRoles
+																		.map(
+																			(r) =>
+																				availableRoles.find(
+																					(ar) => ar.value === r
+																				)?.label || r
+																		)
+																		.join(", ")
 																: "Pilih roles..."}
 															<ChevronDownIcon className="h-4 w-4 opacity-50" />
 														</Button>
@@ -149,18 +156,18 @@ export const CardReportForm: React.FC<CardReportFormProps> = ({
 													<PopoverContent className="w-[250px] p-2 space-y-2">
 														{availableRoles.map((role) => (
 															<div
-																key={`report-fill-${form._id}-${role}`}
+																key={`report-fill-${form._id}-${role.value}`}
 																className="flex items-center space-x-2 cursor-pointer"
 																onClick={() =>
-																	toggleRoleFill(form._id, role, true)
+																	toggleRoleFill(form._id, role.value, true)
 																}>
 																<Checkbox
 																	onClick={(e) => e.stopPropagation()}
 																	checked={config.fillableByRoles.includes(
-																		role
+																		role.value
 																	)}
 																/>
-																<span>{role}</span>
+																<span>{role.label}</span>
 															</div>
 														))}
 													</PopoverContent>
@@ -268,7 +275,14 @@ export const CardReportForm: React.FC<CardReportFormProps> = ({
 															variant="outline"
 															className="w-full justify-between">
 															{config.viewableByRoles.length > 0
-																? config.viewableByRoles.join(", ")
+																? config.viewableByRoles
+																		.map(
+																			(r) =>
+																				availableRoles.find(
+																					(ar) => ar.value === r
+																				)?.label || r
+																		)
+																		.join(", ")
 																: "Pilih roles..."}
 															<ChevronDownIcon className="h-4 w-4 opacity-50" />
 														</Button>
@@ -276,18 +290,18 @@ export const CardReportForm: React.FC<CardReportFormProps> = ({
 													<PopoverContent className="w-[250px] p-2 space-y-2">
 														{availableRoles.map((role) => (
 															<div
-																key={`report-view-${form._id}-${role}`}
+																key={`report-view-${form._id}-${role.value}`}
 																className="flex items-center space-x-2 cursor-pointer"
 																onClick={() =>
-																	toggleRoleView(form._id, role, true)
+																	toggleRoleView(form._id, role.value, true)
 																}>
 																<Checkbox
 																	onClick={(e) => e.stopPropagation()}
 																	checked={config.viewableByRoles.includes(
-																		role
+																		role.value
 																	)}
 																/>
-																<span>{role}</span>
+																<span>{role.label}</span>
 															</div>
 														))}
 													</PopoverContent>

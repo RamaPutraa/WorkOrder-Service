@@ -1,12 +1,14 @@
 import { Button } from "@/components/ui/button";
-import { useCreateService } from "../hooks/useForm";
+import { useCreateService } from "../hooks/useCreateService";
 import { CardServiceInfo } from "../components/create/service-info";
 import { CardWorkOrderForm } from "../components/create/workorder-form";
 import { CardReportForm } from "../components/create/report-form";
-import { Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const CreateService: React.FC = () => {
+	const navigate = useNavigate();
 	const {
 		// form dasar
 		title,
@@ -49,7 +51,25 @@ const CreateService: React.FC = () => {
 
 	return (
 		<div className="max-w-6xl mx-auto py-10 space-y-10">
-			<h1 className="text-2xl font-bold tracking-tight">Tambah Layanan Baru</h1>
+			<div className="container">
+				<div className="flex items-center justify-between mb-8">
+					<div className="flex flex-col space-y-2">
+						<h1 className="text-xl font-bold tracking-tight">
+							Tambah Layanan Baru
+						</h1>
+						<p className="text-muted-foreground">
+							Berikut merupakan form tambah layanan yang dimiliki oleh
+							perusahaan.
+						</p>
+					</div>
+					<Button
+						onClick={() => navigate(-1)}
+						className="bg-primary hover:bg-primary/90">
+						<ArrowLeft className="h-4 w-4" />
+						Kembali
+					</Button>
+				</div>
+			</div>
 
 			{/* === CARD 1 === */}
 			<AnimatePresence>

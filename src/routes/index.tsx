@@ -22,6 +22,7 @@ import CreatePositionPage from "@/features/positions/pages/create-position";
 import ViewCompany from "@/features/company/pages/view-company";
 import ViewService from "@/features/services-wo/pages/view-service";
 import CreateService from "@/features/services-wo/pages/create-service";
+import ClientCompanyServices from "@/features/client/company/pages/company-services";
 
 const router = createBrowserRouter([
 	{
@@ -108,7 +109,16 @@ const router = createBrowserRouter([
 						<AppLayout />
 					</RootLayout>
 				),
-				children: [{ path: "/dashboard/client", element: <DashboardClient /> }],
+				children: [
+					{
+						path: "/dashboard/client",
+						element: <DashboardClient />,
+					},
+					{
+						path: "/dashboard/client/company/:id/services",
+						element: <ClientCompanyServices />,
+					},
+				],
 			},
 		],
 	},

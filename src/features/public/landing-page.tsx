@@ -6,6 +6,10 @@ const LandingPage = () => {
 		<>
 			<Button>
 				<Link to="/company-regis">Company regis</Link>
+			</Button>{" "}
+			<br />
+			<Button className="mt-5">
+				<Link to="/dashboard/client">Create Work Order</Link>
 			</Button>
 		</>
 	);

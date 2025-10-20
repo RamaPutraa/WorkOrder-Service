@@ -27,7 +27,7 @@ type CardWorkOrderFormProps = {
 	positions: Position[];
 	selectedForms: Form[];
 	selectedStaff: Staff[];
-	availableRoles: string[];
+	availableRoles: { value: string; label: string }[];
 	formAccessConfig: Record<string, RoleConfig>;
 	loading: boolean;
 
@@ -133,7 +133,14 @@ export const CardWorkOrderForm: React.FC<CardWorkOrderFormProps> = ({
 															variant="outline"
 															className="w-full justify-between">
 															{config.fillableByRoles.length > 0
-																? config.fillableByRoles.join(", ")
+																? config.fillableByRoles
+																		.map(
+																			(r) =>
+																				availableRoles.find(
+																					(ar) => ar.value === r
+																				)?.label || r
+																		)
+																		.join(", ")
 																: "Pilih roles..."}
 															<ChevronDownIcon className="h-4 w-4 opacity-50" />
 														</Button>
@@ -141,16 +148,18 @@ export const CardWorkOrderForm: React.FC<CardWorkOrderFormProps> = ({
 													<PopoverContent className="w-[250px] p-2 space-y-2">
 														{availableRoles.map((role) => (
 															<div
-																key={`workorder-fill-${form._id}-${role}`}
+																key={`workorder-fill-${form._id}-${role.value}`}
 																className="flex items-center space-x-2 cursor-pointer"
-																onClick={() => toggleRoleFill(form._id, role)}>
+																onClick={() =>
+																	toggleRoleFill(form._id, role.value)
+																}>
 																<Checkbox
 																	onClick={(e) => e.stopPropagation()}
 																	checked={config.fillableByRoles.includes(
-																		role
+																		role.value
 																	)}
 																/>
-																<span>{role}</span>
+																<span>{role.label}</span>
 															</div>
 														))}
 													</PopoverContent>
@@ -250,7 +259,14 @@ export const CardWorkOrderForm: React.FC<CardWorkOrderFormProps> = ({
 															variant="outline"
 															className="w-full justify-between">
 															{config.viewableByRoles.length > 0
-																? config.viewableByRoles.join(", ")
+																? config.viewableByRoles
+																		.map(
+																			(r) =>
+																				availableRoles.find(
+																					(ar) => ar.value === r
+																				)?.label || r
+																		)
+																		.join(", ")
 																: "Pilih roles..."}
 															<ChevronDownIcon className="h-4 w-4 opacity-50" />
 														</Button>
@@ -258,16 +274,18 @@ export const CardWorkOrderForm: React.FC<CardWorkOrderFormProps> = ({
 													<PopoverContent className="w-[250px] p-2 space-y-2">
 														{availableRoles.map((role) => (
 															<div
-																key={`workorder-view-${form._id}-${role}`}
+																key={`workorder-view-${form._id}-${role.value}`}
 																className="flex items-center space-x-2 cursor-pointer"
-																onClick={() => toggleRoleView(form._id, role)}>
+																onClick={() =>
+																	toggleRoleView(form._id, role.value)
+																}>
 																<Checkbox
 																	onClick={(e) => e.stopPropagation()}
 																	checked={config.viewableByRoles.includes(
-																		role
+																		role.value
 																	)}
 																/>
-																<span>{role}</span>
+																<span>{role.label}</span>
 															</div>
 														))}
 													</PopoverContent>

@@ -41,7 +41,9 @@ export const useCreateService = () => {
 	// === Data dropdown ===
 	const [positions, setPositions] = useState<Position[]>([]);
 	const [forms, setForms] = useState<Form[]>([]);
-	const [availableRoles, setAvailableRoles] = useState<string[]>([]);
+	const [availableRoles, setAvailableRoles] = useState<
+		{ value: string; label: string }[]
+	>([]);
 	const loadingPositions = loading;
 	const errorPositions = error;
 
@@ -93,10 +95,9 @@ export const useCreateService = () => {
 		void fetchPositions();
 		void fetchForms();
 		setAvailableRoles([
-			"owner_company",
-			"manager_company",
-			"staff_company",
-			"client",
+			{ value: "manager_company", label: "Manager" },
+			{ value: "staff_company", label: "Staff" },
+			{ value: "client", label: "Client" },
 		]);
 	}, []);
 

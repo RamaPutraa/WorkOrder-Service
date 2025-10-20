@@ -49,8 +49,8 @@ const ViewService: React.FC = () => {
 				<Button
 					className="bg-primary hover:bg-primary/90"
 					onClick={() => navigate("/dashboard/owner/services/create")}>
-					<Plus className="h-4 w-4 mr-2" />
-					Tambah Form
+					<Plus className="h-4 w-4" />
+					Tambah Layanan
 				</Button>
 			</div>
 
