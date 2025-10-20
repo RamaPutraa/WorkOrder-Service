@@ -11,12 +11,12 @@ import {
 import { Button } from "@/components/ui/button";
 
 // Sub-komponen spesifik per tipe
-import { FieldOption } from "./field-types/field-option";
+import { FieldOption } from "./field-type/field-option";
 
 import { Switch } from "@/components/ui/switch";
 import { Trash2 } from "lucide-react";
-import { FieldText } from "./field-types/field-text";
-import { FieldNumber } from "./field-types/field-number";
+import { FieldText } from "./field-type/field-text";
+import { FieldNumber } from "./field-type/field-number";
 
 type Props = {
 	field: Field;

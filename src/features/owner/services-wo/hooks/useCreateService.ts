@@ -4,12 +4,12 @@ import axios from "axios";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
 
 // API services
-import { getPositionsApi } from "@/features/positions/services/positionService";
+import { getPositionsApi } from "@/features/owner/position/services/positionService";
 import {
 	getFormsApi,
 	getFormByIdApi,
-} from "@/features/form/services/formService";
-import { createServiceApi } from "@/features/services-wo/services/servicesWo";
+} from "@/features/owner/form/services/formService";
+import { createServiceApi } from "@/features/owner/services-wo/services/servicesWo";
 
 // === Types ===
 type Status = {

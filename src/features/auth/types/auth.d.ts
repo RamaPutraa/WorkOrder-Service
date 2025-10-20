@@ -34,5 +34,3 @@ type RegisterCompanyResponse = ApiResponse<{
 	user: User;
 	token: string;
 }>;
-
-// staff register

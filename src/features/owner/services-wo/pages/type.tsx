@@ -6,11 +6,11 @@ import { Label } from "@radix-ui/react-dropdown-menu";
 import { ArrowLeft, CheckIcon, ChevronDownIcon, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getPositionsApi } from "@/features/positions/services/positionService";
+import { getPositionsApi } from "@/features/owner/position/services/positionService";
 import {
 	getFormsApi,
 	getFormByIdApi,
-} from "@/features/form/services/formService";
+} from "@/features/owner/form/services/formService";
 
 import { createServiceApi } from "../services/servicesWo";
 

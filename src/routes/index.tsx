@@ -9,19 +9,19 @@ import RegisterPage from "@/features/auth/pages/client-reg-page";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import DashboardOwner from "@/features/owner/dahsboard-client";
 import DashboardClient from "@/features/client/dashboard-client";
-import DashboardStaff from "@/features/staff/dashboard-staff";
-import DashboardUnassigned from "@/features/staff/dashboard-unassigned";
+import DashboardStaff from "@/features/owner/staff/dashboard-staff";
+import DashboardUnassigned from "@/features/owner/staff/dashboard-unassigned";
 import LandingPage from "@/features/public/landing-page";
 import ProtectedRoute from "./ProtectedRoute";
 import GuestRoute from "./GuestRoute";
 import CompanyRegis from "@/features/auth/pages/company-reg-page";
-import CreateFormPage from "@/features/form/pages/create-form";
-import FormPage from "@/features/form/pages/view-form";
-import PositionPage from "@/features/positions/pages/view-position";
-import CreatePositionPage from "@/features/positions/pages/create-position";
-import ViewCompany from "@/features/company/pages/view-company";
-import ViewService from "@/features/services-wo/pages/view-service";
-import CreateService from "@/features/services-wo/pages/create-service";
+import CreateFormPage from "@/features/owner/form/pages/create-form";
+import FormPage from "@/features/owner/form/pages/view-form";
+import PositionPage from "@/features/owner/position/pages/view-position";
+import CreatePositionPage from "@/features/owner/position/pages/create-position";
+import ViewCompany from "@/features/owner/company/pages/view-company";
+import ViewService from "@/features/owner/services-wo/pages/view-service";
+import CreateService from "@/features/owner/services-wo/pages/create-service";
 import ClientCompanyServices from "@/features/client/company/pages/company-services";
 
 const router = createBrowserRouter([

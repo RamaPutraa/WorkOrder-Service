@@ -1,6 +1,5 @@
 // import api from "@/lib/api";
 import apiCLient from "@/lib/api";
-import type { GetPositionsResponse } from "@/types/position";
 
 export const getFormsApi = async () => {
 	const response = await apiCLient.get<FormResponse>("/forms");
@@ -17,7 +16,7 @@ export const createFormApi = async (data: CreateFormRequest) => {
 	return response.data;
 };
 
-export const getPositions = async (): Promise<GetPositionsResponse> => {
-	const response = await apiCLient.get<GetPositionsResponse>("/positions");
+export const getPositions = async (): Promise<GetAllPosition> => {
+	const response = await apiCLient.get<GetAllPosition>("/positions");
 	return response.data;
 };
