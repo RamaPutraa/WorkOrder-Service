@@ -11,34 +11,37 @@ import {
 import { Button } from "@/components/ui/button";
 
 // Sub-komponen spesifik per tipe
-import { FieldOption } from "./field-type/field-option";
+import { FieldOption } from "../field-type/field-option";
 
 import { Switch } from "@/components/ui/switch";
 import { Trash2 } from "lucide-react";
-import { FieldText } from "./field-type/field-text";
-import { FieldNumber } from "./field-type/field-number";
+import { FieldText } from "../field-type/field-text";
+import { FieldNumber } from "../field-type/field-number";
 
 type Props = {
 	field: Field;
 	onRemove: () => void;
 	onUpdate: (updated: Partial<Field>) => void;
+	error?: string;
 };
 
-export const FieldItem: React.FC<Props> = ({ field, onRemove, onUpdate }) => {
+export const FieldItem: React.FC<Props> = ({
+	field,
+	onRemove,
+	onUpdate,
+	error,
+}) => {
 	const renderField = () => {
 		switch (field.type) {
 			case "text":
-				return <FieldText field={field} onUpdate={onUpdate} />;
 			case "textarea":
-				return <FieldText field={field} onUpdate={onUpdate} />;
+				return <FieldText field={field} onUpdate={onUpdate} error={error} />;
 			case "number":
-				return <FieldNumber field={field} onUpdate={onUpdate} />;
-			case "date":
-				return <FieldOption field={field} onUpdate={onUpdate} />;
+				return <FieldNumber field={field} onUpdate={onUpdate} error={error} />;
 			case "multi_select":
-				return <FieldOption field={field} onUpdate={onUpdate} />;
 			case "single_select":
-				return <FieldOption field={field} onUpdate={onUpdate} />;
+			case "date":
+				return <FieldOption field={field} onUpdate={onUpdate} error={error} />;
 			default:
 				return null;
 		}
@@ -51,7 +54,9 @@ export const FieldItem: React.FC<Props> = ({ field, onRemove, onUpdate }) => {
 				{/* Label input */}
 				<div className="col-span-4">
 					<Input
-						className="border-0 border-b-2 shadow-none text-lg py-6 focus-visible:ring-0 focus-visible:border-primary"
+						className={`border-0 border-b-2 shadow-none text-lg py-6 focus-visible:ring-0 ${
+							error ? "border-red-500" : "focus-visible:border-primary"
+						}`}
 						value={field.label}
 						onChange={(e) => onUpdate({ label: e.target.value })}
 						placeholder="Pertanyaan"

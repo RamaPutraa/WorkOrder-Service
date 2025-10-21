@@ -6,9 +6,10 @@ import { X } from "lucide-react";
 type Props = {
 	field: Field;
 	onUpdate: (updated: Partial<Field>) => void;
+	error?: string;
 };
 
-export const FieldOption: React.FC<Props> = ({ field, onUpdate }) => {
+export const FieldOption: React.FC<Props> = ({ field, onUpdate, error }) => {
 	const options = field.options ?? [];
 	const lastInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -63,7 +64,9 @@ export const FieldOption: React.FC<Props> = ({ field, onUpdate }) => {
 							{/* Input opsi */}
 							<Input
 								ref={idx === options.length - 1 ? lastInputRef : null}
-								className="flex-1 focus-visible:ring-0 focus-visible:border-primary"
+								className={`flex-1 focus-visible:ring-0 focus-visible:border-primary ${
+									error ? "border-red-300" : ""
+								}`}
 								value={opt.value}
 								onChange={(e) => handleOptionChange(idx, e.target.value)}
 								placeholder={`Opsi ${idx + 1}`}
@@ -91,6 +94,7 @@ export const FieldOption: React.FC<Props> = ({ field, onUpdate }) => {
 						</button>
 					</div>
 				</div>
+				{error && <p className="text-sm text-red-500 mt-2 ml-6">{error}</p>}
 			</div>
 		</div>
 	);

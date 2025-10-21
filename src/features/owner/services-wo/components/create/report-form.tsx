@@ -404,15 +404,83 @@ export const CardReportForm: React.FC<CardReportFormProps> = ({
 									</h3>
 									<div className="border rounded-md p-6 space-y-4">
 										{form.fields?.map((field, i) => (
-											<div
-												key={`report-field-${form._id}-${i}`}
-												className="space-y-1">
+											<div key={i} className="space-y-1">
 												<Label className="text-sm font-medium">
 													{field.label}
 												</Label>
-												<p className="text-sm text-muted-foreground border rounded-md p-2 bg-muted/40">
-													{field.placeholder || field.type}
-												</p>
+
+												{/* tampilkan sesuai type */}
+												{field.type === "text" && (
+													<p className="text-sm text-muted-foreground border rounded-md p-2 bg-muted/40">
+														{field.placeholder || "Isian teks"}
+													</p>
+												)}
+
+												{field.type === "email" && (
+													<p className="text-sm text-muted-foreground border rounded-md p-2 bg-muted/40">
+														{field.placeholder || "Alamat email"}
+													</p>
+												)}
+
+												{field.type === "number" && (
+													<p className="text-sm text-muted-foreground border rounded-md p-2 bg-muted/40">
+														{field.placeholder || "Isian angka"}
+													</p>
+												)}
+
+												{field.type === "textarea" && (
+													<div className="border rounded-md p-2 bg-muted/40 text-sm text-muted-foreground min-h-[80px]">
+														{field.placeholder || "Area teks"}
+													</div>
+												)}
+
+												{field.type === "single_select" && (
+													<div className="border rounded-md p-2 bg-muted/40 text-sm text-muted-foreground">
+														<p className="mb-1 italic">Pilihan (radio):</p>
+														<ul className="list-disc list-inside space-y-1">
+															{field.options?.map((opt, j) => (
+																<li
+																	key={j}
+																	className="flex items-center space-x-2">
+																	<input
+																		type="radio"
+																		name={`field-${i}`}
+																		disabled
+																	/>
+																	<span>{opt.value}</span>
+																</li>
+															))}
+														</ul>
+													</div>
+												)}
+
+												{field.type === "multi_select" && (
+													<div className="border rounded-md p-2 bg-muted/40 text-sm text-muted-foreground">
+														<p className="mb-1 italic">Pilihan (checkbox):</p>
+														<ul className="list-disc list-inside space-y-1">
+															{field.options?.map((opt, j) => (
+																<li
+																	key={j}
+																	className="flex items-center space-x-2">
+																	<input type="checkbox" disabled />
+																	<span>{opt.value}</span>
+																</li>
+															))}
+														</ul>
+													</div>
+												)}
+
+												{field.type === "date" && (
+													<p className="text-sm text-muted-foreground border rounded-md p-2 bg-muted/40">
+														Tanggal (date picker)
+													</p>
+												)}
+
+												{field.type === "file" && (
+													<p className="text-sm text-muted-foreground border rounded-md p-2 bg-muted/40">
+														Upload file
+													</p>
+												)}
 											</div>
 										))}
 									</div>

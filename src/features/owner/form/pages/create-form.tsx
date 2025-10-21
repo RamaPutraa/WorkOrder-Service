@@ -1,6 +1,9 @@
 // src/features/forms/pages/form-create-page.tsx
 import React, { useRef, useState } from "react";
-import { FormBuilder, type FormBuilderRef } from "../components/form-builder";
+import {
+	FormBuilder,
+	type FormBuilderRef,
+} from "../components/create/form-builder";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
