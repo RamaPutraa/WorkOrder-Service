@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 import { useCreateService } from "../hooks/useCreateService";
 import { CardServiceInfo } from "../components/create/service-info";
 import { CardWorkOrderForm } from "../components/create/workorder-form";
@@ -67,6 +68,11 @@ const CreateService: React.FC = () => {
 		}
 	);
 
+	// Sinkronkan validasi ketika daftar staff berubah dari manapun (toggle, input min/max, hapus)
+	useEffect(() => {
+		validateAndSetField("selectedStaff", selectedStaff);
+	}, [selectedStaff]);
+
 	const handleSubmit = async () => {
 		const isValid = validateForm();
 		if (!isValid) {
@@ -133,12 +139,18 @@ const CreateService: React.FC = () => {
 							validateAndSetField("selectedStatus", val?.value || "");
 						}}
 						setOpenStatus={setOpenStatus}
-						setSelectedStaff={(val) => {
-							setSelectedStaff(val);
-							if (Array.isArray(val)) {
-								validateAndSetField("selectedStaff", val);
-							}
-						}}
+					setSelectedStaff={(updater) => {
+						// Dukung baik nilai array langsung maupun functional updater
+						setSelectedStaff((prev) => {
+							const next =
+								typeof updater === "function"
+									? // @ts-expect-error - infer updater function from React.SetStateAction
+									(updater as (prev: Staff[]) => Staff[])(prev)
+								: updater;
+							validateAndSetField("selectedStaff", next as Staff[]);
+							return next as Staff[];
+						});
+					}}
 						toggleStaff={toggleStaff}
 						fetchPositions={fetchPositions}
 						errors={errors}
