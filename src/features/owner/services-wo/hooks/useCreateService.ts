@@ -34,7 +34,7 @@ export const useCreateService = () => {
 
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
-	const [accessType, setAccessType] = useState("public");
+	const [accessType, setAccessType] = useState("");
 	const [selectedStatus, setSelectedStatus] = useState<Status | null>(null);
 	const [openStatus, setOpenStatus] = useState(false);
 

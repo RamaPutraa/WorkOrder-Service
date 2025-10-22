@@ -6,7 +6,8 @@ import { CardReportForm } from "../components/create/report-form";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-
+import { useValidation } from "@/hooks/use-validation";
+import { required, minLength, minFields } from "@/lib/validators";
 const CreateService: React.FC = () => {
 	const navigate = useNavigate();
 	const {
@@ -48,6 +49,31 @@ const CreateService: React.FC = () => {
 		createService,
 		creating,
 	} = useCreateService();
+	// validasi
+	const { errors, validateForm, validateAndSetField } = useValidation(
+		{
+			title: title || "",
+			description: description || "",
+			selectedStatus: selectedStatus?.value || "",
+			accessType: accessType || "",
+			selectedStaff: selectedStaff || [],
+		},
+		{
+			title: [required("Judul layanan"), minLength(3, "Judul layanan")],
+			description: [required("Deskripsi layanan")],
+			selectedStatus: [required("Status layanan")],
+			accessType: [required("Akses layanan")],
+			selectedStaff: [minFields(1, "Minimal pilih 1 posisi staff")],
+		}
+	);
+
+	const handleSubmit = async () => {
+		const isValid = validateForm();
+		if (!isValid) {
+			return;
+		}
+		await createService();
+	};
 
 	return (
 		<div className="max-w-6xl mx-auto py-10 space-y-10">
@@ -90,14 +116,32 @@ const CreateService: React.FC = () => {
 						positions={positions}
 						loading={loadingPositions}
 						error={errorPositions}
-						setTitle={setTitle}
-						setDescription={setDescription}
-						setAccessType={setAccessType}
-						setSelectedStatus={setSelectedStatus}
+						setTitle={(val) => {
+							setTitle(val);
+							validateAndSetField("title", val);
+						}}
+						setDescription={(val) => {
+							setDescription(val);
+							validateAndSetField("description", val);
+						}}
+						setAccessType={(val) => {
+							setAccessType(val);
+							validateAndSetField("accessType", val);
+						}}
+						setSelectedStatus={(val) => {
+							setSelectedStatus(val);
+							validateAndSetField("selectedStatus", val?.value || "");
+						}}
 						setOpenStatus={setOpenStatus}
-						setSelectedStaff={setSelectedStaff}
+						setSelectedStaff={(val) => {
+							setSelectedStaff(val);
+							if (Array.isArray(val)) {
+								validateAndSetField("selectedStaff", val);
+							}
+						}}
 						toggleStaff={toggleStaff}
 						fetchPositions={fetchPositions}
+						errors={errors}
 					/>
 				</motion.div>
 			</AnimatePresence>
@@ -155,7 +199,7 @@ const CreateService: React.FC = () => {
 			{/* === SUBMIT BUTTON === */}
 			<div className="flex justify-end pt-6 border-t">
 				<Button
-					onClick={createService}
+					onClick={handleSubmit}
 					disabled={creating}
 					className="flex items-center gap-2">
 					{creating && <Loader2 className="w-4 h-4 animate-spin" />}

@@ -29,7 +29,6 @@ import {
 } from "@/components/ui/select";
 import { ChevronDownIcon, CheckIcon, Trash } from "lucide-react";
 import { Label as RadixLabel } from "@radix-ui/react-dropdown-menu";
-
 type Status = {
 	value: string;
 	label: string;
@@ -58,6 +57,8 @@ type CardServiceInfoProps = {
 	// handlers
 	toggleStaff: (pos: Position) => void;
 	fetchPositions?: () => void; // opsional (kalau ingin refetch)
+
+	errors?: Record<string, string>;
 };
 
 export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
@@ -71,6 +72,7 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 	positions,
 	loading,
 	error,
+	errors,
 	setTitle,
 	setDescription,
 	setAccessType,
@@ -93,33 +95,69 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 			<CardContent className="pb-5 space-y-5">
 				{/* Judul Layanan */}
 				<div className="space-y-2">
-					<Label className="text-sm font-medium">Judul Layanan</Label>
+					<Label
+						className={`text-sm font-medium ${
+							errors?.title ? "text-red-500" : "text-foreground"
+						}`}>
+						Judul Layanan
+					</Label>
+
 					<Input
 						placeholder="Contoh: Cleaning Service"
 						value={title}
 						onChange={(e) => setTitle(e.target.value)}
+						className={
+							errors?.title ? "border-red-500 focus-visible:ring-red-300" : ""
+						}
 					/>
+
+					{errors?.title && (
+						<p className="text-xs text-red-500">{errors.title}</p>
+					)}
 				</div>
 
 				{/* Deskripsi */}
 				<div className="space-y-2">
-					<Label className="text-sm font-medium">Deskripsi Layanan</Label>
+					<Label
+						className={`text-sm font-medium ${
+							errors?.description ? "text-red-500" : "text-foreground"
+						}`}>
+						Deskripsi Layanan
+					</Label>
 					<Input
 						placeholder="Contoh: Menjelaskan terkait layanan apa ini"
 						value={description}
 						onChange={(e) => setDescription(e.target.value)}
+						className={
+							errors?.description
+								? "border-red-500 focus-visible:ring-red-300"
+								: ""
+						}
 					/>
+					{errors?.description && (
+						<p className="text-xs text-red-500">{errors.description}</p>
+					)}
 				</div>
 
-				<div className="grid grid-cols-3 my-8">
+				<div className="grid grid-cols-3 my-8 gap-5">
 					{/* Status */}
-					<div className="flex items-center space-x-4">
-						<p className="font-medium text-sm">Status</p>
+					<div className="space-y-2">
+						<Label
+							className={`text-sm font-medium ${
+								errors?.selectedStatus ? "text-red-500" : "text-foreground"
+							}`}>
+							Status
+						</Label>
+
 						<Popover open={openStatus} onOpenChange={setOpenStatus}>
 							<PopoverTrigger asChild>
 								<Button
 									variant="outline"
-									className="w-[150px] justify-start text-muted-foreground font-normal">
+									className={`w-[150px] justify-start font-normal ${
+										errors?.selectedStatus
+											? "border-red-500 text-muted-foreground focus-visible:ring-red-300"
+											: "text-muted-foreground"
+									}`}>
 									{selectedStatus ? selectedStatus.label : "+ Set status"}
 								</Button>
 							</PopoverTrigger>
@@ -146,16 +184,28 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 								</Command>
 							</PopoverContent>
 						</Popover>
+
+						{errors?.selectedStatus && (
+							<p className="text-xs text-red-500">{errors.selectedStatus}</p>
+						)}
 					</div>
 
 					{/* Access Type */}
-					<div className="flex items-center gap-3">
-						<label className="text-sm font-medium whitespace-nowrap">
+					<div className="space-y-2">
+						<Label
+							className={`text-sm font-medium ${
+								errors?.accessType ? "text-red-500" : "text-foreground"
+							}`}>
 							Akses Form
-						</label>
+						</Label>
 
 						<Select value={accessType} onValueChange={setAccessType}>
-							<SelectTrigger className="w-[200px]">
+							<SelectTrigger
+								className={`w-[200px] ${
+									errors?.accessType
+										? "border-red-500 focus-visible:ring-red-300"
+										: ""
+								}`}>
 								<SelectValue placeholder="Pilih Akses" />
 							</SelectTrigger>
 							<SelectContent>
@@ -164,6 +214,10 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 								<SelectItem value="member_only">Langganan Terdaftar</SelectItem>
 							</SelectContent>
 						</Select>
+
+						{errors?.accessType && (
+							<p className="text-xs text-red-500">{errors.accessType}</p>
+						)}
 					</div>
 				</div>
 
@@ -171,7 +225,22 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 				<div className="grid grid-cols-4 gap-2 items-start">
 					{/* Selected Staff List */}
 					<div className="space-y-2 col-span-3">
-						<div className="flex flex-wrap items-start justify-between gap-2 border rounded-md px-3 py-2 mt-1.5 focus-within:ring-2 focus-within:ring-ring transition-all">
+						{/* Label */}
+						<p
+							className={`text-sm font-medium ${
+								errors?.selectedStaff ? "text-red-500" : "text-foreground"
+							}`}>
+							Daftar Pegawai Terpilih
+						</p>
+
+						{/* Container */}
+						<div
+							className={`flex flex-wrap items-start justify-between gap-2 rounded-md px-3 py-2 mt-1.5 transition-all border 
+				${
+					errors?.selectedStaff
+						? "border-red-500 ring-2 ring-red-300"
+						: "border-border focus-within:ring-2 focus-within:ring-ring"
+				}`}>
 							<div className="flex flex-col gap-2 flex-1">
 								{selectedStaff.length > 0 ? (
 									selectedStaff.map((s) => {
@@ -187,10 +256,19 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 												{/* Min & Max Input */}
 												<div className="flex items-center gap-2 mt-2">
 													<div className="flex items-center gap-1">
-														<RadixLabel className="text-xs">Min</RadixLabel>
+														<RadixLabel
+															className={`text-xs ${
+																errors?.selectedStaff ? "text-red-500" : ""
+															}`}>
+															Min
+														</RadixLabel>
 														<Input
 															type="number"
-															className="w-16 h-7 text-xs"
+															className={`w-16 h-7 text-xs ${
+																errors?.selectedStaff
+																	? "border-red-500 focus-visible:ring-red-500"
+																	: ""
+															}`}
 															value={s.minimumStaff}
 															onChange={(e) => {
 																const val = Number(e.target.value);
@@ -205,10 +283,19 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 														/>
 													</div>
 													<div className="flex items-center gap-1">
-														<RadixLabel className="text-xs">Max</RadixLabel>
+														<RadixLabel
+															className={`text-xs ${
+																errors?.selectedStaff ? "text-red-500" : ""
+															}`}>
+															Max
+														</RadixLabel>
 														<Input
 															type="number"
-															className="w-16 h-7 text-xs"
+															className={`w-16 h-7 text-xs ${
+																errors?.selectedStaff
+																	? "border-red-500 focus-visible:ring-red-500"
+																	: ""
+															}`}
 															value={s.maximumStaff}
 															onChange={(e) => {
 																const val = Number(e.target.value);
@@ -238,16 +325,33 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 										);
 									})
 								) : (
-									<span className="text-sm text-muted-foreground">
+									<span
+										className={`text-sm ${
+											errors?.selectedStaff
+												? "text-red-500"
+												: "text-muted-foreground"
+										}`}>
 										Pilih beberapa pegawai yang dibutuhkan
 									</span>
 								)}
 							</div>
 						</div>
+
+						{/* Pesan error di bawah box */}
+						{errors?.selectedStaff && (
+							<p className="text-xs text-red-500">{errors.selectedStaff}</p>
+						)}
 					</div>
 
 					{/* Dropdown pilih posisi */}
 					<div className="space-y-2">
+						<label
+							className={`text-sm font-medium ${
+								errors?.selectedStaff ? "text-red-500" : ""
+							}`}>
+							Tambah Pegawai
+						</label>
+
 						<DropdownMenu
 							onOpenChange={(open) =>
 								open && fetchPositions && fetchPositions()
@@ -256,7 +360,11 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 								<Button
 									variant="outline"
 									size="sm"
-									className="w-full shrink-0 mt-2 flex items-center gap-1 text-sm">
+									className={`w-full shrink-0 mt-2 flex items-center gap-1 text-sm transition-colors ${
+										errors?.selectedStaff
+											? "border-red-500 text-red-500 hover:bg-red-50"
+											: ""
+									}`}>
 									Pilih Pegawai
 									<ChevronDownIcon className="w-3 h-3" />
 								</Button>
