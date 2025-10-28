@@ -236,11 +236,11 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 						{/* Container */}
 						<div
 							className={`flex flex-wrap items-start justify-between gap-2 rounded-md px-3 py-2 mt-1.5 transition-all border 
-				${
-					errors?.selectedStaff
-						? "border-red-500 ring-2 ring-red-300"
-						: "border-border focus-within:ring-2 focus-within:ring-ring"
-				}`}>
+								${
+									errors?.selectedStaff
+										? "border-red-500 ring-2 ring-red-300"
+										: "border-border focus-within:ring-2 focus-within:ring-ring"
+								}`}>
 							<div className="flex flex-col gap-2 flex-1">
 								{selectedStaff.length > 0 ? (
 									selectedStaff.map((s) => {

@@ -23,11 +23,14 @@ import ViewCompany from "@/features/owner/company/pages/view-company";
 import ViewService from "@/features/owner/services-wo/pages/view-service";
 import CreateService from "@/features/owner/services-wo/pages/create-service";
 import ClientCompanyServices from "@/features/client/company/pages/company-services";
+import PublicServicePage from "@/features/client/services-wo/pages/request-services";
+import ErrorPage from "@/shared/errors/templates/error-page";
 
 const router = createBrowserRouter([
 	{
 		path: "/dashboard/owner",
 		element: <ProtectedRoute allowedRoles={["owner_company"]} />,
+		errorElement: <ErrorPage />,
 		children: [
 			{
 				element: (
@@ -118,6 +121,10 @@ const router = createBrowserRouter([
 						path: "/dashboard/client/company/:id/services",
 						element: <ClientCompanyServices />,
 					},
+					{
+						path: "/dashboard/client/company/services/:id/intake-forms",
+						element: <PublicServicePage />,
+					},
 				],
 			},
 		],
@@ -160,6 +167,10 @@ const router = createBrowserRouter([
 				element: <CompanyRegis />,
 			},
 		],
+	},
+	{
+		path: "*",
+		element: <ErrorPage status={404} />, // handle 404 juga
 	},
 ]);
 

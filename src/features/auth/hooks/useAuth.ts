@@ -48,6 +48,8 @@ const useAuth = () => {
 		}
 	};
 
+	// FIXME: perbaiki buat arahin ke login
+
 	// 🔹 fungsi client register
 	const clientRegister = async (data: RegisterRequest) => {
 		setLoading(true);

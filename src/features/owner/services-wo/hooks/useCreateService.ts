@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
 
 // API services
@@ -9,7 +8,11 @@ import {
 	getFormsApi,
 	getFormByIdApi,
 } from "@/features/owner/form/services/formService";
-import { createServiceApi } from "@/features/owner/services-wo/services/servicesWo";
+import {
+	createServiceApi,
+	getServicesWoApi,
+} from "@/features/owner/services-wo/services/servicesWo";
+import { handleApi } from "@/lib/handle-api";
 
 // === Types ===
 type Status = {
@@ -31,6 +34,9 @@ export const useCreateService = () => {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [creating, setCreating] = useState(false);
+	const [services, setServices] = useState<Service[]>([]);
+
+	// === Form fields ===
 
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
@@ -234,74 +240,91 @@ export const useCreateService = () => {
 		setCreating(true);
 		setError(null);
 
-		try {
-			if (!title.trim() || !description.trim()) {
-				notifyError("Gagal menyimpan", "Judul dan deskripsi wajib diisi");
-				return;
-			}
-			if (selectedStaff.length === 0) {
-				notifyError("Gagal menyimpan", "Pilih minimal satu staff");
-				return;
-			}
-
-			const payload: CreateServiceRequest = {
-				title,
-				description,
-				isActive: selectedStatus?.value === "true",
-				accessType,
-				requiredStaff: selectedStaff.map((s) => ({
-					positionId: s.positionId,
-					minimumStaff: s.minimumStaff,
-					maximumStaff: s.maximumStaff,
-				})),
-				workOrderForms: selectedForms.map((form, i) => {
-					const cfg = formAccessConfig[form._id] || {
-						fillableByRoles: [],
-						viewableByRoles: [],
-						fillableByPositionIds: [],
-						viewableByPositionIds: [],
-					};
-					return {
-						order: i + 1,
-						formId: form._id,
-						...cfg,
-					};
-				}),
-				reportForms: selectedReportForms.map((form, i) => {
-					const cfg = formAccessConfigReport[form._id] || {
-						fillableByRoles: [],
-						viewableByRoles: [],
-						fillableByPositionIds: [],
-						viewableByPositionIds: [],
-					};
-					return {
-						order: i + 1,
-						formId: form._id,
-						...cfg,
-					};
-				}),
-			};
-
-			const res = await createServiceApi(payload);
-			console.log("✅ Response:", res.data);
-
-			notifySuccess("Berhasil", "Layanan berhasil dibuat");
-			navigate("/dashboard/owner/services");
-		} catch (err) {
-			if (axios.isAxiosError(err)) {
-				const msg =
-					err.response?.data?.error ||
-					err.response?.data?.message ||
-					"Terjadi kesalahan tak terduga";
-				setError(msg);
-				notifyError("Gagal membuat layanan", msg);
-			} else {
-				setError("Terjadi kesalahan internal");
-				notifyError("Gagal membuat layanan", "Terjadi kesalahan internal");
-			}
-		} finally {
+		if (!title.trim() || !description.trim()) {
+			notifyError("Gagal menyimpan", "Judul dan deskripsi wajib diisi");
 			setCreating(false);
+			return;
 		}
+		if (selectedStaff.length === 0) {
+			notifyError("Gagal menyimpan", "Pilih minimal satu staff");
+			setCreating(false);
+			return;
+		}
+
+		const payload: CreateServiceRequest = {
+			title,
+			description,
+			isActive: selectedStatus?.value === "true",
+			accessType,
+			requiredStaff: selectedStaff.map((s) => ({
+				positionId: s.positionId,
+				minimumStaff: s.minimumStaff,
+				maximumStaff: s.maximumStaff,
+			})),
+			workOrderForms: selectedForms.map((form, i) => {
+				const cfg = formAccessConfig[form._id] || {
+					fillableByRoles: [],
+					viewableByRoles: [],
+					fillableByPositionIds: [],
+					viewableByPositionIds: [],
+				};
+				return {
+					order: i + 1,
+					formId: form._id,
+					...cfg,
+				};
+			}),
+			reportForms: selectedReportForms.map((form, i) => {
+				const cfg = formAccessConfigReport[form._id] || {
+					fillableByRoles: [],
+					viewableByRoles: [],
+					fillableByPositionIds: [],
+					viewableByPositionIds: [],
+				};
+				return {
+					order: i + 1,
+					formId: form._id,
+					...cfg,
+				};
+			}),
+		};
+
+		const { data: res, error } = await handleApi(() =>
+			createServiceApi(payload)
+		);
+		setCreating(false);
+
+		if (error) {
+			setError(error.message);
+			notifyError("Gagal menyimpan", error.message);
+			console.log("Detail validasi:", error.errors);
+			return;
+		}
+
+		const service = res?.data;
+		if (!service) {
+			notifyError("Gagal menyimpan", "Data layanan tidak ditemukan");
+			return;
+		}
+
+		notifySuccess("Layanan berhasil disimpan");
+		navigate("/dashboard/owner/services");
+	};
+
+	const fecthServices = async () => {
+		setLoading(true);
+		setError(null);
+
+		const { data: res, error } = await handleApi(() => getServicesWoApi());
+
+		setLoading(false);
+		if (error) {
+			setError(error.message);
+			notifyError("Gagal memuat data layanan", error.message);
+			return;
+		}
+
+		setServices(res?.data || []);
 	};
 
 	return {
@@ -325,6 +348,7 @@ export const useCreateService = () => {
 		loadingPositions,
 		errorPositions,
 		creating,
+		services,
 
 		// === SETTERS ===
 		setTitle,
@@ -333,6 +357,7 @@ export const useCreateService = () => {
 		setSelectedStatus,
 		setOpenStatus,
 		setSelectedStaff,
+		fecthServices,
 
 		// === HANDLERS ===
 		fetchPositions,

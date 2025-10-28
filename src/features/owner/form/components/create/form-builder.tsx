@@ -16,6 +16,8 @@ import {
 import { useValidation } from "@/hooks/use-validation";
 import { minFields, required, minLength } from "@/lib/validators";
 import { useNavigate } from "react-router-dom";
+import { handleApi } from "@/lib/handle-api";
+import { notifyError, notifySuccess } from "@/lib/toast-helper";
 
 export type FormBuilderRef = {
 	submitForm: () => void;
@@ -92,22 +94,34 @@ export const FormBuilder = forwardRef<FormBuilderRef, Props>(
 
 		const handleSubmit = async () => {
 			setHasSubmitted(true);
+
 			if (!validateForm()) {
 				toast.error("Periksa kembali isian form!");
 				return;
 			}
 
 			setIsSubmitting(true);
-			try {
-				await createFormApi(formData);
-				toast.success("Form berhasil disimpan!");
-				navigate("/dashboard/owner/forms");
-			} catch (error) {
+
+			const { data: res, error } = await handleApi(() =>
+				createFormApi(formData)
+			);
+
+			setIsSubmitting(false);
+
+			if (error) {
 				console.error(error);
-				toast.error("Gagal menyimpan form!");
-			} finally {
-				setIsSubmitting(false);
+				notifyError(error.message || "Gagal menyimpan form!");
+				return;
 			}
+
+			const form = res?.data;
+			if (!form) {
+				notifyError("Gagal membuat form", "Data posisi tidak ditemukan");
+				return;
+			}
+
+			notifySuccess("Form berhasil disimpan!");
+			navigate("/dashboard/owner/forms");
 		};
 
 		useImperativeHandle(ref, () => ({

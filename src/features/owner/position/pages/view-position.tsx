@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { getPositionsApi } from "../services/positionService";
 import {
 	Table,
 	TableBody,
@@ -23,28 +22,16 @@ import {
 	PaginationEllipsis,
 } from "@/components/ui/pagination";
 import { motion } from "framer-motion";
+import usePosition from "../hooks/usePosition";
 
 const ITEMS_PER_PAGE = 6;
 
 const PositionView: React.FC = () => {
-	const [positions, setPositions] = useState<Position[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
+	const { fetchPositions, positions, loading, error } = usePosition();
 	const [currentPage, setCurrentPage] = useState(1);
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		const fetchPositions = async (): Promise<void> => {
-			try {
-				setLoading(true);
-				const res = await getPositionsApi();
-				setPositions(res.data ?? []);
-			} catch {
-				setError("Gagal memuat data posisi");
-			} finally {
-				setLoading(false);
-			}
-		};
 		void fetchPositions();
 	}, []);
 

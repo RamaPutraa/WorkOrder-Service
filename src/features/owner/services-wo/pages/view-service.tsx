@@ -1,32 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getServicesWoApi } from "../services/servicesWo";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCreateService } from "../hooks/useCreateService";
 
 const ViewService: React.FC = () => {
 	const navigate = useNavigate();
-	const [services, setServices] = useState<Service[]>([]);
-	const [loading, setLoading] = useState<boolean>(true);
-	const [error, setError] = useState<string | null>(null);
-	useEffect(() => {
-		const fetchServices = async (): Promise<void> => {
-			try {
-				setLoading(true);
-				const res = await getServicesWoApi();
-				setServices(res.data || []);
-				console.log("📋 Semua services:", res.data);
-			} catch {
-				setError("Gagal memuat data service");
-			} finally {
-				setLoading(false);
-			}
-		};
+	const { fecthServices, services, loading, error } = useCreateService();
 
-		void fetchServices();
+	useEffect(() => {
+		void fecthServices();
 	}, []);
 
 	if (error) {

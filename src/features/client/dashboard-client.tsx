@@ -14,6 +14,8 @@ import {
 import { useEffect, useState } from "react";
 import { getAllCompanyApi } from "./company/services/companyClientService";
 import { useNavigate } from "react-router-dom";
+import { handleApi } from "@/lib/handle-api";
+import { notifyError } from "@/lib/toast-helper";
 
 const metrics = [
 	{
@@ -53,19 +55,23 @@ const DashboardClient = () => {
 	const [search, setSearch] = useState("");
 	const navigate = useNavigate();
 
-	useEffect(() => {
-		const fetchCompanies = async (): Promise<void> => {
-			try {
-				setLoading(true);
-				const res = await getAllCompanyApi();
-				setCompanies(res.data || []);
-			} catch {
-				setError("Gagal memuat data company");
-			} finally {
-				setLoading(false);
-			}
-		};
+	const fetchCompanies = async () => {
+		setLoading(true);
+		setError(null);
 
+		const { data: res, error } = await handleApi(() => getAllCompanyApi());
+		setLoading(false);
+
+		if (error) {
+			setError(error.message);
+			notifyError("Gagal memuat data", error.message);
+			return;
+		}
+
+		setCompanies(res?.data || []);
+	};
+
+	useEffect(() => {
 		void fetchCompanies();
 	}, []);
 

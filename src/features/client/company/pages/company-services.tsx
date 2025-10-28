@@ -1,32 +1,17 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { getCompanyServiceAPi } from "../services/companyClientService";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Wrench } from "lucide-react";
+import useClientCompany from "../hooks/client-company-services";
 
 const ClientCompanyServices = () => {
-	const { id } = useParams();
+	const { fetchCompanyServices, services, loading, error } = useClientCompany();
 	const navigate = useNavigate();
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
-	const [services, setServices] = useState<Service[]>([]);
 
 	useEffect(() => {
-		const fetchServices = async () => {
-			try {
-				setLoading(true);
-				if (!id) return;
-				const res = await getCompanyServiceAPi(id);
-				setServices(res.data || []);
-			} catch {
-				setError("Gagal memuat data layanan perusahaan ini.");
-			} finally {
-				setLoading(false);
-			}
-		};
-		void fetchServices();
-	}, [id]);
+		void fetchCompanyServices();
+	}, []);
 
 	if (loading)
 		return (
@@ -87,7 +72,15 @@ const ClientCompanyServices = () => {
 										? `Kategori: ${service.accessType}`
 										: "Tanpa kategori"}
 								</p>
-								<Button variant="outline" size="sm" className="mt-3 w-full">
+								<Button
+									variant="outline"
+									size="sm"
+									className="mt-3 w-full"
+									onClick={() =>
+										navigate(
+											`/dashboard/client/company/services/${service._id}/intake-forms`
+										)
+									}>
 									Detail
 								</Button>
 							</CardContent>
