@@ -6,24 +6,28 @@ import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
+import { handleApi } from "@/lib/handle-api";
+import { notifyError } from "@/lib/toast-helper";
 
 const ViewForm: React.FC = () => {
 	const [forms, setForms] = useState<Form[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
 	const navigate = useNavigate();
-
+	
 	useEffect(() => {
 		const fetchForms = async (): Promise<void> => {
-			try {
-				setLoading(true);
-				const res = await getFormsApi();
-				setForms(res.data?.forms || []);
-			} catch {
-				setError("Gagal memuat data form");
-			} finally {
-				setLoading(false);
+			setLoading(true);
+			const { data: res, error } = await handleApi(() => getFormsApi());
+
+			setLoading(false);
+			if (error) {
+				setError(error.message);
+				notifyError("Gagal memuat data form", error.message);
+				return;
 			}
+
+			setForms(res?.data || []);
 		};
 
 		void fetchForms();

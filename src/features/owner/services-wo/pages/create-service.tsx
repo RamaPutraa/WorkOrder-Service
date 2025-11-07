@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useCreateService } from "../hooks/useCreateService";
 import { CardServiceInfo } from "../components/create/service-info";
 import { CardWorkOrderForm } from "../components/create/workorder-form";
+import { CardIntakeForm } from "../components/create/intake-form";
 import { CardReportForm } from "../components/create/report-form";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -26,9 +27,11 @@ const CreateService: React.FC = () => {
 		forms,
 		selectedForms,
 		selectedReportForms,
+		selectedIntakeForms,
 		availableRoles,
 		formAccessConfig,
 		formAccessConfigReport,
+		formAccessConfigIntake,
 
 		// handlers dari hook
 		setTitle,
@@ -41,6 +44,7 @@ const CreateService: React.FC = () => {
 		toggleStaff,
 		toggleForm,
 		toggleReportForm,
+		toggleIntakeForm,
 		toggleRoleFill,
 		toggleRoleView,
 		toggleFillablePosition,
@@ -119,10 +123,18 @@ const CreateService: React.FC = () => {
 						formAccessConfig={formAccessConfig}
 						loading={loadingPositions}
 						toggleForm={toggleForm}
-						toggleRoleFill={toggleRoleFill}
-						toggleRoleView={toggleRoleView}
-						toggleFillablePosition={toggleFillablePosition}
-						toggleViewablePosition={toggleViewablePosition}
+						toggleRoleFill={(formId, role) =>
+							toggleRoleFill(formId, role, "workOrder")
+						}
+						toggleRoleView={(formId, role) =>
+							toggleRoleView(formId, role, "workOrder")
+						}
+						toggleFillablePosition={(formId, posId) =>
+							toggleFillablePosition(formId, posId, "workOrder")
+						}
+						toggleViewablePosition={(formId, posId) =>
+							toggleViewablePosition(formId, posId, "workOrder")
+						}
 					/>
 				</motion.div>
 			</AnimatePresence>
@@ -144,10 +156,39 @@ const CreateService: React.FC = () => {
 						formAccessConfigReport={formAccessConfigReport}
 						loading={loadingPositions}
 						toggleReportForm={toggleReportForm}
-						toggleRoleFill={toggleRoleFill}
-						toggleRoleView={toggleRoleView}
-						toggleFillablePosition={toggleFillablePosition}
-						toggleViewablePosition={toggleViewablePosition}
+						toggleRoleFill={(formId, role) =>
+							toggleRoleFill(formId, role, "report")
+						}
+						toggleRoleView={(formId, role) =>
+							toggleRoleView(formId, role, "report")
+						}
+						toggleFillablePosition={(formId, posId) =>
+							toggleFillablePosition(formId, posId, "report")
+						}
+						toggleViewablePosition={(formId, posId) =>
+							toggleViewablePosition(formId, posId, "report")
+						}
+					/>
+				</motion.div>
+			</AnimatePresence>
+
+			{/* === CARD 4 === */}
+			<AnimatePresence>
+				<motion.div
+					key="card-report-form"
+					initial={{ opacity: 0, y: 8 }}
+					animate={{ opacity: 1, y: 0 }}
+					exit={{ opacity: 0, y: -8 }}
+					transition={{ duration: 0.2 }}>
+					<CardIntakeForm
+						forms={forms}
+						positions={positions}
+						selectedIntakeForms={selectedIntakeForms}
+						selectedStaff={selectedStaff}
+						availableRoles={availableRoles}
+						formAccessConfigIntake={formAccessConfigIntake}
+						loading={loadingPositions}
+						toggleIntakeForm={toggleIntakeForm}
 					/>
 				</motion.div>
 			</AnimatePresence>

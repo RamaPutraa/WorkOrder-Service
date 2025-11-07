@@ -14,6 +14,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDownIcon, CheckIcon } from "lucide-react";
+import { type FormType } from "../../hooks/useCreateService";
 
 type RoleConfig = {
 	fillableByRoles: string[];
@@ -32,17 +33,17 @@ type CardReportFormProps = {
 	loading: boolean;
 
 	toggleReportForm: (form: Form) => void;
-	toggleRoleFill: (formId: string, role: string, isReport?: boolean) => void;
-	toggleRoleView: (formId: string, role: string, isReport?: boolean) => void;
+	toggleRoleFill: (formId: string, role: string, type: FormType) => void;
+	toggleRoleView: (formId: string, role: string, type: FormType) => void;
 	toggleFillablePosition: (
 		formId: string,
 		posId: string,
-		isReport?: boolean
+		type: FormType
 	) => void;
 	toggleViewablePosition: (
 		formId: string,
 		posId: string,
-		isReport?: boolean
+		type: FormType
 	) => void;
 };
 
@@ -159,7 +160,7 @@ export const CardReportForm: React.FC<CardReportFormProps> = ({
 																key={`report-fill-${form._id}-${role.value}`}
 																className="flex items-center space-x-2 cursor-pointer"
 																onClick={() =>
-																	toggleRoleFill(form._id, role.value, true)
+																	toggleRoleFill(form._id, role.value, "report")
 																}>
 																<Checkbox
 																	onClick={(e) => e.stopPropagation()}
@@ -201,7 +202,7 @@ export const CardReportForm: React.FC<CardReportFormProps> = ({
 																					toggleFillablePosition(
 																						form._id,
 																						id,
-																						true
+																						"report"
 																					)
 																				}
 																				className="text-xs text-primary/70 hover:text-primary">
@@ -243,7 +244,7 @@ export const CardReportForm: React.FC<CardReportFormProps> = ({
 																				toggleFillablePosition(
 																					form._id,
 																					id,
-																					true
+																					"report"
 																				);
 																			}}
 																			className="flex justify-between">
@@ -293,7 +294,7 @@ export const CardReportForm: React.FC<CardReportFormProps> = ({
 																key={`report-view-${form._id}-${role.value}`}
 																className="flex items-center space-x-2 cursor-pointer"
 																onClick={() =>
-																	toggleRoleView(form._id, role.value, true)
+																	toggleRoleView(form._id, role.value, "report")
 																}>
 																<Checkbox
 																	onClick={(e) => e.stopPropagation()}
@@ -335,7 +336,7 @@ export const CardReportForm: React.FC<CardReportFormProps> = ({
 																					toggleViewablePosition(
 																						form._id,
 																						id,
-																						true
+																						"report"
 																					)
 																				}
 																				className="text-xs text-primary/70 hover:text-primary">
@@ -377,7 +378,7 @@ export const CardReportForm: React.FC<CardReportFormProps> = ({
 																				toggleViewablePosition(
 																					form._id,
 																					id,
-																					true
+																					"report"
 																				);
 																			}}
 																			className="flex justify-between">

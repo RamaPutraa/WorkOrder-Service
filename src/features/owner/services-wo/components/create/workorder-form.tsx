@@ -14,7 +14,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDownIcon, CheckIcon } from "lucide-react";
-
+import { type FormType } from "../../hooks/useCreateService";
 type RoleConfig = {
 	fillableByRoles: string[];
 	fillableByPositionIds: string[];
@@ -33,10 +33,18 @@ type CardWorkOrderFormProps = {
 
 	// Handlers
 	toggleForm: (form: Form) => void;
-	toggleRoleFill: (formId: string, role: string) => void;
-	toggleRoleView: (formId: string, role: string) => void;
-	toggleFillablePosition: (formId: string, posId: string) => void;
-	toggleViewablePosition: (formId: string, posId: string) => void;
+	toggleRoleFill: (formId: string, role: string, type: FormType) => void;
+	toggleRoleView: (formId: string, role: string, type: FormType) => void;
+	toggleFillablePosition: (
+		formId: string,
+		posId: string,
+		type: FormType
+	) => void;
+	toggleViewablePosition: (
+		formId: string,
+		posId: string,
+		type: FormType
+	) => void;
 };
 
 export const CardWorkOrderForm: React.FC<CardWorkOrderFormProps> = ({
@@ -151,7 +159,11 @@ export const CardWorkOrderForm: React.FC<CardWorkOrderFormProps> = ({
 																key={`workorder-fill-${form._id}-${role.value}`}
 																className="flex items-center space-x-2 cursor-pointer"
 																onClick={() =>
-																	toggleRoleFill(form._id, role.value)
+																	toggleRoleFill(
+																		form._id,
+																		role.value,
+																		"workOrder"
+																	)
 																}>
 																<Checkbox
 																	onClick={(e) => e.stopPropagation()}
@@ -190,7 +202,11 @@ export const CardWorkOrderForm: React.FC<CardWorkOrderFormProps> = ({
 																			<button
 																				type="button"
 																				onClick={() =>
-																					toggleFillablePosition(form._id, id)
+																					toggleFillablePosition(
+																						form._id,
+																						id,
+																						"workOrder"
+																					)
 																				}
 																				className="text-xs text-primary/70 hover:text-primary">
 																				×
@@ -228,7 +244,11 @@ export const CardWorkOrderForm: React.FC<CardWorkOrderFormProps> = ({
 																			key={`workorder-fillselect-${form._id}-${id}`}
 																			onClick={(e) => {
 																				e.preventDefault();
-																				toggleFillablePosition(form._id, id);
+																				toggleFillablePosition(
+																					form._id,
+																					id,
+																					"workOrder"
+																				);
 																			}}
 																			className="flex justify-between">
 																			<span>
@@ -277,7 +297,11 @@ export const CardWorkOrderForm: React.FC<CardWorkOrderFormProps> = ({
 																key={`workorder-view-${form._id}-${role.value}`}
 																className="flex items-center space-x-2 cursor-pointer"
 																onClick={() =>
-																	toggleRoleView(form._id, role.value)
+																	toggleRoleView(
+																		form._id,
+																		role.value,
+																		"workOrder"
+																	)
 																}>
 																<Checkbox
 																	onClick={(e) => e.stopPropagation()}
@@ -316,7 +340,11 @@ export const CardWorkOrderForm: React.FC<CardWorkOrderFormProps> = ({
 																			<button
 																				type="button"
 																				onClick={() =>
-																					toggleViewablePosition(form._id, id)
+																					toggleViewablePosition(
+																						form._id,
+																						id,
+																						"workOrder"
+																					)
 																				}
 																				className="text-xs text-primary/70 hover:text-primary">
 																				×
@@ -354,7 +382,11 @@ export const CardWorkOrderForm: React.FC<CardWorkOrderFormProps> = ({
 																			key={`workorder-viewselect-${form._id}-${id}`}
 																			onClick={(e) => {
 																				e.preventDefault();
-																				toggleViewablePosition(form._id, id);
+																				toggleViewablePosition(
+																					form._id,
+																					id,
+																					"workOrder"
+																				);
 																			}}
 																			className="flex justify-between">
 																			<span>

@@ -25,6 +25,11 @@ type ReportForms = {
 	viewableByPositionIds: string[];
 };
 
+type IntakeForms = {
+	order: number;
+	formId: string;
+};
+
 // ==========================
 // === REQUEST & RESPONSE ===
 // ==========================
@@ -38,6 +43,7 @@ type CreateServiceRequest = {
 	requiredStaff: Staff[];
 	workOrderForms: OrderForms[];
 	reportForms: ReportForms[];
+	clientIntakeForms: IntakeForms[];
 };
 
 // response service (response dari backend)

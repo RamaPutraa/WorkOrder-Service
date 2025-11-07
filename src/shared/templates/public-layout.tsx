@@ -1,15 +1,16 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "../organism/navbar";
+import Footer from "../organism/footer";
 
 const PublicLayout = () => {
 	return (
 		<>
 			<div className="min-h-screen flex flex-col">
 				<Navbar showMenu />
-				<main className="p-4">
+				<main>
 					<Outlet />
 				</main>
-				<footer className="p-4 bg-gray-200 text-center"> Setiawan </footer>
+				<Footer />
 			</div>
 		</>
 	);

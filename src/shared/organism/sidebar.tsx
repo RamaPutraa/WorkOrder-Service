@@ -1,133 +1,166 @@
-import { Home, Inbox, Settings, List, LayoutDashboard } from "lucide-react";
+"use client";
 
+import * as React from "react";
+import {
+	AudioWaveform,
+	BookOpen,
+	Bot,
+	Command,
+	Frame,
+	GalleryVerticalEnd,
+	Map,
+	PieChart,
+	Settings2,
+	SquareTerminal,
+} from "lucide-react";
+
+import { NavMain } from "../molecules/nav-main";
+import { NavUser } from "../molecules/nav-user";
+import { NavMenu } from "../molecules/nav-menu";
+import { TeamManagement } from "../molecules/nav-header";
 import {
 	Sidebar,
 	SidebarContent,
-	SidebarGroup,
-	SidebarGroupContent,
-	SidebarGroupLabel,
-	SidebarMenu,
-	SidebarMenuButton,
-	SidebarMenuItem,
+	SidebarFooter,
+	SidebarHeader,
+	SidebarRail,
 } from "@/components/ui/sidebar";
 
-import {
-	Collapsible,
-	CollapsibleTrigger,
-	CollapsibleContent,
-} from "@radix-ui/react-collapsible";
-import useAuth from "@/features/auth/hooks/useAuth";
-
-const AppSidebar = () => {
-	const { user } = useAuth();
-	return (
-		<Sidebar>
-			<SidebarContent>
-				{/* ====== Application Group ====== */}
-				<SidebarGroup>
-					<SidebarGroupLabel>Application</SidebarGroupLabel>
-					<SidebarGroupContent>
-						<SidebarMenu>
-							{/* Home */}
-							<SidebarMenuItem>
-								<SidebarMenuButton asChild>
-									<a href="/">
-										<Home className="w-4 h-4" />
-										<span>Home</span>
-									</a>
-								</SidebarMenuButton>
-							</SidebarMenuItem>
-
-							{/* ====== Work Order ====== */}
-							<SidebarMenuItem>
-								<SidebarMenuButton asChild>
-									<a
-										href={
-											user?.role === "owner_company"
-												? "/dashboard/owner"
-												: user?.role === "staff_company"
-												? "/dashboard/staff"
-												: user?.role === "client"
-												? "/dashboard/client"
-												: "/dashboard"
-										}>
-										<LayoutDashboard className="w-4 h-4" />
-										<span>Dashboard</span>
-									</a>
-								</SidebarMenuButton>
-							</SidebarMenuItem>
-
-							{/* ====== Work Order ====== */}
-							<SidebarMenuItem>
-								<SidebarMenuButton asChild>
-									<a href="#">
-										<Settings className="w-4 h-4" />
-										<span>Work Order</span>
-									</a>
-								</SidebarMenuButton>
-							</SidebarMenuItem>
-
-							{user?.role === "owner_company" && (
-								// ====== Master Data ======
-								<Collapsible defaultOpen>
-									<CollapsibleTrigger asChild>
-										<SidebarMenuButton>
-											<Inbox className="w-4 h-4" />
-											<span>Master Data</span>
-										</SidebarMenuButton>
-									</CollapsibleTrigger>
-									<CollapsibleContent>
-										<SidebarMenu className="pl-6 mt-1 space-y-1">
-											<SidebarMenuItem>
-												<SidebarMenuButton asChild>
-													<a href="/dashboard/owner/company">
-														<List className="w-4 h-4" />
-														<span>Company</span>
-													</a>
-												</SidebarMenuButton>
-											</SidebarMenuItem>
-											<SidebarMenuItem>
-												<SidebarMenuButton asChild>
-													<a href="/dashboard/owner/positions">
-														<List className="w-4 h-4" />
-														<span>Position</span>
-													</a>
-												</SidebarMenuButton>
-											</SidebarMenuItem>
-											<SidebarMenuItem>
-												<SidebarMenuButton asChild>
-													<a href="/dashboard/owner/forms">
-														<List className="w-4 h-4" />
-														<span>Form</span>
-													</a>
-												</SidebarMenuButton>
-											</SidebarMenuItem>
-											<SidebarMenuItem>
-												<SidebarMenuButton asChild>
-													<a href="/dashboard/owner/services">
-														<List className="w-4 h-4" />
-														<span>Service</span>
-													</a>
-												</SidebarMenuButton>
-											</SidebarMenuItem>
-											<SidebarMenuItem>
-												<SidebarMenuButton asChild>
-													<a href="/dashboard/owner/service">
-														<List className="w-4 h-4" />
-														<span>Work Order</span>
-													</a>
-												</SidebarMenuButton>
-											</SidebarMenuItem>
-										</SidebarMenu>
-									</CollapsibleContent>
-								</Collapsible>
-							)}
-						</SidebarMenu>
-					</SidebarGroupContent>
-				</SidebarGroup>
-			</SidebarContent>
-		</Sidebar>
-	);
+// This is sample data.
+const data = {
+	teams: [
+		{
+			name: "Acme Inc",
+			logo: GalleryVerticalEnd,
+			plan: "Enterprise",
+		},
+		{
+			name: "Acme Corp.",
+			logo: AudioWaveform,
+			plan: "Startup",
+		},
+		{
+			name: "Evil Corp.",
+			logo: Command,
+			plan: "Free",
+		},
+	],
+	navMain: [
+		{
+			title: "Services",
+			url: "#",
+			icon: SquareTerminal,
+			isActive: true,
+			items: [
+				{
+					title: "Kelola Service",
+					url: "/dashboard/owner/services",
+				},
+				{
+					title: "Kelola Form",
+					url: "/dashboard/owner/forms",
+				},
+			],
+		},
+		{
+			title: "Pegawai",
+			url: "#",
+			icon: Bot,
+			items: [
+				{
+					title: "Pegawai (Active)",
+					url: "#",
+				},
+				{
+					title: "Pegawai (Pending)",
+					url: "#",
+				},
+				{
+					title: "Posisi Pegawai",
+					url: "/dashboard/owner/positions",
+				},
+			],
+		},
+		{
+			title: "Documentation",
+			url: "#",
+			icon: BookOpen,
+			items: [
+				{
+					title: "Introduction",
+					url: "#",
+				},
+				{
+					title: "Get Started",
+					url: "#",
+				},
+				{
+					title: "Tutorials",
+					url: "#",
+				},
+				{
+					title: "Changelog",
+					url: "#",
+				},
+			],
+		},
+		{
+			title: "Settings",
+			url: "#",
+			icon: Settings2,
+			items: [
+				{
+					title: "General",
+					url: "#",
+				},
+				{
+					title: "Team",
+					url: "#",
+				},
+				{
+					title: "Billing",
+					url: "#",
+				},
+				{
+					title: "Limits",
+					url: "#",
+				},
+			],
+		},
+	],
+	navMenu: [
+		{
+			name: "Beranda",
+			url: "/",
+			icon: Frame,
+		},
+		{
+			name: "Statistik Perusahaan",
+			url: "#",
+			icon: PieChart,
+		},
+		{
+			name: "Travel",
+			url: "#",
+			icon: Map,
+		},
+	],
 };
 
-export default AppSidebar;
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+	return (
+		<Sidebar collapsible="icon" {...props}>
+			<SidebarHeader>
+				<TeamManagement teams={data.teams} />
+			</SidebarHeader>
+			<SidebarContent>
+				<NavMenu menu={data.navMenu} />
+				<NavMain items={data.navMain} />
+			</SidebarContent>
+			<SidebarFooter>
+				<NavUser />
+			</SidebarFooter>
+			<SidebarRail />
+		</Sidebar>
+	);
+}

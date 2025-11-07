@@ -26,7 +26,7 @@ type RoleConfig = {
 	viewableByRoles: string[];
 	viewableByPositionIds: string[];
 };
-
+export type FormType = "report" | "workOrder" | "intake";
 export const useCreateService = () => {
 	const navigate = useNavigate();
 
@@ -57,12 +57,16 @@ export const useCreateService = () => {
 	const [selectedStaff, setSelectedStaff] = useState<Staff[]>([]);
 	const [selectedForms, setSelectedForms] = useState<Form[]>([]);
 	const [selectedReportForms, setSelectedReportForms] = useState<Form[]>([]);
+	const [selectedIntakeForms, setSelectedIntakForms] = useState<Form[]>([]);
 
 	// === Config akses form ===
 	const [formAccessConfig, setFormAccessConfig] = useState<
 		Record<string, RoleConfig>
 	>({});
 	const [formAccessConfigReport, setFormAccessConfigReport] = useState<
+		Record<string, RoleConfig>
+	>({});
+	const [formAccessConfigIntake, setFormAccessConfigIntake] = useState<
 		Record<string, RoleConfig>
 	>({});
 
@@ -85,16 +89,17 @@ export const useCreateService = () => {
 		}
 	};
 
-	const fetchForms = async () => {
-		try {
-			setLoading(true);
-			const res = await getFormsApi();
-			setForms(res.data?.forms || []);
-		} catch {
-			setError("Gagal memuat data form");
-		} finally {
-			setLoading(false);
+	const fetchForms = async (): Promise<void> => {
+		setLoading(true);
+		const { data: res, error } = await handleApi(() => getFormsApi());
+		setLoading(false);
+
+		if (error) {
+			setError(error.message);
+			notifyError("Gagal memuat data form", error.message);
+			return;
 		}
+		setForms(res?.data || []);
 	};
 
 	useEffect(() => {
@@ -127,17 +132,25 @@ export const useCreateService = () => {
 			return;
 		}
 
-		try {
-			setLoading(true);
-			const res = await getFormByIdApi(form._id);
-			const detailedForm = res.data?.form;
-			if (!detailedForm) return;
-			setSelectedForms((prev) => [...prev, detailedForm]);
-		} catch {
+		setLoading(true);
+		const { data: res, error } = await handleApi(() =>
+			getFormByIdApi(form._id)
+		);
+		setLoading(false);
+
+		if (error) {
 			setError("Gagal memuat detail form");
-		} finally {
-			setLoading(false);
+			notifyError("Gagal memuat detail form", error.message);
+			return;
 		}
+
+		const detailedForm = res?.data;
+		if (!detailedForm) return;
+		console.log(detailedForm);
+		if (detailedForm) {
+			setSelectedForms((prev) => [...prev, detailedForm]);
+		}
+		console.log(detailedForm);
 	};
 
 	const toggleReportForm = async (form: Form) => {
@@ -147,22 +160,66 @@ export const useCreateService = () => {
 			return;
 		}
 
-		try {
-			setLoading(true);
-			const res = await getFormByIdApi(form._id);
-			const detailedForm = res.data?.form;
-			if (!detailedForm) return;
-			setSelectedReportForms((prev) => [...prev, detailedForm]);
-		} catch {
+		setLoading(true);
+		const { data: res, error } = await handleApi(() =>
+			getFormByIdApi(form._id)
+		);
+		setLoading(false);
+
+		if (error) {
 			setError("Gagal memuat detail report form");
-		} finally {
-			setLoading(false);
+			notifyError("Gagal memuat detail report form", error.message);
+			return;
+		}
+
+		const detailedForm = res?.data;
+		if (detailedForm) {
+			setSelectedReportForms((prev) => [...prev, detailedForm]);
 		}
 	};
 
-	// === Role toggle (form & report) ===
-	const toggleRoleFill = (formId: string, role: string, isReport = false) => {
-		const setter = isReport ? setFormAccessConfigReport : setFormAccessConfig;
+	const toggleIntakeForm = async (form: Form) => {
+		const alreadySelected = selectedIntakeForms.some((f) => f._id === form._id);
+		if (alreadySelected) {
+			setSelectedIntakForms((prev) => prev.filter((f) => f._id !== form._id));
+			return;
+		}
+
+		setLoading(true);
+		const { data: res, error } = await handleApi(() =>
+			getFormByIdApi(form._id)
+		);
+		setLoading(false);
+
+		if (error) {
+			setError("Gagal memuat detail intake form");
+			notifyError("Gagal memuat detail intake form", error.message);
+			return;
+		}
+
+		const detailedForm = res?.data;
+		if (detailedForm) {
+			setSelectedIntakForms((prev) => [...prev, detailedForm]);
+		}
+	};
+
+	// Helper universal untuk memilih state setter berdasarkan tipe form
+	const getSetter = (
+		type: FormType
+	): React.Dispatch<React.SetStateAction<Record<string, RoleConfig>>> => {
+		switch (type) {
+			case "report":
+				return setFormAccessConfigReport;
+			case "workOrder":
+				return setFormAccessConfig;
+			case "intake":
+			default:
+				return setFormAccessConfigIntake;
+		}
+	};
+
+	const toggleRoleFill = (formId: string, role: string, type: FormType) => {
+		const setter = getSetter(type);
 		setter((prev) => {
 			const current = prev[formId] || {
 				fillableByRoles: [],
@@ -180,8 +237,8 @@ export const useCreateService = () => {
 		});
 	};
 
-	const toggleRoleView = (formId: string, role: string, isReport = false) => {
-		const setter = isReport ? setFormAccessConfigReport : setFormAccessConfig;
+	const toggleRoleView = (formId: string, role: string, type: FormType) => {
+		const setter = getSetter(type);
 		setter((prev) => {
 			const current = prev[formId] || {
 				fillableByRoles: [],
@@ -202,9 +259,9 @@ export const useCreateService = () => {
 	const toggleFillablePosition = (
 		formId: string,
 		posId: string,
-		isReport = false
+		type: FormType
 	) => {
-		const setter = isReport ? setFormAccessConfigReport : setFormAccessConfig;
+		const setter = getSetter(type);
 		setter((prev) => {
 			const current = prev[formId]!;
 			const updated = {
@@ -220,9 +277,9 @@ export const useCreateService = () => {
 	const toggleViewablePosition = (
 		formId: string,
 		posId: string,
-		isReport = false
+		type: FormType
 	) => {
-		const setter = isReport ? setFormAccessConfigReport : setFormAccessConfig;
+		const setter = getSetter(type);
 		setter((prev) => {
 			const current = prev[formId]!;
 			const updated = {
@@ -287,6 +344,10 @@ export const useCreateService = () => {
 					...cfg,
 				};
 			}),
+			clientIntakeForms: selectedIntakeForms.map((form, i) => ({
+				order: i + 1,
+				formId: form._id,
+			})),
 		};
 
 		const { data: res, error } = await handleApi(() =>
@@ -306,6 +367,7 @@ export const useCreateService = () => {
 			notifyError("Gagal menyimpan", "Data layanan tidak ditemukan");
 			return;
 		}
+		console.log(service);
 
 		notifySuccess("Layanan berhasil disimpan");
 		navigate("/dashboard/owner/services");
@@ -341,10 +403,12 @@ export const useCreateService = () => {
 		forms,
 		selectedForms,
 		selectedReportForms,
+		selectedIntakeForms,
 		selectedStaff,
 		availableRoles,
 		formAccessConfig,
 		formAccessConfigReport,
+		formAccessConfigIntake,
 		loadingPositions,
 		errorPositions,
 		creating,
@@ -364,6 +428,7 @@ export const useCreateService = () => {
 		toggleStaff,
 		toggleForm,
 		toggleReportForm,
+		toggleIntakeForm,
 		toggleRoleFill,
 		toggleRoleView,
 		toggleFillablePosition,

@@ -21,10 +21,8 @@ type CreateFormRequest = {
 	fields: Field[];
 };
 
-type FormResponse = ApiResponse<{
-	forms: Form[];
-}>;
+type FormResponse = ApiResponse<Form[]>;
 
-type GetFormByIdResponse = ApiResponse<{
-	form: Form;
-}>;
+type GetAllPosition = ApiResponse<Position[]>;
+
+type GetFormByIdResponse = ApiResponse<Form>;
