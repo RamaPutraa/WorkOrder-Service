@@ -1,37 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { getFormsApi } from "../services/formService";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
-import { handleApi } from "@/lib/handle-api";
-import { notifyError } from "@/lib/toast-helper";
+import { useForm } from "../hooks/use-form";
 
 const ViewForm: React.FC = () => {
-	const [forms, setForms] = useState<Form[]>([]);
-	const [loading, setLoading] = useState<boolean>(true);
-	const [error, setError] = useState<string | null>(null);
+	const { forms, loading, error } = useForm();
 	const navigate = useNavigate();
-	
-	useEffect(() => {
-		const fetchForms = async (): Promise<void> => {
-			setLoading(true);
-			const { data: res, error } = await handleApi(() => getFormsApi());
-
-			setLoading(false);
-			if (error) {
-				setError(error.message);
-				notifyError("Gagal memuat data form", error.message);
-				return;
-			}
-
-			setForms(res?.data || []);
-		};
-
-		void fetchForms();
-	}, []);
 
 	if (error) {
 		return (
@@ -108,7 +85,7 @@ const ViewForm: React.FC = () => {
 										asChild
 										variant="outline"
 										className="text-primary border-primary mt-4 w-full">
-										<a href={`/dashboard/owner/form/${form._id}`}>
+										<a href={`/dashboard/owner/form/detail/${form._id}`}>
 											Lihat Detail
 										</a>
 									</Button>

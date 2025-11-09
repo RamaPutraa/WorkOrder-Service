@@ -10,11 +10,10 @@ import {
 	GalleryVerticalEnd,
 	Map,
 	PieChart,
-	Settings2,
 	SquareTerminal,
 } from "lucide-react";
 
-import { NavMain } from "../molecules/nav-main";
+import { NavSetup } from "../molecules/nav-setup";
 import { NavUser } from "../molecules/nav-user";
 import { NavMenu } from "../molecules/nav-menu";
 import { TeamManagement } from "../molecules/nav-header";
@@ -25,6 +24,7 @@ import {
 	SidebarHeader,
 	SidebarRail,
 } from "@/components/ui/sidebar";
+import { NavBusiness } from "../molecules/nav-business";
 
 // This is sample data.
 const data = {
@@ -45,13 +45,52 @@ const data = {
 			plan: "Free",
 		},
 	],
-	navMain: [
+	navSetup: [
 		{
-			title: "Services",
+			title: "Documentation",
+			url: "#",
+			icon: BookOpen,
+			items: [
+				{
+					title: "FAQ",
+					url: "#",
+				},
+				{
+					title: "Work Order",
+					url: "#",
+				},
+				{
+					title: "Custom WO",
+					url: "#",
+				},
+			],
+		},
+		{
+			title: "FAQ",
 			url: "#",
 			icon: SquareTerminal,
 			isActive: true,
 			items: [
+				{
+					title: "Kelola FAQ",
+					url: "/dashboard/owner/services",
+				},
+				{
+					title: "Kelola Form",
+					url: "/dashboard/owner/forms",
+				},
+			],
+		},
+		{
+			title: "Work Order",
+			url: "#",
+			icon: SquareTerminal,
+			isActive: true,
+			items: [
+				{
+					title: "Template",
+					url: "/dashboard/owner/services",
+				},
 				{
 					title: "Kelola Service",
 					url: "/dashboard/owner/services",
@@ -81,49 +120,43 @@ const data = {
 				},
 			],
 		},
+	],
+	navBusiness: [
 		{
-			title: "Documentation",
+			title: "Work Order",
 			url: "#",
 			icon: BookOpen,
 			items: [
 				{
-					title: "Introduction",
+					title: "FAQ",
 					url: "#",
 				},
 				{
-					title: "Get Started",
+					title: "Work Order",
 					url: "#",
 				},
 				{
-					title: "Tutorials",
-					url: "#",
-				},
-				{
-					title: "Changelog",
+					title: "Custom WO",
 					url: "#",
 				},
 			],
 		},
 		{
-			title: "Settings",
+			title: "Transaksi",
 			url: "#",
-			icon: Settings2,
+			icon: Bot,
 			items: [
 				{
-					title: "General",
+					title: "Pegawai (Active)",
 					url: "#",
 				},
 				{
-					title: "Team",
+					title: "Pegawai (Pending)",
 					url: "#",
 				},
 				{
-					title: "Billing",
-					url: "#",
-				},
-				{
-					title: "Limits",
-					url: "#",
+					title: "Posisi Pegawai",
+					url: "/dashboard/owner/positions",
 				},
 			],
 		},
@@ -155,7 +188,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			</SidebarHeader>
 			<SidebarContent>
 				<NavMenu menu={data.navMenu} />
-				<NavMain items={data.navMain} />
+				<NavSetup items={data.navSetup} />
+				<NavBusiness items={data.navBusiness} />
 			</SidebarContent>
 			<SidebarFooter>
 				<NavUser />
