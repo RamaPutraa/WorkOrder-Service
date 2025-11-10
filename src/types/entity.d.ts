@@ -87,6 +87,11 @@ type Service = {
 		form: Form;
 	}[];
 
+	clientIntakeForms: {
+		order: number;
+		form: Form;
+	}[];
+
 	createdAt: string;
 	updatedAt: string;
 };

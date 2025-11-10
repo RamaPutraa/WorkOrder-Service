@@ -26,6 +26,7 @@ import CreateService from "@/features/owner/services-wo/pages/create-service";
 import ClientCompanyServices from "@/features/client/company/pages/company-services";
 import PublicServicePage from "@/features/client/services-wo/pages/request-services";
 import ErrorPage from "@/shared/errors/templates/error-page";
+import DetailService from "@/features/owner/services-wo/pages/detail-service";
 
 const router = createBrowserRouter([
 	{
@@ -75,6 +76,10 @@ const router = createBrowserRouter([
 					{
 						path: "services/create",
 						element: <CreateService />,
+					},
+					{
+						path: "services/detail/:id",
+						element: <DetailService />,
 					},
 				],
 			},

@@ -79,7 +79,7 @@ const ViewService: React.FC = () => {
 										asChild
 										variant="outline"
 										className="text-primary border-primary mt-4 w-full">
-										<a href={`/dashboard/owner/services/${service._id}`}>
+										<a href={`/dashboard/owner/services/detail/${service._id}`}>
 											Lihat Detail
 										</a>
 									</Button>

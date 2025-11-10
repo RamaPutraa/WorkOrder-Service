@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
 
 // API services
@@ -10,6 +10,7 @@ import {
 } from "@/features/owner/form/services/formService";
 import {
 	createServiceApi,
+	getServiceByIdApi,
 	getServicesWoApi,
 } from "@/features/owner/services-wo/services/servicesWo";
 import { handleApi } from "@/lib/handle-api";
@@ -31,13 +32,14 @@ export const useCreateService = () => {
 	const navigate = useNavigate();
 
 	// === States dasar ===
+	const { id } = useParams<{ id?: string }>();
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [creating, setCreating] = useState(false);
 	const [services, setServices] = useState<Service[]>([]);
+	const [detailService, setDetailService] = useState<Service | null>(null);
 
 	// === Form fields ===
-
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
 	const [accessType, setAccessType] = useState("");
@@ -101,16 +103,6 @@ export const useCreateService = () => {
 		}
 		setForms(res?.data || []);
 	};
-
-	useEffect(() => {
-		void fetchPositions();
-		void fetchForms();
-		setAvailableRoles([
-			{ value: "manager_company", label: "Manager" },
-			{ value: "staff_company", label: "Staff" },
-			{ value: "client", label: "Client" },
-		]);
-	}, []);
 
 	// === Staff handler ===
 	const toggleStaff = (pos: Position) => {
@@ -389,6 +381,41 @@ export const useCreateService = () => {
 		setServices(res?.data || []);
 	};
 
+	// get detail services
+	const getDetailService = async () => {
+		if (!id) {
+			setError("ID layanan tidak ditemukan");
+			notifyError("Gagal memuat data layanan", "ID layanan tidak ditemukan");
+			return;
+		}
+
+		setLoading(true);
+		setError(null);
+
+		const { data: res, error } = await handleApi(() => getServiceByIdApi(id));
+
+		setLoading(false);
+
+		if (error) {
+			console.log(error);
+			setError(error.message);
+			notifyError("Gagal memuat data layanan", error.message);
+			return;
+		}
+		setDetailService(res?.data || null);
+	};
+
+	useEffect(() => {
+		if (id) void getDetailService();
+		void fetchPositions();
+		void fetchForms();
+		setAvailableRoles([
+			{ value: "manager_company", label: "Manager" },
+			{ value: "staff_company", label: "Staff" },
+			{ value: "client", label: "Client" },
+		]);
+	}, [id]);
+
 	return {
 		// === STATE ===
 		loading,
@@ -413,6 +440,7 @@ export const useCreateService = () => {
 		errorPositions,
 		creating,
 		services,
+		detailService,
 
 		// === SETTERS ===
 		setTitle,
@@ -421,6 +449,7 @@ export const useCreateService = () => {
 		setSelectedStatus,
 		setOpenStatus,
 		setSelectedStaff,
+		setDetailService,
 		fecthServices,
 
 		// === HANDLERS ===
