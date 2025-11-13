@@ -95,3 +95,32 @@ type Service = {
 	createdAt: string;
 	updatedAt: string;
 };
+
+//client request service
+type ClientRequestService = {
+	_id: string;
+	serviceId: string;
+	clientId: string;
+	clientIntakeForm: string[];
+	status: string;
+	companyId: string;
+	createdAt: string;
+	updatedAt: string;
+};
+
+//intake submission
+type IntakeSubmission = {
+	_id: string;
+	ownerId: string;
+	formId: string;
+	submissionType: string;
+	fieldsData: {
+		order: number;
+		value: string | number;
+	}[];
+	status: string;
+	submittedBy: string;
+	createdAt: string;
+	updatedAt: string;
+	submittedAt: string;
+};

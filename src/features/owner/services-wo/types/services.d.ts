@@ -52,3 +52,5 @@ type CreateServiceResponse = ApiResponse<{
 }>;
 
 type GetAllServicesResponse = ApiResponse<Service[]>;
+
+type GetServicesResponseByID = ApiResponse<Service>;

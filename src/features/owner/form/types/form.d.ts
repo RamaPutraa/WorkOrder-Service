@@ -4,6 +4,7 @@ type FieldOption = {
 };
 
 type Field = {
+	fieldId: string;
 	order: number | null;
 	label: string;
 	type: FieldType;

@@ -25,6 +25,7 @@ import {
 	SidebarRail,
 } from "@/components/ui/sidebar";
 import { NavBusiness } from "../molecules/nav-business";
+import { NavHelp } from "../molecules/nav-help";
 
 // This is sample data.
 const data = {
@@ -46,25 +47,6 @@ const data = {
 		},
 	],
 	navSetup: [
-		{
-			title: "Documentation",
-			url: "#",
-			icon: BookOpen,
-			items: [
-				{
-					title: "FAQ",
-					url: "#",
-				},
-				{
-					title: "Work Order",
-					url: "#",
-				},
-				{
-					title: "Custom WO",
-					url: "#",
-				},
-			],
-		},
 		{
 			title: "FAQ",
 			url: "#",
@@ -133,7 +115,7 @@ const data = {
 				},
 				{
 					title: "Work Order",
-					url: "#",
+					url: "/dashboard/client/submissions",
 				},
 				{
 					title: "Custom WO",
@@ -178,6 +160,18 @@ const data = {
 			icon: Map,
 		},
 	],
+	navHelp: [
+		{
+			name: "Documentation",
+			url: "/",
+			icon: BookOpen,
+		},
+		{
+			name: "Setting",
+			url: "#",
+			icon: PieChart,
+		},
+	],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -187,9 +181,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				<TeamManagement teams={data.teams} />
 			</SidebarHeader>
 			<SidebarContent>
+				{/* all user */}
 				<NavMenu menu={data.navMenu} />
+				{/* internal */}
 				<NavSetup items={data.navSetup} />
 				<NavBusiness items={data.navBusiness} />
+				<NavHelp help={data.navHelp} />
 			</SidebarContent>
 			<SidebarFooter>
 				<NavUser />

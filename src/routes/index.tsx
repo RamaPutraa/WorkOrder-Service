@@ -27,6 +27,8 @@ import ClientCompanyServices from "@/features/client/company/pages/company-servi
 import PublicServicePage from "@/features/client/services-wo/pages/request-services";
 import ErrorPage from "@/shared/errors/templates/error-page";
 import DetailService from "@/features/owner/services-wo/pages/detail-service";
+import ServiceSubmitPage from "@/features/client/services-wo/pages/services-submit";
+import ServiceDetailSubmit from "@/features/client/services-wo/pages/services-detail-submit";
 
 const router = createBrowserRouter([
 	{
@@ -134,6 +136,14 @@ const router = createBrowserRouter([
 					{
 						path: "/dashboard/client/company/services/:id/intake-forms",
 						element: <PublicServicePage />,
+					},
+					{
+						path: "/dashboard/client/submissions",
+						element: <ServiceSubmitPage />,
+					},
+					{
+						path: "/dashboard/client/submissions/:id",
+						element: <ServiceDetailSubmit />,
 					},
 				],
 			},
