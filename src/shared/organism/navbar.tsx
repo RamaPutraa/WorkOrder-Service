@@ -60,7 +60,7 @@ const Navbar = ({ showMenu = false }: NavbarProps) => {
 					) : (
 						<div className="flex gap-2">
 							<Button asChild size="lg" className="font-semibold">
-								<a href="/login">Login</a>
+								<a href="/login/">Login</a>
 							</Button>
 							<Button
 								asChild
