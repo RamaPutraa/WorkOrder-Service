@@ -203,7 +203,7 @@ export const FormBuilder = forwardRef<FormBuilderRef, Props>(
 								</SelectTrigger>
 								<SelectContent>
 									<SelectItem value="work_order">Work Order</SelectItem>
-									<SelectItem value="intake_forms">Intake Forms</SelectItem>
+									<SelectItem value="intake">Intake Forms</SelectItem>
 									<SelectItem value="report">Laporan</SelectItem>
 								</SelectContent>
 							</Select>
