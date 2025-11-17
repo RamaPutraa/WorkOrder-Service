@@ -8,7 +8,6 @@ import {
 	Command,
 	Frame,
 	GalleryVerticalEnd,
-	Map,
 	PieChart,
 	SquareTerminal,
 } from "lucide-react";
@@ -26,6 +25,7 @@ import {
 } from "@/components/ui/sidebar";
 import { NavBusiness } from "../molecules/nav-business";
 import { NavHelp } from "../molecules/nav-help";
+import useAuth from "@/features/auth/hooks/useAuth";
 
 // This is sample data.
 const data = {
@@ -105,20 +105,31 @@ const data = {
 	],
 	navBusiness: [
 		{
+			title: "Perusahaan",
+			url: "#",
+			icon: BookOpen,
+			items: [
+				{
+					title: "Daftar Perusahaan",
+					url: "/dashboard/client/submissions",
+				},
+				{
+					title: "Daftar Service",
+					url: "#",
+				},
+			],
+		},
+		{
 			title: "Work Order",
 			url: "#",
 			icon: BookOpen,
 			items: [
 				{
-					title: "FAQ",
-					url: "#",
-				},
-				{
-					title: "Work Order",
+					title: "Request Service",
 					url: "/dashboard/client/submissions",
 				},
 				{
-					title: "Custom WO",
+					title: "Report Service",
 					url: "#",
 				},
 			],
@@ -129,16 +140,12 @@ const data = {
 			icon: Bot,
 			items: [
 				{
-					title: "Pegawai (Active)",
+					title: "example",
 					url: "#",
 				},
 				{
-					title: "Pegawai (Pending)",
+					title: "example",
 					url: "#",
-				},
-				{
-					title: "Posisi Pegawai",
-					url: "/dashboard/owner/positions",
 				},
 			],
 		},
@@ -153,11 +160,6 @@ const data = {
 			name: "Statistik Perusahaan",
 			url: "#",
 			icon: PieChart,
-		},
-		{
-			name: "Travel",
-			url: "#",
-			icon: Map,
 		},
 	],
 	navHelp: [
@@ -175,17 +177,22 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+	const { user } = useAuth();
+
 	return (
 		<Sidebar collapsible="icon" {...props}>
 			<SidebarHeader>
 				<TeamManagement teams={data.teams} />
 			</SidebarHeader>
 			<SidebarContent>
-				{/* all user */}
 				<NavMenu menu={data.navMenu} />
-				{/* internal */}
-				<NavSetup items={data.navSetup} />
-				<NavBusiness items={data.navBusiness} />
+				{user &&
+					["owner_company", "manager_company", "staff_company"].includes(
+						user.role
+					) && <NavSetup items={data.navSetup} />}
+				{user && ["client"].includes(user.role) && (
+					<NavBusiness items={data.navBusiness} />
+				)}
 				<NavHelp help={data.navHelp} />
 			</SidebarContent>
 			<SidebarFooter>
