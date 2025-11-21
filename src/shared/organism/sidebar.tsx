@@ -158,7 +158,7 @@ const data = {
 		},
 		{
 			name: "Statistik Perusahaan",
-			url: "#",
+			url: "/dashboard/client",
 			icon: PieChart,
 		},
 	],

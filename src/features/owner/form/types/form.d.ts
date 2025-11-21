@@ -4,7 +4,7 @@ type FieldOption = {
 };
 
 type Field = {
-	order: number | null;
+	order: number;
 	label: string;
 	type: FieldType;
 	required: boolean;

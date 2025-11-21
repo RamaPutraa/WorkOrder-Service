@@ -13,7 +13,6 @@ const usePosition = () => {
 	const [error, setError] = useState<string | null>(null);
 	const [positions, setPositions] = useState<Position[]>([]);
 
-	//  TODO: tinggal auth
 	// create position
 	const createPosition = async (data: PositionRequest) => {
 		setLoading(true);
