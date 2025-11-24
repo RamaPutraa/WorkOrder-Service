@@ -43,6 +43,10 @@ type PublicSubmission = {
 	createdAt: string;
 	updatedAt: string;
 };
+type ClientIntakeForm = {
+	order: number;
+	form: Form;
+};
 type PublicDetailSubmissions = {
 	_id: string;
 	status: string;
@@ -51,7 +55,7 @@ type PublicDetailSubmissions = {
 	companyId: string;
 	client: User;
 	service: Service;
-	clientIntakeForms: Form[];
+	clientIntakeForms: ClientIntakeForm[];
 	submissions: PublicSubmission[];
 };
 
