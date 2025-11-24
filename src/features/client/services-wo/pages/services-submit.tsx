@@ -13,7 +13,7 @@ import { notifyError } from "@/lib/toast-helper";
 import { getAllClientServiceRequestApi } from "../services/public-services";
 import { useNavigate } from "react-router-dom";
 const ServiceSubmitPage = () => {
-	const [requests, setRequests] = useState<ClientServiceRequest[]>([]);
+	const [requests, setRequests] = useState<PublicServiceRequest[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 

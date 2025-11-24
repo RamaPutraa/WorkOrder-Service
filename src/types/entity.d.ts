@@ -96,12 +96,16 @@ type Service = {
 	updatedAt: string;
 };
 
-//client request service
-type ClientRequestService = {
+//client submit service
+type ClientIntakeForm = {
+	order: number;
+	form: Form;
+};
+type PublicServiceSubmited = {
 	_id: string;
 	serviceId: string;
 	clientId: string;
-	clientIntakeForm: string[];
+	clientIntakeForm: ClientIntakeForm[];
 	status: string;
 	companyId: string;
 	createdAt: string;

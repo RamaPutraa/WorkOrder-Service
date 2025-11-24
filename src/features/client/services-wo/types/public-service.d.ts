@@ -1,28 +1,26 @@
-type PublicServiceForm = ApiResponse<
+// get detail service company form client
+type PublicDetailService = ApiResponse<
 	{
 		order: number;
 		form: Form;
 	}[]
 >;
 
+// client submit intake form
 type FieldData = {
 	order: number;
 	value: string | number;
 };
-
-type PublicServiceRequest = {
+type PublicSubmitRequest = {
 	formId: string;
 	fieldsData: FieldData[];
 };
-
-type PublicServiceResponse = ApiResponse<{
-	data: ClientRequestService;
+type PublicSubmitResponse = ApiResponse<{
+	data: PublicServiceSubmited;
 }>;
 
-// TODO: konsistenin typenya
-
 // get client service request
-type ClientServiceRequest = {
+type PublicServiceRequest = {
 	_id: string;
 	status: string;
 	createdAt: string;
@@ -31,11 +29,10 @@ type ClientServiceRequest = {
 	client: User;
 	service: Service;
 };
+type PublicServiceRequestResponse = ApiResponse<PublicServiceRequest[]>;
 
-type ClientServiceRequestResponse = ApiResponse<ClientServiceRequest[]>;
-
-// detail submissions
-type Submission = {
+// detail service submissions from client
+type PublicSubmission = {
 	_id: string;
 	ownerId: string;
 	formId: string;
@@ -46,8 +43,7 @@ type Submission = {
 	createdAt: string;
 	updatedAt: string;
 };
-
-type ClientDetailSubmissions = {
+type PublicDetailSubmissions = {
 	_id: string;
 	status: string;
 	createdAt: string;
@@ -56,7 +52,7 @@ type ClientDetailSubmissions = {
 	client: User;
 	service: Service;
 	clientIntakeForms: Form[];
-	submissions: Submission[];
+	submissions: PublicSubmission[];
 };
 
-type PublicDetailServiceResponse = ApiResponse<ClientDetailSubmissions>;
+type PublicDetailSubmissionResponse = ApiResponse<PublicDetailSubmissions>;

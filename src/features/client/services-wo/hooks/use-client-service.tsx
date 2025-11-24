@@ -84,7 +84,7 @@ export const usePublicServices = () => {
 		setSubmitting(true);
 		setError(null);
 
-		const payload: PublicServiceRequest[] = data.map((form) => ({
+		const payload: PublicSubmitRequest[] = data.map((form) => ({
 			formId: form._id,
 			fieldsData: Object.entries(formValues[form._id] || {}).map(
 				([, fieldValue], i) => ({
@@ -97,7 +97,7 @@ export const usePublicServices = () => {
 		const { data: res, error } = await handleApi(() =>
 			submitIntakeApi(id!, payload)
 		);
-
+		console.log("Payload submitted:", payload);
 		setSubmitting(false);
 
 		if (error) {

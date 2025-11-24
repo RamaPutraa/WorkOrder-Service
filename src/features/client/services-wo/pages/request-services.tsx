@@ -88,11 +88,7 @@ export default function RequestServicePage() {
 											placeholder={field.placeholder || "Isian teks"}
 											className="text-sm border rounded-md p-2 w-full"
 											onChange={(e) =>
-												handleChange(
-													item._id,
-													field.fieldId || field.label,
-													e.target.value
-												)
+												handleChange(item._id, field.label, e.target.value)
 											}
 										/>
 									)}
@@ -103,11 +99,7 @@ export default function RequestServicePage() {
 											placeholder={field.placeholder || "Alamat email"}
 											className="text-sm border rounded-md p-2 w-full"
 											onChange={(e) =>
-												handleChange(
-													item._id,
-													field.fieldId || field.label,
-													e.target.value
-												)
+												handleChange(item._id, field.label, e.target.value)
 											}
 										/>
 									)}
@@ -118,11 +110,7 @@ export default function RequestServicePage() {
 											placeholder={field.placeholder || "Isian angka"}
 											className="text-sm border rounded-md p-2 w-full"
 											onChange={(e) =>
-												handleChange(
-													item._id,
-													field.fieldId || field.label,
-													e.target.value
-												)
+												handleChange(item._id, field.label, e.target.value)
 											}
 										/>
 									)}
@@ -132,11 +120,7 @@ export default function RequestServicePage() {
 											placeholder={field.placeholder || "Area teks"}
 											className="text-sm border rounded-md p-2 w-full min-h-[80px]"
 											onChange={(e) =>
-												handleChange(
-													item._id,
-													field.fieldId || field.label,
-													e.target.value
-												)
+												handleChange(item._id, field.label, e.target.value)
 											}
 										/>
 									)}
@@ -153,7 +137,7 @@ export default function RequestServicePage() {
 														onChange={(e) =>
 															handleChange(
 																item._id,
-																field.fieldId || field.label,
+																field.label,
 																e.target.value
 															)
 														}
@@ -174,7 +158,7 @@ export default function RequestServicePage() {
 														onChange={(e) =>
 															handleChange(
 																item._id,
-																field.fieldId || field.label,
+																field.label,
 																e.target.value
 															)
 														}
@@ -190,11 +174,7 @@ export default function RequestServicePage() {
 											type="date"
 											className="text-sm border rounded-md p-2 w-full"
 											onChange={(e) =>
-												handleChange(
-													item._id,
-													field.fieldId || field.label,
-													e.target.value
-												)
+												handleChange(item._id, field.label, e.target.value)
 											}
 										/>
 									)}
@@ -204,11 +184,7 @@ export default function RequestServicePage() {
 											type="file"
 											className="text-sm border rounded-md p-2 w-full"
 											onChange={(e) =>
-												handleChange(
-													item._id,
-													field.fieldId || field.label,
-													e.target.value
-												)
+												handleChange(item._id, field.label, e.target.value)
 											}
 										/>
 									)}
