@@ -29,6 +29,7 @@ import ErrorPage from "@/shared/errors/templates/error-page";
 import DetailService from "@/features/owner/services-wo/pages/detail-service";
 import ServiceSubmitPage from "@/features/client/services-wo/pages/services-submit";
 import ServiceDetailSubmit from "@/features/client/services-wo/pages/services-detail-submit";
+import ViewServiceRequest from "@/features/owner/business/pages/view-service-request";
 
 const router = createBrowserRouter([
 	{
@@ -82,6 +83,10 @@ const router = createBrowserRouter([
 					{
 						path: "services/detail/:id",
 						element: <DetailService />,
+					},
+					{
+						path: "business/services/request",
+						element: <ViewServiceRequest />,
 					},
 				],
 			},

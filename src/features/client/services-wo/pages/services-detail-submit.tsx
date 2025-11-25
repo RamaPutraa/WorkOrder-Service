@@ -41,6 +41,15 @@ const ServiceDetailSubmit = () => {
 		console.log("Detail Client Service Request:", res?.data);
 	};
 
+	const asInputValue = (
+		val: string | number | string[] | File | undefined
+	): string | number => {
+		if (val instanceof File) return val.name; // file ditampilkan sebagai nama file
+		if (Array.isArray(val)) return val.join(", "); // array jadi "a, b, c"
+		if (val === undefined) return "";
+		return val; // string atau number
+	};
+
 	useEffect(() => {
 		if (id) fetchDetail();
 	}, [id]);
@@ -109,7 +118,7 @@ const ServiceDetailSubmit = () => {
 											) && (
 												<input
 													type={field.type}
-													value={answer || ""}
+													value={asInputValue(answer)}
 													readOnly
 													disabled
 													className="text-sm border rounded-md p-2 w-full bg-gray-100"
@@ -119,7 +128,7 @@ const ServiceDetailSubmit = () => {
 											{/* TEXTAREA */}
 											{field.type === "textarea" && (
 												<textarea
-													value={answer || ""}
+													value={asInputValue(answer)}
 													readOnly
 													disabled
 													className="text-sm border rounded-md p-2 w-full min-h-[90px] bg-gray-100"
@@ -130,7 +139,7 @@ const ServiceDetailSubmit = () => {
 											{field.type === "date" && (
 												<input
 													type="date"
-													value={answer || ""}
+													value={asInputValue(answer)}
 													readOnly
 													disabled
 													className="text-sm border rounded-md p-2 w-full bg-gray-100"

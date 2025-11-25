@@ -9,7 +9,7 @@ type PublicDetailService = ApiResponse<
 // client submit intake form
 type FieldData = {
 	order: number;
-	value: string | number;
+	value: string | number | string[] | File;
 };
 type PublicSubmitRequest = {
 	formId: string;

@@ -26,6 +26,7 @@ import {
 import { NavBusiness } from "../molecules/nav-business";
 import { NavHelp } from "../molecules/nav-help";
 import useAuth from "@/features/auth/hooks/useAuth";
+import { NavInternalBusiness } from "../molecules/nav-internal-business";
 
 // This is sample data.
 const data = {
@@ -174,10 +175,32 @@ const data = {
 			icon: PieChart,
 		},
 	],
+	navInternalBusiness: [
+		{
+			title: "Permintaan Pelanggan",
+			url: "#",
+			icon: BookOpen,
+			items: [
+				{
+					title: "Layanan",
+					url: "/dashboard/owner/business/services/request",
+				},
+				{
+					title: "Pertanyaan",
+					url: "#",
+				},
+			],
+		},
+	],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	const { user } = useAuth();
+	const isCompanyUser = [
+		"owner_company",
+		"manager_company",
+		"staff_company",
+	].includes(user?.role || "");
 
 	return (
 		<Sidebar collapsible="icon" {...props}>
@@ -186,10 +209,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			</SidebarHeader>
 			<SidebarContent>
 				<NavMenu menu={data.navMenu} />
-				{user &&
-					["owner_company", "manager_company", "staff_company"].includes(
-						user.role
-					) && <NavSetup items={data.navSetup} />}
+				{isCompanyUser && (
+					<>
+						<NavSetup items={data.navSetup} />
+						<NavInternalBusiness items={data.navInternalBusiness} />
+					</>
+				)}
 				{user && ["client"].includes(user.role) && (
 					<NavBusiness items={data.navBusiness} />
 				)}

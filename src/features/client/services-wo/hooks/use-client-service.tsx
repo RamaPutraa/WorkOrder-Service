@@ -7,15 +7,15 @@ import {
 } from "../services/public-services";
 import { useEffect, useState } from "react";
 
+type FieldValue = string | number | File | string[];
+type FormValues = Record<string, Record<string, FieldValue>>;
 export const usePublicServices = () => {
 	const { id } = useParams<{ id: string }>();
 	const [data, setData] = useState<Form[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [isSticky, setIsSticky] = useState(false);
-	const [formValues, setFormValues] = useState<
-		Record<string, Record<string, string | number>>
-	>({});
+	const [formValues, setFormValues] = useState<FormValues>({});
 	const [submitting, setSubmitting] = useState(false);
 	const navigate = useNavigate();
 
@@ -62,15 +62,45 @@ export const usePublicServices = () => {
 	const handleChange = (
 		formId: string,
 		fieldId: string,
-		value: string | number
+		value: FieldValue,
+		type?: "multi"
 	) => {
-		setFormValues((prev) => ({
-			...prev,
-			[formId]: {
-				...(prev[formId] || {}),
-				[fieldId]: value,
-			},
-		}));
+		setFormValues((prev) => {
+			const currentForm = prev[formId] || {};
+			const currentValue = currentForm[fieldId];
+
+			// MULTI SELECT (checkbox)
+			if (type === "multi") {
+				let newArray: string[] = Array.isArray(currentValue)
+					? [...currentValue]
+					: [];
+
+				const v = value as string;
+
+				if (newArray.includes(v)) {
+					newArray = newArray.filter((item) => item !== v);
+				} else {
+					newArray.push(v);
+				}
+
+				return {
+					...prev,
+					[formId]: {
+						...currentForm,
+						[fieldId]: newArray,
+					},
+				};
+			}
+
+			// DEFAULT INPUT
+			return {
+				...prev,
+				[formId]: {
+					...currentForm,
+					[fieldId]: value,
+				},
+			};
+		});
 	};
 
 	// submit data

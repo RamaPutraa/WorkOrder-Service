@@ -159,7 +159,8 @@ export default function RequestServicePage() {
 															handleChange(
 																item._id,
 																field.label,
-																e.target.value
+																e.target.value,
+																"multi"
 															)
 														}
 													/>
