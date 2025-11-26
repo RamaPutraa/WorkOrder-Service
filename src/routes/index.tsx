@@ -30,6 +30,7 @@ import DetailService from "@/features/owner/services-wo/pages/detail-service";
 import ServiceSubmitPage from "@/features/client/services-wo/pages/services-submit";
 import ServiceDetailSubmit from "@/features/client/services-wo/pages/services-detail-submit";
 import ViewServiceRequest from "@/features/owner/business/pages/view-service-request";
+import DetailServiceRequest from "@/features/owner/business/pages/detail-service-request";
 
 const router = createBrowserRouter([
 	{
@@ -87,6 +88,10 @@ const router = createBrowserRouter([
 					{
 						path: "business/services/request",
 						element: <ViewServiceRequest />,
+					},
+					{
+						path: "business/services/request/detail/:id",
+						element: <DetailServiceRequest />,
 					},
 				],
 			},

@@ -5,6 +5,7 @@ import {
 	CardDescription,
 	CardContent,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useBusiness } from "../hooks/use-business";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,12 +16,38 @@ import {
 	CheckCircle,
 	XCircle,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const ViewServiceRequest = () => {
 	const { data, loading, error } = useBusiness();
+	const navigate = useNavigate();
 
 	if (loading) return <p className="p-4">Loading...</p>;
 	if (error) return <p className="p-4 text-red-500">{error}</p>;
+
+	const getStatusColor = (status: string) => {
+		switch (status.toLowerCase()) {
+			case "approved":
+				return "border-l-4 border-l-green-600";
+			case "rejected":
+				return "border-l-4 border-l-red-600";
+			default:
+				return "border-l-4 border-l-yellow-500";
+		}
+	};
+
+	const renderStatusBadge = (status: string) => {
+		const s = status.toLowerCase();
+		if (s === "approved")
+			return (
+				<Badge className="bg-green-600 hover:bg-green-700">Approved</Badge>
+			);
+		if (s === "rejected")
+			return <Badge className="bg-red-600 hover:bg-red-700">Rejected</Badge>;
+		return (
+			<Badge className="bg-yellow-500 hover:bg-yellow-600">Received</Badge>
+		);
+	};
 
 	return (
 		<div className="p-4 space-y-6">
@@ -36,7 +63,9 @@ const ViewServiceRequest = () => {
 					{data.map((item) => (
 						<Card
 							key={item._id}
-							className="shadow-sm border hover:shadow-md transition-all duration-200">
+							className={`shadow-sm border hover:shadow-md transition-all duration-200 ${getStatusColor(
+								item.status
+							)}`}>
 							<CardHeader>
 								<CardTitle className="text-lg font-semibold">
 									{item.service?.title}
@@ -52,7 +81,7 @@ const ViewServiceRequest = () => {
 									<div className="space-y-1">
 										<p className="flex items-center gap-2">
 											<span className="font-medium">Status:</span>
-											{item.status}
+											{renderStatusBadge(item.status)}
 										</p>
 
 										<p className="flex items-center gap-2">
@@ -78,10 +107,15 @@ const ViewServiceRequest = () => {
 								</div>
 
 								<div className="grid grid-cols-6 gap-2 mt-6">
-									{/* Lihat Detail → col-span-2 */}
+									{/* Lihat Detail → col-span-4 */}
 									<Button
 										variant="outline"
-										className="flex items-center gap-1 col-span-4 text-xs py-1 h-8">
+										className="flex items-center gap-1 col-span-4 text-xs py-1 h-8"
+										onClick={() =>
+											navigate(
+												`/dashboard/owner/business/services/request/detail/${item._id}`
+											)
+										}>
 										<Eye size={14} />
 										Lihat Detail
 									</Button>
@@ -90,10 +124,10 @@ const ViewServiceRequest = () => {
 									<Button
 										variant="outline"
 										className="
-											col-span-1 text-xs py-1 h-8 flex items-center gap-1
-											border-green-600 text-green-600
-											hover:bg-green-600 hover:text-white
-										">
+                                            col-span-1 text-xs py-1 h-8 flex items-center gap-1
+                                            border-green-600 text-green-600
+                                            hover:bg-green-600 hover:text-white
+                                        ">
 										<CheckCircle size={14} />
 										Approved
 									</Button>
@@ -102,10 +136,10 @@ const ViewServiceRequest = () => {
 									<Button
 										variant="outline"
 										className="
-											col-span-1 text-xs py-1 h-8 flex items-center gap-1
-											border-red-600 text-red-600
-											hover:bg-red-600 hover:text-white
-										">
+                                            col-span-1 text-xs py-1 h-8 flex items-center gap-1
+                                            border-red-600 text-red-600
+                                            hover:bg-red-600 hover:text-white
+                                        ">
 										<XCircle size={14} />
 										Rejected
 									</Button>
