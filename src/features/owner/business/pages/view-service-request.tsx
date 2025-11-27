@@ -11,10 +11,10 @@ import { Button } from "@/components/ui/button";
 import {
 	Calendar,
 	Clock,
-	ClipboardList,
 	Eye,
 	CheckCircle,
 	XCircle,
+	ChevronLeft,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -40,21 +40,32 @@ const ViewServiceRequest = () => {
 		const s = status.toLowerCase();
 		if (s === "approved")
 			return (
-				<Badge className="bg-green-600 hover:bg-green-700">Approved</Badge>
+				<Badge className="bg-green-600 hover:bg-green-700">Disetujui</Badge>
 			);
 		if (s === "rejected")
-			return <Badge className="bg-red-600 hover:bg-red-700">Rejected</Badge>;
+			return <Badge className="bg-red-600 hover:bg-red-700">Ditolak</Badge>;
 		return (
-			<Badge className="bg-yellow-500 hover:bg-yellow-600">Received</Badge>
+			<Badge className="bg-yellow-500 hover:bg-yellow-600">Diterima</Badge>
 		);
 	};
 
 	return (
 		<div className="p-4 space-y-6">
-			<h1 className="text-xl font-semibold flex items-center gap-2">
-				<ClipboardList className="size-5 text-primary" />
-				Daftar Service Request
-			</h1>
+			<div className="flex items-center space-x-6">
+				<Button
+					onClick={() => navigate(-1)}
+					className="bg-primary hover:bg-primary/90 h-full">
+					<ChevronLeft className="size-6" />
+				</Button>
+				<div className="flex flex-col space-y-2">
+					<h1 className="text-xl font-bold tracking-tight">
+						Pengajuan Layanan
+					</h1>
+					<p className="text-muted-foreground">
+						Berikut merupakan layanan yang diajukan oleh pelanggan.
+					</p>
+				</div>
+			</div>
 
 			{data.length === 0 ? (
 				<p className="text-muted-foreground">Belum ada service request.</p>
@@ -129,7 +140,7 @@ const ViewServiceRequest = () => {
                                             hover:bg-green-600 hover:text-white
                                         ">
 										<CheckCircle size={14} />
-										Approved
+										Disetujui
 									</Button>
 
 									{/* Rejected */}
@@ -141,7 +152,7 @@ const ViewServiceRequest = () => {
                                             hover:bg-red-600 hover:text-white
                                         ">
 										<XCircle size={14} />
-										Rejected
+										Ditolak
 									</Button>
 								</div>
 							</CardContent>

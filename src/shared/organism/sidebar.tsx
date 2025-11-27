@@ -65,7 +65,7 @@ const data = {
 			],
 		},
 		{
-			title: "Work Order",
+			title: "Tugas Kerja",
 			url: "#",
 			icon: SquareTerminal,
 			isActive: true,
@@ -75,11 +75,11 @@ const data = {
 					url: "/dashboard/owner/services",
 				},
 				{
-					title: "Kelola Service",
+					title: "Kelola Layanan",
 					url: "/dashboard/owner/services",
 				},
 				{
-					title: "Kelola Form",
+					title: "Kelola Formulir",
 					url: "/dashboard/owner/forms",
 				},
 			],
@@ -90,11 +90,11 @@ const data = {
 			icon: Bot,
 			items: [
 				{
-					title: "Pegawai (Active)",
+					title: "Pegawai (Aktif)",
 					url: "#",
 				},
 				{
-					title: "Pegawai (Pending)",
+					title: "Pegawai (Menunggu)",
 					url: "#",
 				},
 				{
@@ -115,22 +115,22 @@ const data = {
 					url: "/dashboard/client/submissions",
 				},
 				{
-					title: "Daftar Service",
+					title: "Daftar Layanan",
 					url: "#",
 				},
 			],
 		},
 		{
-			title: "Work Order",
+			title: "Tugas Kerja",
 			url: "#",
 			icon: BookOpen,
 			items: [
 				{
-					title: "Request Service",
+					title: "Permintaan Layanan",
 					url: "/dashboard/client/submissions",
 				},
 				{
-					title: "Report Service",
+					title: "Laporan Layanan",
 					url: "#",
 				},
 			],
@@ -165,28 +165,51 @@ const data = {
 	],
 	navHelp: [
 		{
-			name: "Documentation",
+			name: "Dokumentasi",
 			url: "/",
 			icon: BookOpen,
 		},
 		{
-			name: "Setting",
+			name: "Pengaturan",
 			url: "#",
 			icon: PieChart,
 		},
 	],
 	navInternalBusiness: [
 		{
-			title: "Permintaan Pelanggan",
+			title: "Permintaan Layanan",
 			url: "#",
 			icon: BookOpen,
 			items: [
 				{
-					title: "Layanan",
+					title: "Daftar Layanan",
 					url: "/dashboard/owner/business/services/request",
 				},
 				{
-					title: "Pertanyaan",
+					title: "Riwayat Layanan",
+					url: "#",
+				},
+				// {
+				// 	title: "Riwayat Undangan Pegawai",
+				// 	url: "#",
+				// },
+				// {
+				// 	title: "Pelanggan",
+				// 	url: "#",
+				// },
+			],
+		},
+		{
+			title: "Tugas Kerja",
+			url: "#",
+			icon: Bot,
+			items: [
+				{
+					title: "Daftar Tugas Kerja",
+					url: "#",
+				},
+				{
+					title: "Riwayat Tugas Kerja",
 					url: "#",
 				},
 			],

@@ -34,7 +34,7 @@ export function NavInternalBusiness({
 }) {
 	return (
 		<SidebarGroup>
-			<SidebarGroupLabel>Business</SidebarGroupLabel>
+			<SidebarGroupLabel>Menu Operasional</SidebarGroupLabel>
 			<SidebarMenu>
 				{items.map((item) => (
 					<Collapsible
