@@ -31,6 +31,7 @@ import ServiceSubmitPage from "@/features/client/services-wo/pages/services-subm
 import ServiceDetailSubmit from "@/features/client/services-wo/pages/services-detail-submit";
 import ViewServiceRequest from "@/features/owner/business/pages/view-service-request";
 import DetailServiceRequest from "@/features/owner/business/pages/detail-service-request";
+import CompanyViewWo from "@/features/owner/company-wo/pages/company-view-wo";
 
 const router = createBrowserRouter([
 	{
@@ -92,6 +93,10 @@ const router = createBrowserRouter([
 					{
 						path: "business/services/request/detail/:id",
 						element: <DetailServiceRequest />,
+					},
+					{
+						path: "workorders",
+						element: <CompanyViewWo />,
 					},
 				],
 			},

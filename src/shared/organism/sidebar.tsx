@@ -206,7 +206,7 @@ const data = {
 			items: [
 				{
 					title: "Daftar Tugas Kerja",
-					url: "#",
+					url: "/dashboard/owner/workorders",
 				},
 				{
 					title: "Riwayat Tugas Kerja",

@@ -17,10 +17,12 @@ import {
 	ChevronLeft,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useDialogStore } from "@/store/dialogStore";
 
 const ViewServiceRequest = () => {
-	const { data, loading, error } = useBusiness();
+	const { data, loading, error, handleReject, handleApprove } = useBusiness();
 	const navigate = useNavigate();
+	const { showDialog } = useDialogStore();
 
 	if (loading) return <p className="p-4">Loading...</p>;
 	if (error) return <p className="p-4 text-red-500">{error}</p>;
@@ -138,7 +140,17 @@ const ViewServiceRequest = () => {
                                             col-span-1 text-xs py-1 h-8 flex items-center gap-1
                                             border-green-600 text-green-600
                                             hover:bg-green-600 hover:text-white
-                                        ">
+                                        "
+										onClick={() =>
+											showDialog({
+												title: "Konfirmasi Persetujuan",
+												description:
+													"Apakah kamu yakin ingin menyetujui layanan ini?",
+												confirmText: "Setujui",
+												cancelText: "Batal",
+												onConfirm: () => handleApprove(item._id),
+											})
+										}>
 										<CheckCircle size={14} />
 										Disetujui
 									</Button>
@@ -150,7 +162,17 @@ const ViewServiceRequest = () => {
                                             col-span-1 text-xs py-1 h-8 flex items-center gap-1
                                             border-red-600 text-red-600
                                             hover:bg-red-600 hover:text-white
-                                        ">
+                                        "
+										onClick={() =>
+											showDialog({
+												title: "Konfirmasi Penolakan",
+												description:
+													"Apakah kamu yakin ingin menolak layanan ini?",
+												confirmText: "Tolak",
+												cancelText: "Batal",
+												onConfirm: () => handleReject(item._id),
+											})
+										}>
 										<XCircle size={14} />
 										Ditolak
 									</Button>

@@ -2,8 +2,10 @@ import { handleApi } from "@/lib/handle-api";
 import { notifyError } from "@/lib/toast-helper";
 import { useEffect, useState } from "react";
 import {
+	approveInternalBusinessServiceRequestApi,
 	getAllInternalBusinessServiceRequestApi,
 	getDetailInternalBusinessServiceRequestApi,
+	rejectInternalBusinessServiceRequestApi,
 } from "../services/internal-business-services";
 import { useParams } from "react-router-dom";
 
@@ -65,6 +67,50 @@ export const useBusiness = () => {
 		return val; // string atau number
 	};
 
+	const handleReject = async (id: string) => {
+		if (!id) {
+			notifyError("Gagal menolak layanan", "ID layanan tidak ditemukan");
+			return;
+		}
+
+		setLoading(true);
+		setError(null);
+
+		const { data: res, error } = await handleApi(() =>
+			rejectInternalBusinessServiceRequestApi(id)
+		);
+		setLoading(false);
+
+		if (error) {
+			setError(error.message);
+			notifyError("Gagal menolak layanan", error.message);
+			return;
+		}
+
+		await fetchInternalServiceRequests();
+		console.log(res);
+	};
+
+	const handleApprove = async (id: string) => {
+		if (!id) {
+			notifyError("Gagal menyetujui layanan", "ID layanan tidak ditemukan");
+			return;
+		}
+		setLoading(true);
+		setError(null);
+		const { data: res, error } = await handleApi(() =>
+			approveInternalBusinessServiceRequestApi(id)
+		);
+		setLoading(false);
+		if (error) {
+			setError(error.message);
+			notifyError("Gagal menyetujui layanan", error.message);
+			return;
+		}
+		await fetchInternalServiceRequests();
+		console.log(res);
+	};
+
 	useEffect(() => {
 		void fetchInternalServiceRequests();
 		if (id) fetchDetailInternalServiceRequest();
@@ -79,5 +125,7 @@ export const useBusiness = () => {
 		fetchInternalServiceRequests,
 		asInputValue,
 		fetchDetailInternalServiceRequest,
+		handleReject,
+		handleApprove,
 	};
 };
