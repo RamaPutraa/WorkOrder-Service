@@ -4,6 +4,7 @@ type Staff = {
 	minimumStaff: number;
 	maximumStaff: number;
 };
+// TODO: pindah type OrderForms jadi global
 
 // order form service
 type OrderForms = {

@@ -32,6 +32,8 @@ type PublicServiceRequest = {
 type PublicServiceRequestResponse = ApiResponse<PublicServiceRequest[]>;
 
 // detail service submissions from client
+
+// TODO: pindah publicsubmission jadi global type
 type PublicSubmission = {
 	_id: string;
 	ownerId: string;

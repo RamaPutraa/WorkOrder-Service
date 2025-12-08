@@ -34,7 +34,7 @@ export function NavSetup({
 }) {
 	return (
 		<SidebarGroup>
-			<SidebarGroupLabel>Set Up</SidebarGroupLabel>
+			<SidebarGroupLabel>Konfigurasi Perusahaan</SidebarGroupLabel>
 			<SidebarMenu>
 				{items.map((item) => (
 					<Collapsible

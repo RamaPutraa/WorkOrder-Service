@@ -5,43 +5,178 @@ import {
 	CardDescription,
 	CardContent,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useBusiness } from "../hooks/use-business";
+import { Button } from "@/components/ui/button";
+import {
+	Calendar,
+	Clock,
+	Eye,
+	CheckCircle,
+	XCircle,
+	ChevronLeft,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useDialogStore } from "@/store/dialogStore";
 
 const ViewServiceRequest = () => {
-	const { data, loading, error } = useBusiness();
+	const { data, loading, error, handleReject, handleApprove } = useBusiness();
+	const navigate = useNavigate();
+	const { showDialog } = useDialogStore();
 
 	if (loading) return <p className="p-4">Loading...</p>;
 	if (error) return <p className="p-4 text-red-500">{error}</p>;
 
+	const getStatusColor = (status: string) => {
+		switch (status.toLowerCase()) {
+			case "approved":
+				return "border-l-4 border-l-green-600";
+			case "rejected":
+				return "border-l-4 border-l-red-600";
+			default:
+				return "border-l-4 border-l-yellow-500";
+		}
+	};
+
+	const renderStatusBadge = (status: string) => {
+		const s = status.toLowerCase();
+		if (s === "approved")
+			return (
+				<Badge className="bg-green-600 hover:bg-green-700">Disetujui</Badge>
+			);
+		if (s === "rejected")
+			return <Badge className="bg-red-600 hover:bg-red-700">Ditolak</Badge>;
+		return (
+			<Badge className="bg-yellow-500 hover:bg-yellow-600">Diterima</Badge>
+		);
+	};
+
 	return (
 		<div className="p-4 space-y-6">
-			<h1 className="text-xl font-semibold">Daftar Service Request</h1>
+			<div className="flex items-center space-x-6">
+				<Button
+					onClick={() => navigate(-1)}
+					className="bg-primary hover:bg-primary/90 h-full">
+					<ChevronLeft className="size-6" />
+				</Button>
+				<div className="flex flex-col space-y-2">
+					<h1 className="text-xl font-bold tracking-tight">
+						Pengajuan Layanan
+					</h1>
+					<p className="text-muted-foreground">
+						Berikut merupakan layanan yang diajukan oleh pelanggan.
+					</p>
+				</div>
+			</div>
 
 			{data.length === 0 ? (
 				<p className="text-muted-foreground">Belum ada service request.</p>
 			) : (
-				<div className="space-y-4">
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 					{data.map((item) => (
-						<Card key={item._id} className="shadow-sm">
+						<Card
+							key={item._id}
+							className={`shadow-sm border hover:shadow-md transition-all duration-200 ${getStatusColor(
+								item.status
+							)}`}>
 							<CardHeader>
-								<CardTitle className="text-lg">{item.service?.title}</CardTitle>
-								<CardDescription>
+								<CardTitle className="text-lg font-semibold">
+									{item.service?.title}
+								</CardTitle>
+								<CardDescription className="line-clamp-2">
 									{item.service?.description || "Tidak ada deskripsi"}
 								</CardDescription>
 							</CardHeader>
 
-							<CardContent className="text-sm space-y-1">
-								<p>
-									<span className="font-medium">Status:</span> {item.status}
-								</p>
-								<p>
-									<span className="font-medium">Dibuat:</span>{" "}
-									{new Date(item.createdAt).toLocaleString()}
-								</p>
-								<p>
-									<span className="font-medium">Diperbarui:</span>{" "}
-									{new Date(item.updatedAt).toLocaleString()}
-								</p>
+							<CardContent className="text-sm space-y-3">
+								<div className="grid grid-cols-2 gap-4">
+									{/* KIRI */}
+									<div className="space-y-1">
+										<p className="flex items-center gap-2">
+											<span className="font-medium">Status:</span>
+											{renderStatusBadge(item.status)}
+										</p>
+
+										<p className="flex items-center gap-2">
+											<span className="font-medium">Pelanggan:</span>
+											{item.client?.name}
+										</p>
+									</div>
+
+									{/* KANAN */}
+									<div className="space-y-1 text-right">
+										<p className="flex items-center gap-2 justify-end">
+											<Calendar className="size-4 text-blue-600" />
+											<span className="font-medium">Dibuat:</span>
+											{new Date(item.createdAt).toLocaleString()}
+										</p>
+
+										<p className="flex items-center gap-2 justify-end">
+											<Clock className="size-4 text-green-600" />
+											<span className="font-medium">Diperbarui:</span>
+											{new Date(item.updatedAt).toLocaleString()}
+										</p>
+									</div>
+								</div>
+
+								<div className="grid grid-cols-6 gap-2 mt-6">
+									{/* Lihat Detail → col-span-4 */}
+									<Button
+										variant="outline"
+										className="flex items-center gap-1 col-span-4 text-xs py-1 h-8"
+										onClick={() =>
+											navigate(
+												`/dashboard/owner/business/services/request/detail/${item._id}`
+											)
+										}>
+										<Eye size={14} />
+										Lihat Detail
+									</Button>
+
+									{/* Approved */}
+									<Button
+										variant="outline"
+										className="
+                                            col-span-1 text-xs py-1 h-8 flex items-center gap-1
+                                            border-green-600 text-green-600
+                                            hover:bg-green-600 hover:text-white
+                                        "
+										onClick={() =>
+											showDialog({
+												title: "Konfirmasi Persetujuan",
+												description:
+													"Apakah kamu yakin ingin menyetujui layanan ini?",
+												confirmText: "Setujui",
+												cancelText: "Batal",
+												onConfirm: () => handleApprove(item._id),
+											})
+										}>
+										<CheckCircle size={14} />
+										Disetujui
+									</Button>
+
+									{/* Rejected */}
+									<Button
+										variant="outline"
+										className="
+                                            col-span-1 text-xs py-1 h-8 flex items-center gap-1
+                                            border-red-600 text-red-600
+                                            hover:bg-red-600 hover:text-white
+                                        "
+										onClick={() =>
+											showDialog({
+												title: "Konfirmasi Penolakan",
+												description:
+													"Apakah kamu yakin ingin menolak layanan ini?",
+												confirmText: "Tolak",
+												cancelText: "Batal",
+												onConfirm: () => handleReject(item._id),
+											})
+										}>
+										<XCircle size={14} />
+										Ditolak
+									</Button>
+								</div>
 							</CardContent>
 						</Card>
 					))}
