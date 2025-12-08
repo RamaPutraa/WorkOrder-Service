@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { useCompanyWo } from "../hooks/use-company-wo";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { ChevronLeft, Briefcase, Calendar, User } from "lucide-react";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@radix-ui/react-separator";
 
 const CompanyViewWo = () => {
 	const { data, loading, error } = useCompanyWo();
@@ -30,40 +31,105 @@ const CompanyViewWo = () => {
 				</div>
 			</div>
 
-			<div className="grid gap-4">
-				{data.map((wo) => (
-					<Card key={wo._id} className="rounded-2xl shadow-sm border">
-						<CardHeader>
-							<CardTitle className="flex items-center justify-between">
-								<span>{wo.service?.title}</span>
-								<Badge variant="outline" className="capitalize">
-									{wo.status}
-								</Badge>
-							</CardTitle>
-						</CardHeader>
-						<CardContent className="space-y-2 text-sm">
-							<p>
-								<span className="font-semibold">Client:</span>{" "}
-								{wo.createdBy?.name}
-							</p>
-							<p>
-								<span className="font-semibold">Created:</span>{" "}
-								{new Date(wo.createdAt).toLocaleString()}
-							</p>
+			{/* Grid 2 kolom */}
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+				{data.map((wo) => {
+					const positions =
+						[...new Set(wo.assignedStaffs?.map((s) => s.position?.name))]
+							.filter(Boolean)
+							.join(", ") || "Belum ada posisi yang ditugaskan";
 
-							<div className="pt-2">
+					// Status color mapping
+					const statusVariant:
+						| "default"
+						| "secondary"
+						| "destructive"
+						| "outline" =
+						wo.status === "drafted"
+							? "secondary"
+							: wo.status === "ongoing"
+							? "default"
+							: wo.status === "completed"
+							? "outline"
+							: "destructive"; // fallback untuk status lain
+
+					return (
+						<Card
+							key={wo._id}
+							className="rounded-2xl transition-all hover:shadow-md border">
+							<CardHeader>
+								<div className="flex items-center justify-between">
+									<h3 className="text-lg font-semibold">{wo.service?.title}</h3>
+
+									<Badge variant={statusVariant} className="capitalize">
+										{wo.status}
+									</Badge>
+								</div>
+
+								<p className="text-sm text-muted-foreground">
+									{wo.service?.description || "-"}
+								</p>
+							</CardHeader>
+
+							<CardContent className="space-y-5">
+								{/* Client (kiri) — Tanggal (kanan) */}
+								<div className="flex items-center justify-between">
+									{/* Client */}
+									<div className="flex items-center space-x-3">
+										<User className="size-5 text-muted-foreground" />
+										<div>
+											<p className="text-xs font-medium text-muted-foreground">
+												Client
+											</p>
+											<p className="text-sm">{wo.createdBy?.name || "-"}</p>
+										</div>
+									</div>
+
+									{/* Tanggal */}
+									<div className="flex items-center space-x-3">
+										<Calendar className="size-5 text-muted-foreground" />
+										<div className="text-left">
+											<p className="text-xs font-medium text-muted-foreground">
+												Dibuat Pada
+											</p>
+											<p className="text-sm">
+												{new Date(wo.createdAt).toLocaleDateString("id-ID", {
+													day: "2-digit",
+													month: "long",
+													year: "numeric",
+												})}
+											</p>
+										</div>
+									</div>
+								</div>
+
+								<Separator />
+
+								{/* Posisi Dibutuhkan */}
+								<div className="flex items-center space-x-3">
+									<Briefcase className="size-5 text-muted-foreground" />
+									<div>
+										<p className="text-xs font-medium text-muted-foreground">
+											Posisi Ditugaskan
+										</p>
+										<p className="text-sm">{positions}</p>
+									</div>
+								</div>
+
 								<Button
-									className="w-full bg-primary hover:bg-primary/90"
-									onClick={() => navigate(`/company/work-order/${wo._id}`)}>
+									className="w-full mt-3"
+									onClick={() =>
+										navigate(`/dashboard/owner/workorders/detail/${wo._id}`)
+									}>
 									Lihat Detail
 								</Button>
-							</div>
-						</CardContent>
-					</Card>
-				))}
+							</CardContent>
+						</Card>
+					);
+				})}
 
 				{data.length === 0 && (
-					<p className="text-muted-foreground text-center py-10">
+					<p className="text-muted-foreground text-center py-10 col-span-2">
 						Belum ada data work order.
 					</p>
 				)}

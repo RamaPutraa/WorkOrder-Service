@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { ChevronLeft, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,13 +21,24 @@ const ViewForm: React.FC = () => {
 	return (
 		<div className="container">
 			<div className="flex items-center justify-between mb-8">
-				<div className="flex flex-col space-y-2">
-					<h1 className="text-2xl font-bold">List Data Form</h1>
-					<p className="text-muted-foreground">
-						Berikut merupakan list form yang dimiliki oleh perusahaan.
-					</p>
+				<div className="flex items-center space-x-4">
+					{/* Back Button */}
+					<Button
+						onClick={() => navigate(-1)}
+						className="bg-primary hover:bg-primary/90 h-full">
+						<ChevronLeft className="size-6" />
+					</Button>
+
+					{/* Title Section */}
+					<div className="flex flex-col space-y-1">
+						<h1 className="text-2xl font-bold">List Data Form</h1>
+						<p className="text-muted-foreground">
+							Berikut merupakan list form yang dimiliki oleh perusahaan.
+						</p>
+					</div>
 				</div>
 
+				{/* Add Button */}
 				<Button
 					className="bg-primary hover:bg-primary/90"
 					onClick={() => navigate("/dashboard/owner/form/create")}>

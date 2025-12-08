@@ -6,3 +6,10 @@ export const getInternalCompanyWorkOrders = async () => {
 	);
 	return response.data;
 };
+
+export const getInternalCompanyWorkOrderDetail = async (id: string) => {
+	const response = await apiClient.get<DetailInternalWorkOrderResponse>(
+		`/workorders/${id}`
+	);
+	return response.data;
+};

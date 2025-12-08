@@ -3,13 +3,19 @@ type InternalWorkOrder = {
 	clientServiceRequestId: string;
 	companyId: string;
 	relateWorkOrderId?: string;
-	assignedStaff: Staff[];
+	assignedStaffs: User[];
 	status: string;
 	createdAt: string;
 	updatedAt: string;
-	startAt?: string;
+	startedAt?: string;
 	completedAt?: string;
 	createdBy: User;
 	service: Service;
 };
 type InternalWorkOrderResponse = ApiResponse<InternalWorkOrder[]>;
+
+type DetailInternalWorkOrder = InternalWorkOrder & {
+	workorderForms: OrderForms[];
+	submissions: PublicSubmission[];
+};
+type DetailInternalWorkOrderResponse = ApiResponse<DetailInternalWorkOrder>;

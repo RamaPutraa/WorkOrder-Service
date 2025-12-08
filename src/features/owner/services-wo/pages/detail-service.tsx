@@ -80,12 +80,6 @@ const DetailService = () => {
 									{detailService?.accessType}
 								</p>
 							</div>
-							<div>
-								<Label className="text-xs text-muted-foreground">
-									ID Layanan
-								</Label>
-								<p className="font-mono text-sm">{detailService?._id || "-"}</p>
-							</div>
 						</div>
 
 						<Separator className="my-4" />
