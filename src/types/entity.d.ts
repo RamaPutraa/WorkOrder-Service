@@ -1,6 +1,6 @@
 // users
 type User = {
-	_id: number;
+	_id: string;
 	name: string;
 	email: string;
 	role: string;
@@ -15,6 +15,21 @@ type Position = {
 	companyId: number;
 	createAt: string;
 	updateAt: string;
+};
+
+// staff item
+type StaffItem = {
+	_id: string;
+	name: string;
+	email: string;
+	role: string;
+	position: Position;
+};
+
+// employees
+type EmployeeGroup = {
+	company: CompanyMinimal;
+	employees: StaffItem[];
 };
 
 // forms

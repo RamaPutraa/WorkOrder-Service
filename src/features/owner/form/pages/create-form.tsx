@@ -6,7 +6,7 @@ import {
 } from "../components/create/form-builder";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNavigate } from "react-router-dom";
@@ -17,20 +17,24 @@ const FormCreatePage: React.FC = () => {
 	const isSubmitting = formRef.current?.isSubmitting;
 	const navigate = useNavigate();
 	return (
-		<div className="container">
+		<>
 			<div className="flex items-center justify-between mb-8">
-				<div className="flex flex-col space-y-2">
-					<h1 className="text-2xl font-bold">Buat Form Baru</h1>
-					<p className="text-muted-foreground">
-						Lengkapi detail form dan tambahkan field secara dinamis di bawah.
-					</p>
+				<div className="flex items-center space-x-4">
+					{/* Back Button */}
+					<Button
+						onClick={() => navigate(-1)}
+						className="bg-primary hover:bg-primary/90 h-full">
+						<ChevronLeft className="size-6" />
+					</Button>
+
+					{/* Title Section */}
+					<div className="flex flex-col space-y-1">
+						<h1 className="text-2xl font-bold">Buat Form Baru</h1>
+						<p className="text-muted-foreground">
+							Lengkapi detail form dan tambahkan field secara dinamis di bawah.
+						</p>
+					</div>
 				</div>
-				<Button
-					onClick={() => navigate(-1)}
-					className="bg-primary hover:bg-primary/90">
-					<ArrowLeft className="h-4 w-4" />
-					Kembali
-				</Button>
 			</div>
 
 			<div className="flex items-start gap-8">
@@ -58,14 +62,12 @@ const FormCreatePage: React.FC = () => {
 								className="rounded-full w-full"
 								onClick={() => formRef.current?.submitForm()}
 								disabled={isSubmitting}>
-								{isSubmitting ? (
+								{isSubmitting ?
 									<>
 										<Loader2 className="w-4 h-4 mr-2 animate-spin" />
 										Menyimpan...
 									</>
-								) : (
-									"Simpan Form"
-								)}
+								:	"Simpan Form"}
 							</Button>
 						</div>
 
@@ -75,7 +77,7 @@ const FormCreatePage: React.FC = () => {
 
 							<ScrollArea className="max-h-[calc(100vh-300px)] pr-2">
 								<div className="text-sm space-y-1">
-									{fields.length ? (
+									{fields.length ?
 										fields.map((f, i) => (
 											<div
 												key={i}
@@ -84,16 +86,14 @@ const FormCreatePage: React.FC = () => {
 												<span className="truncate">{f.type}</span>
 											</div>
 										))
-									) : (
-										<p className="text-muted-foreground">Belum ada field</p>
-									)}
+									:	<p className="text-muted-foreground">Belum ada field</p>}
 								</div>
 							</ScrollArea>
 						</div>
 					</Card>
 				</div>
 			</div>
-		</div>
+		</>
 	);
 };
 

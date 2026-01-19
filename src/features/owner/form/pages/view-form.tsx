@@ -19,7 +19,7 @@ const ViewForm: React.FC = () => {
 	}
 
 	return (
-		<div className="container">
+		<>
 			<div className="flex items-center justify-between mb-8">
 				<div className="flex items-center space-x-4">
 					{/* Back Button */}
@@ -49,7 +49,7 @@ const ViewForm: React.FC = () => {
 
 			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 				<AnimatePresence mode="wait">
-					{loading ? (
+					{loading ?
 						Array.from({ length: 6 }).map((_, i) => (
 							<motion.div
 								key={i}
@@ -67,7 +67,7 @@ const ViewForm: React.FC = () => {
 								</Card>
 							</motion.div>
 						))
-					) : forms.length > 0 ? (
+					: forms.length > 0 ?
 						forms.map((form) => (
 							<motion.div
 								key={form._id}
@@ -103,17 +103,16 @@ const ViewForm: React.FC = () => {
 								</Card>
 							</motion.div>
 						))
-					) : (
-						<motion.p
+					:	<motion.p
 							initial={{ opacity: 0 }}
 							animate={{ opacity: 1 }}
 							className="text-muted-foreground text-center col-span-full py-6">
 							Tidak ada data form.
 						</motion.p>
-					)}
+					}
 				</AnimatePresence>
 			</div>
-		</div>
+		</>
 	);
 };
 

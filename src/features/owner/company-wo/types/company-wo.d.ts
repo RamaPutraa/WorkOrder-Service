@@ -14,8 +14,20 @@ type InternalWorkOrder = {
 };
 type InternalWorkOrderResponse = ApiResponse<InternalWorkOrder[]>;
 
+type WorkOrderFormItem = {
+	order: number;
+	form: Form;
+	fieldsData?: FieldData[];
+};
+
 type DetailInternalWorkOrder = InternalWorkOrder & {
-	workorderForms: OrderForms[];
+	workorderForms: WorkOrderFormItem[];
 	submissions: PublicSubmission[];
 };
 type DetailInternalWorkOrderResponse = ApiResponse<DetailInternalWorkOrder>;
+
+// wo submit
+type AssignStaffToWorkOrder = ApiResponse<{
+	company: CompanyMinimal;
+	employees: StaffItem[];
+}>;
