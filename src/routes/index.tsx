@@ -9,8 +9,6 @@ import RegisterPage from "@/features/auth/pages/client-reg-page";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import DashboardOwner from "@/features/owner/dahsboard-client";
 import DashboardClient from "@/features/client/dashboard-client";
-import DashboardStaff from "@/features/owner/staff/dashboard-staff";
-import DashboardUnassigned from "@/features/owner/staff/dashboard-unassigned";
 import LandingPage from "@/features/public/landing-page";
 import ProtectedRoute from "./ProtectedRoute";
 import GuestRoute from "./GuestRoute";
@@ -33,6 +31,7 @@ import ViewServiceRequest from "@/features/owner/business/pages/view-service-req
 import DetailServiceRequest from "@/features/owner/business/pages/detail-service-request";
 import CompanyViewWo from "@/features/owner/company-wo/pages/company-view-wo";
 import CompanyDetailWo from "@/features/owner/company-wo/pages/company-detail-wo";
+import ViewStaff from "@/features/owner/staff-master/pages/view-staff";
 
 const router = createBrowserRouter([
 	{
@@ -72,6 +71,10 @@ const router = createBrowserRouter([
 						element: <CreatePositionPage />,
 					},
 					{
+						path: "staff",
+						element: <ViewStaff />,
+					},
+					{
 						path: "company",
 						element: <ViewCompany />,
 					},
@@ -107,34 +110,34 @@ const router = createBrowserRouter([
 			},
 		],
 	},
-	{
-		element: <ProtectedRoute allowedRoles={["staff_company"]} />,
-		children: [
-			{
-				element: (
-					<RootLayout>
-						<AppLayout />
-					</RootLayout>
-				),
-				children: [{ path: "/dashboard/staff", element: <DashboardStaff /> }],
-			},
-		],
-	},
-	{
-		element: <ProtectedRoute allowedRoles={["staff_unassigned"]} />,
-		children: [
-			{
-				element: (
-					<RootLayout>
-						<AppLayout />
-					</RootLayout>
-				),
-				children: [
-					{ path: "/dashboard/unassigned", element: <DashboardUnassigned /> },
-				],
-			},
-		],
-	},
+	// {
+	// 	element: <ProtectedRoute allowedRoles={["staff_company"]} />,
+	// 	children: [
+	// 		{
+	// 			element: (
+	// 				<RootLayout>
+	// 					<AppLayout />
+	// 				</RootLayout>
+	// 			),
+	// 			children: [{ path: "/dashboard/staff", element: <DashboardStaff /> }],
+	// 		},
+	// 	],
+	// },
+	// {
+	// 	element: <ProtectedRoute allowedRoles={["staff_unassigned"]} />,
+	// 	children: [
+	// 		{
+	// 			element: (
+	// 				<RootLayout>
+	// 					<AppLayout />
+	// 				</RootLayout>
+	// 			),
+	// 			children: [
+	// 				{ path: "/dashboard/unassigned", element: <DashboardUnassigned /> },
+	// 			],
+	// 		},
+	// 	],
+	// },
 	{
 		element: <ProtectedRoute allowedRoles={["client"]} />,
 		children: [

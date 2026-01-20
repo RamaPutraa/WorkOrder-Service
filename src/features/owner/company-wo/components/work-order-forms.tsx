@@ -26,11 +26,6 @@ const WorkOrderForms = ({
 	const [isSaving, setIsSaving] = useState(false);
 	const [isEditMode, setIsEditMode] = useState(false);
 
-	// Helper function to check if a specific form has submission
-	const isFormSubmitted = (formId: string): boolean => {
-		return submissions.some((sub) => sub.formId === formId);
-	};
-
 	// State to track form data: Map<formId, Map<fieldOrder, value>>
 	const [formData, setFormData] = useState<
 		Map<string, Map<number, AnswerValue>>

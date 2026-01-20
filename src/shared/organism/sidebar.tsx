@@ -90,12 +90,8 @@ const data = {
 			icon: Bot,
 			items: [
 				{
-					title: "Pegawai (Aktif)",
-					url: "#",
-				},
-				{
-					title: "Pegawai (Menunggu)",
-					url: "#",
+					title: "Pegawai Perusahaan",
+					url: "/dashboard/owner/staff",
 				},
 				{
 					title: "Posisi Pegawai",
