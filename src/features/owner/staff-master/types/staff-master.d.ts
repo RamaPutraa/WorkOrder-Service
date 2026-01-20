@@ -22,7 +22,7 @@ type CompanyEmployeesData = {
 	employees: Employee[];
 };
 
-type CompanyEmployeesResponse = ApiResponse<CompanyEmployeesData> & {
+type CompanyEmployeesResponse = ApiResponse<Employee[]> & {
 	meta: {
 		count: number;
 	};

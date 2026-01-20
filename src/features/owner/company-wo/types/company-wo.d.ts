@@ -27,7 +27,8 @@ type DetailInternalWorkOrder = InternalWorkOrder & {
 type DetailInternalWorkOrderResponse = ApiResponse<DetailInternalWorkOrder>;
 
 // wo submit
-type AssignStaffToWorkOrder = ApiResponse<{
-	company: CompanyMinimal;
-	employees: StaffItem[];
-}>;
+type AssignStaffToWorkOrder = ApiResponse<StaffItem[]> & {
+	meta: {
+		count: number;
+	};
+};

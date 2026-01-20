@@ -106,7 +106,6 @@ const StaffAssigned = ({
 			},
 		});
 	};
-
 	// Handle remove staff with confirmation
 	const handleRemoveStaff = (staff: StaffItem) => {
 		showDialog({
@@ -154,10 +153,16 @@ const StaffAssigned = ({
 	);
 
 	const filteredEmployees = employees
-		.filter((emp) => requiredPositions.includes(emp.position?.name))
+		.filter(
+			(emp) => emp.position && requiredPositions.includes(emp.position.name),
+		)
 		.filter(
 			(emp) => !assignedStaffsUI.some((assigned) => assigned._id === emp._id),
 		);
+
+	console.log("Required Positions:", requiredPositions);
+	console.log("All Employees:", employees);
+	console.log("Filtered Employees:", filteredEmployees);
 
 	const countByPosition = (positionId: string) =>
 		assignedStaffsUI.filter((s) => s.position?._id === positionId).length;

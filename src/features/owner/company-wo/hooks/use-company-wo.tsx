@@ -36,7 +36,9 @@ export const useCompanyWo = () => {
 			return;
 		}
 
-		setEmployees(res?.data?.employees ?? []);
+		console.log("API Response:", res);
+		console.log("Response Data:", res?.data);
+		setEmployees(res?.data ?? []);
 	};
 	// Fetch internal company work orders
 	const fetchInternalCompanyWorkOrders = async () => {

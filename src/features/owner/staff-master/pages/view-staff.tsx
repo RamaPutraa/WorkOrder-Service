@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
 const ViewStaff = () => {
-	const { employees, company, loading, error } = useStaff();
+	const { employees, loading, error } = useStaff();
 	const navigate = useNavigate();
 
 	if (loading) {
@@ -44,7 +44,7 @@ const ViewStaff = () => {
 							Manajemen Pegawai
 						</h1>
 						<p className="text-muted-foreground">
-							{company?.name} - Total {employees.length} karyawan
+							Total {employees.length} karyawan
 						</p>
 					</div>
 				</div>

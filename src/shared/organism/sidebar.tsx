@@ -102,66 +102,46 @@ const data = {
 	],
 	navBusiness: [
 		{
-			title: "Perusahaan",
+			title: "Daftar Perusahaan",
+			url: "/dashboard/client/companies",
+			icon: BookOpen,
+		},
+		{
+			title: "Daftar Layanan",
+			url: "/dashboard/client/services",
+			icon: BookOpen,
+		},
+		{
+			title: "Permintaan Layanan",
 			url: "#",
 			icon: BookOpen,
 			items: [
 				{
-					title: "Daftar Perusahaan",
+					title: "Riwayat Permintaan",
 					url: "/dashboard/client/submissions",
 				},
 				{
-					title: "Daftar Layanan",
-					url: "#",
-				},
-			],
-		},
-		{
-			title: "Tugas Kerja",
-			url: "#",
-			icon: BookOpen,
-			items: [
-				{
-					title: "Permintaan Layanan",
-					url: "/dashboard/client/submissions",
-				},
-				{
-					title: "Laporan Layanan",
-					url: "#",
-				},
-			],
-		},
-		{
-			title: "Transaksi",
-			url: "#",
-			icon: Bot,
-			items: [
-				{
-					title: "example",
-					url: "#",
-				},
-				{
-					title: "example",
-					url: "#",
+					title: "Pelaporan",
+					url: "/dashboard/client/reports",
 				},
 			],
 		},
 	],
 	navMenu: [
 		{
-			name: "Beranda",
+			name: "Home",
 			url: "/",
 			icon: Frame,
 		},
 		{
-			name: "Statistik Perusahaan",
+			name: "Dashboard",
 			url: "/dashboard/client",
 			icon: PieChart,
 		},
 	],
 	navHelp: [
 		{
-			name: "Dokumentasi",
+			name: "Bantuan",
 			url: "/",
 			icon: BookOpen,
 		},
