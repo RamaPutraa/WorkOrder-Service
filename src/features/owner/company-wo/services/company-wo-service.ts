@@ -38,3 +38,8 @@ export const submitWorkOrderFormApi = async (
 	});
 	return response.data;
 };
+
+export const markWorkOrderReady = async (id: string) => {
+	const response = await apiClient.put(`/workorders/${id}/ready`);
+	return response.data;
+};

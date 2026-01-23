@@ -1,21 +1,35 @@
 import { useNavigate } from "react-router-dom";
 import { useCompanyWo } from "../hooks/use-company-wo";
 import { Button } from "@/components/ui/button";
-import { Calendar, ChevronLeft, User } from "lucide-react";
+import {
+	Calendar,
+	ChevronLeft,
+	User,
+	CheckCircle2,
+	Play,
+	X,
+} from "lucide-react";
 import { Separator } from "@radix-ui/react-separator";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useState, useEffect } from "react";
 import StaffAssigned from "../components/staff-assigned";
 import WorkOrderForms from "../components/work-order-forms";
+import { markWorkOrderReady } from "../services/company-wo-service";
+import { handleApi } from "@/lib/handle-api";
+import { notifyError, notifySuccess } from "@/lib/toast-helper";
+import { useDialogStore } from "@/store/dialogStore";
 
 const CompanyDetailWo = () => {
 	const navigate = useNavigate();
-	const { detailData, employees } = useCompanyWo();
+	const { detailData, employees, fecthDetailInternalCompanyWorkOrder } =
+		useCompanyWo();
+	const { showDialog } = useDialogStore();
 
 	// Assigned Staff (UI State)
 	const [assignedStaffsUI, setAssignedStaffsUI] = useState<StaffItem[]>([]);
 	const [isSticky, setIsSticky] = useState(false);
+	const [isSubmittingReady, setIsSubmittingReady] = useState(false);
 
 	// Setelah detailData berhasil load → isi assigned staff ke UI state
 	useEffect(() => {
@@ -33,6 +47,40 @@ const CompanyDetailWo = () => {
 		window.addEventListener("scroll", handleScroll);
 		return () => window.removeEventListener("scroll", handleScroll);
 	}, []);
+
+	// Handle mark as ready
+	const handleMarkReady = () => {
+		showDialog({
+			title: "Konfirmasi Konfigurasi Selesai",
+			description:
+				"Apakah Anda yakin konfigurasi sudah selesai dan siap untuk memulai perintah kerja?",
+			confirmText: "Ya, Selesai",
+			cancelText: "Batal",
+			onConfirm: async () => {
+				setIsSubmittingReady(true);
+				const { error } = await handleApi(() =>
+					markWorkOrderReady(detailData!._id),
+				);
+
+				setIsSubmittingReady(false);
+
+				if (error) {
+					notifyError("Gagal menandai konfigurasi selesai", error.message);
+					return;
+				}
+
+				notifySuccess("Konfigurasi Selesai", "Work order siap untuk dimulai");
+
+				// Refresh detail data
+				if (detailData) {
+					fecthDetailInternalCompanyWorkOrder(detailData._id);
+				}
+			},
+		});
+	};
+
+	// Check if work order is ready (status = 'ready' or similar)
+	const isReady = detailData?.status === "ready";
 
 	if (!detailData) {
 		return <p className="p-4">Loading detail...</p>;
@@ -65,12 +113,32 @@ const CompanyDetailWo = () => {
 
 					{/* Action Buttons */}
 					<div className="flex items-center gap-3">
-						<Button
-							variant="outline"
-							className="border-green-500 text-green-600 hover:bg-green-50">
-							Ready
-						</Button>
-						<Button className="bg-primary hover:bg-primary/90">Start</Button>
+						{!isReady ?
+							<>
+								<Button variant="outline" onClick={() => navigate(-1)}>
+									<X className="h-4 w-4 mr-2" />
+									Batal
+								</Button>
+								<Button
+									variant="outline"
+									className="border-green-500 text-green-600 hover:bg-green-50"
+									onClick={handleMarkReady}
+									disabled={isSubmittingReady}>
+									<CheckCircle2 className="h-4 w-4 mr-2" />
+									{isSubmittingReady ? "Memproses..." : "Konfigurasi Selesai ✓"}
+								</Button>
+							</>
+						:	<>
+								<Button variant="outline" onClick={() => navigate(-1)}>
+									<X className="h-4 w-4 mr-2" />
+									Batal
+								</Button>
+								<Button className="bg-primary hover:bg-primary/90">
+									<Play className="h-4 w-4 mr-2" />
+									Mulai Perintah Kerja
+								</Button>
+							</>
+						}
 					</div>
 				</div>
 			</div>
