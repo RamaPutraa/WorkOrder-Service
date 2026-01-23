@@ -27,6 +27,8 @@ import { NavBusiness } from "../molecules/nav-business";
 import { NavHelp } from "../molecules/nav-help";
 import useAuth from "@/features/auth/hooks/useAuth";
 import { NavInternalBusiness } from "../molecules/nav-internal-business";
+import { NavStaffBusiness } from "../molecules/nav-menu-staff";
+import { NavManagerBusiness } from "../molecules/nav-menu-manager";
 
 // This is sample data.
 const data = {
@@ -56,11 +58,11 @@ const data = {
 			items: [
 				{
 					title: "Kelola FAQ",
-					url: "/dashboard/owner/services",
+					url: "/dashboard/internal/services",
 				},
 				{
 					title: "Kelola Form",
-					url: "/dashboard/owner/forms",
+					url: "/dashboard/internal/forms",
 				},
 			],
 		},
@@ -72,15 +74,15 @@ const data = {
 			items: [
 				{
 					title: "Template",
-					url: "/dashboard/owner/services",
+					url: "/dashboard/internal/services",
 				},
 				{
 					title: "Kelola Layanan",
-					url: "/dashboard/owner/services",
+					url: "/dashboard/internal/services",
 				},
 				{
 					title: "Kelola Formulir",
-					url: "/dashboard/owner/forms",
+					url: "/dashboard/internal/forms",
 				},
 			],
 		},
@@ -91,11 +93,11 @@ const data = {
 			items: [
 				{
 					title: "Pegawai Perusahaan",
-					url: "/dashboard/owner/staff",
+					url: "/dashboard/internal/staff",
 				},
 				{
 					title: "Posisi Pegawai",
-					url: "/dashboard/owner/positions",
+					url: "/dashboard/internal/positions",
 				},
 			],
 		},
@@ -159,20 +161,12 @@ const data = {
 			items: [
 				{
 					title: "Daftar Layanan",
-					url: "/dashboard/owner/business/services/request",
+					url: "/dashboard/internal/business/services/request",
 				},
 				{
 					title: "Riwayat Layanan",
 					url: "#",
 				},
-				// {
-				// 	title: "Riwayat Undangan Pegawai",
-				// 	url: "#",
-				// },
-				// {
-				// 	title: "Pelanggan",
-				// 	url: "#",
-				// },
 			],
 		},
 		{
@@ -182,7 +176,7 @@ const data = {
 			items: [
 				{
 					title: "Daftar Tugas Kerja",
-					url: "/dashboard/owner/workorders",
+					url: "/dashboard/internal/workorders",
 				},
 				{
 					title: "Riwayat Tugas Kerja",
@@ -191,15 +185,37 @@ const data = {
 			],
 		},
 	],
+	navStaffBusiness: [
+		{
+			title: "Rekan Kerja",
+			url: "/dashboard/client/companies",
+			icon: BookOpen,
+		},
+		{
+			title: "Perintah Kerja",
+			url: "#",
+			icon: BookOpen,
+			items: [
+				{
+					title: "Tugas Kerja",
+					url: "/dashboard/client/submissions",
+				},
+				{
+					title: "Riwayat Tugas Kerja",
+					url: "/dashboard/client/reports",
+				},
+			],
+		},
+	],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	const { user } = useAuth();
-	const isCompanyUser = [
-		"owner_company",
-		"manager_company",
-		"staff_company",
-	].includes(user?.role || "");
+	// const isCompanyUser = [
+	// 	"owner_company",
+	// 	"manager_company",
+	// 	"staff_company",
+	// ].includes(user?.role || "");
 
 	return (
 		<Sidebar collapsible="icon" {...props}>
@@ -208,11 +224,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			</SidebarHeader>
 			<SidebarContent>
 				<NavMenu menu={data.navMenu} />
-				{isCompanyUser && (
+				{user && ["owner_company"].includes(user.role) && (
 					<>
 						<NavSetup items={data.navSetup} />
 						<NavInternalBusiness items={data.navInternalBusiness} />
 					</>
+				)}
+				{user && ["manager_company"].includes(user.role) && (
+					<NavInternalBusiness items={data.navInternalBusiness} />
+				)}
+				{user && ["staff_company"].includes(user.role) && (
+					<NavStaffBusiness items={data.navStaffBusiness} />
 				)}
 				{user && ["client"].includes(user.role) && (
 					<NavBusiness items={data.navBusiness} />

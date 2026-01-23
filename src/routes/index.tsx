@@ -34,11 +34,15 @@ import CompanyDetailWo from "@/features/owner/company-wo/pages/company-detail-wo
 import ViewStaff from "@/features/owner/staff-master/pages/view-staff";
 import CompanyList from "@/features/client/company/pages/company-list";
 import ServicesList from "@/features/client/services-wo/pages/services-list";
+import DashboardStaff from "@/features/staff/dahsboard-staff";
+import DashboardManager from "@/features/manager/dashboard-manager";
 
 const router = createBrowserRouter([
 	{
-		path: "/dashboard/owner",
-		element: <ProtectedRoute allowedRoles={["owner_company"]} />,
+		path: "/dashboard/internal",
+		element: (
+			<ProtectedRoute allowedRoles={["owner_company", "manager_company"]} />
+		),
 		errorElement: <ErrorPage />,
 		children: [
 			{
@@ -112,19 +116,38 @@ const router = createBrowserRouter([
 			},
 		],
 	},
-	// {
-	// 	element: <ProtectedRoute allowedRoles={["staff_company"]} />,
-	// 	children: [
-	// 		{
-	// 			element: (
-	// 				<RootLayout>
-	// 					<AppLayout />
-	// 				</RootLayout>
-	// 			),
-	// 			children: [{ path: "/dashboard/staff", element: <DashboardStaff /> }],
-	// 		},
-	// 	],
-	// },
+	{
+		path: "/dashboard/manager",
+		element: <ProtectedRoute allowedRoles={["manager_company"]} />,
+		children: [
+			{
+				element: (
+					<RootLayout>
+						<AppLayout />
+					</RootLayout>
+				),
+				children: [
+					{
+						path: "",
+						element: <DashboardManager />,
+					},
+				],
+			},
+		],
+	},
+	{
+		element: <ProtectedRoute allowedRoles={["staff_company"]} />,
+		children: [
+			{
+				element: (
+					<RootLayout>
+						<AppLayout />
+					</RootLayout>
+				),
+				children: [{ path: "/dashboard/staff", element: <DashboardStaff /> }],
+			},
+		],
+	},
 	// {
 	// 	element: <ProtectedRoute allowedRoles={["staff_unassigned"]} />,
 	// 	children: [

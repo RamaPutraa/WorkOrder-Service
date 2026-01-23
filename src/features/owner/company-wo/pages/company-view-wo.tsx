@@ -45,13 +45,10 @@ const CompanyViewWo = () => {
 						| "secondary"
 						| "destructive"
 						| "outline" =
-						wo.status === "drafted"
-							? "secondary"
-							: wo.status === "ongoing"
-							? "default"
-							: wo.status === "completed"
-							? "outline"
-							: "destructive"; // fallback untuk status lain
+						wo.status === "drafted" ? "secondary"
+						: wo.status === "ongoing" ? "default"
+						: wo.status === "completed" ? "outline"
+						: "destructive"; // fallback untuk status lain
 
 					return (
 						<Card
@@ -119,7 +116,7 @@ const CompanyViewWo = () => {
 								<Button
 									className="w-full mt-3"
 									onClick={() =>
-										navigate(`/dashboard/owner/workorders/detail/${wo._id}`)
+										navigate(`/dashboard/internal/workorders/detail/${wo._id}`)
 									}>
 									Lihat Detail
 								</Button>

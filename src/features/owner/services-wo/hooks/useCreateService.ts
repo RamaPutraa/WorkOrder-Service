@@ -126,7 +126,7 @@ export const useCreateService = () => {
 
 		setLoading(true);
 		const { data: res, error } = await handleApi(() =>
-			getFormByIdApi(form._id)
+			getFormByIdApi(form._id),
 		);
 		setLoading(false);
 
@@ -154,7 +154,7 @@ export const useCreateService = () => {
 
 		setLoading(true);
 		const { data: res, error } = await handleApi(() =>
-			getFormByIdApi(form._id)
+			getFormByIdApi(form._id),
 		);
 		setLoading(false);
 
@@ -179,7 +179,7 @@ export const useCreateService = () => {
 
 		setLoading(true);
 		const { data: res, error } = await handleApi(() =>
-			getFormByIdApi(form._id)
+			getFormByIdApi(form._id),
 		);
 		setLoading(false);
 
@@ -197,7 +197,7 @@ export const useCreateService = () => {
 
 	// Helper universal untuk memilih state setter berdasarkan tipe form
 	const getSetter = (
-		type: FormType
+		type: FormType,
 	): React.Dispatch<React.SetStateAction<Record<string, RoleConfig>>> => {
 		switch (type) {
 			case "report":
@@ -221,9 +221,10 @@ export const useCreateService = () => {
 			};
 			const updated = {
 				...current,
-				fillableByRoles: current.fillableByRoles.includes(role)
-					? current.fillableByRoles.filter((r) => r !== role)
-					: [...current.fillableByRoles, role],
+				fillableByRoles:
+					current.fillableByRoles.includes(role) ?
+						current.fillableByRoles.filter((r) => r !== role)
+					:	[...current.fillableByRoles, role],
 			};
 			return { ...prev, [formId]: updated };
 		});
@@ -240,9 +241,10 @@ export const useCreateService = () => {
 			};
 			const updated = {
 				...current,
-				viewableByRoles: current.viewableByRoles.includes(role)
-					? current.viewableByRoles.filter((r) => r !== role)
-					: [...current.viewableByRoles, role],
+				viewableByRoles:
+					current.viewableByRoles.includes(role) ?
+						current.viewableByRoles.filter((r) => r !== role)
+					:	[...current.viewableByRoles, role],
 			};
 			return { ...prev, [formId]: updated };
 		});
@@ -251,16 +253,17 @@ export const useCreateService = () => {
 	const toggleFillablePosition = (
 		formId: string,
 		posId: string,
-		type: FormType
+		type: FormType,
 	) => {
 		const setter = getSetter(type);
 		setter((prev) => {
 			const current = prev[formId]!;
 			const updated = {
 				...current,
-				fillableByPositionIds: current.fillableByPositionIds.includes(posId)
-					? current.fillableByPositionIds.filter((id) => id !== posId)
-					: [...current.fillableByPositionIds, posId],
+				fillableByPositionIds:
+					current.fillableByPositionIds.includes(posId) ?
+						current.fillableByPositionIds.filter((id) => id !== posId)
+					:	[...current.fillableByPositionIds, posId],
 			};
 			return { ...prev, [formId]: updated };
 		});
@@ -269,16 +272,17 @@ export const useCreateService = () => {
 	const toggleViewablePosition = (
 		formId: string,
 		posId: string,
-		type: FormType
+		type: FormType,
 	) => {
 		const setter = getSetter(type);
 		setter((prev) => {
 			const current = prev[formId]!;
 			const updated = {
 				...current,
-				viewableByPositionIds: current.viewableByPositionIds.includes(posId)
-					? current.viewableByPositionIds.filter((id) => id !== posId)
-					: [...current.viewableByPositionIds, posId],
+				viewableByPositionIds:
+					current.viewableByPositionIds.includes(posId) ?
+						current.viewableByPositionIds.filter((id) => id !== posId)
+					:	[...current.viewableByPositionIds, posId],
 			};
 			return { ...prev, [formId]: updated };
 		});
@@ -343,7 +347,7 @@ export const useCreateService = () => {
 		};
 
 		const { data: res, error } = await handleApi(() =>
-			createServiceApi(payload)
+			createServiceApi(payload),
 		);
 		setCreating(false);
 

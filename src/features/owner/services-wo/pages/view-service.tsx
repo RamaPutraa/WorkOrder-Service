@@ -54,7 +54,7 @@ const ViewService: React.FC = () => {
 				{/* Add Button */}
 				<Button
 					className="bg-primary hover:bg-primary/90"
-					onClick={() => navigate("/dashboard/owner/services/create")}>
+					onClick={() => navigate("/dashboard/internal/services/create")}>
 					<Plus className="h-4 w-4" />
 					Tambah Layanan
 				</Button>
@@ -62,7 +62,7 @@ const ViewService: React.FC = () => {
 
 			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 				<AnimatePresence mode="wait">
-					{loading ? (
+					{loading ?
 						Array.from({ length: 6 }).map((_, i) => (
 							<motion.div
 								key={i}
@@ -80,7 +80,7 @@ const ViewService: React.FC = () => {
 								</Card>
 							</motion.div>
 						))
-					) : services.length > 0 ? (
+					: services.length > 0 ?
 						services.map((service) => (
 							<motion.div
 								key={service._id}
@@ -103,34 +103,32 @@ const ViewService: React.FC = () => {
 										<div className="flex items-center gap-2 text-sm">
 											<span className="font-medium">Akses:</span>
 
-											{service.accessType === "internal" ? (
+											{service.accessType === "internal" ?
 												<div className="flex items-center gap-1 text-blue-600">
 													<ShieldCheck className="w-4 h-4" />
 													<span>Internal</span>
 												</div>
-											) : (
-												<div className="flex items-center gap-1 text-green-600">
+											:	<div className="flex items-center gap-1 text-green-600">
 													<Globe className="w-4 h-4" />
 													<span>Public</span>
 												</div>
-											)}
+											}
 										</div>
 
 										{/* Status */}
 										<div className="flex items-center gap-2 text-sm">
 											<span className="font-medium">Status:</span>
 
-											{service.isActive ? (
+											{service.isActive ?
 												<div className="flex items-center gap-1 text-green-600">
 													<CheckCircle className="w-4 h-4" />
 													<span>Aktif</span>
 												</div>
-											) : (
-												<div className="flex items-center gap-1 text-red-600">
+											:	<div className="flex items-center gap-1 text-red-600">
 													<XCircle className="w-4 h-4" />
 													<span>Nonaktif</span>
 												</div>
-											)}
+											}
 										</div>
 
 										{/* Required Staff Count */}
@@ -149,21 +147,21 @@ const ViewService: React.FC = () => {
 										asChild
 										variant="outline"
 										className="text-primary border-primary mt-4 w-full">
-										<a href={`/dashboard/owner/services/detail/${service._id}`}>
+										<a
+											href={`/dashboard/internal/services/detail/${service._id}`}>
 											Lihat Detail
 										</a>
 									</Button>
 								</Card>
 							</motion.div>
 						))
-					) : (
-						<motion.div
+					:	<motion.div
 							initial={{ opacity: 0 }}
 							animate={{ opacity: 1 }}
 							className="col-span-full text-center py-10 text-muted-foreground">
 							Tidak ada data service tersedia.
 						</motion.div>
-					)}
+					}
 				</AnimatePresence>
 			</div>
 		</div>

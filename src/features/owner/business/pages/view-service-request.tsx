@@ -69,15 +69,14 @@ const ViewServiceRequest = () => {
 				</div>
 			</div>
 
-			{data.length === 0 ? (
+			{data.length === 0 ?
 				<p className="text-muted-foreground">Belum ada service request.</p>
-			) : (
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+			:	<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 					{data.map((item) => (
 						<Card
 							key={item._id}
 							className={`shadow-sm border hover:shadow-md transition-all duration-200 ${getStatusColor(
-								item.status
+								item.status,
 							)}`}>
 							<CardHeader>
 								<CardTitle className="text-lg font-semibold">
@@ -126,7 +125,7 @@ const ViewServiceRequest = () => {
 										className="flex items-center gap-1 col-span-4 text-xs py-1 h-8"
 										onClick={() =>
 											navigate(
-												`/dashboard/owner/business/services/request/detail/${item._id}`
+												`/dashboard/internal/business/services/request/detail/${item._id}`,
 											)
 										}>
 										<Eye size={14} />
@@ -181,7 +180,7 @@ const ViewServiceRequest = () => {
 						</Card>
 					))}
 				</div>
-			)}
+			}
 		</div>
 	);
 };

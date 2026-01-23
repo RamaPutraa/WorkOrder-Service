@@ -41,7 +41,7 @@ const ViewForm: React.FC = () => {
 				{/* Add Button */}
 				<Button
 					className="bg-primary hover:bg-primary/90"
-					onClick={() => navigate("/dashboard/owner/form/create")}>
+					onClick={() => navigate("/dashboard/internal/form/create")}>
 					<Plus className="h-4 w-4 mr-2" />
 					Tambah Form
 				</Button>
@@ -96,7 +96,7 @@ const ViewForm: React.FC = () => {
 										asChild
 										variant="outline"
 										className="text-primary border-primary mt-4 w-full">
-										<a href={`/dashboard/owner/form/detail/${form._id}`}>
+										<a href={`/dashboard/internal/form/detail/${form._id}`}>
 											Lihat Detail
 										</a>
 									</Button>

@@ -57,7 +57,7 @@ const PositionView = () => {
 
 				<Button
 					className="bg-primary hover:bg-primary/90"
-					onClick={() => navigate("/dashboard/owner/positions/create")}>
+					onClick={() => navigate("/dashboard/internal/positions/create")}>
 					<Plus className="h-4 w-4 mr-2" />
 					Tambah Posisi
 				</Button>
