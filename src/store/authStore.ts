@@ -1,11 +1,12 @@
 import { create } from "zustand";
+import { logoutApi } from "@/features/auth/services/authService";
 
 type AuthState = {
 	token: string | null;
 	user: User | null;
 	isAuthenticated: boolean;
 	setAuth: (token: string, user: User) => void;
-	logout: () => void;
+	logout: () => Promise<void>;
 };
 
 // 🔹 Fungsi bantu untuk inisialisasi dari localStorage
@@ -37,9 +38,18 @@ export const useAuthStore = create<AuthState>((set) => ({
 		set({ token, user, isAuthenticated: true });
 	},
 
-	logout: () => {
-		localStorage.removeItem("token");
-		localStorage.removeItem("user");
-		set({ token: null, user: null, isAuthenticated: false });
+	logout: async () => {
+		try {
+			// Call logout API endpoint
+			await logoutApi();
+		} catch (error) {
+			// Even if API call fails, still clear local storage
+			console.error("Logout API error:", error);
+		} finally {
+			// Always clear local storage and state
+			localStorage.removeItem("token");
+			localStorage.removeItem("user");
+			set({ token: null, user: null, isAuthenticated: false });
+		}
 	},
 }));

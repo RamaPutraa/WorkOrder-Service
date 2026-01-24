@@ -15,7 +15,10 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useState, useEffect } from "react";
 import StaffAssigned from "../components/staff-assigned";
 import WorkOrderForms from "../components/work-order-forms";
-import { markWorkOrderReady } from "../services/company-wo-service";
+import {
+	markWorkOrderReady,
+	startWorkOrderApi,
+} from "../services/company-wo-service";
 import { handleApi } from "@/lib/handle-api";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
 import { useDialogStore } from "@/store/dialogStore";
@@ -30,6 +33,7 @@ const CompanyDetailWo = () => {
 	const [assignedStaffsUI, setAssignedStaffsUI] = useState<StaffItem[]>([]);
 	const [isSticky, setIsSticky] = useState(false);
 	const [isSubmittingReady, setIsSubmittingReady] = useState(false);
+	const [isStarting, setIsStarting] = useState(false);
 
 	// Setelah detailData berhasil load → isi assigned staff ke UI state
 	useEffect(() => {
@@ -79,6 +83,37 @@ const CompanyDetailWo = () => {
 		});
 	};
 
+	// Handle start work order
+	const handleStartWorkOrder = () => {
+		showDialog({
+			title: "Mulai Perintah Kerja",
+			description:
+				"Apakah Anda yakin ingin memulai perintah kerja ini? Status akan berubah menjadi 'Sedang Dikerjakan'.",
+			confirmText: "Ya, Mulai",
+			cancelText: "Batal",
+			onConfirm: async () => {
+				setIsStarting(true);
+				const { error } = await handleApi(() =>
+					startWorkOrderApi(detailData!._id),
+				);
+
+				setIsStarting(false);
+
+				if (error) {
+					notifyError("Gagal memulai perintah kerja", error.message);
+					return;
+				}
+
+				notifySuccess("Berhasil Dimulai", "Perintah kerja telah dimulai");
+
+				// Refresh detail data
+				if (detailData) {
+					fecthDetailInternalCompanyWorkOrder(detailData._id);
+				}
+			},
+		});
+	};
+
 	// Check if work order is ready (status = 'ready' or similar)
 	const isReady = detailData?.status === "ready";
 
@@ -93,35 +128,38 @@ const CompanyDetailWo = () => {
 				className={`sticky top-0 z-30 bg-background transition-shadow duration-300 ${
 					isSticky ? "shadow-xl rounded-md py-2" : ""
 				}`}>
-				<div className="flex items-center justify-between my-5 px-6 py-4 relative z-10">
-					<div className="flex items-center space-x-6">
+				<div className="flex flex-col md:flex-row md:items-center justify-between my-4 px-4 sm:px-6 py-4 relative z-10 gap-4 md:gap-0">
+					<div className="flex items-center space-x-4 sm:space-x-6">
 						<Button
 							onClick={() => navigate(-1)}
-							className="bg-primary hover:bg-primary/90 h-full">
-							<ChevronLeft className="size-6" />
+							className="bg-primary hover:bg-primary/90 h-10 sm:h-full shrink-0">
+							<ChevronLeft className="size-5 sm:size-6" />
 						</Button>
 
-						<div className="flex flex-col space-y-2">
-							<h1 className="text-xl font-bold tracking-tight">
+						<div className="flex flex-col space-y-1 sm:space-y-2">
+							<h1 className="text-lg sm:text-xl font-bold tracking-tight line-clamp-1">
 								Detail Perintah Kerja
 							</h1>
-							<p className="text-muted-foreground">
+							<p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
 								Lakukan konfigurasi sebelum memulai perintah kerja.
 							</p>
 						</div>
 					</div>
 
 					{/* Action Buttons */}
-					<div className="flex items-center gap-3">
+					<div className="flex items-center gap-2 sm:gap-3 w-full md:w-auto">
 						{!isReady ?
 							<>
-								<Button variant="outline" onClick={() => navigate(-1)}>
+								<Button
+									variant="outline"
+									onClick={() => navigate(-1)}
+									className="flex-1 md:flex-none">
 									<X className="h-4 w-4 mr-2" />
 									Batal
 								</Button>
 								<Button
 									variant="outline"
-									className="border-green-500 text-green-600 hover:bg-green-50"
+									className="border-green-500 text-green-600 hover:bg-green-50 flex-1 md:flex-none"
 									onClick={handleMarkReady}
 									disabled={isSubmittingReady}>
 									<CheckCircle2 className="h-4 w-4 mr-2" />
@@ -129,13 +167,19 @@ const CompanyDetailWo = () => {
 								</Button>
 							</>
 						:	<>
-								<Button variant="outline" onClick={() => navigate(-1)}>
+								<Button
+									variant="outline"
+									onClick={() => navigate(-1)}
+									className="flex-1 md:flex-none">
 									<X className="h-4 w-4 mr-2" />
 									Batal
 								</Button>
-								<Button className="bg-primary hover:bg-primary/90">
+								<Button
+									className="bg-primary hover:bg-primary/90 flex-1 md:flex-none"
+									onClick={handleStartWorkOrder}
+									disabled={isStarting}>
 									<Play className="h-4 w-4 mr-2" />
-									Mulai Perintah Kerja
+									{isStarting ? "Memulai..." : "Mulai Perintah Kerja"}
 								</Button>
 							</>
 						}

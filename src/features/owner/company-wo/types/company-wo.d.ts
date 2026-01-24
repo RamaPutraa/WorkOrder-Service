@@ -32,3 +32,22 @@ type AssignStaffToWorkOrder = ApiResponse<StaffItem[]> & {
 		count: number;
 	};
 };
+
+// wo report
+type WorkOrderReport = {
+	_id: string;
+	workOrderId: string;
+	companyId: string;
+	status: string;
+	createdAt: string;
+	updatedAt: string;
+	startedAt: string | null;
+	completedAt: string | null;
+	reportForms: {
+		order: number;
+		form: Form;
+	}[];
+	subimissions: PublicSubmission[];
+};
+
+type WorkOrderReportResponse = ApiResponse<WorkOrderReport>;

@@ -8,6 +8,7 @@ import {
 	User,
 	Eye,
 	FileText,
+	FileCheck,
 } from "lucide-react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -203,17 +204,30 @@ const CompanyViewWo = () => {
 												</div>
 											</div>
 
-											{/* Action Button */}
-											<Button
-												className="w-full mt-auto h-10 rounded-lg border-2 border-primary bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 font-medium"
-												onClick={() =>
-													navigate(
-														`/dashboard/internal/workorders/detail/${wo._id}`,
-													)
-												}>
-												<Eye className="w-4 h-4 mr-2" />
-												Lihat Detail
-											</Button>
+											{/* Action Buttons */}
+											<div className="grid grid-cols-2 gap-2 mt-auto">
+												<Button
+													variant="outline"
+													className="h-10 rounded-lg border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all duration-200 font-medium"
+													onClick={() =>
+														navigate(
+															`/dashboard/internal/workorders/detail/${wo._id}`,
+														)
+													}>
+													<Eye className="w-4 h-4 mr-1" />
+													Detail
+												</Button>
+												<Button
+													className="h-10 rounded-lg bg-primary text-white hover:bg-primary/90 transition-all duration-200 font-medium"
+													onClick={() =>
+														navigate(
+															`/dashboard/internal/workorders/${wo._id}/report`,
+														)
+													}>
+													<FileCheck className="w-4 h-4 mr-1" />
+													Laporan
+												</Button>
+											</div>
 										</CardContent>
 									</Card>
 								</motion.div>

@@ -43,3 +43,28 @@ export const markWorkOrderReady = async (id: string) => {
 	const response = await apiClient.put(`/workorders/${id}/ready`);
 	return response.data;
 };
+
+export const startWorkOrderApi = async (id: string) => {
+	const response = await apiClient.put(`/workorders/${id}/in-progress`);
+	return response.data;
+};
+
+export const getWorkOrderReport = async (id: string) => {
+	const response = await apiClient.get<WorkOrderReportResponse>(
+		`/workorders/${id}/report`,
+	);
+	return response.data;
+};
+
+export const submitWorkOrderReportApi = async (
+	id: string,
+	submissions: {
+		formId: string;
+		fieldsData: FieldData[];
+	}[],
+) => {
+	const response = await apiClient.put(`/workorders/${id}/report/submissions`, {
+		submissions,
+	});
+	return response.data;
+};

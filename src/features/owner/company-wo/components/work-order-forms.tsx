@@ -209,8 +209,8 @@ const WorkOrderForms = ({
 	return (
 		<Tabs defaultValue="workorder">
 			<TabsList>
-				<TabsTrigger value="workorder">Perintah Kerja</TabsTrigger>
-				<TabsTrigger value="report">Laporan Perintah Kerja</TabsTrigger>
+				<TabsTrigger value="workorder">Formulir Perintah Kerja</TabsTrigger>
+				<TabsTrigger value="report">Pengajuan Perintah Kerja</TabsTrigger>
 			</TabsList>
 
 			{/* TAB: PERINTAH KERJA */}
