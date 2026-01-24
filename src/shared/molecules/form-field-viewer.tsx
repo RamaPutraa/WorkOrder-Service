@@ -28,7 +28,9 @@ export default function FormFieldViewer({
 		onChange?.(newValue);
 	};
 
-	const baseInput = `w-full text-sm border rounded-md p-2 ${readOnly ? "bg-gray-50 cursor-not-allowed" : ""}`;
+	const baseInput = `w-full px-4 py-2.5 text-sm border rounded-lg bg-background focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none ${
+		readOnly ? "bg-muted/50 cursor-not-allowed opacity-70" : ""
+	}`;
 
 	const renderField = () => {
 		switch (field.type) {
@@ -40,7 +42,7 @@ export default function FormFieldViewer({
 						type={field.type}
 						value={(localValue as string) ?? ""}
 						onChange={(e) => handleValueChange(e.target.value)}
-						placeholder={field.placeholder || ""}
+						placeholder={field.placeholder || "Masukkan teks"}
 						readOnly={readOnly}
 						disabled={readOnly}
 						className={baseInput}
@@ -57,7 +59,9 @@ export default function FormFieldViewer({
 								e.target.value === "" ? null : Number(e.target.value);
 							handleValueChange(newValue);
 						}}
-						placeholder={field.placeholder || ""}
+						placeholder={field.placeholder || "Masukkan angka"}
+						readOnly={readOnly}
+						disabled={readOnly}
 						className={baseInput}
 					/>
 				);
@@ -67,10 +71,10 @@ export default function FormFieldViewer({
 					<textarea
 						value={(localValue as string) ?? ""}
 						onChange={(e) => handleValueChange(e.target.value)}
-						placeholder={field.placeholder || ""}
+						placeholder={field.placeholder || "Masukkan teks panjang"}
 						readOnly={readOnly}
 						disabled={readOnly}
-						className={`${baseInput} min-h-[90px]`}
+						className={`${baseInput} min-h-[100px] resize-y`}
 					/>
 				);
 
@@ -89,17 +93,28 @@ export default function FormFieldViewer({
 
 			case "single_select":
 				return (
-					<div className="space-y-1">
+					<div className="space-y-2.5">
 						{field.options?.map((opt) => (
 							<label
 								key={opt.key ?? opt.value}
-								className="flex items-center gap-2">
+								className={`flex items-center gap-3 p-3 rounded-lg transition-colors group ${
+									readOnly ?
+										"cursor-not-allowed opacity-70"
+									:	"hover:bg-background cursor-pointer"
+								}`}>
 								<input
 									type="radio"
 									checked={localValue === opt.value}
 									onChange={() => handleValueChange(opt.value)}
+									disabled={readOnly}
+									className="w-4 h-4 text-primary focus:ring-2 focus:ring-primary cursor-pointer disabled:cursor-not-allowed"
 								/>
-								<span className="text-sm">{opt.value}</span>
+								<span
+									className={`text-sm font-medium transition-colors ${
+										readOnly ? "" : "group-hover:text-primary"
+									}`}>
+									{opt.value}
+								</span>
 							</label>
 						))}
 					</div>
@@ -107,11 +122,12 @@ export default function FormFieldViewer({
 
 			case "multi_select":
 				return (
-					<div className="space-y-1">
+					<div className="space-y-2.5">
 						{field.options?.map((opt) => {
 							const arr = Array.isArray(localValue) ? localValue : [];
 
 							const toggle = () => {
+								if (readOnly) return;
 								if (arr.includes(opt.value)) {
 									handleValueChange(arr.filter((v) => v !== opt.value));
 								} else {
@@ -122,13 +138,24 @@ export default function FormFieldViewer({
 							return (
 								<label
 									key={opt.key ?? opt.value}
-									className="flex items-center gap-2">
+									className={`flex items-center gap-3 p-3 rounded-lg transition-colors group ${
+										readOnly ?
+											"cursor-not-allowed opacity-70"
+										:	"hover:bg-background cursor-pointer"
+									}`}>
 									<input
 										type="checkbox"
 										checked={arr.includes(opt.value)}
 										onChange={toggle}
+										disabled={readOnly}
+										className="w-4 h-4 text-primary rounded focus:ring-2 focus:ring-primary cursor-pointer disabled:cursor-not-allowed"
 									/>
-									<span className="text-sm">{opt.value}</span>
+									<span
+										className={`text-sm font-medium transition-colors ${
+											readOnly ? "" : "group-hover:text-primary"
+										}`}>
+										{opt.value}
+									</span>
 								</label>
 							);
 						})}
@@ -137,32 +164,47 @@ export default function FormFieldViewer({
 
 			case "file":
 				return (
-					<div>
+					<div className="p-4 border rounded-lg bg-muted/30">
 						{typeof localValue === "string" ?
 							<a
 								href={localValue}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="text-blue-600 underline text-sm">
+								className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors underline">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									className="h-4 w-4"
+									viewBox="0 0 20 20"
+									fill="currentColor">
+									<path
+										fillRule="evenodd"
+										d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"
+										clipRule="evenodd"
+									/>
+								</svg>
 								Lihat File
 							</a>
-						:	<p className="text-gray-500 text-sm">Tidak ada file</p>}
+						:	<p className="text-sm text-muted-foreground">
+								Tidak ada file yang diunggah
+							</p>
+						}
 					</div>
 				);
 
 			default:
 				return (
-					<p className="text-sm text-gray-500">
-						Unknown field type: {field.type}
+					<p className="text-sm text-muted-foreground p-3 bg-muted/30 rounded-lg">
+						Tipe field tidak diketahui: {field.type}
 					</p>
 				);
 		}
 	};
 
 	return (
-		<div className="space-y-1">
-			<label className="text-xs font-semibold text-gray-700">
+		<div className="space-y-3">
+			<label className="block text-sm font-semibold text-foreground">
 				{field.label}
+				{field.required && <span className="text-destructive ml-1">*</span>}
 			</label>
 			{renderField()}
 		</div>

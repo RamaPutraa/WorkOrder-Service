@@ -28,7 +28,6 @@ import { NavHelp } from "../molecules/nav-help";
 import useAuth from "@/features/auth/hooks/useAuth";
 import { NavInternalBusiness } from "../molecules/nav-internal-business";
 import { NavStaffBusiness } from "../molecules/nav-menu-staff";
-import { NavManagerBusiness } from "../molecules/nav-menu-manager";
 
 // This is sample data.
 const data = {
@@ -51,21 +50,11 @@ const data = {
 	],
 	navSetup: [
 		{
-			title: "FAQ",
-			url: "#",
-			icon: SquareTerminal,
-			isActive: true,
-			items: [
-				{
-					title: "Kelola FAQ",
-					url: "/dashboard/internal/services",
-				},
-				{
-					title: "Kelola Form",
-					url: "/dashboard/internal/forms",
-				},
-			],
+			title: "Kelola FAQ",
+			url: "",
+			icon: BookOpen,
 		},
+
 		{
 			title: "Tugas Kerja",
 			url: "#",
@@ -77,12 +66,12 @@ const data = {
 					url: "/dashboard/internal/services",
 				},
 				{
-					title: "Kelola Layanan",
-					url: "/dashboard/internal/services",
-				},
-				{
 					title: "Kelola Formulir",
 					url: "/dashboard/internal/forms",
+				},
+				{
+					title: "Kelola Layanan",
+					url: "/dashboard/internal/services",
 				},
 			],
 		},

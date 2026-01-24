@@ -15,17 +15,25 @@ import {
 	CheckCircle,
 	XCircle,
 	ChevronLeft,
+	User,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDialogStore } from "@/store/dialogStore";
+import { motion, AnimatePresence } from "framer-motion";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ViewServiceRequest = () => {
 	const { data, loading, error, handleReject, handleApprove } = useBusiness();
 	const navigate = useNavigate();
 	const { showDialog } = useDialogStore();
 
-	if (loading) return <p className="p-4">Loading...</p>;
-	if (error) return <p className="p-4 text-red-500">{error}</p>;
+	if (error) {
+		return (
+			<div className="container py-8 px-10">
+				<p className="text-red-500">{error}</p>
+			</div>
+		);
+	}
 
 	const getStatusColor = (status: string) => {
 		switch (status.toLowerCase()) {
@@ -42,146 +50,246 @@ const ViewServiceRequest = () => {
 		const s = status.toLowerCase();
 		if (s === "approved")
 			return (
-				<Badge className="bg-green-600 hover:bg-green-700">Disetujui</Badge>
+				<div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-green-50 text-green-700 border border-green-200">
+					<CheckCircle className="w-3.5 h-3.5" />
+					<span className="text-xs font-semibold">Disetujui</span>
+				</div>
 			);
 		if (s === "rejected")
-			return <Badge className="bg-red-600 hover:bg-red-700">Ditolak</Badge>;
+			return (
+				<div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-red-50 text-red-700 border border-red-200">
+					<XCircle className="w-3.5 h-3.5" />
+					<span className="text-xs font-semibold">Ditolak</span>
+				</div>
+			);
 		return (
-			<Badge className="bg-yellow-500 hover:bg-yellow-600">Diterima</Badge>
+			<div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-yellow-50 text-yellow-700 border border-yellow-200">
+				<Clock className="w-3.5 h-3.5" />
+				<span className="text-xs font-semibold">Menunggu</span>
+			</div>
 		);
 	};
 
 	return (
-		<div className="p-4 space-y-6">
-			<div className="flex items-center space-x-6">
-				<Button
-					onClick={() => navigate(-1)}
-					className="bg-primary hover:bg-primary/90 h-full">
-					<ChevronLeft className="size-6" />
-				</Button>
-				<div className="flex flex-col space-y-2">
-					<h1 className="text-xl font-bold tracking-tight">
-						Pengajuan Layanan
-					</h1>
-					<p className="text-muted-foreground">
-						Berikut merupakan layanan yang diajukan oleh pelanggan.
-					</p>
+		<>
+			{/* Header Section */}
+			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+				<div className="flex items-center space-x-4">
+					{/* Back Button */}
+					<Button
+						onClick={() => navigate(-1)}
+						className="bg-primary hover:bg-primary/90 h-full">
+						<ChevronLeft className="size-6" />
+					</Button>
+
+					{/* Title Section */}
+					<div className="flex flex-col space-y-1">
+						<h1 className="text-2xl font-bold">Pengajuan Layanan</h1>
+						<p className="text-muted-foreground text-sm sm:text-base">
+							Berikut merupakan layanan yang diajukan oleh pelanggan.
+						</p>
+					</div>
 				</div>
 			</div>
 
-			{data.length === 0 ?
-				<p className="text-muted-foreground">Belum ada service request.</p>
-			:	<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-					{data.map((item) => (
-						<Card
-							key={item._id}
-							className={`shadow-sm border hover:shadow-md transition-all duration-200 ${getStatusColor(
-								item.status,
-							)}`}>
-							<CardHeader>
-								<CardTitle className="text-lg font-semibold">
-									{item.service?.title}
-								</CardTitle>
-								<CardDescription className="line-clamp-2">
-									{item.service?.description || "Tidak ada deskripsi"}
-								</CardDescription>
-							</CardHeader>
-
-							<CardContent className="text-sm space-y-3">
-								<div className="grid grid-cols-2 gap-4">
-									{/* KIRI */}
-									<div className="space-y-1">
-										<p className="flex items-center gap-2">
-											<span className="font-medium">Status:</span>
-											{renderStatusBadge(item.status)}
-										</p>
-
-										<p className="flex items-center gap-2">
-											<span className="font-medium">Pelanggan:</span>
-											{item.client?.name}
-										</p>
+			{/* Main Content - Service Requests Grid */}
+			<div className="grid gap-4 sm:gap-5 grid-cols-1 lg:grid-cols-2">
+				<AnimatePresence mode="wait">
+					{loading ?
+						Array.from({ length: 4 }).map((_, i) => (
+							<motion.div
+								key={i}
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								exit={{ opacity: 0 }}
+								transition={{ duration: 0.3 }}>
+								<Card className="p-5 flex flex-col justify-between border shadow-sm rounded-lg">
+									<div>
+										<Skeleton className="h-6 w-3/4 mb-3 rounded" />
+										<Skeleton className="h-4 w-full mb-2 rounded" />
+										<Skeleton className="h-4 w-2/3 mb-4 rounded" />
+										<div className="grid grid-cols-2 gap-4">
+											<Skeleton className="h-20 w-full rounded" />
+											<Skeleton className="h-20 w-full rounded" />
+										</div>
 									</div>
-
-									{/* KANAN */}
-									<div className="space-y-1 text-right">
-										<p className="flex items-center gap-2 justify-end">
-											<Calendar className="size-4 text-blue-600" />
-											<span className="font-medium">Dibuat:</span>
-											{new Date(item.createdAt).toLocaleString()}
-										</p>
-
-										<p className="flex items-center gap-2 justify-end">
-											<Clock className="size-4 text-green-600" />
-											<span className="font-medium">Diperbarui:</span>
-											{new Date(item.updatedAt).toLocaleString()}
-										</p>
+									<div className="grid grid-cols-6 gap-2 mt-4">
+										<Skeleton className="h-10 w-full col-span-4 rounded-lg" />
+										<Skeleton className="h-10 w-full col-span-1 rounded-lg" />
+										<Skeleton className="h-10 w-full col-span-1 rounded-lg" />
 									</div>
-								</div>
+								</Card>
+							</motion.div>
+						))
+					: data.length > 0 ?
+						data.map((item) => (
+							<motion.div
+								key={item._id}
+								initial={{ opacity: 0, y: 20 }}
+								animate={{ opacity: 1, y: 0 }}
+								whileHover={{ scale: 1.01, y: -4 }}
+								transition={{ duration: 0.2, ease: "easeOut" }}>
+								<Card
+									className={`p-5 flex flex-col justify-between h-full border shadow-md hover:shadow-lg rounded-lg transition-all duration-200 bg-gradient-to-br from-background to-muted/10 ${getStatusColor(
+										item.status,
+									)}`}>
+									{/* Header */}
+									<CardHeader className="p-0 mb-4">
+										<CardTitle className="text-lg font-bold leading-tight">
+											{item.service?.title}
+										</CardTitle>
+										<CardDescription className="text-sm text-muted-foreground leading-relaxed line-clamp-2 mt-2">
+											{item.service?.description || "Tidak ada deskripsi"}
+										</CardDescription>
+									</CardHeader>
 
-								<div className="grid grid-cols-6 gap-2 mt-6">
-									{/* Lihat Detail → col-span-4 */}
-									<Button
-										variant="outline"
-										className="flex items-center gap-1 col-span-4 text-xs py-1 h-8"
-										onClick={() =>
-											navigate(
-												`/dashboard/internal/business/services/request/detail/${item._id}`,
-											)
-										}>
-										<Eye size={14} />
-										Lihat Detail
-									</Button>
+									{/* Content */}
+									<CardContent className="p-0 space-y-4">
+										{/* Info Grid */}
+										<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+											{/* Left Column */}
+											<div className="space-y-3">
+												{/* Status */}
+												<div className="flex flex-col gap-1.5">
+													<span className="text-xs font-medium text-muted-foreground">
+														Status
+													</span>
+													{renderStatusBadge(item.status)}
+												</div>
 
-									{/* Approved */}
-									<Button
-										variant="outline"
-										className="
-                                            col-span-1 text-xs py-1 h-8 flex items-center gap-1
-                                            border-green-600 text-green-600
-                                            hover:bg-green-600 hover:text-white
-                                        "
-										onClick={() =>
-											showDialog({
-												title: "Konfirmasi Persetujuan",
-												description:
-													"Apakah kamu yakin ingin menyetujui layanan ini?",
-												confirmText: "Setujui",
-												cancelText: "Batal",
-												onConfirm: () => handleApprove(item._id),
-											})
-										}>
-										<CheckCircle size={14} />
-										Disetujui
-									</Button>
+												{/* Client */}
+												<div className="flex flex-col gap-1.5">
+													<span className="text-xs font-medium text-muted-foreground">
+														Pelanggan
+													</span>
+													<div className="flex items-center gap-2 text-sm">
+														<User className="w-4 h-4 text-primary" />
+														<span className="font-medium">
+															{item.client?.name}
+														</span>
+													</div>
+												</div>
+											</div>
 
-									{/* Rejected */}
-									<Button
-										variant="outline"
-										className="
-                                            col-span-1 text-xs py-1 h-8 flex items-center gap-1
-                                            border-red-600 text-red-600
-                                            hover:bg-red-600 hover:text-white
-                                        "
-										onClick={() =>
-											showDialog({
-												title: "Konfirmasi Penolakan",
-												description:
-													"Apakah kamu yakin ingin menolak layanan ini?",
-												confirmText: "Tolak",
-												cancelText: "Batal",
-												onConfirm: () => handleReject(item._id),
-											})
-										}>
-										<XCircle size={14} />
-										Ditolak
-									</Button>
-								</div>
-							</CardContent>
-						</Card>
-					))}
-				</div>
-			}
-		</div>
+											{/* Right Column */}
+											<div className="space-y-3">
+												{/* Created Date */}
+												<div className="flex flex-col gap-1.5">
+													<span className="text-xs font-medium text-muted-foreground">
+														Dibuat
+													</span>
+													<div className="flex items-center gap-2 text-sm">
+														<Calendar className="w-4 h-4 text-blue-600" />
+														<span>
+															{new Date(item.createdAt).toLocaleDateString(
+																"id-ID",
+																{
+																	day: "2-digit",
+																	month: "short",
+																	year: "numeric",
+																},
+															)}
+														</span>
+													</div>
+												</div>
+
+												{/* Updated Date */}
+												<div className="flex flex-col gap-1.5">
+													<span className="text-xs font-medium text-muted-foreground">
+														Diperbarui
+													</span>
+													<div className="flex items-center gap-2 text-sm">
+														<Clock className="w-4 h-4 text-green-600" />
+														<span>
+															{new Date(item.updatedAt).toLocaleDateString(
+																"id-ID",
+																{
+																	day: "2-digit",
+																	month: "short",
+																	year: "numeric",
+																},
+															)}
+														</span>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										{/* Action Buttons */}
+										<div className="flex flex-col sm:flex-row gap-2 pt-2">
+											{/* View Detail Button - Full width on mobile, flex-1 on desktop */}
+											<Button
+												variant="outline"
+												className="flex-1 h-10 rounded-lg border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-200 font-medium"
+												onClick={() =>
+													navigate(
+														`/dashboard/internal/business/services/request/detail/${item._id}`,
+													)
+												}>
+												<Eye className="w-4 h-4 mr-2" />
+												Lihat Detail
+											</Button>
+
+											{/* Approve/Reject Buttons Container */}
+											<div className="flex gap-2">
+												{/* Approve Button */}
+												<Button
+													variant="outline"
+													className="flex-1 sm:w-auto h-10 rounded-lg border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white transition-all duration-200 font-medium"
+													onClick={() =>
+														showDialog({
+															title: "Konfirmasi Persetujuan",
+															description:
+																"Apakah kamu yakin ingin menyetujui layanan ini?",
+															confirmText: "Setujui",
+															cancelText: "Batal",
+															onConfirm: () => handleApprove(item._id),
+														})
+													}>
+													<CheckCircle className="w-4 h-4 sm:mr-0 mr-2" />
+													<span className="sm:hidden">Setujui</span>
+												</Button>
+
+												{/* Reject Button */}
+												<Button
+													variant="outline"
+													className="flex-1 sm:w-auto h-10 rounded-lg border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition-all duration-200 font-medium"
+													onClick={() =>
+														showDialog({
+															title: "Konfirmasi Penolakan",
+															description:
+																"Apakah kamu yakin ingin menolak layanan ini?",
+															confirmText: "Tolak",
+															cancelText: "Batal",
+															onConfirm: () => handleReject(item._id),
+														})
+													}>
+													<XCircle className="w-4 h-4 sm:mr-0 mr-2" />
+													<span className="sm:hidden">Tolak</span>
+												</Button>
+											</div>
+										</div>
+									</CardContent>
+								</Card>
+							</motion.div>
+						))
+					:	<motion.div
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							className="col-span-full">
+							<Card className="p-12 text-center border-dashed border-2 rounded-lg">
+								<p className="text-muted-foreground text-base">
+									Belum ada pengajuan layanan.
+								</p>
+								<p className="text-sm text-muted-foreground mt-2">
+									Pengajuan layanan dari pelanggan akan muncul di sini.
+								</p>
+							</Card>
+						</motion.div>
+					}
+				</AnimatePresence>
+			</div>
+		</>
 	);
 };
 
