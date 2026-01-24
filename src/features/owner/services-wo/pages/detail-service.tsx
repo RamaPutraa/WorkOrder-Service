@@ -10,10 +10,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useCreateService } from "../hooks/useCreateService";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label"; // gunakan komponen Label dari shadcn-ui
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@radix-ui/react-separator";
+import { Card } from "@/components/ui/card";
 
 const DetailService = () => {
 	const navigate = useNavigate();
@@ -22,190 +19,221 @@ const DetailService = () => {
 	return (
 		<>
 			{/* Header Navigasi */}
-			<div className="flex items-center space-x-6 mb-8">
-				<Button
-					onClick={() => navigate(-1)}
-					className="bg-primary hover:bg-primary/90 h-full">
-					<ChevronLeft className="size-6" />
-				</Button>
-				<div className="flex flex-col space-y-2">
-					<h1 className="text-xl font-bold tracking-tight">
-						Detail Service {detailService?.title}
-					</h1>
-					<p className="text-muted-foreground">
-						Berikut merupakan detail service {detailService?.title} yang
-						dimiliki oleh perusahaan.
-					</p>
+			<div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-8">
+				<div className="flex items-center space-x-4">
+					<Button
+						onClick={() => navigate(-1)}
+						className="bg-primary hover:bg-primary/90 h-full">
+						<ChevronLeft className="size-6" />
+					</Button>
+					<div className="flex flex-col space-y-1">
+						<h1 className="text-2xl font-bold">
+							Detail Service {detailService?.title}
+						</h1>
+						<p className="text-muted-foreground text-sm sm:text-base">
+							Berikut merupakan detail service {detailService?.title} yang
+							dimiliki oleh perusahaan.
+						</p>
+					</div>
 				</div>
 			</div>
 
 			<div className="space-y-8">
 				{/* Informasi Utama */}
-				<Card className="shadow-sm">
-					<CardHeader className="flex flex-row items-center justify-between">
-						<div>
-							<CardTitle className="text-lg font-semibold flex items-center gap-2">
-								<FileText className="size-5 text-primary" />
-								{detailService?.title}
-								{detailService?.isActive ? (
-									<Badge variant="default" className="ml-2">
-										Aktif
-									</Badge>
-								) : (
-									<Badge variant="secondary" className="ml-2">
-										Nonaktif
-									</Badge>
-								)}
-							</CardTitle>
-							<p className="text-sm text-muted-foreground mt-1">
-								{detailService?.description}
-							</p>
-						</div>
-						<div className="flex gap-2">
-							<Button variant="outline" size="sm">
-								<Edit className="w-4 h-4 mr-1" /> Edit
-							</Button>
-							<Button variant="destructive" size="sm">
-								<Trash className="w-4 h-4 mr-1" /> Delete
-							</Button>
-						</div>
-					</CardHeader>
-					<CardContent className="space-y-4">
-						<div className="flex flex-wrap gap-4">
-							<div>
-								<Label className="text-xs text-muted-foreground">
-									Tipe Akses
-								</Label>
-								<p className="font-medium capitalize">
-									{detailService?.accessType}
+				<Card className="shadow-md border rounded-lg overflow-hidden">
+					{/* Card Header with Actions */}
+					<div className="p-5 lg:p-6 border-b bg-gradient-to-br from-background to-muted/20">
+						<div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+							<div className="flex-1 space-y-3">
+								<div className="flex items-center gap-3 flex-wrap">
+									<FileText className="size-6 text-primary shrink-0" />
+									<h2 className="text-xl font-bold">{detailService?.title}</h2>
+									{detailService?.isActive ?
+										<div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-green-50 text-green-700 border border-green-200">
+											<CheckCircle className="w-3.5 h-3.5" />
+											<span className="text-xs font-semibold">Aktif</span>
+										</div>
+									:	<div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-gray-50 text-gray-700 border border-gray-200">
+											<span className="text-xs font-semibold">Nonaktif</span>
+										</div>
+									}
+								</div>
+								<p className="text-sm text-muted-foreground leading-relaxed">
+									{detailService?.description}
 								</p>
+								<div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 w-fit">
+									<span className="text-xs font-semibold">Tipe Akses:</span>
+									<span className="text-xs font-bold capitalize">
+										{detailService?.accessType}
+									</span>
+								</div>
+							</div>
+
+							<div className="flex gap-2 sm:flex-shrink-0">
+								<Button
+									variant="outline"
+									size="sm"
+									className="flex-1 sm:flex-none h-10 px-4 rounded-lg border-2 hover:bg-muted transition-colors">
+									<Edit className="w-4 h-4 sm:mr-2" />
+									<span className="hidden sm:inline">Edit</span>
+								</Button>
+								<Button
+									variant="destructive"
+									size="sm"
+									className="flex-1 sm:flex-none h-10 px-4 rounded-lg transition-colors">
+									<Trash className="w-4 h-4 sm:mr-2" />
+									<span className="hidden sm:inline">Delete</span>
+								</Button>
 							</div>
 						</div>
+					</div>
 
-						<Separator className="my-4" />
-
+					{/* Card Content */}
+					<div className="p-5 lg:p-6">
 						{/* Required Staff */}
-						<div className="space-y-2">
-							<h3 className="font-semibold flex items-center gap-2">
-								<Users className="size-4 text-primary" />
+						<div className="space-y-3">
+							<h3 className="font-semibold text-base flex items-center gap-2">
+								<Users className="size-5 text-primary" />
 								Pegawai yang Diperlukan
 							</h3>
-							{detailService?.requiredStaff?.length ? (
-								<div className="grid gap-3">
+							{detailService?.requiredStaff?.length ?
+								<div className="grid gap-3 sm:grid-cols-2">
 									{detailService.requiredStaff.map((staff, i) => (
 										<div
 											key={i}
-											className="border rounded-md p-3 bg-muted/50 flex justify-between items-center">
-											<div>
-												<p className="font-medium">{staff.position?.name}</p>
-												<p className="text-xs text-muted-foreground">
-													Minimal {staff.minimumStaff} - Maksimal{" "}
-													{staff.maximumStaff} orang
+											className="border rounded-lg p-4 bg-muted/30 hover:bg-muted/50 transition-colors flex justify-between items-center">
+											<div className="flex-1">
+												<p className="font-semibold text-sm">
+													{staff.position?.name}
+												</p>
+												<p className="text-xs text-muted-foreground mt-1">
+													Min: {staff.minimumStaff} - Max: {staff.maximumStaff}{" "}
+													orang
 												</p>
 											</div>
-											<CheckCircle className="size-5 text-green-600" />
+											<CheckCircle className="size-5 text-green-600 shrink-0 ml-2" />
 										</div>
 									))}
 								</div>
-							) : (
-								<p className="text-sm text-muted-foreground">
+							:	<p className="text-sm text-muted-foreground italic">
 									Tidak ada kebutuhan staf spesifik.
 								</p>
-							)}
+							}
 						</div>
-					</CardContent>
+					</div>
 				</Card>
 
 				{/* Client Intake Forms */}
 				{(detailService?.clientIntakeForms?.length ?? 0) > 0 && (
-					<Card className="shadow-sm">
-						<CardHeader>
-							<CardTitle className="flex items-center gap-2">
+					<Card className="shadow-md border rounded-lg overflow-hidden">
+						<div className="p-5 lg:p-6 border-b bg-gradient-to-br from-background to-muted/20">
+							<h3 className="font-semibold text-lg flex items-center gap-2">
 								<ClipboardList className="size-5 text-primary" />
 								Client Intake Forms
-							</CardTitle>
-						</CardHeader>
-						<CardContent className="grid gap-3">
+							</h3>
+						</div>
+						<div className="p-5 lg:p-6 grid gap-3 sm:grid-cols-2">
 							{detailService?.clientIntakeForms?.map((item, i) => (
 								<div
 									key={i}
-									className="border rounded-md p-4 bg-muted/40 flex flex-col">
-									<span className="font-medium">
-										#{item.order}. {item.form.title}
-									</span>
-									<p className="text-xs text-muted-foreground">
-										{item.form.description}
-									</p>
-									<Badge
-										variant="outline"
-										className="mt-2 w-fit capitalize text-xs">
-										{item.form.formType}
-									</Badge>
+									className="border rounded-lg p-4 bg-muted/30 hover:bg-muted/50 transition-colors flex flex-col space-y-2">
+									<div className="flex items-start gap-2">
+										<div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-semibold shrink-0">
+											{item.order}
+										</div>
+										<div className="flex-1">
+											<span className="font-semibold text-sm">
+												{item.form.title}
+											</span>
+											<p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+												{item.form.description}
+											</p>
+										</div>
+									</div>
+									<div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-primary/10 text-primary border border-primary/20 w-fit">
+										<span className="text-xs font-semibold capitalize">
+											{item.form.formType}
+										</span>
+									</div>
 								</div>
 							))}
-						</CardContent>
+						</div>
 					</Card>
 				)}
 
 				{/* Work Order Forms */}
 				{(detailService?.workOrderForms?.length ?? 0) > 0 && (
-					<Card className="shadow-sm">
-						<CardHeader>
-							<CardTitle className="flex items-center gap-2">
+					<Card className="shadow-md border rounded-lg overflow-hidden">
+						<div className="p-5 lg:p-6 border-b bg-gradient-to-br from-background to-muted/20">
+							<h3 className="font-semibold text-lg flex items-center gap-2">
 								<FileText className="size-5 text-primary" />
 								Work Order Forms
-							</CardTitle>
-						</CardHeader>
-						<CardContent className="grid gap-3">
+							</h3>
+						</div>
+						<div className="p-5 lg:p-6 grid gap-3 sm:grid-cols-2">
 							{detailService?.workOrderForms?.map((wo, i) => (
 								<div
 									key={i}
-									className="border rounded-md p-4 bg-muted/40 flex flex-col">
-									<span className="font-medium">
-										#{wo.order}. {wo.form.title}
-									</span>
-									<p className="text-xs text-muted-foreground">
-										{wo.form.description}
-									</p>
-									<Badge
-										variant="outline"
-										className="mt-2 w-fit capitalize text-xs">
-										{wo.form.formType}
-									</Badge>
+									className="border rounded-lg p-4 bg-muted/30 hover:bg-muted/50 transition-colors flex flex-col space-y-2">
+									<div className="flex items-start gap-2">
+										<div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-semibold shrink-0">
+											{wo.order}
+										</div>
+										<div className="flex-1">
+											<span className="font-semibold text-sm">
+												{wo.form.title}
+											</span>
+											<p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+												{wo.form.description}
+											</p>
+										</div>
+									</div>
+									<div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-primary/10 text-primary border border-primary/20 w-fit">
+										<span className="text-xs font-semibold capitalize">
+											{wo.form.formType}
+										</span>
+									</div>
 								</div>
 							))}
-						</CardContent>
+						</div>
 					</Card>
 				)}
 
 				{/* Report Forms */}
 				{(detailService?.reportForms?.length ?? 0) > 0 && (
-					<Card className="shadow-sm">
-						<CardHeader>
-							<CardTitle className="flex items-center gap-2">
+					<Card className="shadow-md border rounded-lg overflow-hidden">
+						<div className="p-5 lg:p-6 border-b bg-gradient-to-br from-background to-muted/20">
+							<h3 className="font-semibold text-lg flex items-center gap-2">
 								<FileText className="size-5 text-primary" />
 								Report Forms
-							</CardTitle>
-						</CardHeader>
-						<CardContent className="grid gap-3">
+							</h3>
+						</div>
+						<div className="p-5 lg:p-6 grid gap-3 sm:grid-cols-2">
 							{detailService?.reportForms?.map((rf, i) => (
 								<div
 									key={i}
-									className="border rounded-md p-4 bg-muted/40 flex flex-col">
-									<span className="font-medium">
-										#{rf.order}. {rf.form.title}
-									</span>
-									<p className="text-xs text-muted-foreground">
-										{rf.form.description}
-									</p>
-									<Badge
-										variant="outline"
-										className="mt-2 w-fit capitalize text-xs">
-										{rf.form.formType}
-									</Badge>
+									className="border rounded-lg p-4 bg-muted/30 hover:bg-muted/50 transition-colors flex flex-col space-y-2">
+									<div className="flex items-start gap-2">
+										<div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-semibold shrink-0">
+											{rf.order}
+										</div>
+										<div className="flex-1">
+											<span className="font-semibold text-sm">
+												{rf.form.title}
+											</span>
+											<p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+												{rf.form.description}
+											</p>
+										</div>
+									</div>
+									<div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-primary/10 text-primary border border-primary/20 w-fit">
+										<span className="text-xs font-semibold capitalize">
+											{rf.form.formType}
+										</span>
+									</div>
 								</div>
 							))}
-						</CardContent>
+						</div>
 					</Card>
 				)}
 			</div>

@@ -1,5 +1,6 @@
 import { handleApi } from "@/lib/handle-api";
 import {
+	assignStaffToWorkOrder,
 	getInternalCompanyWorkOrderDetail,
 	getInternalCompanyWorkOrders,
 } from "../services/company-wo-service";
@@ -9,19 +10,42 @@ import { useParams } from "react-router-dom";
 
 export const useCompanyWo = () => {
 	const { id } = useParams<{ id: string }>();
+	const [employees, setEmployees] = useState<StaffItem[]>([]);
+
 	const [data, setData] = useState<InternalWorkOrder[]>([]);
 	const [detailData, setDetailData] = useState<DetailInternalWorkOrder | null>(
-		null
+		null,
 	);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
+	// fecth employee list
+	const fetchEmployeeList = async () => {
+		setLoading(true);
+		setError(null);
+
+		const { data: res, error } = await handleApi(() =>
+			assignStaffToWorkOrder(),
+		);
+
+		setLoading(false);
+
+		if (error) {
+			setError(error.message);
+			notifyError("Gagal memuat data karyawan", error.message);
+			return;
+		}
+
+		console.log("API Response:", res);
+		console.log("Response Data:", res?.data);
+		setEmployees(res?.data ?? []);
+	};
 	// Fetch internal company work orders
 	const fetchInternalCompanyWorkOrders = async () => {
 		setLoading(true);
 		setError(null);
 		const { data: res, error } = await handleApi(() =>
-			getInternalCompanyWorkOrders()
+			getInternalCompanyWorkOrders(),
 		);
 		setLoading(false);
 		if (error) {
@@ -37,7 +61,7 @@ export const useCompanyWo = () => {
 		setLoading(true);
 		setError(null);
 		const { data: res, error } = await handleApi(() =>
-			getInternalCompanyWorkOrderDetail(id)
+			getInternalCompanyWorkOrderDetail(id),
 		);
 		setLoading(false);
 		if (error) {
@@ -50,16 +74,19 @@ export const useCompanyWo = () => {
 	};
 
 	useEffect(() => {
+		void fetchEmployeeList();
 		void fetchInternalCompanyWorkOrders();
 		if (id) fecthDetailInternalCompanyWorkOrder(id);
 	}, []);
 
 	return {
+		employees,
 		data,
 		detailData,
 		loading,
 		error,
 		fetchInternalCompanyWorkOrders,
 		fecthDetailInternalCompanyWorkOrder,
+		fetchEmployeeList,
 	};
 };

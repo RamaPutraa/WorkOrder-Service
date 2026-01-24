@@ -13,7 +13,12 @@ export const clientRegisterApi = async (data: RegisterRequest) => {
 export const registerCompanyApi = async (data: RegisterCompanyRequest) => {
 	const response = await axios.post<RegisterCompanyResponse>(
 		"/auth/register-company",
-		data
+		data,
 	);
+	return response.data;
+};
+
+export const logoutApi = async () => {
+	const response = await axios.post("/auth/logout");
 	return response.data;
 };

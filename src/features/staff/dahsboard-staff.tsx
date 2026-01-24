@@ -1,9 +1,7 @@
+import React from "react";
+
 const DashboardStaff = () => {
-	return (
-		<>
-			<p>asd</p>
-		</>
-	);
+	return <div>DashboardStaff</div>;
 };
 
 export default DashboardStaff;

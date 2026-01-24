@@ -9,8 +9,6 @@ import RegisterPage from "@/features/auth/pages/client-reg-page";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import DashboardOwner from "@/features/owner/dahsboard-client";
 import DashboardClient from "@/features/client/dashboard-client";
-import DashboardStaff from "@/features/owner/staff/dashboard-staff";
-import DashboardUnassigned from "@/features/owner/staff/dashboard-unassigned";
 import LandingPage from "@/features/public/landing-page";
 import ProtectedRoute from "./ProtectedRoute";
 import GuestRoute from "./GuestRoute";
@@ -24,7 +22,7 @@ import ViewCompany from "@/features/owner/company/pages/view-company";
 import ViewService from "@/features/owner/services-wo/pages/view-service";
 import CreateService from "@/features/owner/services-wo/pages/create-service";
 import ClientCompanyServices from "@/features/client/company/pages/company-services";
-import PublicServicePage from "@/features/client/services-wo/pages/request-services";
+import PublicServicePage from "@/features/client/services-wo/pages/service-request";
 import ErrorPage from "@/shared/errors/templates/error-page";
 import DetailService from "@/features/owner/services-wo/pages/detail-service";
 import ServiceSubmitPage from "@/features/client/services-wo/pages/services-submit";
@@ -33,11 +31,19 @@ import ViewServiceRequest from "@/features/owner/business/pages/view-service-req
 import DetailServiceRequest from "@/features/owner/business/pages/detail-service-request";
 import CompanyViewWo from "@/features/owner/company-wo/pages/company-view-wo";
 import CompanyDetailWo from "@/features/owner/company-wo/pages/company-detail-wo";
+import ViewStaff from "@/features/owner/staff-master/pages/view-staff";
+import CompanyList from "@/features/client/company/pages/company-list";
+import ServicesList from "@/features/client/services-wo/pages/services-list";
+import DashboardStaff from "@/features/staff/dahsboard-staff";
+import DashboardManager from "@/features/manager/dashboard-manager";
+import CompanyReportWo from "@/features/owner/company-wo/pages/company-report-wo";
 
 const router = createBrowserRouter([
 	{
-		path: "/dashboard/owner",
-		element: <ProtectedRoute allowedRoles={["owner_company"]} />,
+		path: "/dashboard/internal",
+		element: (
+			<ProtectedRoute allowedRoles={["owner_company", "manager_company"]} />
+		),
 		errorElement: <ErrorPage />,
 		children: [
 			{
@@ -72,6 +78,10 @@ const router = createBrowserRouter([
 						element: <CreatePositionPage />,
 					},
 					{
+						path: "staff",
+						element: <ViewStaff />,
+					},
+					{
 						path: "company",
 						element: <ViewCompany />,
 					},
@@ -103,6 +113,29 @@ const router = createBrowserRouter([
 						path: "workorders/detail/:id",
 						element: <CompanyDetailWo />,
 					},
+					{
+						path: "workorders/:id/report",
+						element: <CompanyReportWo />,
+					},
+				],
+			},
+		],
+	},
+	{
+		path: "/dashboard/manager",
+		element: <ProtectedRoute allowedRoles={["manager_company"]} />,
+		children: [
+			{
+				element: (
+					<RootLayout>
+						<AppLayout />
+					</RootLayout>
+				),
+				children: [
+					{
+						path: "",
+						element: <DashboardManager />,
+					},
 				],
 			},
 		],
@@ -120,22 +153,23 @@ const router = createBrowserRouter([
 			},
 		],
 	},
+	// {
+	// 	element: <ProtectedRoute allowedRoles={["staff_unassigned"]} />,
+	// 	children: [
+	// 		{
+	// 			element: (
+	// 				<RootLayout>
+	// 					<AppLayout />
+	// 				</RootLayout>
+	// 			),
+	// 			children: [
+	// 				{ path: "/dashboard/unassigned", element: <DashboardUnassigned /> },
+	// 			],
+	// 		},
+	// 	],
+	// },
 	{
-		element: <ProtectedRoute allowedRoles={["staff_unassigned"]} />,
-		children: [
-			{
-				element: (
-					<RootLayout>
-						<AppLayout />
-					</RootLayout>
-				),
-				children: [
-					{ path: "/dashboard/unassigned", element: <DashboardUnassigned /> },
-				],
-			},
-		],
-	},
-	{
+		path: "/dashboard/client",
 		element: <ProtectedRoute allowedRoles={["client"]} />,
 		children: [
 			{
@@ -146,23 +180,31 @@ const router = createBrowserRouter([
 				),
 				children: [
 					{
-						path: "/dashboard/client",
+						path: "",
 						element: <DashboardClient />,
 					},
 					{
-						path: "/dashboard/client/company/:id/services",
+						path: "companies",
+						element: <CompanyList />,
+					},
+					{
+						path: "company/:id/services",
 						element: <ClientCompanyServices />,
 					},
 					{
-						path: "/dashboard/client/company/services/:id/intake-forms",
+						path: "company/services/:id/intake-forms",
 						element: <PublicServicePage />,
 					},
 					{
-						path: "/dashboard/client/submissions",
+						path: "services/",
+						element: <ServicesList />,
+					},
+					{
+						path: "submissions",
 						element: <ServiceSubmitPage />,
 					},
 					{
-						path: "/dashboard/client/submissions/:id",
+						path: "submissions/:id",
 						element: <ServiceDetailSubmit />,
 					},
 				],

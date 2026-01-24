@@ -52,7 +52,7 @@ export const FormBuilder = forwardRef<FormBuilderRef, Props>(
 					fields: [
 						minFields(1, "Minimal tambahkan 1 pertanyaan ke dalam form"),
 					],
-				}
+				},
 			);
 		const handleAddField = () => {
 			const newField: Field = {
@@ -103,7 +103,7 @@ export const FormBuilder = forwardRef<FormBuilderRef, Props>(
 			setIsSubmitting(true);
 
 			const { data: res, error } = await handleApi(() =>
-				createFormApi(formData)
+				createFormApi(formData),
 			);
 
 			setIsSubmitting(false);
@@ -121,7 +121,7 @@ export const FormBuilder = forwardRef<FormBuilderRef, Props>(
 			}
 
 			notifySuccess("Form berhasil disimpan!");
-			navigate("/dashboard/owner/forms");
+			navigate("/dashboard/internal/forms");
 		};
 
 		useImperativeHandle(ref, () => ({
@@ -145,9 +145,9 @@ export const FormBuilder = forwardRef<FormBuilderRef, Props>(
 								onChange={(e) => validateAndSetField("title", e.target.value)}
 								placeholder="Contoh: Formulir Pendaftaran"
 								className={`${
-									errors.title
-										? "border-red-500 focus-visible:ring-red-300"
-										: ""
+									errors.title ?
+										"border-red-500 focus-visible:ring-red-300"
+									:	""
 								}`}
 							/>
 							{errors.title && (
@@ -170,9 +170,9 @@ export const FormBuilder = forwardRef<FormBuilderRef, Props>(
 								}
 								placeholder="Tuliskan deskripsi singkat form..."
 								className={`${
-									errors.description
-										? "border-red-500 focus-visible:ring-red-300"
-										: ""
+									errors.description ?
+										"border-red-500 focus-visible:ring-red-300"
+									:	""
 								}`}
 							/>
 							{errors.description && (
@@ -195,9 +195,9 @@ export const FormBuilder = forwardRef<FormBuilderRef, Props>(
 								}>
 								<SelectTrigger
 									className={`w-full ${
-										errors.formType
-											? "border-red-500 focus:ring-red-500 focus:border-red-300"
-											: ""
+										errors.formType ?
+											"border-red-500 focus:ring-red-500 focus:border-red-300"
+										:	""
 									}`}>
 									<SelectValue placeholder="Pilih tipe form" />
 								</SelectTrigger>
@@ -232,5 +232,5 @@ export const FormBuilder = forwardRef<FormBuilderRef, Props>(
 				)}
 			</div>
 		);
-	}
+	},
 );

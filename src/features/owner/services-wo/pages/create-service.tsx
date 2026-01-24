@@ -54,22 +54,20 @@ const CreateService: React.FC = () => {
 	} = useCreateService();
 
 	return (
-		<div className="max-w-6xl mx-auto py-10 space-y-10">
+		<div className="max-w-6xl mx-auto py-6 space-y-8">
 			<div className="container">
-				<div className="flex items-center justify-between mb-8">
-					<div className="flex flex-col space-y-2">
-						<h1 className="text-xl font-bold tracking-tight">
-							Tambah Layanan Baru
-						</h1>
-						<p className="text-muted-foreground">
+				<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+					<div className="flex flex-col space-y-1">
+						<h1 className="text-2xl font-bold">Tambah Layanan Baru</h1>
+						<p className="text-muted-foreground text-sm sm:text-base">
 							Berikut merupakan form tambah layanan yang dimiliki oleh
 							perusahaan.
 						</p>
 					</div>
 					<Button
 						onClick={() => navigate(-1)}
-						className="bg-primary hover:bg-primary/90">
-						<ArrowLeft className="h-4 w-4" />
+						className="bg-primary hover:bg-primary/90 w-full sm:w-auto h-10 px-6">
+						<ArrowLeft className="h-4 w-4 mr-2" />
 						Kembali
 					</Button>
 				</div>
@@ -198,7 +196,7 @@ const CreateService: React.FC = () => {
 				<Button
 					onClick={createService}
 					disabled={creating}
-					className="flex items-center gap-2">
+					className="flex items-center gap-2 h-11 px-8 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-medium w-full sm:w-auto">
 					{creating && <Loader2 className="w-4 h-4 animate-spin" />}
 					{creating ? "Menyimpan..." : "Simpan Layanan"}
 				</Button>

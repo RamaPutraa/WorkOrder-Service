@@ -32,9 +32,9 @@ export default function RequestServicePage() {
 		<>
 			<div
 				className={`sticky top-0 z-30 bg-background transition-shadow duration-300 ${
-					isSticky ? "shadow-xl rounded-md" : ""
+					isSticky ? "shadow-xl rounded-md px-6 py-4" : ""
 				}`}>
-				<div className="flex items-center justify-between my-5 px-6 py-4 relative z-10">
+				<div className="flex items-center justify-between my-5  relative z-10">
 					<div className="flex items-center space-x-6">
 						<Button
 							onClick={() => navigate(-1)}
@@ -55,14 +55,12 @@ export default function RequestServicePage() {
 						className="bg-primary hover:bg-primary/90"
 						onClick={() => handleSubmit()}
 						disabled={submitting}>
-						{submitting ? (
+						{submitting ?
 							<>
 								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
 								Mengirim...
 							</>
-						) : (
-							"Pesan Layanan"
-						)}
+						:	"Pesan Layanan"}
 					</Button>
 				</div>
 			</div>
@@ -138,7 +136,7 @@ export default function RequestServicePage() {
 															handleChange(
 																item._id,
 																field.label,
-																e.target.value
+																e.target.value,
 															)
 														}
 													/>
@@ -160,7 +158,7 @@ export default function RequestServicePage() {
 																item._id,
 																field.label,
 																e.target.value,
-																"multi"
+																"multi",
 															)
 														}
 													/>

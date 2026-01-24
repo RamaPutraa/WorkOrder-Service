@@ -14,8 +14,40 @@ type InternalWorkOrder = {
 };
 type InternalWorkOrderResponse = ApiResponse<InternalWorkOrder[]>;
 
+type WorkOrderFormItem = {
+	order: number;
+	form: Form;
+	fieldsData?: FieldData[];
+};
+
 type DetailInternalWorkOrder = InternalWorkOrder & {
-	workorderForms: OrderForms[];
+	workorderForms: WorkOrderFormItem[];
 	submissions: PublicSubmission[];
 };
 type DetailInternalWorkOrderResponse = ApiResponse<DetailInternalWorkOrder>;
+
+// wo submit
+type AssignStaffToWorkOrder = ApiResponse<StaffItem[]> & {
+	meta: {
+		count: number;
+	};
+};
+
+// wo report
+type WorkOrderReport = {
+	_id: string;
+	workOrderId: string;
+	companyId: string;
+	status: string;
+	createdAt: string;
+	updatedAt: string;
+	startedAt: string | null;
+	completedAt: string | null;
+	reportForms: {
+		order: number;
+		form: Form;
+	}[];
+	subimissions: PublicSubmission[];
+};
+
+type WorkOrderReportResponse = ApiResponse<WorkOrderReport>;

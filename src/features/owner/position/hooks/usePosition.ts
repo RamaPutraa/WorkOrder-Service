@@ -37,9 +37,9 @@ const usePosition = () => {
 
 		notifySuccess(
 			"Posisi berhasil dibuat",
-			`Posisi ${position.name} telah ditambahkan`
+			`Posisi ${position.name} telah ditambahkan`,
 		);
-		navigate("/dashboard/owner/positions");
+		navigate("/dashboard/internal/positions");
 	};
 
 	const fetchPositions = async () => {

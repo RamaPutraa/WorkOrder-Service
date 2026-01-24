@@ -18,7 +18,7 @@ import {
 	SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 
-export function NavSetup({
+export function NavManagerBusiness({
 	items,
 }: {
 	items: {
@@ -34,7 +34,7 @@ export function NavSetup({
 }) {
 	return (
 		<SidebarGroup>
-			<SidebarGroupLabel>Konfigurasi Perusahaan</SidebarGroupLabel>
+			<SidebarGroupLabel>Menu Operasional</SidebarGroupLabel>
 			<SidebarMenu>
 				{items.map((item) =>
 					item.items ?

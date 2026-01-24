@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -83,20 +83,18 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 	fetchPositions,
 }) => {
 	return (
-		<Card className="p-4 border shadow-md rounded-2xl">
-			<CardHeader className="pt-5 px-6">
-				<div className="flex items-center justify-between">
-					<p className="text-muted-foreground">
-						Isi form di bawah untuk menambahkan layanan work order baru.
-					</p>
-				</div>
-			</CardHeader>
+		<Card className="border shadow-md rounded-lg overflow-hidden">
+			<div className="p-5 lg:p-6 border-b bg-gradient-to-br from-background to-muted/20">
+				<p className="text-sm text-muted-foreground">
+					Isi form di bawah untuk menambahkan layanan work order baru.
+				</p>
+			</div>
 
-			<CardContent className="pb-5 space-y-5">
+			<div className="p-5 lg:p-6 space-y-6">
 				{/* Judul Layanan */}
 				<div className="space-y-2">
 					<Label
-						className={`text-sm font-medium ${
+						className={`text-sm font-semibold ${
 							errors?.title ? "text-red-500" : "text-foreground"
 						}`}>
 						Judul Layanan
@@ -119,7 +117,7 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 				{/* Deskripsi */}
 				<div className="space-y-2">
 					<Label
-						className={`text-sm font-medium ${
+						className={`text-sm font-semibold ${
 							errors?.description ? "text-red-500" : "text-foreground"
 						}`}>
 						Deskripsi Layanan
@@ -129,9 +127,9 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 						value={description}
 						onChange={(e) => setDescription(e.target.value)}
 						className={
-							errors?.description
-								? "border-red-500 focus-visible:ring-red-300"
-								: ""
+							errors?.description ?
+								"border-red-500 focus-visible:ring-red-300"
+							:	""
 						}
 					/>
 					{errors?.description && (
@@ -139,11 +137,11 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 					)}
 				</div>
 
-				<div className="grid grid-cols-3 my-8 gap-5">
+				<div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
 					{/* Status */}
 					<div className="space-y-2">
 						<Label
-							className={`text-sm font-medium ${
+							className={`text-sm font-semibold ${
 								errors?.selectedStatus ? "text-red-500" : "text-foreground"
 							}`}>
 							Status
@@ -154,9 +152,9 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 								<Button
 									variant="outline"
 									className={`w-[150px] justify-start font-normal ${
-										errors?.selectedStatus
-											? "border-red-500 text-muted-foreground focus-visible:ring-red-300"
-											: "text-muted-foreground"
+										errors?.selectedStatus ?
+											"border-red-500 text-muted-foreground focus-visible:ring-red-300"
+										:	"text-muted-foreground"
 									}`}>
 									{selectedStatus ? selectedStatus.label : "+ Set status"}
 								</Button>
@@ -193,7 +191,7 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 					{/* Access Type */}
 					<div className="space-y-2">
 						<Label
-							className={`text-sm font-medium ${
+							className={`text-sm font-semibold ${
 								errors?.accessType ? "text-red-500" : "text-foreground"
 							}`}>
 							Akses Form
@@ -202,9 +200,9 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 						<Select value={accessType} onValueChange={setAccessType}>
 							<SelectTrigger
 								className={`w-[200px] ${
-									errors?.accessType
-										? "border-red-500 focus-visible:ring-red-300"
-										: ""
+									errors?.accessType ?
+										"border-red-500 focus-visible:ring-red-300"
+									:	""
 								}`}>
 								<SelectValue placeholder="Pilih Akses" />
 							</SelectTrigger>
@@ -237,12 +235,12 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 						<div
 							className={`flex flex-wrap items-start justify-between gap-2 rounded-md px-3 py-2 mt-1.5 transition-all border 
 								${
-									errors?.selectedStaff
-										? "border-red-500 ring-2 ring-red-300"
-										: "border-border focus-within:ring-2 focus-within:ring-ring"
+									errors?.selectedStaff ?
+										"border-red-500 ring-2 ring-red-300"
+									:	"border-border focus-within:ring-2 focus-within:ring-ring"
 								}`}>
 							<div className="flex flex-col gap-2 flex-1">
-								{selectedStaff.length > 0 ? (
+								{selectedStaff.length > 0 ?
 									selectedStaff.map((s) => {
 										const pos = positions.find((p) => p._id === s.positionId);
 										return (
@@ -265,19 +263,19 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 														<Input
 															type="number"
 															className={`w-16 h-7 text-xs ${
-																errors?.selectedStaff
-																	? "border-red-500 focus-visible:ring-red-500"
-																	: ""
+																errors?.selectedStaff ?
+																	"border-red-500 focus-visible:ring-red-500"
+																:	""
 															}`}
 															value={s.minimumStaff}
 															onChange={(e) => {
 																const val = Number(e.target.value);
 																setSelectedStaff((prev) =>
 																	prev.map((st) =>
-																		st.positionId === s.positionId
-																			? { ...st, minimumStaff: val }
-																			: st
-																	)
+																		st.positionId === s.positionId ?
+																			{ ...st, minimumStaff: val }
+																		:	st,
+																	),
 																);
 															}}
 														/>
@@ -292,19 +290,19 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 														<Input
 															type="number"
 															className={`w-16 h-7 text-xs ${
-																errors?.selectedStaff
-																	? "border-red-500 focus-visible:ring-red-500"
-																	: ""
+																errors?.selectedStaff ?
+																	"border-red-500 focus-visible:ring-red-500"
+																:	""
 															}`}
 															value={s.maximumStaff}
 															onChange={(e) => {
 																const val = Number(e.target.value);
 																setSelectedStaff((prev) =>
 																	prev.map((st) =>
-																		st.positionId === s.positionId
-																			? { ...st, maximumStaff: val }
-																			: st
-																	)
+																		st.positionId === s.positionId ?
+																			{ ...st, maximumStaff: val }
+																		:	st,
+																	),
 																);
 															}}
 														/>
@@ -314,8 +312,8 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 															e.stopPropagation();
 															setSelectedStaff((prev) =>
 																prev.filter(
-																	(st) => st.positionId !== s.positionId
-																)
+																	(st) => st.positionId !== s.positionId,
+																),
 															);
 														}}
 														className="size-4 mx-4 cursor-pointer hover:text-destructive transition-colors"
@@ -324,16 +322,15 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 											</div>
 										);
 									})
-								) : (
-									<span
+								:	<span
 										className={`text-sm ${
-											errors?.selectedStaff
-												? "text-red-500"
-												: "text-muted-foreground"
+											errors?.selectedStaff ? "text-red-500" : (
+												"text-muted-foreground"
+											)
 										}`}>
 										Pilih beberapa pegawai yang dibutuhkan
 									</span>
-								)}
+								}
 							</div>
 						</div>
 
@@ -361,9 +358,9 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 									variant="outline"
 									size="sm"
 									className={`w-full shrink-0 mt-2 flex items-center gap-1 text-sm transition-colors ${
-										errors?.selectedStaff
-											? "border-red-500 text-red-500 hover:bg-red-50"
-											: ""
+										errors?.selectedStaff ?
+											"border-red-500 text-red-500 hover:bg-red-50"
+										:	""
 									}`}>
 									Pilih Pegawai
 									<ChevronDownIcon className="w-3 h-3" />
@@ -373,14 +370,14 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 							<DropdownMenuContent
 								align="end"
 								className="h-[300px] overflow-y-auto w-[250px]">
-								{loading ? (
+								{loading ?
 									<DropdownMenuItem disabled>Loading...</DropdownMenuItem>
-								) : error ? (
+								: error ?
 									<DropdownMenuItem disabled>{error}</DropdownMenuItem>
-								) : positions.length > 0 ? (
+								: positions.length > 0 ?
 									positions.map((p) => {
 										const isSelected = selectedStaff.some(
-											(s) => s.positionId === p._id
+											(s) => s.positionId === p._id,
 										);
 										return (
 											<DropdownMenuItem
@@ -397,16 +394,15 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 											</DropdownMenuItem>
 										);
 									})
-								) : (
-									<DropdownMenuItem disabled>
+								:	<DropdownMenuItem disabled>
 										Tidak ada posisi tersedia
 									</DropdownMenuItem>
-								)}
+								}
 							</DropdownMenuContent>
 						</DropdownMenu>
 					</div>
 				</div>
-			</CardContent>
+			</div>
 		</Card>
 	);
 };

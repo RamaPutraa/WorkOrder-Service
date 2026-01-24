@@ -1,50 +1,53 @@
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-	Mail,
-	Eye,
-	MousePointerClick,
-	BarChart3,
-	Search,
-	Filter,
 	Building2,
+	TrendingUp,
+	Clock,
+	CheckCircle2,
+	Search,
+	ArrowRight,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getAllCompanyApi } from "./company/services/companyClientService";
 import { useNavigate } from "react-router-dom";
 import { handleApi } from "@/lib/handle-api";
 import { notifyError } from "@/lib/toast-helper";
+import { Badge } from "@/components/ui/badge";
 
 const metrics = [
 	{
-		title: "All Time",
-		value: "1.457%",
-		subtitle: "X-Ray Leads Captured",
-		icon: <BarChart3 className="h-5 w-5 text-blue-500" />,
+		title: "Total Perusahaan",
+		value: "12",
+		subtitle: "Perusahaan terdaftar",
+		icon: <Building2 className="h-6 w-6" />,
 		bg: "bg-blue-50",
+		iconBg: "bg-blue-500",
 	},
 	{
-		title: "Sent Emails",
-		value: "1.457%",
-		subtitle: "X-Ray Leads Captured",
-		icon: <Mail className="h-5 w-5 text-purple-500" />,
-		bg: "bg-purple-50",
+		title: "Permintaan Aktif",
+		value: "8",
+		subtitle: "Sedang diproses",
+		icon: <Clock className="h-6 w-6" />,
+		bg: "bg-blue-50",
+		iconBg: "bg-blue-600",
 	},
 	{
-		title: "Open Rate",
-		value: "1.457%",
-		subtitle: "X-Ray Leads Captured",
-		icon: <Eye className="h-5 w-5 text-emerald-500" />,
-		bg: "bg-emerald-50",
+		title: "Selesai Bulan Ini",
+		value: "24",
+		subtitle: "Permintaan selesai",
+		icon: <CheckCircle2 className="h-6 w-6" />,
+		bg: "bg-blue-50",
+		iconBg: "bg-blue-700",
 	},
 	{
-		title: "Click Rate",
-		value: "1.457%",
-		subtitle: "X-Ray Leads Captured",
-		icon: <MousePointerClick className="h-5 w-5 text-orange-500" />,
-		bg: "bg-orange-50",
+		title: "Tingkat Kepuasan",
+		value: "98%",
+		subtitle: "Rating rata-rata",
+		icon: <TrendingUp className="h-6 w-6" />,
+		bg: "bg-blue-50",
+		iconBg: "bg-blue-800",
 	},
 ];
 
@@ -75,145 +78,156 @@ const DashboardClient = () => {
 		void fetchCompanies();
 	}, []);
 
-	// Filter pencarian sederhana
 	const filteredCompanies = companies.filter((c) =>
-		c.name.toLowerCase().includes(search.toLowerCase())
+		c.name.toLowerCase().includes(search.toLowerCase()),
 	);
 
 	if (error) {
 		return (
 			<div className="container py-8 px-10">
-				<p className="text-red-500">{error}</p>
+				<div className="bg-red-50 border border-red-200 rounded-lg p-4">
+					<p className="text-red-600">{error}</p>
+				</div>
 			</div>
 		);
 	}
 
 	return (
-		<>
-			{/* Header */}
-			<div className="flex items-center pb-5">
-				<h1 className="text-xl font-semibold">Dashboard Client</h1>
+		<div className="space-y-8">
+			{/* Header with Blue Gradient */}
+			<div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-blue-800 p-8 text-white shadow-xl">
+				<div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:20px_20px]" />
+				<div className="relative z-10">
+					<div className="flex items-center gap-2 mb-2">
+						<span className="text-sm font-medium opacity-90">
+							Selamat Datang Kembali
+						</span>
+					</div>
+					<h1 className="text-3xl font-bold mb-2">Dashboard Client</h1>
+					<p className="text-blue-100 max-w-2xl">
+						Kelola permintaan layanan dan pantau progress pekerjaan Anda dengan
+						mudah
+					</p>
+				</div>
+				<div className="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-white/10 to-transparent" />
 			</div>
 
-			<div className="space-y-12">
-				{/* ===== Statistik Card ===== */}
-				<Card className="p-6">
-					<div className="flex items-center mb-4">
-						<h1 className="text-xl font-semibold">Work Order Statistik</h1>
-					</div>
-
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-						{metrics.map((item, i) => (
-							<Card
-								key={i}
-								className={`${item.bg} border-none shadow-sm hover:shadow-md transition-all duration-200`}>
-								<CardHeader className="flex flex-row items-center justify-between pb-2">
-									<CardTitle className="text-sm font-medium text-muted-foreground">
-										{item.title}
-									</CardTitle>
-									{item.icon}
-								</CardHeader>
-								<CardContent>
-									<p className="text-2xl font-bold">{item.value}</p>
-									<p className="text-xs text-muted-foreground mt-1">
-										{item.subtitle}
-									</p>
-								</CardContent>
-							</Card>
-						))}
-					</div>
-				</Card>
-
-				{/* ===== Daftar Company ===== */}
-				<div className="space-y-4">
-					{/* Tabs atas */}
-					<Tabs defaultValue="companies" className="w-full">
-						<TabsList className="flex justify-start gap-4 bg-transparent border-b">
-							<TabsTrigger
-								value="companies"
-								className="pb-3 text-sm font-medium data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary rounded-none">
-								Companies
-							</TabsTrigger>
-						</TabsList>
-					</Tabs>
-
-					{/* Toolbar */}
-					<div className="flex items-center justify-between">
-						<p className="text-sm text-muted-foreground">
-							{loading
-								? "Loading companies..."
-								: `${filteredCompanies.length} Companies Found`}
-						</p>
-						<div className="flex items-center gap-3">
-							<div className="relative">
-								<Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-								<Input
-									placeholder="Search company..."
-									value={search}
-									onChange={(e) => setSearch(e.target.value)}
-									className="pl-8 w-[220px]"
-								/>
+			{/* Metrics Cards */}
+			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+				{metrics.map((item, i) => (
+					<Card
+						key={i}
+						className={`${item.bg} border-none shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden group`}>
+						<CardHeader className="flex flex-row items-center justify-between pb-2">
+							<CardTitle className="text-sm font-medium text-gray-700">
+								{item.title}
+							</CardTitle>
+							<div
+								className={`${item.iconBg} p-2.5 rounded-lg text-white shadow-md group-hover:scale-110 transition-transform duration-300`}>
+								{item.icon}
 							</div>
-							<Button variant="outline" className="flex items-center gap-2">
-								<Filter className="h-4 w-4" />
-								Filters
-							</Button>
+						</CardHeader>
+						<CardContent>
+							<p className="text-3xl font-bold text-blue-600">{item.value}</p>
+							<p className="text-xs text-gray-600 mt-1">{item.subtitle}</p>
+						</CardContent>
+					</Card>
+				))}
+			</div>
+
+			{/* Companies Section */}
+			<Card className="shadow-lg border-0">
+				<CardHeader className="border-b bg-gradient-to-t from-gray-50 to-white">
+					<div className="flex items-center justify-between">
+						<div>
+							<CardTitle className="text-xl font-bold">
+								Daftar Perusahaan
+							</CardTitle>
+							<p className="text-sm text-muted-foreground mt-1">
+								{loading ?
+									"Memuat data..."
+								:	`${filteredCompanies.length} perusahaan tersedia`}
+							</p>
+						</div>
+						<Badge variant="secondary" className="px-3 py-1">
+							{companies.length} Total
+						</Badge>
+					</div>
+				</CardHeader>
+
+				<CardContent className="pt-6">
+					{/* Search Bar */}
+					<div className="mb-6">
+						<div className="relative max-w-md">
+							<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+							<Input
+								placeholder="Cari perusahaan..."
+								value={search}
+								onChange={(e) => setSearch(e.target.value)}
+								className="pl-10 h-11 border-2 focus:border-primary transition-colors"
+							/>
 						</div>
 					</div>
 
-					{/* Cards Company */}
-					{loading ? (
-						<p className="text-sm text-muted-foreground text-center py-8">
-							Loading data...
-						</p>
-					) : filteredCompanies.length === 0 ? (
-						<p className="text-sm text-muted-foreground text-center py-8">
-							No companies found.
-						</p>
-					) : (
-						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+					{/* Companies Grid */}
+					{loading ?
+						<div className="flex items-center justify-center py-12">
+							<div className="text-center space-y-3">
+								<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto" />
+								<p className="text-sm text-muted-foreground">
+									Memuat data perusahaan...
+								</p>
+							</div>
+						</div>
+					: filteredCompanies.length === 0 ?
+						<div className="text-center py-12">
+							<Building2 className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+							<p className="text-lg font-medium text-gray-600">
+								Tidak ada perusahaan ditemukan
+							</p>
+							<p className="text-sm text-muted-foreground mt-1">
+								Coba ubah kata kunci pencarian Anda
+							</p>
+						</div>
+					:	<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 							{filteredCompanies.map((company) => (
 								<Card
 									key={company._id}
-									className="shadow-sm hover:shadow-md transition-all">
-									<CardHeader className="flex flex-row items-center gap-3">
-										<div className="p-2 bg-primary/10 rounded-lg">
-											<Building2 className="w-6 h-6 text-primary" />
-										</div>
-										<div>
-											<CardTitle className="text-base">
-												{company.name}
-											</CardTitle>
-											<p className="text-sm text-muted-foreground">
-												{company.description}
-											</p>
+									className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 hover:border-primary/50 overflow-hidden">
+									<CardHeader className="space-y-3">
+										<div className="flex items-start gap-3">
+											<div className="p-3 bg-blue-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+												<Building2 className="w-6 h-6 text-white" />
+											</div>
+											<div className="flex-1 min-w-0">
+												<CardTitle className="text-md font-bold truncate group-hover:text-primary transition-colors">
+													{company.name}
+												</CardTitle>
+												<p className="text-sm text-muted-foreground line-clamp-1 mt-1">
+													{company.description || "Tidak ada deskripsi"}
+												</p>
+											</div>
 										</div>
 									</CardHeader>
-									<CardContent className="space-y-3">
-										<div className="flex items-center gap-2 pt-3">
-											<Button variant="outline" size="sm" className="flex-1">
-												Profile
-											</Button>
-											<Button
-												variant="default"
-												size="sm"
-												className="flex-1"
-												onClick={() =>
-													navigate(
-														`/dashboard/client/company/${company._id}/services`
-													)
-												}>
-												Lihat Layanan
-											</Button>
-										</div>
+									<CardContent>
+										<Button
+											onClick={() =>
+												navigate(
+													`/dashboard/client/company/${company._id}/services`,
+												)
+											}
+											className="w-full group/btn bg-blue-600 hover:bg-blue-700 shadow-md">
+											<span>Lihat Layanan</span>
+											<ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+										</Button>
 									</CardContent>
 								</Card>
 							))}
 						</div>
-					)}
-				</div>
-			</div>
-		</>
+					}
+				</CardContent>
+			</Card>
+		</div>
 	);
 };
 

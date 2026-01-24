@@ -25,7 +25,7 @@ const ServiceDetailSubmit = () => {
 		setError(null);
 
 		const { data: res, error } = await handleApi(() =>
-			getDetailClientServiceRequestApi(id)
+			getDetailClientServiceRequestApi(id),
 		);
 
 		setLoading(false);
@@ -42,7 +42,7 @@ const ServiceDetailSubmit = () => {
 	};
 
 	const asInputValue = (
-		val: string | number | string[] | File | undefined
+		val: string | number | string[] | File | undefined,
 	): string | number => {
 		if (val instanceof File) return val.name; // file ditampilkan sebagai nama file
 		if (Array.isArray(val)) return val.join(", "); // array jadi "a, b, c"
@@ -81,7 +81,7 @@ const ServiceDetailSubmit = () => {
 				const form = item.form;
 
 				const submission = detail.submissions.find(
-					(s) => s.formId === form._id
+					(s) => s.formId === form._id,
 				);
 
 				return (
@@ -97,10 +97,10 @@ const ServiceDetailSubmit = () => {
 						</Card>
 
 						{/* ==== CARD FIELDS (terpisah, bukan di dalam card di atas) ==== */}
-						{submission ? (
+						{submission ?
 							form.fields.map((field, i) => {
 								const answer = submission.fieldsData.find(
-									(fd) => fd.order === field.order
+									(fd) => fd.order === field.order,
 								)?.value;
 
 								return (
@@ -114,7 +114,7 @@ const ServiceDetailSubmit = () => {
 
 											{/* TEXT / EMAIL / NUMBER / PASSWORD */}
 											{["text", "email", "password", "number"].includes(
-												field.type
+												field.type,
 											) && (
 												<input
 													type={field.type}
@@ -169,11 +169,9 @@ const ServiceDetailSubmit = () => {
 												<div className="text-sm space-y-1">
 													{(field.options || []).map((opt, j) => {
 														const arr =
-															typeof answer === "string"
-																? answer.split(",")
-																: Array.isArray(answer)
-																? answer
-																: [];
+															typeof answer === "string" ? answer.split(",")
+															: Array.isArray(answer) ? answer
+															: [];
 
 														return (
 															<label
@@ -204,9 +202,7 @@ const ServiceDetailSubmit = () => {
 									</Card>
 								);
 							})
-						) : (
-							<p className="text-red-500">Belum ada jawaban</p>
-						)}
+						:	<p className="text-red-500">Belum ada jawaban</p>}
 					</div>
 				);
 			})}
