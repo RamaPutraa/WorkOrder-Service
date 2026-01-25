@@ -148,7 +148,7 @@ const StaffAssigned = ({
 		});
 	};
 
-	const requiredPositions = detailData.service.requiredStaff.map(
+	const requiredPositions = detailData.service.requiredStaffs.map(
 		(rs) => rs.position.name,
 	);
 
@@ -167,7 +167,7 @@ const StaffAssigned = ({
 	const countByPosition = (positionId: string) =>
 		assignedStaffsUI.filter((s) => s.position?._id === positionId).length;
 
-	const required = detailData.service.requiredStaff.find(
+	const required = detailData.service.requiredStaffs.find(
 		(r) => r.position._id === selectedStaff?.position._id,
 	);
 
@@ -257,7 +257,7 @@ const StaffAssigned = ({
 									if (!selectedStaff) return;
 
 									const requiredForSelected =
-										detailData.service.requiredStaff.find(
+										detailData.service.requiredStaffs.find(
 											(r) => r.position._id === selectedStaff.position._id,
 										);
 									const maxForSelected = requiredForSelected?.maximumStaff ?? 0;

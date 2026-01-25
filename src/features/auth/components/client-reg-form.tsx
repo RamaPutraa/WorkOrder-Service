@@ -46,8 +46,14 @@ const RegisterForm = () => {
 		},
 	];
 
-	const onSubmit = (data: z.infer<typeof clientRegisterSchema>) =>
-		clientRegister(data);
+	const onSubmit = (data: z.infer<typeof clientRegisterSchema>) => {
+		// Menambahkan role 'client' secara otomatis
+		const registerData = {
+			...data,
+			role: "client",
+		};
+		clientRegister(registerData);
+	};
 
 	return (
 		<div>

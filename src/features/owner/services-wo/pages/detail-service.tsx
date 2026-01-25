@@ -96,9 +96,9 @@ const DetailService = () => {
 								<Users className="size-5 text-primary" />
 								Pegawai yang Diperlukan
 							</h3>
-							{detailService?.requiredStaff?.length ?
+							{detailService?.requiredStaffs?.length ?
 								<div className="grid gap-3 sm:grid-cols-2">
-									{detailService.requiredStaff.map((staff, i) => (
+									{detailService.requiredStaffs.map((staff, i) => (
 										<div
 											key={i}
 											className="border rounded-lg p-4 bg-muted/30 hover:bg-muted/50 transition-colors flex justify-between items-center">

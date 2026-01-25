@@ -136,7 +136,7 @@ const ViewService: React.FC = () => {
 											<div className="flex items-center gap-1.5 text-sm text-muted-foreground">
 												<Users className="w-4 h-4" />
 												<span className="font-medium">
-													{service.requiredStaff?.length ?? 0} posisi staff
+													{service.requiredStaffs?.length ?? 0} posisi staff
 												</span>
 											</div>
 										</div>

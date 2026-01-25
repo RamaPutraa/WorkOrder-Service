@@ -41,7 +41,7 @@ type CreateServiceRequest = {
 	description: string;
 	isActive: boolean;
 	accessType: string;
-	requiredStaff: Staff[];
+	requiredStaffs: Staff[];
 	workOrderForms: OrderForms[];
 	reportForms: ReportForms[];
 	clientIntakeForms: IntakeForms[];

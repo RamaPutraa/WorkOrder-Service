@@ -15,6 +15,7 @@ type RegisterRequest = {
 	email: string;
 	password: string;
 	password_confirmation: string;
+	role: string;
 };
 
 type RegisterResponse = ApiResponse<{

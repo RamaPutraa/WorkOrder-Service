@@ -63,7 +63,7 @@ type Service = {
 	accessType: string;
 	isActive: boolean;
 
-	requiredStaff: {
+	requiredStaffs: {
 		position: {
 			_id: string;
 			name: string;

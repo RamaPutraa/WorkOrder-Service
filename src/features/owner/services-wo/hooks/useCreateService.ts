@@ -309,7 +309,7 @@ export const useCreateService = () => {
 			description,
 			isActive: selectedStatus?.value === "true",
 			accessType,
-			requiredStaff: selectedStaff.map((s) => ({
+			requiredStaffs: selectedStaff.map((s) => ({
 				positionId: s.positionId,
 				minimumStaff: s.minimumStaff,
 				maximumStaff: s.maximumStaff,
@@ -366,7 +366,7 @@ export const useCreateService = () => {
 		console.log(service);
 
 		notifySuccess("Layanan berhasil disimpan");
-		navigate("/dashboard/owner/services");
+		navigate("/dashboard/internal/services");
 	};
 
 	const fecthServices = async () => {

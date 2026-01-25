@@ -268,7 +268,7 @@ const CompanyDetailWo = () => {
 									Kebutuhan Staff
 								</p>
 								<div className="space-y-1">
-									{detailData.service.requiredStaff.map((rs, idx) => (
+									{detailData.service.requiredStaffs.map((rs, idx) => (
 										<div
 											key={idx}
 											className="flex justify-between text-sm border rounded-lg p-2">
