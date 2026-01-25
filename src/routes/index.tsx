@@ -42,7 +42,9 @@ const router = createBrowserRouter([
 	{
 		path: "/dashboard/internal",
 		element: (
-			<ProtectedRoute allowedRoles={["owner_company", "manager_company"]} />
+			<ProtectedRoute
+				allowedRoles={["owner_company", "manager_company", "staff_company"]}
+			/>
 		),
 		errorElement: <ErrorPage />,
 		children: [

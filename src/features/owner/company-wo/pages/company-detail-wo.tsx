@@ -22,12 +22,17 @@ import {
 import { handleApi } from "@/lib/handle-api";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
 import { useDialogStore } from "@/store/dialogStore";
+import { useAuthStore } from "@/store/authStore";
 
 const CompanyDetailWo = () => {
 	const navigate = useNavigate();
 	const { detailData, employees, fecthDetailInternalCompanyWorkOrder } =
 		useCompanyWo();
 	const { showDialog } = useDialogStore();
+	const { user } = useAuthStore();
+
+	// Check if user is staff_company (read-only mode)
+	const isReadOnly = user?.role === "staff_company";
 
 	// Assigned Staff (UI State)
 	const [assignedStaffsUI, setAssignedStaffsUI] = useState<StaffItem[]>([]);
@@ -147,43 +152,47 @@ const CompanyDetailWo = () => {
 					</div>
 
 					{/* Action Buttons */}
-					<div className="flex items-center gap-2 sm:gap-3 w-full md:w-auto">
-						{!isReady ?
-							<>
-								<Button
-									variant="outline"
-									onClick={() => navigate(-1)}
-									className="flex-1 md:flex-none">
-									<X className="h-4 w-4 mr-2" />
-									Batal
-								</Button>
-								<Button
-									variant="outline"
-									className="border-green-500 text-green-600 hover:bg-green-50 flex-1 md:flex-none"
-									onClick={handleMarkReady}
-									disabled={isSubmittingReady}>
-									<CheckCircle2 className="h-4 w-4 mr-2" />
-									{isSubmittingReady ? "Memproses..." : "Konfigurasi Selesai ✓"}
-								</Button>
-							</>
-						:	<>
-								<Button
-									variant="outline"
-									onClick={() => navigate(-1)}
-									className="flex-1 md:flex-none">
-									<X className="h-4 w-4 mr-2" />
-									Batal
-								</Button>
-								<Button
-									className="bg-primary hover:bg-primary/90 flex-1 md:flex-none"
-									onClick={handleStartWorkOrder}
-									disabled={isStarting}>
-									<Play className="h-4 w-4 mr-2" />
-									{isStarting ? "Memulai..." : "Mulai Perintah Kerja"}
-								</Button>
-							</>
-						}
-					</div>
+					{!isReadOnly && (
+						<div className="flex items-center gap-2 sm:gap-3 w-full md:w-auto">
+							{!isReady ?
+								<>
+									<Button
+										variant="outline"
+										onClick={() => navigate(-1)}
+										className="flex-1 md:flex-none">
+										<X className="h-4 w-4 mr-2" />
+										Batal
+									</Button>
+									<Button
+										variant="outline"
+										className="border-green-500 text-green-600 hover:bg-green-50 flex-1 md:flex-none"
+										onClick={handleMarkReady}
+										disabled={isSubmittingReady}>
+										<CheckCircle2 className="h-4 w-4 mr-2" />
+										{isSubmittingReady ?
+											"Memproses..."
+										:	"Konfigurasi Selesai ✓"}
+									</Button>
+								</>
+							:	<>
+									<Button
+										variant="outline"
+										onClick={() => navigate(-1)}
+										className="flex-1 md:flex-none">
+										<X className="h-4 w-4 mr-2" />
+										Batal
+									</Button>
+									<Button
+										className="bg-primary hover:bg-primary/90 flex-1 md:flex-none"
+										onClick={handleStartWorkOrder}
+										disabled={isStarting}>
+										<Play className="h-4 w-4 mr-2" />
+										{isStarting ? "Memulai..." : "Mulai Perintah Kerja"}
+									</Button>
+								</>
+							}
+						</div>
+					)}
 				</div>
 			</div>
 
@@ -290,6 +299,7 @@ const CompanyDetailWo = () => {
 					employees={employees}
 					assignedStaffsUI={assignedStaffsUI}
 					setAssignedStaffsUI={setAssignedStaffsUI}
+					isReadOnly={isReadOnly}
 				/>
 
 				{/* ================= WORK ORDER FORMS ================= */}
@@ -297,6 +307,7 @@ const CompanyDetailWo = () => {
 					workorderForms={detailData.workorderForms}
 					workOrderId={detailData._id}
 					submissions={detailData.submissions}
+					isReadOnly={isReadOnly}
 				/>
 			</div>
 		</div>
