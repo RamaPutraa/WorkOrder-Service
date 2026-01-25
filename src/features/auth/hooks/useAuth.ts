@@ -40,7 +40,7 @@ const useAuth = () => {
 				setError(error.response?.data.message || "Terjadi kesalahan");
 				notifyError(
 					"Gagal login",
-					error.response?.data.message || "Terjadi kesalahan"
+					error.response?.data.message || "Terjadi kesalahan",
 				);
 			}
 		} finally {
@@ -54,23 +54,25 @@ const useAuth = () => {
 		setError(null);
 		try {
 			const ress: RegisterResponse = await clientRegisterApi(data);
-			const token = ress.data?.token;
-			const user = ress.data?.user;
 
-			if (!token || !user) {
-				notifyError("Gagal registrasi", "Token atau data user tidak ditemukan");
+			// Validasi response dari API
+			if (!ress.data) {
+				notifyError("Gagal registrasi", "Tidak ada data dari server");
 				return;
 			}
 
-			setAuth(token, user);
-			notifySuccess("Registrasi berhasil", `Selamat datang ${user.name}`);
-			navigate(redirectToRoleDashboard(user.role));
+			// Tidak perlu menyimpan token, langsung redirect ke login
+			notifySuccess(
+				"Registrasi berhasil",
+				"Silakan login menggunakan akun yang telah didaftarkan",
+			);
+			navigate("/login");
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				setError(error.response?.data.message || "Terjadi kesalahan");
 				notifyError(
 					"Gagal registrasi",
-					error.response?.data.message || "Terjadi kesalahan"
+					error.response?.data.message || "Terjadi kesalahan",
 				);
 			}
 		} finally {
@@ -100,7 +102,7 @@ const useAuth = () => {
 				setError(error.response?.data.message || "Terjadi kesalahan");
 				notifyError(
 					"Gagal registrasi",
-					error.response?.data.message || "Terjadi kesalahan"
+					error.response?.data.message || "Terjadi kesalahan",
 				);
 			}
 		} finally {
