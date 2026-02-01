@@ -366,7 +366,7 @@ export const useCreateService = () => {
 		console.log(service);
 
 		notifySuccess("Layanan berhasil disimpan");
-		navigate("/dashboard/owner/services");
+		navigate("/dashboard/internal/services");
 	};
 
 	const fecthServices = async () => {

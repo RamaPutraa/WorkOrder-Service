@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import FormFieldViewer from "../../../../../shared/molecules/form-field-viewer";
 
 type RoleConfig = {
 	fillableByRoles: string[];
@@ -27,52 +28,89 @@ export const CardIntakeForm: React.FC<CardIntakeFormProps> = ({
 	toggleIntakeForm,
 }) => {
 	return (
-		<Card className="p-4 border shadow-md rounded-2xl mt-8">
-			<CardHeader className="pt-5 px-6">
-				<div className="flex items-center justify-between">
-					<p className="text-muted-foreground">
-						Pilih form intake (form intake) yang akan digunakan setelah layanan
-						work order selesai.
-					</p>
-				</div>
-			</CardHeader>
+		<Card className="border shadow-md rounded-lg overflow-hidden h-full flex flex-col">
+			<div className="p-4 border-b bg-gradient-to-br from-background to-muted/20 shrink-0">
+				<p className="text-sm text-muted-foreground">
+					Pilih form intake (form intake) yang akan digunakan setelah layanan
+					work order selesai.
+				</p>
+			</div>
 
-			<CardContent className="pb-5 space-y-5">
-				{/* Pilihan form report */}
-				<div className="grid grid-cols-2 gap-2">
-					{forms.map((form) => (
-						<Label
-							key={`report-available-${form._id}`}
-							onClick={() => toggleIntakeForm(form)}
-							className="
-								hover:bg-accent/50 cursor-pointer flex items-start gap-3
-								rounded-lg border p-3 transition-colors
-								has-[[aria-checked=true]]:border-primary
-								has-[[aria-checked=true]]:bg-primary/5
-							">
-							<Checkbox
-								onClick={(e) => e.stopPropagation()} // 🔥 mencegah double toggle
-								checked={selectedIntakeForms.some((f) => f._id === form._id)}
-								className="data-[state=checked]:border-primary data-[state=checked]:bg-primary"
-							/>
-							<div className="grid gap-1.5 font-normal">
-								<p className="text-sm leading-none font-medium">{form.title}</p>
-								<p className="text-muted-foreground text-sm line-clamp-3">
-									{form.description}
-								</p>
-							</div>
-						</Label>
-					))}
+			<CardContent className="pb-5 space-y-8 flex-1 overflow-y-auto min-h-0">
+				{/* Pilihan form */}
+				<div className="space-y-4">
+					<div className="flex items-center justify-between">
+						<Label className="text-base font-semibold">Pilih Intake Form</Label>
+						<span className="text-sm text-muted-foreground">
+							{selectedIntakeForms.length} dipilih
+						</span>
+					</div>
+
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+						{forms.map((form) => {
+							const isSelected = selectedIntakeForms.some(
+								(f) => f._id === form._id,
+							);
+							return (
+								<div
+									key={`intake-available-${form._id}`}
+									onClick={() => toggleIntakeForm(form)}
+									className={`
+										relative group cursor-pointer rounded-xl border-2 p-4 transition-all duration-200
+										hover:border-primary/50 hover:bg-accent/50
+										${isSelected ? "border-primary bg-primary/5 shadow-sm" : "border-muted bg-card"}
+									`}>
+									<div className="flex items-start justify-between gap-3 mb-2">
+										<div
+											className={`
+												p-2 rounded-lg transition-colors
+												${isSelected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}
+											`}>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												strokeWidth="2"
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												className="w-4 h-4">
+												<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+												<polyline points="14 2 14 8 20 8" />
+												<line x1="16" y1="13" x2="8" y2="13" />
+												<line x1="16" y1="17" x2="8" y2="17" />
+												<polyline points="10 9 9 9 8 9" />
+											</svg>
+										</div>
+										<Checkbox
+											checked={isSelected}
+											className={`
+												transition-opacity duration-200
+												${isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"}
+											`}
+										/>
+									</div>
+									<div className="space-y-1">
+										<h4 className="font-semibold leading-none tracking-tight">
+											{form.title}
+										</h4>
+										<p className="text-sm text-muted-foreground line-clamp-2 h-10">
+											{form.description}
+										</p>
+									</div>
+								</div>
+							);
+						})}
+					</div>
 				</div>
 
 				{/* Konfigurasi akses form report */}
 				<div className="border bg-muted rounded-md p-6 space-y-6">
-					{selectedIntakeForms.length === 0 ? (
+					{selectedIntakeForms.length === 0 ?
 						<p className="text-muted-foreground text-sm text-center">
 							Pilih form untuk melihat pratinjau di sini
 						</p>
-					) : (
-						selectedIntakeForms.map((form) => {
+					:	selectedIntakeForms.map((form) => {
 							return (
 								<Card
 									key={`report-form-${form._id}`}
@@ -88,95 +126,35 @@ export const CardIntakeForm: React.FC<CardIntakeFormProps> = ({
 									</div>
 
 									{/* Preview fields */}
-									<h3 className="leading-none font-medium mt-8">
-										Pertanyaan Form
-									</h3>
-									<div className="border rounded-md p-6 space-y-4">
-										{form.fields?.map((field, i) => (
-											<div key={i} className="space-y-1">
-												<Label className="text-sm font-medium">
-													{field.label}
-												</Label>
-
-												{/* tampilkan sesuai type */}
-												{field.type === "text" && (
-													<p className="text-sm text-muted-foreground border rounded-md p-2 bg-muted/40">
-														{field.placeholder || "Isian teks"}
-													</p>
-												)}
-
-												{field.type === "email" && (
-													<p className="text-sm text-muted-foreground border rounded-md p-2 bg-muted/40">
-														{field.placeholder || "Alamat email"}
-													</p>
-												)}
-
-												{field.type === "number" && (
-													<p className="text-sm text-muted-foreground border rounded-md p-2 bg-muted/40">
-														{field.placeholder || "Isian angka"}
-													</p>
-												)}
-
-												{field.type === "textarea" && (
-													<div className="border rounded-md p-2 bg-muted/40 text-sm text-muted-foreground min-h-[80px]">
-														{field.placeholder || "Area teks"}
-													</div>
-												)}
-
-												{field.type === "single_select" && (
-													<div className="border rounded-md p-2 bg-muted/40 text-sm text-muted-foreground">
-														<p className="mb-1 italic">Pilihan (radio):</p>
-														<ul className="list-disc list-inside space-y-1">
-															{field.options?.map((opt, j) => (
-																<li
-																	key={j}
-																	className="flex items-center space-x-2">
-																	<input
-																		type="radio"
-																		name={`field-${i}`}
-																		disabled
-																	/>
-																	<span>{opt.value}</span>
-																</li>
-															))}
-														</ul>
-													</div>
-												)}
-
-												{field.type === "multi_select" && (
-													<div className="border rounded-md p-2 bg-muted/40 text-sm text-muted-foreground">
-														<p className="mb-1 italic">Pilihan (checkbox):</p>
-														<ul className="list-disc list-inside space-y-1">
-															{field.options?.map((opt, j) => (
-																<li
-																	key={j}
-																	className="flex items-center space-x-2">
-																	<input type="checkbox" disabled />
-																	<span>{opt.value}</span>
-																</li>
-															))}
-														</ul>
-													</div>
-												)}
-
-												{field.type === "date" && (
-													<p className="text-sm text-muted-foreground border rounded-md p-2 bg-muted/40">
-														Tanggal (date picker)
-													</p>
-												)}
-
-												{field.type === "file" && (
-													<p className="text-sm text-muted-foreground border rounded-md p-2 bg-muted/40">
-														Upload file
-													</p>
-												)}
-											</div>
-										))}
+									<div>
+										<div className="flex items-center justify-between mb-4 mt-8">
+											<h3 className="font-semibold text-base flex items-center gap-2">
+												Preview Form
+												<span className="text-xs font-normal text-muted-foreground px-2 py-0.5 rounded-full bg-muted border">
+													Read Only
+												</span>
+											</h3>
+										</div>
+										<div className="border rounded-xl p-6 space-y-6 bg-card/50">
+											{form.fields?.length > 0 ?
+												form.fields.map((field, i) => (
+													<FormFieldViewer
+														key={i}
+														field={field}
+														answer={null}
+														readOnly={true}
+													/>
+												))
+											:	<div className="text-center py-8 text-muted-foreground bg-muted/20 rounded-lg border-2 border-dashed">
+													<p>Belum ada pertanyaan pada form ini</p>
+												</div>
+											}
+										</div>
 									</div>
 								</Card>
 							);
 						})
-					)}
+					}
 				</div>
 			</CardContent>
 		</Card>
