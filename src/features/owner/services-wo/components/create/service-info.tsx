@@ -27,8 +27,14 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { ChevronDownIcon, CheckIcon, Trash } from "lucide-react";
-import { Label as RadixLabel } from "@radix-ui/react-dropdown-menu";
+import {
+	ChevronDownIcon,
+	CheckIcon,
+	Trash,
+	UserIcon,
+	UsersIcon,
+} from "lucide-react";
+
 type Status = {
 	value: string;
 	label: string;
@@ -83,14 +89,14 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 	fetchPositions,
 }) => {
 	return (
-		<Card className="border shadow-md rounded-lg overflow-hidden">
-			<div className="p-5 lg:p-6 border-b bg-gradient-to-br from-background to-muted/20">
+		<Card className="border shadow-md rounded-lg overflow-hidden h-full flex flex-col">
+			<div className="p-4 border-b bg-gradient-to-br from-background to-muted/20 shrink-0">
 				<p className="text-sm text-muted-foreground">
 					Isi form di bawah untuk menambahkan layanan work order baru.
 				</p>
 			</div>
 
-			<div className="p-5 lg:p-6 space-y-6">
+			<div className="p-5 lg:p-6 space-y-6 flex-1 overflow-y-auto min-h-0">
 				{/* Judul Layanan */}
 				<div className="space-y-2">
 					<Label
@@ -194,7 +200,7 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 							className={`text-sm font-semibold ${
 								errors?.accessType ? "text-red-500" : "text-foreground"
 							}`}>
-							Akses Form
+							Akses Layanan
 						</Label>
 
 						<Select value={accessType} onValueChange={setAccessType}>
@@ -207,7 +213,7 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 								<SelectValue placeholder="Pilih Akses" />
 							</SelectTrigger>
 							<SelectContent>
-								<SelectItem value="public">Public</SelectItem>
+								<SelectItem value="public">Publik</SelectItem>
 								<SelectItem value="internal">Internal</SelectItem>
 								<SelectItem value="member_only">Langganan Terdaftar</SelectItem>
 							</SelectContent>
@@ -220,135 +226,11 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 				</div>
 
 				{/* Staff Picker */}
-				<div className="grid grid-cols-4 gap-2 items-start">
-					{/* Selected Staff List */}
-					<div className="space-y-2 col-span-3">
-						{/* Label */}
-						<p
-							className={`text-sm font-medium ${
-								errors?.selectedStaff ? "text-red-500" : "text-foreground"
-							}`}>
-							Daftar Pegawai Terpilih
-						</p>
-
-						{/* Container */}
-						<div
-							className={`flex flex-wrap items-start justify-between gap-2 rounded-md px-3 py-2 mt-1.5 transition-all border 
-								${
-									errors?.selectedStaff ?
-										"border-red-500 ring-2 ring-red-300"
-									:	"border-border focus-within:ring-2 focus-within:ring-ring"
-								}`}>
-							<div className="flex flex-col gap-2 flex-1">
-								{selectedStaff.length > 0 ?
-									selectedStaff.map((s) => {
-										const pos = positions.find((p) => p._id === s.positionId);
-										return (
-											<div
-												key={s.positionId}
-												className="flex items-center justify-between gap-1 border-b pb-2 last:border-none">
-												<div className="inline-flex items-center gap-1 px-2 py-1 text-sm rounded-md border border-primary text-primary transition-colors w-fit">
-													<span>{pos?.name || "Tidak diketahui"}</span>
-												</div>
-
-												{/* Min & Max Input */}
-												<div className="flex items-center gap-2 mt-2">
-													<div className="flex items-center gap-1">
-														<RadixLabel
-															className={`text-xs ${
-																errors?.selectedStaff ? "text-red-500" : ""
-															}`}>
-															Min
-														</RadixLabel>
-														<Input
-															type="number"
-															className={`w-16 h-7 text-xs ${
-																errors?.selectedStaff ?
-																	"border-red-500 focus-visible:ring-red-500"
-																:	""
-															}`}
-															value={s.minimumStaff}
-															onChange={(e) => {
-																const val = Number(e.target.value);
-																setSelectedStaff((prev) =>
-																	prev.map((st) =>
-																		st.positionId === s.positionId ?
-																			{ ...st, minimumStaff: val }
-																		:	st,
-																	),
-																);
-															}}
-														/>
-													</div>
-													<div className="flex items-center gap-1">
-														<RadixLabel
-															className={`text-xs ${
-																errors?.selectedStaff ? "text-red-500" : ""
-															}`}>
-															Max
-														</RadixLabel>
-														<Input
-															type="number"
-															className={`w-16 h-7 text-xs ${
-																errors?.selectedStaff ?
-																	"border-red-500 focus-visible:ring-red-500"
-																:	""
-															}`}
-															value={s.maximumStaff}
-															onChange={(e) => {
-																const val = Number(e.target.value);
-																setSelectedStaff((prev) =>
-																	prev.map((st) =>
-																		st.positionId === s.positionId ?
-																			{ ...st, maximumStaff: val }
-																		:	st,
-																	),
-																);
-															}}
-														/>
-													</div>
-													<Trash
-														onClick={(e) => {
-															e.stopPropagation();
-															setSelectedStaff((prev) =>
-																prev.filter(
-																	(st) => st.positionId !== s.positionId,
-																),
-															);
-														}}
-														className="size-4 mx-4 cursor-pointer hover:text-destructive transition-colors"
-													/>
-												</div>
-											</div>
-										);
-									})
-								:	<span
-										className={`text-sm ${
-											errors?.selectedStaff ? "text-red-500" : (
-												"text-muted-foreground"
-											)
-										}`}>
-										Pilih beberapa pegawai yang dibutuhkan
-									</span>
-								}
-							</div>
-						</div>
-
-						{/* Pesan error di bawah box */}
-						{errors?.selectedStaff && (
-							<p className="text-xs text-red-500">{errors.selectedStaff}</p>
-						)}
-					</div>
-
-					{/* Dropdown pilih posisi */}
-					<div className="space-y-2">
-						<label
-							className={`text-sm font-medium ${
-								errors?.selectedStaff ? "text-red-500" : ""
-							}`}>
-							Tambah Pegawai
-						</label>
-
+				<div className="space-y-4">
+					<div className="flex items-center justify-between">
+						<Label className="text-base font-semibold">
+							Konfigurasi Pegawai
+						</Label>
 						<DropdownMenu
 							onOpenChange={(open) =>
 								open && fetchPositions && fetchPositions()
@@ -357,16 +239,11 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 								<Button
 									variant="outline"
 									size="sm"
-									className={`w-full shrink-0 mt-2 flex items-center gap-1 text-sm transition-colors ${
-										errors?.selectedStaff ?
-											"border-red-500 text-red-500 hover:bg-red-50"
-										:	""
-									}`}>
-									Pilih Pegawai
-									<ChevronDownIcon className="w-3 h-3" />
+									className="gap-2 border-dashed">
+									<ChevronDownIcon className="w-4 h-4" />
+									Tambah Posisi
 								</Button>
 							</DropdownMenuTrigger>
-
 							<DropdownMenuContent
 								align="end"
 								className="h-[300px] overflow-y-auto w-[250px]">
@@ -386,7 +263,7 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 													e.preventDefault();
 													toggleStaff(p);
 												}}
-												className="flex justify-between">
+												className="flex justify-between cursor-pointer">
 												<span>{p.name}</span>
 												{isSelected && (
 													<CheckIcon className="w-4 h-4 text-primary" />
@@ -401,6 +278,108 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 							</DropdownMenuContent>
 						</DropdownMenu>
 					</div>
+
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+						{selectedStaff.length > 0 ?
+							selectedStaff.map((s) => {
+								const pos = positions.find((p) => p._id === s.positionId);
+								return (
+									<div
+										key={s.positionId}
+										className="relative flex flex-col gap-3 rounded-xl border p-4 bg-card/50 transition-all hover:bg-card">
+										<div className="flex items-start justify-between">
+											<div className="flex items-center gap-2">
+												<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+													<UserIcon className="h-4 w-4" />
+												</div>
+												<div>
+													<p className="font-medium leading-none">
+														{pos?.name || "Posisi ?"}
+													</p>
+													<p className="text-xs text-muted-foreground mt-1">
+														Atur jumlah staff
+													</p>
+												</div>
+											</div>
+											<Button
+												variant="ghost"
+												size="icon"
+												className="h-8 w-8 text-muted-foreground hover:text-destructive"
+												onClick={() =>
+													setSelectedStaff((prev) =>
+														prev.filter((st) => st.positionId !== s.positionId),
+													)
+												}>
+												<Trash className="h-4 w-4" />
+											</Button>
+										</div>
+
+										<div className="grid grid-cols-2 gap-3 pt-2">
+											<div className="space-y-1.5">
+												<label className="text-xs font-medium text-muted-foreground">
+													Minimum
+												</label>
+												<Input
+													type="number"
+													min={0}
+													className="h-8"
+													value={s.minimumStaff}
+													onChange={(e) => {
+														const val = Number(e.target.value);
+														setSelectedStaff((prev) =>
+															prev.map((st) =>
+																st.positionId === s.positionId ?
+																	{ ...st, minimumStaff: val }
+																:	st,
+															),
+														);
+													}}
+												/>
+											</div>
+											<div className="space-y-1.5">
+												<label className="text-xs font-medium text-muted-foreground">
+													Maksimum
+												</label>
+												<Input
+													type="number"
+													min={1}
+													className="h-8"
+													value={s.maximumStaff}
+													onChange={(e) => {
+														const val = Number(e.target.value);
+														setSelectedStaff((prev) =>
+															prev.map((st) =>
+																st.positionId === s.positionId ?
+																	{ ...st, maximumStaff: val }
+																:	st,
+															),
+														);
+													}}
+												/>
+											</div>
+										</div>
+									</div>
+								);
+							})
+						:	<div className="col-span-full flex flex-col items-center justify-center rounded-xl border border-dashed p-8 text-center animate-in fade-in-50">
+								<div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted mb-3">
+									<UsersIcon className="h-5 w-5 text-muted-foreground" />
+								</div>
+								<p className="text-sm font-medium text-muted-foreground">
+									Belum ada pegawai dipilih
+								</p>
+								<p className="text-xs text-muted-foreground/60 mt-1 max-w-xs">
+									Tambahkan posisi pegawai yang diperlukan untuk layanan ini.
+								</p>
+							</div>
+						}
+					</div>
+
+					{errors?.selectedStaff && (
+						<p className="text-xs text-red-500 font-medium">
+							{errors.selectedStaff}
+						</p>
+					)}
 				</div>
 			</div>
 		</Card>

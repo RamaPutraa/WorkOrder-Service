@@ -5,7 +5,6 @@ import {
 	CardDescription,
 	CardContent,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { useBusiness } from "../hooks/use-business";
 import { Button } from "@/components/ui/button";
 import {

@@ -187,7 +187,7 @@ const data = {
 			items: [
 				{
 					title: "Tugas Kerja",
-					url: "/dashboard/client/submissions",
+					url: "/dashboard/internal/workorders",
 				},
 				{
 					title: "Riwayat Tugas Kerja",

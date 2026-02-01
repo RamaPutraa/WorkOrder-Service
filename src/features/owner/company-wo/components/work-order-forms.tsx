@@ -15,12 +15,14 @@ interface WorkOrderFormsProps {
 	workorderForms: WorkOrderFormItem[];
 	workOrderId: string;
 	submissions: PublicSubmission[];
+	isReadOnly?: boolean;
 }
 
 const WorkOrderForms = ({
 	workorderForms,
 	workOrderId,
 	submissions,
+	isReadOnly = false,
 }: WorkOrderFormsProps) => {
 	const { showDialog } = useDialogStore();
 	const [isSaving, setIsSaving] = useState(false);
@@ -245,6 +247,7 @@ const WorkOrderForms = ({
 													<FormFieldViewer
 														field={field}
 														answer={answer}
+														readOnly={isReadOnly}
 														onChange={(value) =>
 															handleFieldChange(
 																woForm.form._id,
@@ -261,8 +264,8 @@ const WorkOrderForms = ({
 						))}
 					</div>
 
-					{/* Tombol Simpan dan Batal - hanya muncul jika ada perubahan */}
-					{hasChanges() && (
+					{/* Tombol Simpan dan Batal - hanya untuk owner/manager */}
+					{!isReadOnly && hasChanges() && (
 						<div className="flex items-center justify-end border-t-2 mx-5">
 							<div className="flex items-center gap-2 pt-5 pb-3">
 								<Button
@@ -293,7 +296,7 @@ const WorkOrderForms = ({
 									Formulir ini merupakan laporan dari perintah kerja
 								</p>
 							</div>
-							{!isEditMode && submissions.length > 0 && (
+							{!isReadOnly && !isEditMode && submissions.length > 0 && (
 								<Button
 									onClick={handleEnterEditMode}
 									variant="outline"
@@ -395,7 +398,7 @@ const WorkOrderForms = ({
 															<FormFieldViewer
 																field={field}
 																answer={currentValue}
-																readOnly={!isEditMode}
+																readOnly={isReadOnly || !isEditMode}
 																onChange={
 																	isEditMode ?
 																		(value) =>
@@ -417,8 +420,8 @@ const WorkOrderForms = ({
 						}
 					</CardContent>
 
-					{/* Tombol Simpan dan Batal - muncul saat edit mode dan ada perubahan */}
-					{isEditMode && hasChanges() && (
+					{/* Tombol Simpan dan Batal - hanya untuk owner/manager */}
+					{!isReadOnly && isEditMode && hasChanges() && (
 						<div className="flex items-center justify-end border-t-2 mx-5">
 							<div className="flex items-center gap-2 pt-5 pb-3">
 								<Button

@@ -33,6 +33,7 @@ interface StaffAssignedProps {
 	employees: StaffItem[];
 	assignedStaffsUI: StaffItem[];
 	setAssignedStaffsUI: React.Dispatch<React.SetStateAction<StaffItem[]>>;
+	isReadOnly?: boolean;
 }
 
 const StaffAssigned = ({
@@ -40,6 +41,7 @@ const StaffAssigned = ({
 	employees,
 	assignedStaffsUI,
 	setAssignedStaffsUI,
+	isReadOnly = false,
 }: StaffAssignedProps) => {
 	const [open, setOpen] = useState(false);
 	const [showMaxAlert, setShowMaxAlert] = useState(false);
@@ -200,24 +202,26 @@ const StaffAssigned = ({
 						<Card
 							key={staff._id}
 							className="relative overflow-hidden border shadow-sm hover:shadow-md transition">
-							{/* Tombol Hapus */}
-							<button
-								onClick={() => handleRemoveStaff(staff)}
-								className="absolute top-2 right-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-full p-1 transition">
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									className="h-5 w-5"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-									strokeWidth={2}>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m2 0h-1m-8 0H7m10 0l-1-3H8L7 7"
-									/>
-								</svg>
-							</button>
+							{/* Tombol Hapus - hanya untuk owner/manager */}
+							{!isReadOnly && (
+								<button
+									onClick={() => handleRemoveStaff(staff)}
+									className="absolute top-2 right-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-full p-1 transition">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										className="h-5 w-5"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+										strokeWidth={2}>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m2 0h-1m-8 0H7m10 0l-1-3H8L7 7"
+										/>
+									</svg>
+								</button>
+							)}
 
 							<CardContent className="flex flex-col items-center text-center space-y-3 p-4">
 								<div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary transition">
@@ -236,125 +240,128 @@ const StaffAssigned = ({
 						</Card>
 					))}
 
-					{/* ========== BUTTON ADD STAFF ========== */}
-					<Dialog open={open} onOpenChange={setOpen}>
-						<DialogTrigger asChild>
-							<button className="group flex flex-col items-center justify-center p-4 border-2 border-dashed border-muted-foreground/25 rounded-xl bg-muted/30 hover:bg-muted/50 hover:border-primary/50 cursor-pointer transition min-h-[160px]">
-								<div className="h-10 w-10 rounded-full bg-background border border-muted-foreground/20 flex items-center justify-center mb-2 group-hover:border-primary group-hover:text-primary transition">
-									<Plus className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
-								</div>
-								<p className="text-sm font-medium text-muted-foreground group-hover:text-primary transition">
-									Tambah Staff
-								</p>
-							</button>
-						</DialogTrigger>
-
-						{/* === Dialog Content === */}
-						<DialogContent className="sm:max-w-[500px]">
-							<form
-								onSubmit={(e) => {
-									e.preventDefault();
-									if (!selectedStaff) return;
-
-									const requiredForSelected =
-										detailData.service.requiredStaffs.find(
-											(r) => r.position._id === selectedStaff.position._id,
-										);
-									const maxForSelected = requiredForSelected?.maximumStaff ?? 0;
-
-									const currentCount = countByPosition(
-										selectedStaff.position._id,
-									);
-
-									if (currentCount >= maxForSelected) {
-										setShowMaxAlert(true);
-										return;
-									}
-
-									setAssignedStaffsUI((prev) => [...prev, selectedStaff]);
-									setSelectedStaff(null);
-									setShowMaxAlert(false);
-									setOpen(false);
-								}}>
-								<DialogHeader>
-									<DialogTitle>Pegawai Bertugas</DialogTitle>
-									<DialogDescription>
-										Pilih staff yang ingin ditugaskan.
-									</DialogDescription>
-								</DialogHeader>
-
-								{showMaxAlert && (
-									<Alert className="bg-yellow-50 text-yellow-800 border-yellow-300 shadow-sm mt-2">
-										<AlertTitle className="flex items-center gap-2">
-											<AlertTriangle className="h-4 w-4" />
-											Kuota Staff Penuh
-										</AlertTitle>
-										<AlertDescription>
-											Posisi <b>{selectedStaff?.position.name}</b> hanya boleh
-											maksimal {maxStaff} staff.
-										</AlertDescription>
-									</Alert>
-								)}
-
-								{/* ComboBox */}
-								<div className="grid gap-4 py-4">
-									<div className="grid gap-2">
-										<Label>Pilih Staff</Label>
-
-										<Command className="rounded-lg border shadow">
-											<CommandInput placeholder="Cari nama staff..." />
-
-											<CommandList>
-												<CommandEmpty>
-													<Badge variant="secondary" className="p-1">
-														Semua staff sudah dipilih!
-													</Badge>
-												</CommandEmpty>
-
-												<CommandGroup>
-													{filteredEmployees.map((s) => (
-														<CommandItem
-															key={s._id}
-															value={s.name}
-															onSelect={() => setSelectedStaff(s)}
-															className="cursor-pointer">
-															{s.name} —
-															<span className="text-muted-foreground ml-1">
-																{s.position?.name}
-															</span>
-														</CommandItem>
-													))}
-												</CommandGroup>
-											</CommandList>
-										</Command>
-
-										{selectedStaff && (
-											<div className="mt-2 text-sm p-2 border rounded-lg bg-muted/30">
-												<p className="font-medium">{selectedStaff.name}</p>
-												<p className="text-xs text-muted-foreground">
-													{selectedStaff.position?.name}
-												</p>
-											</div>
-										)}
+					{/* ========== BUTTON ADD STAFF - hanya untuk owner/manager ========== */}
+					{!isReadOnly && (
+						<Dialog open={open} onOpenChange={setOpen}>
+							<DialogTrigger asChild>
+								<button className="group flex flex-col items-center justify-center p-4 border-2 border-dashed border-muted-foreground/25 rounded-xl bg-muted/30 hover:bg-muted/50 hover:border-primary/50 cursor-pointer transition min-h-[160px]">
+									<div className="h-10 w-10 rounded-full bg-background border border-muted-foreground/20 flex items-center justify-center mb-2 group-hover:border-primary group-hover:text-primary transition">
+										<Plus className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
 									</div>
-								</div>
+									<p className="text-sm font-medium text-muted-foreground group-hover:text-primary transition">
+										Tambah Staff
+									</p>
+								</button>
+							</DialogTrigger>
 
-								<DialogFooter>
-									<DialogClose asChild>
-										<Button variant="outline" type="button">
-											Batal
-										</Button>
-									</DialogClose>
+							{/* === Dialog Content === */}
+							<DialogContent className="sm:max-w-[500px]">
+								<form
+									onSubmit={(e) => {
+										e.preventDefault();
+										if (!selectedStaff) return;
 
-									<Button type="submit">Simpan</Button>
-								</DialogFooter>
-							</form>
-						</DialogContent>
-					</Dialog>
+										const requiredForSelected =
+											detailData.service.requiredStaffs.find(
+												(r) => r.position._id === selectedStaff.position._id,
+											);
+										const maxForSelected =
+											requiredForSelected?.maximumStaff ?? 0;
+
+										const currentCount = countByPosition(
+											selectedStaff.position._id,
+										);
+
+										if (currentCount >= maxForSelected) {
+											setShowMaxAlert(true);
+											return;
+										}
+
+										setAssignedStaffsUI((prev) => [...prev, selectedStaff]);
+										setSelectedStaff(null);
+										setShowMaxAlert(false);
+										setOpen(false);
+									}}>
+									<DialogHeader>
+										<DialogTitle>Pegawai Bertugas</DialogTitle>
+										<DialogDescription>
+											Pilih staff yang ingin ditugaskan.
+										</DialogDescription>
+									</DialogHeader>
+
+									{showMaxAlert && (
+										<Alert className="bg-yellow-50 text-yellow-800 border-yellow-300 shadow-sm mt-2">
+											<AlertTitle className="flex items-center gap-2">
+												<AlertTriangle className="h-4 w-4" />
+												Kuota Staff Penuh
+											</AlertTitle>
+											<AlertDescription>
+												Posisi <b>{selectedStaff?.position.name}</b> hanya boleh
+												maksimal {maxStaff} staff.
+											</AlertDescription>
+										</Alert>
+									)}
+
+									{/* ComboBox */}
+									<div className="grid gap-4 py-4">
+										<div className="grid gap-2">
+											<Label>Pilih Staff</Label>
+
+											<Command className="rounded-lg border shadow">
+												<CommandInput placeholder="Cari nama staff..." />
+
+												<CommandList>
+													<CommandEmpty>
+														<Badge variant="secondary" className="p-1">
+															Semua staff sudah dipilih!
+														</Badge>
+													</CommandEmpty>
+
+													<CommandGroup>
+														{filteredEmployees.map((s) => (
+															<CommandItem
+																key={s._id}
+																value={s.name}
+																onSelect={() => setSelectedStaff(s)}
+																className="cursor-pointer">
+																{s.name} —
+																<span className="text-muted-foreground ml-1">
+																	{s.position?.name}
+																</span>
+															</CommandItem>
+														))}
+													</CommandGroup>
+												</CommandList>
+											</Command>
+
+											{selectedStaff && (
+												<div className="mt-2 text-sm p-2 border rounded-lg bg-muted/30">
+													<p className="font-medium">{selectedStaff.name}</p>
+													<p className="text-xs text-muted-foreground">
+														{selectedStaff.position?.name}
+													</p>
+												</div>
+											)}
+										</div>
+									</div>
+
+									<DialogFooter>
+										<DialogClose asChild>
+											<Button variant="outline" type="button">
+												Batal
+											</Button>
+										</DialogClose>
+
+										<Button type="submit">Simpan</Button>
+									</DialogFooter>
+								</form>
+							</DialogContent>
+						</Dialog>
+					)}
 				</div>
 			</CardContent>
-			{/* Tombol Simpan dan Batal */}
-			{hasChanges() && (
+			{/* Tombol Simpan dan Batal - hanya untuk owner/manager */}
+			{!isReadOnly && hasChanges() && (
 				<div className="flex items-center justify-end border-t-2 mx-5">
 					<div className="flex items-center gap-2 pt-5 pb-3">
 						<Button
