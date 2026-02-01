@@ -9,6 +9,8 @@ import {
 	Eye,
 	FileText,
 	FileCheck,
+	Timer,
+	Ticket,
 } from "lucide-react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -33,7 +35,7 @@ const CompanyViewWo = () => {
 			case "drafted":
 				return {
 					className: "bg-gray-100 text-gray-700 border border-gray-200",
-					label: "Sedang Menunggu",
+					label: "Dirancang",
 				};
 			case "ready":
 				return {
@@ -112,11 +114,6 @@ const CompanyViewWo = () => {
 						))
 					: data.length > 0 ?
 						data.map((wo) => {
-							const positions =
-								[...new Set(wo.assignedStaffs?.map((s) => s.position?.name))]
-									.filter(Boolean)
-									.join(", ") || "Belum ada posisi yang ditugaskan";
-
 							const statusConfig = getStatusConfig(wo.status);
 
 							return (
@@ -138,10 +135,10 @@ const CompanyViewWo = () => {
 														{wo.service?.description || "-"}
 													</p>
 												</div>
-												<div
+												{/* <div
 													className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap ${statusConfig.className}`}>
 													{statusConfig.label}
-												</div>
+												</div> */}
 											</div>
 										</CardHeader>
 
@@ -149,6 +146,21 @@ const CompanyViewWo = () => {
 										<CardContent className="flex-1 flex flex-col gap-4 pt-0">
 											{/* Info Grid */}
 											<div className="space-y-3">
+												{/* status */}
+												<div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+													<div className="p-2 rounded-md bg-background">
+														<Ticket className="w-4 h-4 text-primary" />
+													</div>
+													<div className="flex-1 min-w-0">
+														<p className="text-xs font-medium text-muted-foreground mb-0.5">
+															Status Tugas Kerja
+														</p>
+														<p className="text-sm font-medium truncate">
+															{statusConfig.label}
+														</p>
+													</div>
+												</div>
+
 												{/* Client Info */}
 												<div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
 													<div className="p-2 rounded-md bg-background">
@@ -187,21 +199,6 @@ const CompanyViewWo = () => {
 												</div>
 
 												<Separator />
-
-												{/* Positions Info */}
-												<div className="flex items-start gap-3">
-													<div className="p-2 rounded-md bg-primary/10">
-														<Briefcase className="w-4 h-4 text-primary" />
-													</div>
-													<div className="flex-1 min-w-0">
-														<p className="text-xs font-medium text-muted-foreground mb-1">
-															Posisi Ditugaskan
-														</p>
-														<p className="text-sm font-medium leading-relaxed">
-															{positions}
-														</p>
-													</div>
-												</div>
 											</div>
 
 											{/* Action Buttons */}

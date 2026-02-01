@@ -119,8 +119,8 @@ const CompanyDetailWo = () => {
 		});
 	};
 
-	// Check if work order is ready (status = 'ready' or similar)
-	const isReady = detailData?.status === "ready";
+	// Get current status
+	const currentStatus = detailData?.status;
 
 	if (!detailData) {
 		return <p className="p-4">Loading detail...</p>;
@@ -146,7 +146,15 @@ const CompanyDetailWo = () => {
 								Detail Perintah Kerja
 							</h1>
 							<p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
-								Lakukan konfigurasi sebelum memulai perintah kerja.
+								{currentStatus === "drafted" ?
+									"Lakukan konfigurasi sebelum memulai perintah kerja."
+								: currentStatus === "ready" ?
+									"Perintah kerja siap untuk dimulai."
+								: currentStatus === "in_progress" ?
+									"Perintah kerja sedang dikerjakan."
+								: currentStatus === "completed" ?
+									"Perintah kerja telah selesai."
+								:	"Detail perintah kerja."}
 							</p>
 						</div>
 					</div>
@@ -154,7 +162,8 @@ const CompanyDetailWo = () => {
 					{/* Action Buttons */}
 					{!isReadOnly && (
 						<div className="flex items-center gap-2 sm:gap-3 w-full md:w-auto">
-							{!isReady ?
+							{/* Status: drafted - Show "Konfigurasi Selesai" button */}
+							{currentStatus === "drafted" && (
 								<>
 									<Button
 										variant="outline"
@@ -174,7 +183,11 @@ const CompanyDetailWo = () => {
 										:	"Konfigurasi Selesai ✓"}
 									</Button>
 								</>
-							:	<>
+							)}
+
+							{/* Status: ready - Show "Mulai Perintah Kerja" button */}
+							{currentStatus === "ready" && (
+								<>
 									<Button
 										variant="outline"
 										onClick={() => navigate(-1)}
@@ -190,7 +203,20 @@ const CompanyDetailWo = () => {
 										{isStarting ? "Memulai..." : "Mulai Perintah Kerja"}
 									</Button>
 								</>
-							}
+							)}
+
+							{/* Status: in_progress, completed, cancelled - No action buttons, just back */}
+							{(currentStatus === "in_progress" ||
+								currentStatus === "completed" ||
+								currentStatus === "cancelled") && (
+								<Button
+									variant="outline"
+									onClick={() => navigate(-1)}
+									className="flex-1 md:flex-none">
+									<ChevronLeft className="h-4 w-4 mr-2" />
+									Kembali
+								</Button>
+							)}
 						</div>
 					)}
 				</div>

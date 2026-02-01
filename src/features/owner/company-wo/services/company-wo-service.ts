@@ -45,7 +45,7 @@ export const markWorkOrderReady = async (id: string) => {
 };
 
 export const startWorkOrderApi = async (id: string) => {
-	const response = await apiClient.put(`/workorders/${id}/in-progress`);
+	const response = await apiClient.put(`/workorders/${id}/start`);
 	return response.data;
 };
 

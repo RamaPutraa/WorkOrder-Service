@@ -1,9 +1,11 @@
 import { ChevronLeft, Loader2 } from "lucide-react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { Label } from "@radix-ui/react-dropdown-menu";
 import usePublicService from "../hooks/use-client-service";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import FormFieldViewer, {
+	type AnswerValue,
+} from "@/shared/molecules/form-field-viewer";
 
 export default function RequestServicePage() {
 	const {
@@ -12,6 +14,7 @@ export default function RequestServicePage() {
 		error,
 		isSticky,
 		submitting,
+		formValues,
 		handleChange,
 		handleSubmit,
 	} = usePublicService();
@@ -66,129 +69,37 @@ export default function RequestServicePage() {
 			</div>
 
 			<div className="space-y-6">
-				{data.map((item) => (
-					<Card key={item._id} className="shadow-sm">
+				{data.map((form) => (
+					<Card key={form._id} className="shadow-sm">
 						<CardHeader>
-							<h2 className="text-lg font-semibold">{item.title}</h2>
+							<h2 className="text-lg font-semibold">{form.title}</h2>
 							<p className="text-sm text-muted-foreground">
-								{item.description}
+								{form.description}
 							</p>
 						</CardHeader>
 						<CardContent className="space-y-4">
-							{item.fields?.map((field, i) => (
-								<div key={i} className="space-y-1">
-									<Label className="text-sm font-medium">{field.label}</Label>
+							{form.fields
+								?.sort((a, b) => a.order - b.order)
+								.map((field) => {
+									// Get current value from formValues state
+									const currentValue =
+										formValues[form._id]?.[field.order] ?? null;
 
-									{/* tampilkan sesuai type */}
-									{field.type === "text" && (
-										<input
-											type="text"
-											placeholder={field.placeholder || "Isian teks"}
-											className="text-sm border rounded-md p-2 w-full"
-											onChange={(e) =>
-												handleChange(item._id, field.label, e.target.value)
-											}
-										/>
-									)}
-
-									{field.type === "email" && (
-										<input
-											type="email"
-											placeholder={field.placeholder || "Alamat email"}
-											className="text-sm border rounded-md p-2 w-full"
-											onChange={(e) =>
-												handleChange(item._id, field.label, e.target.value)
-											}
-										/>
-									)}
-
-									{field.type === "number" && (
-										<input
-											type="number"
-											placeholder={field.placeholder || "Isian angka"}
-											className="text-sm border rounded-md p-2 w-full"
-											onChange={(e) =>
-												handleChange(item._id, field.label, e.target.value)
-											}
-										/>
-									)}
-
-									{field.type === "textarea" && (
-										<textarea
-											placeholder={field.placeholder || "Area teks"}
-											className="text-sm border rounded-md p-2 w-full min-h-[80px]"
-											onChange={(e) =>
-												handleChange(item._id, field.label, e.target.value)
-											}
-										/>
-									)}
-
-									{field.type === "single_select" && (
-										<div className="text-sm space-y-1">
-											<p className="mb-1 italic">Pilihan (radio):</p>
-											{field.options?.map((opt, j) => (
-												<label key={j} className="flex items-center space-x-2">
-													<input
-														type="radio"
-														name={`field-${i}`}
-														value={opt.value}
-														onChange={(e) =>
-															handleChange(
-																item._id,
-																field.label,
-																e.target.value,
-															)
-														}
-													/>
-													<span>{opt.value}</span>
-												</label>
-											))}
-										</div>
-									)}
-
-									{field.type === "multi_select" && (
-										<div className="text-sm space-y-1">
-											{field.options?.map((opt, j) => (
-												<label key={j} className="flex items-center space-x-2">
-													<input
-														type="checkbox"
-														value={opt.value}
-														onChange={(e) =>
-															handleChange(
-																item._id,
-																field.label,
-																e.target.value,
-																"multi",
-															)
-														}
-													/>
-													<span>{opt.value}</span>
-												</label>
-											))}
-										</div>
-									)}
-
-									{field.type === "date" && (
-										<input
-											type="date"
-											className="text-sm border rounded-md p-2 w-full"
-											onChange={(e) =>
-												handleChange(item._id, field.label, e.target.value)
-											}
-										/>
-									)}
-
-									{field.type === "file" && (
-										<input
-											type="file"
-											className="text-sm border rounded-md p-2 w-full"
-											onChange={(e) =>
-												handleChange(item._id, field.label, e.target.value)
-											}
-										/>
-									)}
-								</div>
-							))}
+									return (
+										<Card
+											key={field.order}
+											className="shadow-sm border rounded-lg p-4 bg-white">
+											<FormFieldViewer
+												field={field}
+												answer={currentValue as AnswerValue}
+												readOnly={false}
+												onChange={(value) =>
+													handleChange(form._id, field.order, value)
+												}
+											/>
+										</Card>
+									);
+								})}
 						</CardContent>
 					</Card>
 				))}

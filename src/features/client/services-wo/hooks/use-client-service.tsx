@@ -7,8 +7,9 @@ import {
 } from "../services/public-services";
 import { useEffect, useState } from "react";
 
-type FieldValue = string | number | File | string[];
-type FormValues = Record<string, Record<string, FieldValue>>;
+type FieldValue = string | number | File | string[] | null;
+// Changed: Now using field order (number) as key instead of field label (string)
+type FormValues = Record<string, Record<number, FieldValue>>;
 export const usePublicServices = () => {
 	const { id } = useParams<{ id: string }>();
 	const [data, setData] = useState<Form[]>([]);
@@ -30,7 +31,7 @@ export const usePublicServices = () => {
 		setError(null);
 
 		const { data: res, error } = await handleApi(() =>
-			getDetailServiceByIdApi(id)
+			getDetailServiceByIdApi(id),
 		);
 
 		setLoading(false);
@@ -58,22 +59,21 @@ export const usePublicServices = () => {
 		return () => window.removeEventListener("scroll", handleScroll);
 	}, []);
 
-	// handle input form
+	// handle input form - now using field order instead of field label
 	const handleChange = (
 		formId: string,
-		fieldId: string,
+		fieldOrder: number,
 		value: FieldValue,
-		type?: "multi"
+		type?: "multi",
 	) => {
 		setFormValues((prev) => {
 			const currentForm = prev[formId] || {};
-			const currentValue = currentForm[fieldId];
+			const currentValue = currentForm[fieldOrder];
 
 			// MULTI SELECT (checkbox)
 			if (type === "multi") {
-				let newArray: string[] = Array.isArray(currentValue)
-					? [...currentValue]
-					: [];
+				let newArray: string[] =
+					Array.isArray(currentValue) ? [...currentValue] : [];
 
 				const v = value as string;
 
@@ -87,7 +87,7 @@ export const usePublicServices = () => {
 					...prev,
 					[formId]: {
 						...currentForm,
-						[fieldId]: newArray,
+						[fieldOrder]: newArray,
 					},
 				};
 			}
@@ -97,7 +97,7 @@ export const usePublicServices = () => {
 				...prev,
 				[formId]: {
 					...currentForm,
-					[fieldId]: value,
+					[fieldOrder]: value,
 				},
 			};
 		});
@@ -114,18 +114,24 @@ export const usePublicServices = () => {
 		setSubmitting(true);
 		setError(null);
 
-		const payload: PublicSubmitRequest[] = data.map((form) => ({
+		// Build submissions array
+		const submissions = data.map((form) => ({
 			formId: form._id,
 			fieldsData: Object.entries(formValues[form._id] || {}).map(
-				([, fieldValue], i) => ({
-					order: i + 1,
+				([fieldOrder, fieldValue]) => ({
+					order: Number(fieldOrder),
 					value: fieldValue,
-				})
+				}),
 			),
 		}));
 
+		// Wrap in the required format
+		const payload: PublicSubmitRequest = {
+			submissions,
+		};
+
 		const { data: res, error } = await handleApi(() =>
-			submitIntakeApi(id!, payload)
+			submitIntakeApi(id!, payload),
 		);
 		console.log("Payload submitted:", payload);
 		setSubmitting(false);
@@ -153,6 +159,7 @@ export const usePublicServices = () => {
 		error,
 		isSticky,
 		submitting,
+		formValues,
 		handleChange,
 		handleSubmit,
 		fetchPublicServiceDetail,
