@@ -94,29 +94,32 @@ export default function FormFieldViewer({
 			case "single_select":
 				return (
 					<div className="space-y-2.5">
-						{field.options?.map((opt) => (
-							<label
-								key={opt.key ?? opt.value}
-								className={`flex items-center gap-3 p-3 rounded-lg transition-colors group ${
-									readOnly ?
-										"cursor-not-allowed opacity-70"
-									:	"hover:bg-background cursor-pointer"
-								}`}>
-								<input
-									type="radio"
-									checked={localValue === opt.value}
-									onChange={() => handleValueChange(opt.value)}
-									disabled={readOnly}
-									className="w-4 h-4 text-primary focus:ring-2 focus:ring-primary cursor-pointer disabled:cursor-not-allowed"
-								/>
-								<span
-									className={`text-sm font-medium transition-colors ${
-										readOnly ? "" : "group-hover:text-primary"
+						{field.options?.map((opt) => {
+							const optionValue = opt.key ?? opt.value;
+							return (
+								<label
+									key={optionValue}
+									className={`flex items-center gap-3 p-3 rounded-lg transition-colors group ${
+										readOnly ?
+											"cursor-not-allowed opacity-70"
+										:	"hover:bg-background cursor-pointer"
 									}`}>
-									{opt.value}
-								</span>
-							</label>
-						))}
+									<input
+										type="radio"
+										checked={localValue === optionValue}
+										onChange={() => handleValueChange(optionValue)}
+										disabled={readOnly}
+										className="w-4 h-4 text-primary focus:ring-2 focus:ring-primary cursor-pointer disabled:cursor-not-allowed"
+									/>
+									<span
+										className={`text-sm font-medium transition-colors ${
+											readOnly ? "" : "group-hover:text-primary"
+										}`}>
+										{opt.value}
+									</span>
+								</label>
+							);
+						})}
 					</div>
 				);
 
@@ -124,20 +127,21 @@ export default function FormFieldViewer({
 				return (
 					<div className="space-y-2.5">
 						{field.options?.map((opt) => {
+							const optionValue = opt.key ?? opt.value;
 							const arr = Array.isArray(localValue) ? localValue : [];
 
 							const toggle = () => {
 								if (readOnly) return;
-								if (arr.includes(opt.value)) {
-									handleValueChange(arr.filter((v) => v !== opt.value));
+								if (arr.includes(optionValue)) {
+									handleValueChange(arr.filter((v) => v !== optionValue));
 								} else {
-									handleValueChange([...arr, opt.value]);
+									handleValueChange([...arr, optionValue]);
 								}
 							};
 
 							return (
 								<label
-									key={opt.key ?? opt.value}
+									key={optionValue}
 									className={`flex items-center gap-3 p-3 rounded-lg transition-colors group ${
 										readOnly ?
 											"cursor-not-allowed opacity-70"
@@ -145,7 +149,7 @@ export default function FormFieldViewer({
 									}`}>
 									<input
 										type="checkbox"
-										checked={arr.includes(opt.value)}
+										checked={arr.includes(optionValue)}
 										onChange={toggle}
 										disabled={readOnly}
 										className="w-4 h-4 text-primary rounded focus:ring-2 focus:ring-primary cursor-pointer disabled:cursor-not-allowed"

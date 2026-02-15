@@ -63,7 +63,7 @@ export const submitWorkOrderReportApi = async (
 		fieldsData: FieldData[];
 	}[],
 ) => {
-	const response = await apiClient.put(`/workorders/${id}/report/submissions`, {
+	const response = await apiClient.put(`/workorders/${id}/report`, {
 		submissions,
 	});
 	return response.data;

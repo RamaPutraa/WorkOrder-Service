@@ -16,6 +16,7 @@ interface WorkOrderFormsProps {
 	workOrderId: string;
 	submissions: PublicSubmission[];
 	isReadOnly?: boolean;
+	onSaveSuccess?: () => void;
 }
 
 const WorkOrderForms = ({
@@ -23,6 +24,7 @@ const WorkOrderForms = ({
 	workOrderId,
 	submissions,
 	isReadOnly = false,
+	onSaveSuccess,
 }: WorkOrderFormsProps) => {
 	const { showDialog } = useDialogStore();
 	const [isSaving, setIsSaving] = useState(false);
@@ -38,15 +40,37 @@ const WorkOrderForms = ({
 		Map<string, Map<number, AnswerValue>>
 	>(new Map());
 
+	// Helper function to get the latest submission for each form
+	const getLatestSubmissions = (
+		submissions: PublicSubmission[],
+	): PublicSubmission[] => {
+		const latestByFormId = new Map<string, PublicSubmission>();
+
+		submissions.forEach((submission) => {
+			const existing = latestByFormId.get(submission.formId);
+			if (
+				!existing ||
+				new Date(submission.updatedAt) > new Date(existing.updatedAt)
+			) {
+				latestByFormId.set(submission.formId, submission);
+			}
+		});
+
+		return Array.from(latestByFormId.values());
+	};
+
 	// Initialize form data from workorderForms or submissions
 	useEffect(() => {
 		const initialData = new Map<string, Map<number, AnswerValue>>();
 
+		// Get only the latest submissions for each form
+		const latestSubmissions = getLatestSubmissions(submissions);
+
 		workorderForms.forEach((woForm) => {
 			const fieldMap = new Map<number, AnswerValue>();
 
-			// Check if there's a submission for this form
-			const submission = submissions.find(
+			// Check if there's a submission for this form (use latest only)
+			const submission = latestSubmissions.find(
 				(sub) => sub.formId === woForm.form._id,
 			);
 
@@ -124,7 +148,7 @@ const WorkOrderForms = ({
 				setIsSaving(true);
 
 				// Build submissions array - only include forms that have been filled
-				const submissions: PublicSubmission[] = workorderForms
+				const submissionsToSend: PublicSubmission[] = workorderForms
 					.map((woForm) => {
 						const fieldMap = formData.get(woForm.form._id) || new Map();
 						const fieldsData: FieldData[] = Array.from(fieldMap.entries()).map(
@@ -148,22 +172,31 @@ const WorkOrderForms = ({
 						// Only return submission if form has filled fields
 						if (!hasFilledFields) return null;
 
+						// ✨ CHECK IF SUBMISSION ALREADY EXISTS FOR THIS FORM
+						const existingSubmission = submissions.find(
+							(sub) => sub.formId === woForm.form._id,
+						);
+
 						return {
-							_id: `sub_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
-							ownerId: "", // Will be set by backend
+							// ✨ USE EXISTING ID IF AVAILABLE, OTHERWISE GENERATE NEW
+							_id:
+								existingSubmission?._id ??
+								`sub_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+							ownerId: existingSubmission?.ownerId ?? "", // Will be set by backend
 							formId: woForm.form._id,
 							submissionType: "work_order",
 							fieldsData,
 							status: "submitted",
-							submittedBy: "", // Will be set by backend
-							createdAt: new Date().toISOString(),
-							updatedAt: new Date().toISOString(),
+							submittedBy: existingSubmission?.submittedBy ?? "", // Will be set by backend
+							createdAt:
+								existingSubmission?.createdAt ?? new Date().toISOString(),
+							updatedAt: new Date().toISOString(), // ✨ ALWAYS UPDATE timestamp
 						};
 					})
 					.filter((sub): sub is PublicSubmission => sub !== null); // Remove null entries
 
 				const { error } = await handleApi(() =>
-					submitWorkOrderFormApi(workOrderId, submissions),
+					submitWorkOrderFormApi(workOrderId, submissionsToSend),
 				);
 
 				setIsSaving(false);
@@ -178,10 +211,13 @@ const WorkOrderForms = ({
 					"Formulir perintah kerja telah disimpan",
 				);
 
-				// Reload page to get updated data
-				setTimeout(() => {
-					window.location.reload();
-				}, 1000); // Delay 1 detik agar toast notification terlihat
+				// Exit edit mode
+				setIsEditMode(false);
+
+				// Call parent callback to refetch data
+				if (onSaveSuccess) {
+					onSaveSuccess();
+				}
 			},
 		});
 	};
@@ -296,16 +332,18 @@ const WorkOrderForms = ({
 									Formulir ini merupakan laporan dari perintah kerja
 								</p>
 							</div>
-							{!isReadOnly && !isEditMode && submissions.length > 0 && (
-								<Button
-									onClick={handleEnterEditMode}
-									variant="outline"
-									size="sm"
-									className="gap-2">
-									<Pencil className="w-4 h-4" />
-									Edit
-								</Button>
-							)}
+							{!isReadOnly &&
+								!isEditMode &&
+								getLatestSubmissions(submissions).length > 0 && (
+									<Button
+										onClick={handleEnterEditMode}
+										variant="outline"
+										size="sm"
+										className="gap-2">
+										<Pencil className="w-4 h-4" />
+										Edit
+									</Button>
+								)}
 						</div>
 						{isEditMode && (
 							<div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-2">
@@ -336,7 +374,7 @@ const WorkOrderForms = ({
 									Perintah kerja belum dikerjakan
 								</p>
 							</div>
-						:	submissions.map((submission) => {
+						:	getLatestSubmissions(submissions).map((submission) => {
 								// Find the corresponding form
 								const woForm = workorderForms.find(
 									(wf) => wf.form._id === submission.formId,
@@ -357,10 +395,10 @@ const WorkOrderForms = ({
 											</div>
 											<div className="text-right">
 												<p className="text-xs text-muted-foreground">
-													Dikirim pada:
+													Terakhir diperbarui:
 												</p>
 												<p className="text-sm font-medium">
-													{new Date(submission.createdAt).toLocaleDateString(
+													{new Date(submission.updatedAt).toLocaleDateString(
 														"id-ID",
 														{
 															day: "2-digit",

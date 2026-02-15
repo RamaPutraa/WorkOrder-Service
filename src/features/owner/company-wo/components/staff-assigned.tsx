@@ -34,6 +34,7 @@ interface StaffAssignedProps {
 	assignedStaffsUI: StaffItem[];
 	setAssignedStaffsUI: React.Dispatch<React.SetStateAction<StaffItem[]>>;
 	isReadOnly?: boolean;
+	fetchEmployeeList: () => Promise<void>;
 }
 
 const StaffAssigned = ({
@@ -42,6 +43,7 @@ const StaffAssigned = ({
 	assignedStaffsUI,
 	setAssignedStaffsUI,
 	isReadOnly = false,
+	fetchEmployeeList,
 }: StaffAssignedProps) => {
 	const [open, setOpen] = useState(false);
 	const [showMaxAlert, setShowMaxAlert] = useState(false);
@@ -49,6 +51,13 @@ const StaffAssigned = ({
 	const [isSaving, setIsSaving] = useState(false);
 	const [originalStaffs, setOriginalStaffs] = useState<StaffItem[]>([]);
 	const { showDialog } = useDialogStore();
+
+	// Fetch employees when dialog opens
+	useEffect(() => {
+		if (open && !isReadOnly) {
+			void fetchEmployeeList();
+		}
+	}, [open, isReadOnly]);
 
 	// Track original staff when component mounts or detailData changes
 	useEffect(() => {

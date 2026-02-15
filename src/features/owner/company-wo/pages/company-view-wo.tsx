@@ -3,13 +3,11 @@ import { useCompanyWo } from "../hooks/use-company-wo";
 import { Button } from "@/components/ui/button";
 import {
 	ChevronLeft,
-	Briefcase,
 	Calendar,
 	User,
 	Eye,
 	FileText,
 	FileCheck,
-	Timer,
 	Ticket,
 } from "lucide-react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
@@ -168,7 +166,7 @@ const CompanyViewWo = () => {
 													</div>
 													<div className="flex-1 min-w-0">
 														<p className="text-xs font-medium text-muted-foreground mb-0.5">
-															Client
+															Manager
 														</p>
 														<p className="text-sm font-medium truncate">
 															{wo.createdBy?.name || "-"}

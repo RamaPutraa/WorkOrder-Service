@@ -47,7 +47,7 @@ type WorkOrderReport = {
 		order: number;
 		form: Form;
 	}[];
-	subimissions: PublicSubmission[];
+	submissions: PublicSubmission[];
 };
 
 type WorkOrderReportResponse = ApiResponse<WorkOrderReport>;

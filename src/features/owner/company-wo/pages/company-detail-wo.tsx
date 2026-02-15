@@ -26,8 +26,12 @@ import { useAuthStore } from "@/store/authStore";
 
 const CompanyDetailWo = () => {
 	const navigate = useNavigate();
-	const { detailData, employees, fecthDetailInternalCompanyWorkOrder } =
-		useCompanyWo();
+	const {
+		detailData,
+		employees,
+		fecthDetailInternalCompanyWorkOrder,
+		fetchEmployeeList,
+	} = useCompanyWo();
 	const { showDialog } = useDialogStore();
 	const { user } = useAuthStore();
 
@@ -326,6 +330,7 @@ const CompanyDetailWo = () => {
 					assignedStaffsUI={assignedStaffsUI}
 					setAssignedStaffsUI={setAssignedStaffsUI}
 					isReadOnly={isReadOnly}
+					fetchEmployeeList={fetchEmployeeList}
 				/>
 
 				{/* ================= WORK ORDER FORMS ================= */}
@@ -334,6 +339,9 @@ const CompanyDetailWo = () => {
 					workOrderId={detailData._id}
 					submissions={detailData.submissions}
 					isReadOnly={isReadOnly}
+					onSaveSuccess={() => {
+						fecthDetailInternalCompanyWorkOrder(detailData._id);
+					}}
 				/>
 			</div>
 		</div>

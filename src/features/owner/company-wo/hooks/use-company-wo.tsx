@@ -36,8 +36,6 @@ export const useCompanyWo = () => {
 			return;
 		}
 
-		console.log("API Response:", res);
-		console.log("Response Data:", res?.data);
 		setEmployees(res?.data ?? []);
 	};
 	// Fetch internal company work orders
@@ -54,7 +52,6 @@ export const useCompanyWo = () => {
 			return;
 		}
 		setData(res?.data ?? []);
-		console.log(res);
 	};
 
 	const fecthDetailInternalCompanyWorkOrder = async (id: string) => {
@@ -74,7 +71,6 @@ export const useCompanyWo = () => {
 	};
 
 	useEffect(() => {
-		void fetchEmployeeList();
 		void fetchInternalCompanyWorkOrders();
 		if (id) fecthDetailInternalCompanyWorkOrder(id);
 	}, []);

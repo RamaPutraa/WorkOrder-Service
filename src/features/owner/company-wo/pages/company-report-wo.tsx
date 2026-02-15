@@ -43,6 +43,25 @@ const CompanyReportWo = () => {
 		Map<string, Map<number, AnswerValue>>
 	>(new Map());
 
+	// Helper function to get the latest submission for each form
+	const getLatestSubmissions = (
+		submissions: PublicSubmission[],
+	): PublicSubmission[] => {
+		const latestByFormId = new Map<string, PublicSubmission>();
+
+		submissions.forEach((submission) => {
+			const existing = latestByFormId.get(submission.formId);
+			if (
+				!existing ||
+				new Date(submission.updatedAt) > new Date(existing.updatedAt)
+			) {
+				latestByFormId.set(submission.formId, submission);
+			}
+		});
+
+		return Array.from(latestByFormId.values());
+	};
+
 	// Fetch report data
 	useEffect(() => {
 		const fetchReportData = async () => {
@@ -75,11 +94,17 @@ const CompanyReportWo = () => {
 
 		const initialData = new Map<string, Map<number, AnswerValue>>();
 
+		// Get only the latest submissions for each form
+		const latestSubmissions =
+			reportData.submissions ?
+				getLatestSubmissions(reportData.submissions)
+			:	[];
+
 		reportData.reportForms.forEach((reportForm) => {
 			const fieldMap = new Map<number, AnswerValue>();
 
-			// Check if there's a submission for this form
-			const submission = reportData.subimissions?.find(
+			// Check if there's a submission for this form (use latest only)
+			const submission = latestSubmissions.find(
 				(sub) => sub.formId === reportForm.form._id,
 			);
 
@@ -198,15 +223,22 @@ const CompanyReportWo = () => {
 					return;
 				}
 
-				// Reload page to get updated data
-				setTimeout(() => {
-					window.location.reload();
-				}, 1000);
-
 				notifySuccess(
 					"Berhasil disimpan",
 					"Formulir laporan kerja telah disimpan",
 				);
+
+				// Exit edit mode
+				setIsEditMode(false);
+
+				// Refetch report data to get updated submissions
+				const { data: res, error: fetchError } = await handleApi(() =>
+					getWorkOrderReport(id),
+				);
+
+				if (!fetchError && res?.data) {
+					setReportData(res.data);
+				}
 			},
 		});
 	};
@@ -503,8 +535,8 @@ const CompanyReportWo = () => {
 											</p>
 										</div>
 										{!isEditMode &&
-											reportData.subimissions &&
-											reportData.subimissions.length > 0 && (
+											reportData.submissions &&
+											reportData.submissions.length > 0 && (
 												<Button
 													onClick={handleEnterEditMode}
 													variant="outline"
@@ -539,96 +571,98 @@ const CompanyReportWo = () => {
 
 								<CardContent className="space-y-6">
 									{(
-										!reportData.subimissions ||
-										reportData.subimissions.length === 0
+										!reportData.submissions ||
+										reportData.submissions.length === 0
 									) ?
 										<div className="group flex flex-col items-center justify-center p-4 border-2 border-dashed border-muted-foreground/25 rounded-xl bg-muted/30 hover:bg-muted/50 hover:border-primary/50 cursor-pointer transition min-h-[160px]">
 											<p className="text-sm font-medium text-muted-foreground group-hover:text-primary transition">
 												Laporan belum dikerjakan
 											</p>
 										</div>
-									:	reportData.subimissions.map((submission) => {
-											// Find the corresponding form
-											const reportForm = reportData.reportForms.find(
-												(rf) => rf.form._id === submission.formId,
-											);
+									:	getLatestSubmissions(reportData.submissions).map(
+											(submission) => {
+												// Find the corresponding form
+												const reportForm = reportData.reportForms.find(
+													(rf) => rf.form._id === submission.formId,
+												);
 
-											if (!reportForm) return null;
+												if (!reportForm) return null;
 
-											return (
-												<div key={submission._id} className="space-y-4">
-													<div className="flex items-center justify-between">
-														<div>
-															<h3 className="text-lg font-semibold">
-																{reportForm.form?.title}
-															</h3>
-															<p className="text-sm text-muted-foreground">
-																{reportForm.form?.description}
-															</p>
+												return (
+													<div key={submission._id} className="space-y-4">
+														<div className="flex items-center justify-between">
+															<div>
+																<h3 className="text-lg font-semibold">
+																	{reportForm.form?.title}
+																</h3>
+																<p className="text-sm text-muted-foreground">
+																	{reportForm.form?.description}
+																</p>
+															</div>
+															<div className="text-right">
+																<p className="text-xs text-muted-foreground">
+																	Terakhir diperbarui:
+																</p>
+																<p className="text-sm font-medium">
+																	{new Date(
+																		submission.updatedAt,
+																	).toLocaleDateString("id-ID", {
+																		day: "2-digit",
+																		month: "long",
+																		year: "numeric",
+																		hour: "2-digit",
+																		minute: "2-digit",
+																	})}
+																</p>
+															</div>
 														</div>
-														<div className="text-right">
-															<p className="text-xs text-muted-foreground">
-																Dikirim pada:
-															</p>
-															<p className="text-sm font-medium">
-																{new Date(
-																	submission.createdAt,
-																).toLocaleDateString("id-ID", {
-																	day: "2-digit",
-																	month: "long",
-																	year: "numeric",
-																	hour: "2-digit",
-																	minute: "2-digit",
+
+														<div className="space-y-4">
+															{reportForm.form.fields
+																.sort((a, b) => a.order - b.order)
+																.map((field) => {
+																	const fieldData = submission.fieldsData.find(
+																		(fd) => Number(fd.order) === field.order,
+																	);
+
+																	// Get current value from formData if in edit mode
+																	const fieldMap = formData.get(
+																		reportForm.form._id,
+																	);
+																	const currentValue =
+																		isEditMode ?
+																			(fieldMap?.get(field.order) ??
+																			fieldData?.value ??
+																			null)
+																		:	(fieldData?.value ?? null);
+
+																	return (
+																		<Card
+																			key={field.order}
+																			className="shadow-sm border rounded-lg p-4 bg-white">
+																			<FormFieldViewer
+																				field={field}
+																				answer={currentValue}
+																				readOnly={!isEditMode}
+																				onChange={
+																					isEditMode ?
+																						(value) =>
+																							handleFieldChange(
+																								reportForm.form._id,
+																								field.order,
+																								value,
+																							)
+																					:	undefined
+																				}
+																			/>
+																		</Card>
+																	);
 																})}
-															</p>
 														</div>
 													</div>
-
-													<div className="space-y-4">
-														{reportForm.form.fields
-															.sort((a, b) => a.order - b.order)
-															.map((field) => {
-																const fieldData = submission.fieldsData.find(
-																	(fd) => Number(fd.order) === field.order,
-																);
-
-																// Get current value from formData if in edit mode
-																const fieldMap = formData.get(
-																	reportForm.form._id,
-																);
-																const currentValue =
-																	isEditMode ?
-																		(fieldMap?.get(field.order) ??
-																		fieldData?.value ??
-																		null)
-																	:	(fieldData?.value ?? null);
-
-																return (
-																	<Card
-																		key={field.order}
-																		className="shadow-sm border rounded-lg p-4 bg-white">
-																		<FormFieldViewer
-																			field={field}
-																			answer={currentValue}
-																			readOnly={!isEditMode}
-																			onChange={
-																				isEditMode ?
-																					(value) =>
-																						handleFieldChange(
-																							reportForm.form._id,
-																							field.order,
-																							value,
-																						)
-																				:	undefined
-																			}
-																		/>
-																	</Card>
-																);
-															})}
-													</div>
-												</div>
-											);
-										})
+												);
+											},
+										)
 									}
 								</CardContent>
 

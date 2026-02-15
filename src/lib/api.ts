@@ -8,7 +8,7 @@ const api = axios.create({
 	},
 });
 
-// Interceptor: sebelum request dikirim
+// Interceptor
 api.interceptors.request.use(
 	(config) => {
 		let token = useAuthStore.getState().token;
@@ -21,9 +21,8 @@ api.interceptors.request.use(
 		}
 
 		const fullUrl = `${config.baseURL?.replace(/\/$/, "")}${config.url}`;
-		// 🟡 Logging request
 		console.groupCollapsed(
-			`📤 [REQUEST] ${config.method?.toUpperCase()} → ${fullUrl}`
+			`[REQUEST] ${config.method?.toUpperCase()} → ${fullUrl}`,
 		);
 		console.log("Endpoint:", fullUrl);
 		console.log("Headers:", config.headers);
@@ -34,19 +33,18 @@ api.interceptors.request.use(
 		return config;
 	},
 	(error) => {
-		console.error("❌ [REQUEST ERROR]", error);
+		console.error("[REQUEST ERROR]", error);
 		return Promise.reject(error);
-	}
+	},
 );
 
-// Interceptor: setelah response diterima
+// Interceptor
 api.interceptors.response.use(
 	(response) => {
-		// 🟢 Logging response sukses
 		console.groupCollapsed(
-			`✅ [RESPONSE] ${response.config.method?.toUpperCase()} ${
+			`[RESPONSE] ${response.config.method?.toUpperCase()} ${
 				response.config.url
-			}`
+			}`,
 		);
 		console.log("Status:", response.status);
 		console.log("Data:", response.data);
@@ -55,21 +53,20 @@ api.interceptors.response.use(
 		return response;
 	},
 	(error) => {
-		// 🔴 Logging response gagal
 		if (error.response) {
 			console.groupCollapsed(
 				`[RESPONSE ERROR] ${error.config?.method?.toUpperCase()} ${
 					error.config?.url
-				}`
+				}`,
 			);
 			console.log("Status:", error.response.status);
 			console.log("Data:", error.response.data);
 			console.groupEnd();
 		} else {
-			console.error("🚨 [NETWORK ERROR]", error.message);
+			console.error("[NETWORK ERROR]", error.message);
 		}
 		return Promise.reject(error);
-	}
+	},
 );
 
 export default api;
