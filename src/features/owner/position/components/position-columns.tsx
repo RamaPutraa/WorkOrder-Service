@@ -23,7 +23,11 @@ export const positionColumns: ColumnDef<Position>[] = [
 	},
 	{
 		accessorKey: "name",
-		header: "Nama Posisi",
+		header: "Nama Departemen",
+	},
+	{
+		accessorKey: "description",
+		header: "Deskripsi Departemen",
 	},
 	{
 		id: "actions",

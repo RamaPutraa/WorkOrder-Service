@@ -2,7 +2,7 @@
 import { DataTable } from "@/components/ui/data-table";
 import { positionColumns } from "../components/position-columns";
 import usePosition from "../hooks/usePosition";
-import { ChevronLeft, Loader2, Plus } from "lucide-react";
+import { ChevronLeft, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -36,13 +36,11 @@ const PositionView = () => {
 					<ChevronLeft className="size-6" />
 				</Button>
 				<div className="flex-1">
-					<h1 className="text-2xl font-bold">Manajemen Pegawai</h1>
+					<h1 className="text-2xl font-bold">Manajemen Departemen</h1>
 					<p className="text-muted-foreground text-sm mt-0.5">
-						Daftar posisi pegawai - Total {positions.length} posisi
+						Daftar departemen - Total {positions.length} departemen
 					</p>
 				</div>
-
-				{/* Add Button */}
 
 				<Button
 					className="bg-primary hover:bg-primary/90"
@@ -55,7 +53,7 @@ const PositionView = () => {
 			{/* Data Table */}
 			<Card>
 				<CardHeader>
-					<h2 className="text-lg font-semibold">Daftar Posisi</h2>
+					<h2 className="text-lg font-semibold">Daftar Departemen</h2>
 				</CardHeader>
 				<CardContent>
 					<DataTable

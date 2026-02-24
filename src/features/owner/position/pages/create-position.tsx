@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, ChevronLeft, LoaderCircle, Plus } from "lucide-react";
+import { ChevronLeft, Plus } from "lucide-react";
 import usePosition from "../hooks/usePosition";
 import { useForm } from "react-hook-form";
 import { positionSchema } from "../schemas/positionSchema";
@@ -9,6 +9,7 @@ import FormFields from "@/shared/molecules/form-fields";
 import z from "zod";
 import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ButtonLoading } from "@/shared/atoms";
 
 const CreatePosition: React.FC = () => {
 	const navigate = useNavigate();
@@ -17,15 +18,22 @@ const CreatePosition: React.FC = () => {
 		resolver: zodResolver(positionSchema),
 		defaultValues: {
 			name: "",
+			description: "",
 		},
 	});
 
 	const positionsFields: FieldConfig[] = [
 		{
 			name: "name",
-			label: "Nama Posisi",
+			label: "Nama Departemen",
 			type: "text",
 			placeholder: "Contoh: Manager, Staff, dll",
+		},
+		{
+			name: "description",
+			label: "Deskripsi Departemen",
+			type: "text",
+			placeholder: "Deskripsi departemen",
 		},
 	];
 
@@ -42,9 +50,9 @@ const CreatePosition: React.FC = () => {
 						<ChevronLeft className="size-6" />
 					</Button>
 					<div className="flex-1">
-						<h1 className="text-2xl font-bold">Tambah Data Posisi Pegawai</h1>
+						<h1 className="text-2xl font-bold">Tambah Data Departemen</h1>
 						<p className="text-muted-foreground text-sm mt-0.5">
-							Berikut merupakan form tambah posisi pegawai yang dimiliki oleh
+							Berikut merupakan form tambah departemen yang dimiliki oleh
 							perusahaan.
 						</p>
 					</div>
@@ -58,9 +66,10 @@ const CreatePosition: React.FC = () => {
 							type="submit"
 							className="w-4xs p-4 bg-primary mt-3"
 							disabled={loading}>
-							{loading && <LoaderCircle className="h-4 w-4 animate-spin" />}
-							<Plus className="h-4 w-4" />
-							Simpan Posisi
+							{loading ?
+								<ButtonLoading />
+							:	<Plus className="h-4 w-4" />}
+							Simpan Departemen
 						</Button>
 					</form>
 				</Form>

@@ -1,5 +1,6 @@
 type PositionRequest = {
 	name: string;
+	description: string;
 };
 type GetAllPosition = ApiResponse<Position[]>;
 
