@@ -10,9 +10,9 @@ import {
 	CheckCircle,
 	Clock,
 	XCircle,
-	Loader2,
 	Pencil,
 } from "lucide-react";
+import { SectionLoading } from "@/shared/atoms";
 import { useEffect, useState } from "react";
 import { handleApi } from "@/lib/handle-api";
 import {
@@ -306,34 +306,23 @@ const CompanyReportWo = () => {
 	return (
 		<>
 			{/* Header Section */}
-			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-				<div className="flex items-center space-x-4">
-					{/* Back Button */}
-					<Button
-						onClick={() => navigate(-1)}
-						className="bg-primary hover:bg-primary/90 h-full">
-						<ChevronLeft className="size-6" />
-					</Button>
 
-					{/* Title Section */}
-					<div className="flex flex-col space-y-1">
-						<h1 className="text-2xl font-bold ">Laporan Tugas Kerja</h1>
-						<p className="text-muted-foreground text-sm sm:text-base">
-							Kelola formulir laporan dari tugas kerja
-						</p>
-					</div>
+			<div className="flex items-center gap-4 mb-8">
+				<Button
+					onClick={() => navigate(-1)}
+					className="bg-primary hover:bg-primary/90 h-full shrink-0">
+					<ChevronLeft className="size-6" />
+				</Button>
+				<div className="flex-1">
+					<h1 className="text-2xl font-bold">Laporan Tugas Kerja</h1>
+					<p className="text-muted-foreground text-sm mt-0.5">
+						Kelola formulir laporan dari tugas kerja
+					</p>
 				</div>
 			</div>
 
 			{/* Loading State */}
-			{loading && (
-				<Card className="p-12 text-center">
-					<div className="flex flex-col items-center gap-4">
-						<Loader2 className="w-12 h-12 text-primary animate-spin" />
-						<p className="text-muted-foreground">Memuat laporan...</p>
-					</div>
-				</Card>
-			)}
+			{loading && <SectionLoading message="Memuat laporan..." />}
 
 			{/* Error State */}
 			{error && !loading && (

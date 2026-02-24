@@ -12,13 +12,14 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { SectionLoading } from "@/shared/atoms";
 import { useCreateService } from "../hooks/useCreateService";
 
 const ViewService: React.FC = () => {
 	const navigate = useNavigate();
-	const { fecthServices, services, loading, error } = useCreateService();
+	const { services, loading, error, fecthServices } = useCreateService();
 
+	// Lazy loading - fetch services on mount
 	useEffect(() => {
 		void fecthServices();
 	}, []);
@@ -64,24 +65,14 @@ const ViewService: React.FC = () => {
 			<div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
 				<AnimatePresence mode="wait">
 					{loading ?
-						Array.from({ length: 6 }).map((_, i) => (
-							<motion.div
-								key={i}
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-								exit={{ opacity: 0 }}
-								transition={{ duration: 0.3 }}>
-								<Card className="p-5 flex flex-col justify-between border shadow-sm rounded-lg">
-									<div>
-										<Skeleton className="h-6 w-3/4 mb-3 rounded" />
-										<Skeleton className="h-4 w-full mb-2 rounded" />
-										<Skeleton className="h-4 w-2/3 mb-4 rounded" />
-										<Skeleton className="h-16 w-full rounded" />
-									</div>
-									<Skeleton className="h-10 w-full mt-4 rounded-lg" />
-								</Card>
-							</motion.div>
-						))
+						<motion.div
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							exit={{ opacity: 0 }}
+							transition={{ duration: 0.3 }}
+							className="col-span-full">
+							<SectionLoading message="Memuat data service..." />
+						</motion.div>
 					: services.length > 0 ?
 						services.map((service) => (
 							<motion.div

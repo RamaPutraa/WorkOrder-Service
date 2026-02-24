@@ -16,15 +16,6 @@ const PositionView = () => {
 		void fetchPositions();
 	}, []);
 
-	if (loading) {
-		return (
-			<div className="flex items-center justify-center h-40">
-				<Loader2 className="animate-spin" />
-				<span className="ml-2">Memuat data posisi...</span>
-			</div>
-		);
-	}
-
 	if (error) {
 		return (
 			<div className="p-6">
@@ -36,24 +27,22 @@ const PositionView = () => {
 	}
 
 	return (
-		<div className="space-y-6">
-			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div className="flex items-center space-x-6">
-					<Button
-						onClick={() => navigate(-1)}
-						className="bg-primary hover:bg-primary/90 h-full">
-						<ChevronLeft className="size-6" />
-					</Button>
-					<div className="flex flex-col space-y-2">
-						<h1 className="text-2xl font-bold tracking-tight">
-							Manajemen Posisi
-						</h1>
-						<p className="text-muted-foreground">
-							Daftar posisi pegawai - Total {positions.length} posisi
-						</p>
-					</div>
+		<>
+			{/* header */}
+			<div className="flex items-center gap-4 mb-8">
+				<Button
+					onClick={() => navigate(-1)}
+					className="bg-primary hover:bg-primary/90 h-full shrink-0">
+					<ChevronLeft className="size-6" />
+				</Button>
+				<div className="flex-1">
+					<h1 className="text-2xl font-bold">Manajemen Pegawai</h1>
+					<p className="text-muted-foreground text-sm mt-0.5">
+						Daftar posisi pegawai - Total {positions.length} posisi
+					</p>
 				</div>
+
+				{/* Add Button */}
 
 				<Button
 					className="bg-primary hover:bg-primary/90"
@@ -69,10 +58,15 @@ const PositionView = () => {
 					<h2 className="text-lg font-semibold">Daftar Posisi</h2>
 				</CardHeader>
 				<CardContent>
-					<DataTable columns={positionColumns} data={positions} />
+					<DataTable
+						columns={positionColumns}
+						data={positions}
+						loading={loading}
+						loadingMessage="Memuat data posisi..."
+					/>
 				</CardContent>
 			</Card>
-		</div>
+		</>
 	);
 };
 

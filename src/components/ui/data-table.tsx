@@ -23,16 +23,22 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
+import { SectionLoading } from "@/shared/atoms";
+
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
 	data: TData[];
 	searchKey?: string;
+	loading?: boolean;
+	loadingMessage?: string;
 }
 
 export function DataTable<TData, TValue>({
 	columns,
 	data,
-	searchKey = "name",
+	searchKey = "nama",
+	loading = false,
+	loadingMessage = "Memuat data...",
 }: DataTableProps<TData, TValue>) {
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -88,7 +94,13 @@ export function DataTable<TData, TValue>({
 						))}
 					</TableHeader>
 					<TableBody>
-						{table.getRowModel().rows?.length ?
+						{loading ?
+							<TableRow>
+								<TableCell colSpan={columns.length} className="h-36">
+									<SectionLoading message={loadingMessage} />
+								</TableCell>
+							</TableRow>
+						: table.getRowModel().rows?.length ?
 							table.getRowModel().rows.map((row) => (
 								<TableRow
 									key={row.id}

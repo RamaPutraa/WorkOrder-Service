@@ -19,7 +19,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useDialogStore } from "@/store/dialogStore";
 import { motion, AnimatePresence } from "framer-motion";
-import { Skeleton } from "@/components/ui/skeleton";
+import { SectionLoading } from "@/shared/atoms";
 
 const ViewServiceRequest = () => {
 	const { data, loading, error, handleReject, handleApprove } = useBusiness();
@@ -34,239 +34,153 @@ const ViewServiceRequest = () => {
 		);
 	}
 
-	const getStatusColor = (status: string) => {
-		switch (status.toLowerCase()) {
-			case "approved":
-				return "border-l-4 border-l-green-600";
-			case "rejected":
-				return "border-l-4 border-l-red-600";
-			default:
-				return "border-l-4 border-l-yellow-500";
-		}
-	};
-
-	const renderStatusBadge = (status: string) => {
+	const getStatusBadge = (status: string) => {
 		const s = status.toLowerCase();
 		if (s === "approved")
 			return (
-				<div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-green-50 text-green-700 border border-green-200">
-					<CheckCircle className="w-3.5 h-3.5" />
-					<span className="text-xs font-semibold">Disetujui</span>
-				</div>
+				<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-medium">
+					<CheckCircle className="w-3 h-3" />
+					Disetujui
+				</span>
 			);
 		if (s === "rejected")
 			return (
-				<div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-red-50 text-red-700 border border-red-200">
-					<XCircle className="w-3.5 h-3.5" />
-					<span className="text-xs font-semibold">Ditolak</span>
-				</div>
+				<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-50 text-red-600 border border-red-200 text-xs font-medium">
+					<XCircle className="w-3 h-3" />
+					Ditolak
+				</span>
 			);
 		return (
-			<div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-yellow-50 text-yellow-700 border border-yellow-200">
-				<Clock className="w-3.5 h-3.5" />
-				<span className="text-xs font-semibold">Menunggu</span>
-			</div>
+			<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-xs font-medium">
+				<Clock className="w-3 h-3" />
+				Menunggu
+			</span>
 		);
 	};
 
 	return (
 		<>
 			{/* Header Section */}
-			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-				<div className="flex items-center space-x-4">
-					{/* Back Button */}
-					<Button
-						onClick={() => navigate(-1)}
-						className="bg-primary hover:bg-primary/90 h-full">
-						<ChevronLeft className="size-6" />
-					</Button>
-
-					{/* Title Section */}
-					<div className="flex flex-col space-y-1">
-						<h1 className="text-2xl font-bold">Pengajuan Layanan</h1>
-						<p className="text-muted-foreground text-sm sm:text-base">
-							Berikut merupakan layanan yang diajukan oleh pelanggan.
-						</p>
-					</div>
+			<div className="flex items-center gap-4 mb-8">
+				<Button
+					onClick={() => navigate(-1)}
+					className="bg-primary hover:bg-primary/90 h-full">
+					<ChevronLeft className="size-6" />
+				</Button>
+				<div>
+					<h1 className="text-2xl font-bold">Pengajuan Layanan</h1>
+					<p className="text-muted-foreground text-sm mt-0.5">
+						Berikut merupakan layanan yang diajukan oleh pelanggan.
+					</p>
 				</div>
 			</div>
 
-			{/* Main Content - Service Requests Grid */}
-			<div className="grid gap-4 sm:gap-5 grid-cols-1 lg:grid-cols-2">
+			{/* Main Content */}
+			<div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
 				<AnimatePresence mode="wait">
 					{loading ?
-						Array.from({ length: 4 }).map((_, i) => (
-							<motion.div
-								key={i}
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-								exit={{ opacity: 0 }}
-								transition={{ duration: 0.3 }}>
-								<Card className="p-5 flex flex-col justify-between border shadow-sm rounded-lg">
-									<div>
-										<Skeleton className="h-6 w-3/4 mb-3 rounded" />
-										<Skeleton className="h-4 w-full mb-2 rounded" />
-										<Skeleton className="h-4 w-2/3 mb-4 rounded" />
-										<div className="grid grid-cols-2 gap-4">
-											<Skeleton className="h-20 w-full rounded" />
-											<Skeleton className="h-20 w-full rounded" />
-										</div>
-									</div>
-									<div className="grid grid-cols-6 gap-2 mt-4">
-										<Skeleton className="h-10 w-full col-span-4 rounded-lg" />
-										<Skeleton className="h-10 w-full col-span-1 rounded-lg" />
-										<Skeleton className="h-10 w-full col-span-1 rounded-lg" />
-									</div>
-								</Card>
-							</motion.div>
-						))
+						<motion.div
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							exit={{ opacity: 0 }}
+							className="col-span-full">
+							<SectionLoading message="Memuat data pengajuan layanan..." />
+						</motion.div>
 					: data.length > 0 ?
 						data.map((item) => (
 							<motion.div
 								key={item._id}
-								initial={{ opacity: 0, y: 20 }}
+								initial={{ opacity: 0, y: 16 }}
 								animate={{ opacity: 1, y: 0 }}
-								whileHover={{ scale: 1.01, y: -4 }}
 								transition={{ duration: 0.2, ease: "easeOut" }}>
-								<Card
-									className={`p-5 flex flex-col justify-between h-full border shadow-md hover:shadow-lg rounded-lg transition-all duration-200 bg-gradient-to-br from-background to-muted/10 ${getStatusColor(
-										item.status,
-									)}`}>
-									{/* Header */}
-									<CardHeader className="p-0 mb-4">
-										<CardTitle className="text-lg font-bold leading-tight">
-											{item.service?.title}
-										</CardTitle>
-										<CardDescription className="text-sm text-muted-foreground leading-relaxed line-clamp-2 mt-2">
-											{item.service?.description || "Tidak ada deskripsi"}
-										</CardDescription>
+								<Card className="flex flex-col h-full border rounded-xl shadow-sm bg-white hover:shadow-md transition-shadow duration-200">
+									<CardHeader className="pb-3">
+										<div className="flex items-start justify-between gap-3">
+											<div className="flex-1 min-w-0">
+												<CardTitle className="text-base font-semibold leading-snug truncate">
+													{item.service?.title}
+												</CardTitle>
+												<CardDescription className="text-sm leading-relaxed line-clamp-2 mt-1">
+													{item.service?.description || "Tidak ada deskripsi"}
+												</CardDescription>
+											</div>
+											{getStatusBadge(item.status)}
+										</div>
 									</CardHeader>
 
-									{/* Content */}
-									<CardContent className="p-0 space-y-4">
-										{/* Info Grid */}
-										<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-											{/* Left Column */}
-											<div className="space-y-3">
-												{/* Status */}
-												<div className="flex flex-col gap-1.5">
-													<span className="text-xs font-medium text-muted-foreground">
-														Status
-													</span>
-													{renderStatusBadge(item.status)}
-												</div>
-
-												{/* Client */}
-												<div className="flex flex-col gap-1.5">
-													<span className="text-xs font-medium text-muted-foreground">
-														Pelanggan
-													</span>
-													<div className="flex items-center gap-2 text-sm">
-														<User className="w-4 h-4 text-primary" />
-														<span className="font-medium">
-															{item.client?.name}
-														</span>
-													</div>
-												</div>
+									<CardContent className="pt-0 space-y-4">
+										{/* Info Row */}
+										<div className="flex items-center gap-6 text-sm text-muted-foreground">
+											<div className="flex items-center gap-1.5">
+												<User className="w-3.5 h-3.5" />
+												<span>{item.client?.name ?? "-"}</span>
 											</div>
-
-											{/* Right Column */}
-											<div className="space-y-3">
-												{/* Created Date */}
-												<div className="flex flex-col gap-1.5">
-													<span className="text-xs font-medium text-muted-foreground">
-														Dibuat
-													</span>
-													<div className="flex items-center gap-2 text-sm">
-														<Calendar className="w-4 h-4 text-blue-600" />
-														<span>
-															{new Date(item.createdAt).toLocaleDateString(
-																"id-ID",
-																{
-																	day: "2-digit",
-																	month: "short",
-																	year: "numeric",
-																},
-															)}
-														</span>
-													</div>
-												</div>
-
-												{/* Updated Date */}
-												<div className="flex flex-col gap-1.5">
-													<span className="text-xs font-medium text-muted-foreground">
-														Diperbarui
-													</span>
-													<div className="flex items-center gap-2 text-sm">
-														<Clock className="w-4 h-4 text-green-600" />
-														<span>
-															{new Date(item.updatedAt).toLocaleDateString(
-																"id-ID",
-																{
-																	day: "2-digit",
-																	month: "short",
-																	year: "numeric",
-																},
-															)}
-														</span>
-													</div>
-												</div>
+											<div className="flex items-center gap-1.5">
+												<Calendar className="w-3.5 h-3.5" />
+												<span>
+													{new Date(item.createdAt).toLocaleDateString(
+														"id-ID",
+														{
+															day: "2-digit",
+															month: "short",
+															year: "numeric",
+														},
+													)}
+												</span>
 											</div>
 										</div>
 
+										{/* Divider */}
+										<div className="border-t" />
+
 										{/* Action Buttons */}
-										<div className="flex flex-col sm:flex-row gap-2 pt-2">
-											{/* View Detail Button - Full width on mobile, flex-1 on desktop */}
+										<div className="flex gap-2">
 											<Button
 												variant="outline"
-												className="flex-1 h-10 rounded-lg border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-200 font-medium"
+												size="sm"
+												className="flex-1 gap-1.5"
 												onClick={() =>
 													navigate(
 														`/dashboard/internal/business/services/request/detail/${item._id}`,
 													)
 												}>
-												<Eye className="w-4 h-4 mr-2" />
+												<Eye className="w-4 h-4" />
 												Lihat Detail
 											</Button>
 
-											{/* Approve/Reject Buttons Container */}
-											<div className="flex gap-2">
-												{/* Approve Button */}
-												<Button
-													variant="outline"
-													className="flex-1 sm:w-auto h-10 rounded-lg border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white transition-all duration-200 font-medium"
-													onClick={() =>
-														showDialog({
-															title: "Konfirmasi Persetujuan",
-															description:
-																"Apakah kamu yakin ingin menyetujui layanan ini?",
-															confirmText: "Setujui",
-															cancelText: "Batal",
-															onConfirm: () => handleApprove(item._id),
-														})
-													}>
-													<CheckCircle className="w-4 h-4 sm:mr-0 mr-2" />
-													<span className="sm:hidden">Setujui</span>
-												</Button>
+											<Button
+												size="sm"
+												className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white"
+												onClick={() =>
+													showDialog({
+														title: "Konfirmasi Persetujuan",
+														description:
+															"Apakah kamu yakin ingin menyetujui layanan ini?",
+														confirmText: "Setujui",
+														cancelText: "Batal",
+														onConfirm: () => handleApprove(item._id),
+													})
+												}>
+												<CheckCircle className="w-4 h-4" />
+												Terima
+											</Button>
 
-												{/* Reject Button */}
-												<Button
-													variant="outline"
-													className="flex-1 sm:w-auto h-10 rounded-lg border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition-all duration-200 font-medium"
-													onClick={() =>
-														showDialog({
-															title: "Konfirmasi Penolakan",
-															description:
-																"Apakah kamu yakin ingin menolak layanan ini?",
-															confirmText: "Tolak",
-															cancelText: "Batal",
-															onConfirm: () => handleReject(item._id),
-														})
-													}>
-													<XCircle className="w-4 h-4 sm:mr-0 mr-2" />
-													<span className="sm:hidden">Tolak</span>
-												</Button>
-											</div>
+											<Button
+												size="sm"
+												className="gap-1.5 bg-red-500 hover:bg-red-600 text-white"
+												onClick={() =>
+													showDialog({
+														title: "Konfirmasi Penolakan",
+														description:
+															"Apakah kamu yakin ingin menolak layanan ini?",
+														confirmText: "Tolak",
+														cancelText: "Batal",
+														onConfirm: () => handleReject(item._id),
+													})
+												}>
+												<XCircle className="w-4 h-4" />
+												Tolak
+											</Button>
 										</div>
 									</CardContent>
 								</Card>
@@ -276,11 +190,11 @@ const ViewServiceRequest = () => {
 							initial={{ opacity: 0 }}
 							animate={{ opacity: 1 }}
 							className="col-span-full">
-							<Card className="p-12 text-center border-dashed border-2 rounded-lg">
-								<p className="text-muted-foreground text-base">
+							<Card className="p-12 text-center border-dashed border-2 rounded-xl">
+								<p className="text-muted-foreground">
 									Belum ada pengajuan layanan.
 								</p>
-								<p className="text-sm text-muted-foreground mt-2">
+								<p className="text-sm text-muted-foreground mt-1">
 									Pengajuan layanan dari pelanggan akan muncul di sini.
 								</p>
 							</Card>

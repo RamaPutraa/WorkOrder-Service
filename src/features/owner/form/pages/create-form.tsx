@@ -16,22 +16,17 @@ const FormCreatePage: React.FC = () => {
 	const navigate = useNavigate();
 	return (
 		<>
-			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-				<div className="flex items-center space-x-4">
-					{/* Back Button */}
-					<Button
-						onClick={() => navigate(-1)}
-						className="bg-primary hover:bg-primary/90 h-full">
-						<ChevronLeft className="size-6" />
-					</Button>
-
-					{/* Title Section */}
-					<div className="flex flex-col space-y-1">
-						<h1 className="text-2xl font-bold">Buat Form Baru</h1>
-						<p className="text-muted-foreground text-sm sm:text-base">
-							Lengkapi detail form dan tambahkan field secara dinamis di bawah.
-						</p>
-					</div>
+			<div className="flex items-center gap-4 mb-8">
+				<Button
+					onClick={() => navigate(-1)}
+					className="bg-primary hover:bg-primary/90 h-full shrink-0">
+					<ChevronLeft className="size-6" />
+				</Button>
+				<div className="flex-1">
+					<h1 className="text-2xl font-bold">Buat Formulir Baru</h1>
+					<p className="text-muted-foreground text-sm mt-0.5">
+						Lengkapi detail formulir dan tambahkan field secara dinamis di bawah.
+					</p>
 				</div>
 			</div>
 

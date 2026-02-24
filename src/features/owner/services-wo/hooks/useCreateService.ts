@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
 
@@ -33,7 +33,7 @@ export const useCreateService = () => {
 
 	// === States dasar ===
 	const { id } = useParams<{ id?: string }>();
-	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [creating, setCreating] = useState(false);
 	const [services, setServices] = useState<Service[]>([]);
@@ -49,9 +49,14 @@ export const useCreateService = () => {
 	// === Data dropdown ===
 	const [positions, setPositions] = useState<Position[]>([]);
 	const [forms, setForms] = useState<Form[]>([]);
-	const [availableRoles, setAvailableRoles] = useState<
-		{ value: string; label: string }[]
-	>([]);
+
+	// Static data - no need for state
+	const availableRoles = [
+		{ value: "manager_company", label: "Manager" },
+		{ value: "staff_company", label: "Staff" },
+		{ value: "client", label: "Client" },
+	];
+
 	const loadingPositions = loading;
 	const errorPositions = error;
 
@@ -374,15 +379,15 @@ export const useCreateService = () => {
 		setError(null);
 
 		const { data: res, error } = await handleApi(() => getServicesWoApi());
-
 		setLoading(false);
+
 		if (error) {
 			setError(error.message);
 			notifyError("Gagal memuat data layanan", error.message);
 			return;
 		}
 
-		setServices(res?.data || []);
+		setServices(res?.data ?? []);
 	};
 
 	// get detail services
@@ -409,16 +414,8 @@ export const useCreateService = () => {
 		setDetailService(res?.data || null);
 	};
 
-	useEffect(() => {
-		if (id) void getDetailService();
-		void fetchPositions();
-		void fetchForms();
-		setAvailableRoles([
-			{ value: "manager_company", label: "Manager" },
-			{ value: "staff_company", label: "Staff" },
-			{ value: "client", label: "Client" },
-		]);
-	}, [id]);
+	// Lazy Loading Pattern - Pages control when to fetch data
+	// No useEffect here - each page will call fetch functions as needed
 
 	return {
 		// === STATE ===
@@ -454,10 +451,12 @@ export const useCreateService = () => {
 		setOpenStatus,
 		setSelectedStaff,
 		setDetailService,
-		fecthServices,
 
 		// === HANDLERS ===
 		fetchPositions,
+		fetchForms,
+		fecthServices,
+		getDetailService,
 		toggleStaff,
 		toggleForm,
 		toggleReportForm,

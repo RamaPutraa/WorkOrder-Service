@@ -1,10 +1,11 @@
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useCreateService } from "../hooks/useCreateService";
 import { CardServiceInfo } from "../components/create/service-info";
 import { CardWorkOrderForm } from "../components/create/workorder-form";
 import { CardIntakeForm } from "../components/create/intake-form";
 import { CardReportForm } from "../components/create/report-form";
-import { ArrowLeft, ChevronLeft, Loader2 } from "lucide-react";
+import { ChevronLeft, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import React from "react";
@@ -42,6 +43,7 @@ const CreateService: React.FC = () => {
 		setOpenStatus,
 		setSelectedStaff,
 		fetchPositions,
+		fetchForms,
 		toggleStaff,
 		toggleForm,
 		toggleReportForm,
@@ -53,6 +55,12 @@ const CreateService: React.FC = () => {
 		createService,
 		creating,
 	} = useCreateService();
+
+	// Lazy loading - fetch positions and forms on mount
+	useEffect(() => {
+		void fetchPositions();
+		void fetchForms();
+	}, []);
 
 	const [activeStep, setActiveStep] = React.useState<
 		"info" | "intake" | "workOrder" | "report"

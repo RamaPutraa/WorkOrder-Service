@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	CheckCircle,
@@ -14,7 +15,12 @@ import { Card } from "@/components/ui/card";
 
 const DetailService = () => {
 	const navigate = useNavigate();
-	const { detailService } = useCreateService();
+	const { detailService, getDetailService } = useCreateService();
+
+	// Lazy loading - fetch service details on mount
+	useEffect(() => {
+		void getDetailService();
+	}, []);
 
 	return (
 		<>

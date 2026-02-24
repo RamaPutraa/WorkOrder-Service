@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, LoaderCircle, Plus } from "lucide-react";
+import { ArrowLeft, ChevronLeft, LoaderCircle, Plus } from "lucide-react";
 import usePosition from "../hooks/usePosition";
 import { useForm } from "react-hook-form";
 import { positionSchema } from "../schemas/positionSchema";
@@ -35,22 +35,19 @@ const CreatePosition: React.FC = () => {
 	return (
 		<Card className="p-4 border shadow-md rounded-2xl ">
 			<div className="container py-10 px-6">
-				<div className="flex items-center justify-between mb-8">
-					<div className="flex flex-col space-y-2">
-						<h1 className="text-xl font-bold tracking-tight">
-							Tambah Data Posisi Pegawai
-						</h1>
-						<p className="text-muted-foreground">
+				<div className="flex items-center gap-4 mb-8">
+					<Button
+						onClick={() => navigate(-1)}
+						className="bg-primary hover:bg-primary/90 h-full shrink-0">
+						<ChevronLeft className="size-6" />
+					</Button>
+					<div className="flex-1">
+						<h1 className="text-2xl font-bold">Tambah Data Posisi Pegawai</h1>
+						<p className="text-muted-foreground text-sm mt-0.5">
 							Berikut merupakan form tambah posisi pegawai yang dimiliki oleh
 							perusahaan.
 						</p>
 					</div>
-					<Button
-						onClick={() => navigate(-1)}
-						className="bg-primary hover:bg-primary/90">
-						<ArrowLeft className="h-4 w-4" />
-						Kembali
-					</Button>
 				</div>
 
 				<Form {...form}>

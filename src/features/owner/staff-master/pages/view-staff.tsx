@@ -1,7 +1,7 @@
 import { DataTable } from "@/components/ui/data-table";
 import { columns } from "../components/columns";
 import { useStaff } from "../hooks/use-staff";
-import { ChevronLeft, Loader2, Plus } from "lucide-react";
+import { ChevronLeft, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -9,15 +9,6 @@ import { useNavigate } from "react-router-dom";
 const ViewStaff = () => {
 	const { employees, loading, error } = useStaff();
 	const navigate = useNavigate();
-
-	if (loading) {
-		return (
-			<div className="flex items-center justify-center h-40">
-				<Loader2 className="animate-spin" />
-				<span className="ml-2">Memuat data karyawan...</span>
-			</div>
-		);
-	}
 
 	if (error) {
 		return (
@@ -30,24 +21,22 @@ const ViewStaff = () => {
 	}
 
 	return (
-		<div className="space-y-6">
-			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div className="flex items-center space-x-6">
-					<Button
-						onClick={() => navigate(-1)}
-						className="bg-primary hover:bg-primary/90 h-full">
-						<ChevronLeft className="size-6" />
-					</Button>
-					<div className="flex flex-col space-y-2">
-						<h1 className="text-2xl font-bold tracking-tight">
-							Manajemen Pegawai
-						</h1>
-						<p className="text-muted-foreground">
-							Total {employees.length} karyawan
-						</p>
-					</div>
+		<>
+			{/* header */}
+			<div className="flex items-center gap-4 mb-8">
+				<Button
+					onClick={() => navigate(-1)}
+					className="bg-primary hover:bg-primary/90 h-full shrink-0">
+					<ChevronLeft className="size-6" />
+				</Button>
+				<div className="flex-1">
+					<h1 className="text-2xl font-bold">Manajemen Pegawai</h1>
+					<p className="text-muted-foreground text-sm mt-0.5">
+						Total {employees.length} karyawan
+					</p>
 				</div>
+
+				{/* Add Button */}
 				<Button
 					className="bg-primary hover:bg-primary/90"
 					onClick={() => navigate("")}>
@@ -62,10 +51,15 @@ const ViewStaff = () => {
 					<h2 className="text-lg font-semibold">Daftar Karyawan</h2>
 				</CardHeader>
 				<CardContent>
-					<DataTable columns={columns} data={employees} />
+					<DataTable
+						columns={columns}
+						data={employees}
+						loading={loading}
+						loadingMessage="Memuat data karyawan..."
+					/>
 				</CardContent>
 			</Card>
-		</div>
+		</>
 	);
 };
 

@@ -9,11 +9,13 @@ import {
 	FileText,
 	FileCheck,
 	Ticket,
+	Section,
 } from "lucide-react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SectionLoading } from "@/shared/atoms";
 
 const CompanyViewWo = () => {
 	const { data, loading, error } = useCompanyWo();
@@ -66,22 +68,17 @@ const CompanyViewWo = () => {
 	return (
 		<>
 			{/* Header Section */}
-			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-				<div className="flex items-center space-x-4">
-					{/* Back Button */}
-					<Button
-						onClick={() => navigate(-1)}
-						className="bg-primary hover:bg-primary/90 h-full">
-						<ChevronLeft className="size-6" />
-					</Button>
-
-					{/* Title Section */}
-					<div className="flex flex-col space-y-1">
-						<h1 className="text-2xl font-bold">Daftar Tugas Kerja</h1>
-						<p className="text-muted-foreground text-sm sm:text-base">
-							Berikut merupakan daftar tugas kerja yang tersedia.
-						</p>
-					</div>
+			<div className="flex items-center gap-4 mb-8">
+				<Button
+					onClick={() => navigate(-1)}
+					className="bg-primary hover:bg-primary/90 h-full shrink-0">
+					<ChevronLeft className="size-6" />
+				</Button>
+				<div className="flex-1">
+					<h1 className="text-2xl font-bold">Daftar Tugas Kerja</h1>
+					<p className="text-muted-foreground text-sm mt-0.5">
+						Berikut merupakan daftar tugas kerja yang tersedia.
+					</p>
 				</div>
 			</div>
 
@@ -89,27 +86,14 @@ const CompanyViewWo = () => {
 			<div className="grid gap-4 sm:gap-5 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
 				<AnimatePresence mode="wait">
 					{loading ?
-						Array.from({ length: 6 }).map((_, i) => (
-							<motion.div
-								key={i}
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-								exit={{ opacity: 0 }}
-								transition={{ duration: 0.3 }}>
-								<Card className="p-5 flex flex-col justify-between border shadow-sm rounded-lg h-full">
-									<div>
-										<Skeleton className="h-6 w-3/4 mb-3 rounded" />
-										<Skeleton className="h-4 w-full mb-2 rounded" />
-										<Skeleton className="h-4 w-2/3 mb-4 rounded" />
-										<div className="space-y-3">
-											<Skeleton className="h-16 w-full rounded" />
-											<Skeleton className="h-16 w-full rounded" />
-										</div>
-									</div>
-									<Skeleton className="h-10 w-full mt-4 rounded-lg" />
-								</Card>
-							</motion.div>
-						))
+						<motion.div
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							exit={{ opacity: 0 }}
+							transition={{ duration: 0.3 }}
+							className="col-span-full">
+							<SectionLoading message="Memuat data tugas kerja..." />
+						</motion.div>
 					: data.length > 0 ?
 						data.map((wo) => {
 							const statusConfig = getStatusConfig(wo.status);

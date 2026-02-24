@@ -23,6 +23,7 @@ import { handleApi } from "@/lib/handle-api";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
 import { useDialogStore } from "@/store/dialogStore";
 import { useAuthStore } from "@/store/authStore";
+import { SectionLoading } from "@/shared/atoms";
 
 const CompanyDetailWo = () => {
 	const navigate = useNavigate();
@@ -126,10 +127,6 @@ const CompanyDetailWo = () => {
 	// Get current status
 	const currentStatus = detailData?.status;
 
-	if (!detailData) {
-		return <p className="p-4">Loading detail...</p>;
-	}
-
 	return (
 		<div className="space-y-15">
 			{/* ================= STICKY HEADER ================= */}
@@ -227,123 +224,128 @@ const CompanyDetailWo = () => {
 			</div>
 
 			{/* ================= CONTENT ================= */}
-			<div className="space-y-6">
-				{/* GRID 2 KOLOM */}
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-					{/* ---------- CARD WORK ORDER ---------- */}
-					<Card className="border rounded-xl shadow-sm">
-						<CardHeader>
-							<div className="flex items-center justify-between">
-								<h2 className="text-lg font-semibold">Informasi Work Order</h2>
-								<Badge className="capitalize">{detailData.status}</Badge>
-							</div>
-							<p className="text-sm text-muted-foreground">
-								Detail umum mengenai Work Order ini.
-							</p>
-						</CardHeader>
-
-						<Separator />
-
-						<CardContent className="space-y-4">
-							<div className="flex items-center justify-between">
-								{/* Client */}
-								<div className="flex items-center space-x-3">
-									<User className="size-5 text-muted-foreground" />
-									<div>
-										<p className="text-xs font-medium text-muted-foreground">
-											Client
-										</p>
-										<p className="text-sm">
-											{detailData.createdBy?.name || "-"}
-										</p>
-									</div>
+			{!detailData ?
+				<SectionLoading message="Memuat data tugas kerja..." />
+			:	<div className="space-y-6">
+					{/* GRID 2 KOLOM */}
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+						{/* ---------- CARD WORK ORDER ---------- */}
+						<Card className="border rounded-xl shadow-sm">
+							<CardHeader>
+								<div className="flex items-center justify-between">
+									<h2 className="text-lg font-semibold">
+										Informasi Work Order
+									</h2>
+									<Badge className="capitalize">{detailData.status}</Badge>
 								</div>
-
-								{/* Tanggal */}
-								<div className="flex items-center space-x-3">
-									<Calendar className="size-5 text-muted-foreground" />
-									<div className="text-left">
-										<p className="text-xs font-medium text-muted-foreground">
-											Dibuat Pada
-										</p>
-										<p className="text-sm">
-											{new Date(detailData.createdAt).toLocaleDateString(
-												"id-ID",
-												{
-													day: "2-digit",
-													month: "long",
-													year: "numeric",
-												},
-											)}
-										</p>
-									</div>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-
-					{/* ---------- CARD SERVICE ---------- */}
-					<Card className="border rounded-xl shadow-sm">
-						<CardHeader>
-							<h2 className="text-lg font-semibold">Detail Service</h2>
-							<p className="text-sm text-muted-foreground">
-								Informasi service yang terkait pada WO ini.
-							</p>
-						</CardHeader>
-
-						<CardContent className="space-y-4">
-							<div className="space-y-1">
-								<p className="text-base font-medium">
-									{detailData.service?.title}
-								</p>
 								<p className="text-sm text-muted-foreground">
-									{detailData.service?.description}
+									Detail umum mengenai Work Order ini.
 								</p>
-							</div>
+							</CardHeader>
 
-							{/* Required Staff */}
-							<div className="mt-3">
-								<p className="text-xs text-muted-foreground mb-2">
-									Kebutuhan Staff
-								</p>
-								<div className="space-y-1">
-									{detailData.service.requiredStaffs.map((rs, idx) => (
-										<div
-											key={idx}
-											className="flex justify-between text-sm border rounded-lg p-2">
-											<p className="font-medium">{rs.position.name}</p>
-											<p className="text-muted-foreground">
-												{rs.minimumStaff} - {rs.maximumStaff} orang
+							<Separator />
+
+							<CardContent className="space-y-4">
+								<div className="flex items-center justify-between">
+									{/* Client */}
+									<div className="flex items-center space-x-3">
+										<User className="size-5 text-muted-foreground" />
+										<div>
+											<p className="text-xs font-medium text-muted-foreground">
+												Client
+											</p>
+											<p className="text-sm">
+												{detailData.createdBy?.name || "-"}
 											</p>
 										</div>
-									))}
+									</div>
+
+									{/* Tanggal */}
+									<div className="flex items-center space-x-3">
+										<Calendar className="size-5 text-muted-foreground" />
+										<div className="text-left">
+											<p className="text-xs font-medium text-muted-foreground">
+												Dibuat Pada
+											</p>
+											<p className="text-sm">
+												{new Date(detailData.createdAt).toLocaleDateString(
+													"id-ID",
+													{
+														day: "2-digit",
+														month: "long",
+														year: "numeric",
+													},
+												)}
+											</p>
+										</div>
+									</div>
 								</div>
-							</div>
-						</CardContent>
-					</Card>
+							</CardContent>
+						</Card>
+
+						{/* ---------- CARD SERVICE ---------- */}
+						<Card className="border rounded-xl shadow-sm">
+							<CardHeader>
+								<h2 className="text-lg font-semibold">Detail Service</h2>
+								<p className="text-sm text-muted-foreground">
+									Informasi service yang terkait pada WO ini.
+								</p>
+							</CardHeader>
+
+							<CardContent className="space-y-4">
+								<div className="space-y-1">
+									<p className="text-base font-medium">
+										{detailData.service?.title}
+									</p>
+									<p className="text-sm text-muted-foreground">
+										{detailData.service?.description}
+									</p>
+								</div>
+
+								{/* Required Staff */}
+								<div className="mt-3">
+									<p className="text-xs text-muted-foreground mb-2">
+										Kebutuhan Staff
+									</p>
+									<div className="space-y-1">
+										{detailData.service.requiredStaffs.map((rs, idx) => (
+											<div
+												key={idx}
+												className="flex justify-between text-sm border rounded-lg p-2">
+												<p className="font-medium">{rs.position.name}</p>
+												<p className="text-muted-foreground">
+													{rs.minimumStaff} - {rs.maximumStaff} orang
+												</p>
+											</div>
+										))}
+									</div>
+								</div>
+							</CardContent>
+						</Card>
+					</div>
+
+					{/* ================= ASSIGNED STAFF ================= */}
+					<StaffAssigned
+						detailData={detailData}
+						employees={employees}
+						assignedStaffsUI={assignedStaffsUI}
+						setAssignedStaffsUI={setAssignedStaffsUI}
+						isReadOnly={isReadOnly}
+						fetchEmployeeList={fetchEmployeeList}
+					/>
+
+					{/* ================= WORK ORDER FORMS ================= */}
+					<WorkOrderForms
+						workorderForms={detailData.workorderForms}
+						workOrderId={detailData._id}
+						submissions={detailData.submissions}
+						isReadOnly={isReadOnly}
+						onSaveSuccess={() => {
+							fecthDetailInternalCompanyWorkOrder(detailData._id);
+						}}
+					/>
 				</div>
-
-				{/* ================= ASSIGNED STAFF ================= */}
-				<StaffAssigned
-					detailData={detailData}
-					employees={employees}
-					assignedStaffsUI={assignedStaffsUI}
-					setAssignedStaffsUI={setAssignedStaffsUI}
-					isReadOnly={isReadOnly}
-					fetchEmployeeList={fetchEmployeeList}
-				/>
-
-				{/* ================= WORK ORDER FORMS ================= */}
-				<WorkOrderForms
-					workorderForms={detailData.workorderForms}
-					workOrderId={detailData._id}
-					submissions={detailData.submissions}
-					isReadOnly={isReadOnly}
-					onSaveSuccess={() => {
-						fecthDetailInternalCompanyWorkOrder(detailData._id);
-					}}
-				/>
-			</div>
+			}
 		</div>
 	);
 };
