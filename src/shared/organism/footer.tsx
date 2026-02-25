@@ -1,100 +1,93 @@
 import { Separator } from "@/components/ui/separator";
-import { Facebook, Twitter, Instagram, Github, Mail } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Facebook, Twitter, Instagram, Mail } from "lucide-react";
 
 export const Footer = () => {
+	const currentYear = new Date().getFullYear();
+
 	return (
-		<footer className="bg-primary text-background mt-12">
-			<div className="max-w-7xl mx-auto px-6 py-12">
-				{/* Bagian atas */}
-				<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+		<footer className="bg-gray-950 text-white">
+			<div className="max-w-7xl mx-auto px-6 pt-12 pb-8">
+				{/* Top grid */}
+				<div className="grid grid-cols-1 md:grid-cols-3 gap-10">
 					{/* Brand */}
 					<div>
-						<h2 className="text-2xl font-bold">Manpits</h2>
-						<p className="text-sm text-blue-100 mt-2">
-							Platform manajemen digital yang membantu organisasi beroperasi
-							dengan efisien dan modern.
+						<div className="flex items-center gap-2 mb-4">
+							<div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
+								<span className="text-white font-bold text-sm">W</span>
+							</div>
+							<span className="font-bold text-white text-lg tracking-tight">
+								WorkOrder
+							</span>
+						</div>
+						<p className="text-sm text-gray-400 leading-relaxed max-w-xs">
+							Platform manajemen work order digital yang membantu organisasi
+							beroperasi lebih efisien dan modern.
 						</p>
 					</div>
 
-					{/* Navigasi */}
+					{/* Navigation */}
 					<div>
-						<h3 className="text-lg font-semibold mb-3">Navigasi</h3>
-						<ul className="space-y-2 text-blue-100">
-							<li>
-								<a href="/" className="hover:text-white transition-colors">
-									Beranda
-								</a>
-							</li>
-							<li>
-								<a href="/about" className="hover:text-white transition-colors">
-									Tentang Kami
-								</a>
-							</li>
-							<li>
-								<a
-									href="/services"
-									className="hover:text-white transition-colors">
-									Layanan
-								</a>
-							</li>
-							<li>
-								<a
-									href="/contact"
-									className="hover:text-white transition-colors">
-									Kontak
-								</a>
-							</li>
+						<h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
+							Navigasi
+						</h3>
+						<ul className="space-y-2.5">
+							{[
+								{ label: "Beranda", href: "/" },
+								{ label: "Tentang Kami", href: "/about" },
+								{ label: "Kontak", href: "/contact" },
+							].map((link) => (
+								<li key={link.href}>
+									<a
+										href={link.href}
+										className="text-sm text-gray-400 hover:text-white transition-colors duration-200">
+										{link.label}
+									</a>
+								</li>
+							))}
 						</ul>
 					</div>
 
-					{/* Kontak & Sosial */}
+					{/* Contact & Social */}
 					<div>
-						<h3 className="text-lg font-semibold mb-3">Hubungi Kami</h3>
-						<p className="text-sm text-blue-100 mb-3 flex items-center gap-2">
-							<Mail className="h-4 w-4" /> support@manpits.xyz
-						</p>
-
-						<div className="flex gap-3">
-							<Button
-								size="icon"
-								variant="secondary"
-								className="bg-white/10 hover:bg-white/20">
-								<Facebook className="h-4 w-4 text-white" />
-							</Button>
-							<Button
-								size="icon"
-								variant="secondary"
-								className="bg-white/10 hover:bg-white/20">
-								<Twitter className="h-4 w-4 text-white" />
-							</Button>
-							<Button
-								size="icon"
-								variant="secondary"
-								className="bg-white/10 hover:bg-white/20">
-								<Instagram className="h-4 w-4 text-white" />
-							</Button>
-							<Button
-								size="icon"
-								variant="secondary"
-								className="bg-white/10 hover:bg-white/20">
-								<Github className="h-4 w-4 text-white" />
-							</Button>
+						<h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
+							Hubungi Kami
+						</h3>
+						<a
+							href="mailto:support@workorder.xyz"
+							className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors mb-5">
+							<Mail className="h-4 w-4 text-blue-400 shrink-0" />
+							support@workorder.xyz
+						</a>
+						<div className="flex gap-2">
+							{[
+								{ Icon: Facebook, label: "Facebook" },
+								{ Icon: Twitter, label: "Twitter" },
+								{ Icon: Instagram, label: "Instagram" },
+							].map(({ Icon, label }) => (
+								<button
+									key={label}
+									aria-label={label}
+									className="w-9 h-9 rounded-lg bg-white/5 hover:bg-blue-600 border border-white/10 hover:border-blue-600 flex items-center justify-center transition-all duration-200 group">
+									<Icon className="h-4 w-4 text-gray-400 group-hover:text-white" />
+								</button>
+							))}
 						</div>
 					</div>
 				</div>
 
-				{/* Garis pemisah */}
-				<Separator className="my-8 bg-blue-400/40" />
+				{/* Divider */}
+				<Separator className="my-8 bg-white/10" />
 
-				{/* Bagian bawah */}
-				<div className="flex flex-col md:flex-row justify-between items-center text-sm text-blue-100">
-					<p>© {new Date().getFullYear()} Manpits. Semua hak dilindungi.</p>
-					<div className="flex gap-4 mt-3 md:mt-0">
-						<a href="/privacy" className="hover:text-white transition-colors">
+				{/* Bottom bar */}
+				<div className="flex flex-col md:flex-row justify-between items-center gap-3 text-sm text-gray-500">
+					<p>© {currentYear} WorkOrder. Semua hak dilindungi.</p>
+					<div className="flex gap-5">
+						<a
+							href="/privacy"
+							className="hover:text-gray-300 transition-colors">
 							Kebijakan Privasi
 						</a>
-						<a href="/terms" className="hover:text-white transition-colors">
+						<a href="/terms" className="hover:text-gray-300 transition-colors">
 							Syarat & Ketentuan
 						</a>
 					</div>

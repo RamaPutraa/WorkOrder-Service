@@ -1,13 +1,12 @@
-import type { FieldConfig } from "@/types";
 import { useForm } from "react-hook-form";
 import { registerCompanySchema } from "../../schemas/authSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import FormFields from "@/shared/molecules/form-fields";
-import { Button } from "@/components/ui/button";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle, ArrowRight } from "lucide-react";
 import useAuth from "../../hooks/useAuth";
 import { Form } from "@/components/ui/form";
+
 const CompanyRegForm = () => {
 	const { loading, registerCompany } = useAuth();
 	const form = useForm<z.infer<typeof registerCompanySchema>>({
@@ -51,25 +50,21 @@ const CompanyRegForm = () => {
 		registerCompany(data);
 
 	return (
-		<div>
-			<Form {...form}>
-				<form className="space-y-3" onSubmit={form.handleSubmit(onSubmit)}>
-					<FormFields fields={registerCompanyFields} control={form.control} />
-					{/* Tombol Submit */}
-					<div className="flex justify-center">
-						<Button
-							type="submit"
-							className="w-full sm:w-auto px-6 py-5 mt-3 bg-primary"
-							disabled={loading}>
-							{loading && (
-								<LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-							)}
-							Daftar
-						</Button>
-					</div>
-				</form>
-			</Form>
-		</div>
+		<Form {...form}>
+			<form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+				<FormFields fields={registerCompanyFields} control={form.control} />
+
+				<button
+					type="submit"
+					disabled={loading}
+					className="w-full mt-2 inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md text-sm">
+					{loading ?
+						<LoaderCircle className="h-4 w-4 animate-spin" />
+					:	<ArrowRight size={15} />}
+					{loading ? "Mendaftarkan..." : "Daftar Sekarang"}
+				</button>
+			</form>
+		</Form>
 	);
 };
 

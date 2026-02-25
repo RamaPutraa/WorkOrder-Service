@@ -7,7 +7,7 @@ const CompanyWizard = () => {
 	const [step, setStep] = useState(1);
 
 	return (
-		<div className="content-center w-full py-10">
+		<div className="content-center w-full">
 			<AnimatePresence mode="wait">
 				{step === 1 && (
 					<motion.div
