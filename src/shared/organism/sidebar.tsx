@@ -77,17 +77,21 @@ const data = {
 			],
 		},
 		{
-			title: "Pegawai",
+			title: "Kepegawaian",
 			url: "#",
 			icon: Bot,
 			items: [
+				{
+					title: "Departemen",
+					url: "/dashboard/internal/positions",
+				},
 				{
 					title: "Pegawai Perusahaan",
 					url: "/dashboard/internal/staff",
 				},
 				{
-					title: "Posisi Pegawai",
-					url: "/dashboard/internal/positions",
+					title: "Riwayat Undangan",
+					url: "/dashboard/internal/staff/history-invitations",
 				},
 			],
 		},

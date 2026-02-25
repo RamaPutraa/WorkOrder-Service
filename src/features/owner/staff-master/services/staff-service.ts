@@ -13,3 +13,10 @@ export const inviteEmployee = async (data: InvitationEmployeeRequest) => {
 	);
 	return response.data;
 };
+
+export const getInvitationsHistory = async () => {
+	const response = await apiClient.get<InvitationsHistoryResponse>(
+		"/company/invitations/history",
+	);
+	return response.data;
+};

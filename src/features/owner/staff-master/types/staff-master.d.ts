@@ -29,6 +29,29 @@ type CompanyEmployeesResponse = ApiResponse<Employee[]> & {
 };
 
 // TODO: global type
+type InvitationsHistory = {
+	_id: string;
+	role: string;
+	status: string;
+	expiresAt: string;
+	createdAt: string;
+	updatedAt: string;
+	company: CompanyMinimal;
+	user: {
+		_id: string;
+		name: string;
+		email: string;
+	};
+	position: {
+		_id: string;
+		name: string;
+	};
+};
+
+type InvitationsHistoryResponse = ApiResponse<{
+	invitations: InvitationsHistory[];
+}>;
+
 type InvitedItem = {
 	user: {
 		name: string;

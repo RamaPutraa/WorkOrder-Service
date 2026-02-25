@@ -37,6 +37,7 @@ import ServicesList from "@/features/client/services-wo/pages/services-list";
 import DashboardStaff from "@/features/staff/dahsboard-staff";
 import DashboardManager from "@/features/manager/dashboard-manager";
 import CompanyReportWo from "@/features/owner/company-wo/pages/company-report-wo";
+import HistoryStaffInvitations from "@/features/owner/staff-master/pages/history-staff-invitations";
 
 const router = createBrowserRouter([
 	{
@@ -82,6 +83,10 @@ const router = createBrowserRouter([
 					{
 						path: "staff",
 						element: <ViewStaff />,
+					},
+					{
+						path: "staff/history-invitations",
+						element: <HistoryStaffInvitations />,
 					},
 					{
 						path: "company",
