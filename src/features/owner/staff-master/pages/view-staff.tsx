@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { DataTable } from "@/components/ui/data-table";
 import { columns } from "../components/columns";
 import { useStaff } from "../hooks/use-staff";
@@ -5,10 +6,12 @@ import { ChevronLeft, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import InviteEmployeeDialog from "../components/invite-employee-dialog";
 
 const ViewStaff = () => {
-	const { employees, loading, error } = useStaff();
+	const { employees, loading, error, refetch } = useStaff();
 	const navigate = useNavigate();
+	const [openInvite, setOpenInvite] = useState(false);
 
 	if (error) {
 		return (
@@ -39,7 +42,7 @@ const ViewStaff = () => {
 				{/* Add Button */}
 				<Button
 					className="bg-primary hover:bg-primary/90"
-					onClick={() => navigate("")}>
+					onClick={() => setOpenInvite(true)}>
 					<Plus className="h-4 w-4 mr-2" />
 					Undang Pegawai
 				</Button>
@@ -59,6 +62,13 @@ const ViewStaff = () => {
 					/>
 				</CardContent>
 			</Card>
+
+			{/* Invite Dialog */}
+			<InviteEmployeeDialog
+				open={openInvite}
+				onOpenChange={setOpenInvite}
+				onSuccess={refetch}
+			/>
 		</>
 	);
 };

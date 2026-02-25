@@ -27,3 +27,33 @@ type CompanyEmployeesResponse = ApiResponse<Employee[]> & {
 		count: number;
 	};
 };
+
+// TODO: global type
+type InvitedItem = {
+	user: {
+		name: string;
+		email: string;
+	};
+	role_offered: string;
+	position_offered: {
+		_id: string;
+		name: string;
+	};
+};
+
+type InvitationEmployee = {
+	company: CompanyMinimal;
+	invited: InvitedItem[];
+};
+
+type InviteSingleItem = {
+	email: string;
+	role: string;
+	positionId: string;
+};
+
+type InvitationEmployeeRequest = {
+	invites: InviteSingleItem[];
+};
+
+type InvitationEmployeeResponse = ApiResponse<InvitationEmployee>;

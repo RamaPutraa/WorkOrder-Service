@@ -28,6 +28,7 @@ import { NavHelp } from "../molecules/nav-help";
 import useAuth from "@/features/auth/hooks/useAuth";
 import { NavInternalBusiness } from "../molecules/nav-internal-business";
 import { NavStaffBusiness } from "../molecules/nav-menu-staff";
+import { NavUndangan } from "../molecules/nav-menu-invitation";
 
 // This is sample data.
 const data = {
@@ -196,6 +197,18 @@ const data = {
 			],
 		},
 	],
+	navUndangan: [
+		{
+			name: "Undangan Perusahaan",
+			url: " ",
+			icon: Frame,
+		},
+		{
+			name: "Riwayat Undangan",
+			url: " ",
+			icon: PieChart,
+		},
+	],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -223,7 +236,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 					<NavInternalBusiness items={data.navInternalBusiness} />
 				)}
 				{user && ["staff_company"].includes(user.role) && (
-					<NavStaffBusiness items={data.navStaffBusiness} />
+					<>
+						<NavUndangan undangan={data.navUndangan} />
+						<NavStaffBusiness items={data.navStaffBusiness} />
+					</>
+				)}
+				{user && ["staff_unassigned"].includes(user.role) && (
+					<>
+						<NavUndangan undangan={data.navUndangan} />
+						<NavStaffBusiness items={data.navStaffBusiness} />
+					</>
 				)}
 				{user && ["client"].includes(user.role) && (
 					<NavBusiness items={data.navBusiness} />

@@ -36,7 +36,7 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
 	columns,
 	data,
-	searchKey = "nama",
+	searchKey = "name",
 	loading = false,
 	loadingMessage = "Memuat data...",
 }: DataTableProps<TData, TValue>) {
