@@ -155,21 +155,21 @@ const router = createBrowserRouter([
 			},
 		],
 	},
-	// {
-	// 	element: <ProtectedRoute allowedRoles={["staff_unassigned"]} />,
-	// 	children: [
-	// 		{
-	// 			element: (
-	// 				<RootLayout>
-	// 					<AppLayout />
-	// 				</RootLayout>
-	// 			),
-	// 			children: [
-	// 				{ path: "/dashboard/unassigned", element: <DashboardUnassigned /> },
-	// 			],
-	// 		},
-	// 	],
-	// },
+	{
+		element: <ProtectedRoute allowedRoles={["staff_unassigned"]} />,
+		children: [
+			{
+				element: (
+					<RootLayout>
+						<AppLayout />
+					</RootLayout>
+				),
+				children: [
+					{ path: "/dashboard/unassigned", element: <DashboardStaff /> },
+				],
+			},
+		],
+	},
 	{
 		path: "/dashboard/client",
 		element: <ProtectedRoute allowedRoles={["client"]} />,

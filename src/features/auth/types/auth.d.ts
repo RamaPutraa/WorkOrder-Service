@@ -35,3 +35,16 @@ type RegisterCompanyResponse = ApiResponse<{
 	user: User;
 	token: string;
 }>;
+
+// staff register
+type RegisterStaffRequest = {
+	name: string;
+	email: string;
+	password: string;
+	role: string;
+};
+
+type RegisterStaffResponse = ApiResponse<{
+	user: User;
+	token: string;
+}>;

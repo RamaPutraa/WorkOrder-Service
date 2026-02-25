@@ -5,6 +5,7 @@ import {
 	loginApi,
 	clientRegisterApi,
 	registerCompanyApi,
+	staffRegisterApi,
 } from "../services/authService";
 import axios from "axios";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
@@ -86,17 +87,47 @@ const useAuth = () => {
 		setError(null);
 		try {
 			const ress: RegisterCompanyResponse = await registerCompanyApi(data);
-			const token = ress.data?.token;
-			const user = ress.data?.user;
 
-			if (!token || !user) {
-				notifyError("Gagal registrasi", "Token atau data user tidak ditemukan");
+			if (!ress.data) {
+				notifyError("Gagal registrasi", "Tidak ada data dari server");
 				return;
 			}
 
-			setAuth(token, user);
-			notifySuccess("Registrasi berhasil", `Selamat datang ${user.name}`);
-			navigate(redirectToRoleDashboard(user.role));
+			notifySuccess(
+				"Registrasi berhasil",
+				"Silakan login menggunakan akun yang telah didaftarkan",
+			);
+			navigate("/login");
+		} catch (error) {
+			if (axios.isAxiosError(error)) {
+				setError(error.response?.data.message || "Terjadi kesalahan");
+				notifyError(
+					"Gagal registrasi",
+					error.response?.data.message || "Terjadi kesalahan",
+				);
+			}
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	// 🔹 fungsi staff register
+	const staffRegister = async (data: RegisterStaffRequest) => {
+		setLoading(true);
+		setError(null);
+		try {
+			const ress: RegisterStaffResponse = await staffRegisterApi(data);
+
+			if (!ress.data) {
+				notifyError("Gagal registrasi", "Tidak ada data dari server");
+				return;
+			}
+
+			notifySuccess(
+				"Registrasi berhasil",
+				"Silakan login menggunakan akun yang telah didaftarkan",
+			);
+			navigate("/login");
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				setError(error.response?.data.message || "Terjadi kesalahan");
@@ -113,6 +144,7 @@ const useAuth = () => {
 	return {
 		clientRegister,
 		registerCompany,
+		staffRegister,
 		login,
 		logout,
 		user,

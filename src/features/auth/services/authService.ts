@@ -18,6 +18,14 @@ export const registerCompanyApi = async (data: RegisterCompanyRequest) => {
 	return response.data;
 };
 
+export const staffRegisterApi = async (data: RegisterStaffRequest) => {
+	const response = await axios.post<RegisterStaffResponse>(
+		"/auth/register",
+		data,
+	);
+	return response.data;
+};
+
 export const logoutApi = async () => {
 	const response = await axios.post("/auth/logout");
 	return response.data;

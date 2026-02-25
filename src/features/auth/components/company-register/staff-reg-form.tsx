@@ -1,65 +1,63 @@
-import { ArrowRight } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { registerStaffSchema } from "../../schemas/authSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import FormFields from "@/shared/molecules/form-fields";
+import { LoaderCircle, ArrowRight } from "lucide-react";
+import useAuth from "../../hooks/useAuth";
+import { Form } from "@/components/ui/form";
 
-// TODO: Sambungkan dengan schema dan useAuth ketika siap
 const StaffRegForm = () => {
+	const { loading, staffRegister } = useAuth();
+	const form = useForm<z.infer<typeof registerStaffSchema>>({
+		resolver: zodResolver(registerStaffSchema),
+		defaultValues: {
+			name: "",
+			email: "",
+			password: "",
+		},
+	});
+
+	const registerStaffFields: FieldConfig[] = [
+		{
+			name: "name",
+			label: "Nama Lengkap",
+			type: "text",
+			placeholder: "John Doe",
+		},
+		{
+			name: "email",
+			label: "Alamat Email",
+			type: "email",
+			placeholder: "johndoe@gmail.com",
+		},
+		{
+			name: "password",
+			label: "Password",
+			type: "password",
+			placeholder: "••••••••",
+		},
+	];
+
+	const onSubmit = (data: z.infer<typeof registerStaffSchema>) =>
+		staffRegister({ ...data, role: "staff_unassigned" });
+
 	return (
-		<form className="space-y-4">
-			{/* Company Code */}
-			<div className="space-y-1.5">
-				<label className="block text-sm font-medium text-gray-700">
-					Kode Perusahaan
-				</label>
-				<input
-					type="text"
-					placeholder="Contoh: COMP-XXXX"
-					className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition"
-				/>
-			</div>
+		<Form {...form}>
+			<form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+				<FormFields fields={registerStaffFields} control={form.control} />
 
-			{/* Name */}
-			<div className="space-y-1.5">
-				<label className="block text-sm font-medium text-gray-700">
-					Nama Lengkap
-				</label>
-				<input
-					type="text"
-					placeholder="John Doe"
-					className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition"
-				/>
-			</div>
-
-			{/* Email */}
-			<div className="space-y-1.5">
-				<label className="block text-sm font-medium text-gray-700">
-					Alamat Email
-				</label>
-				<input
-					type="email"
-					placeholder="johndoe@gmail.com"
-					className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition"
-				/>
-			</div>
-
-			{/* Password */}
-			<div className="space-y-1.5">
-				<label className="block text-sm font-medium text-gray-700">
-					Password
-				</label>
-				<input
-					type="password"
-					placeholder="••••••••"
-					className="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition"
-				/>
-			</div>
-
-			{/* Submit */}
-			<button
-				type="submit"
-				className="w-full mt-2 inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md text-sm">
-				<ArrowRight size={15} />
-				Daftar sebagai Pegawai
-			</button>
-		</form>
+				<button
+					type="submit"
+					disabled={loading}
+					className="w-full mt-2 inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md text-sm">
+					{loading ?
+						<LoaderCircle className="h-4 w-4 animate-spin" />
+					:	<ArrowRight size={15} />}
+					{loading ? "Mendaftarkan..." : "Daftar sebagai Pegawai"}
+				</button>
+			</form>
+		</Form>
 	);
 };
 
