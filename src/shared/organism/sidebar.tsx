@@ -181,6 +181,11 @@ const data = {
 	],
 	navStaffBusiness: [
 		{
+			title: "Undangan Perusahaan",
+			url: "/dashboard/unassigned/invitations-history",
+			icon: PieChart,
+		},
+		{
 			title: "Rekan Kerja",
 			url: "/dashboard/client/companies",
 			icon: BookOpen,
@@ -201,27 +206,10 @@ const data = {
 			],
 		},
 	],
-	navUndangan: [
-		{
-			name: "Undangan Perusahaan",
-			url: " ",
-			icon: Frame,
-		},
-		{
-			name: "Riwayat Undangan",
-			url: " ",
-			icon: PieChart,
-		},
-	],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	const { user } = useAuth();
-	// const isCompanyUser = [
-	// 	"owner_company",
-	// 	"manager_company",
-	// 	"staff_company",
-	// ].includes(user?.role || "");
 
 	return (
 		<Sidebar collapsible="icon" {...props}>
@@ -240,16 +228,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 					<NavInternalBusiness items={data.navInternalBusiness} />
 				)}
 				{user && ["staff_company"].includes(user.role) && (
-					<>
-						<NavUndangan undangan={data.navUndangan} />
-						<NavStaffBusiness items={data.navStaffBusiness} />
-					</>
+					<NavStaffBusiness items={data.navStaffBusiness} />
 				)}
 				{user && ["staff_unassigned"].includes(user.role) && (
-					<>
-						<NavUndangan undangan={data.navUndangan} />
-						<NavStaffBusiness items={data.navStaffBusiness} />
-					</>
+					<NavStaffBusiness items={data.navStaffBusiness} isUnassigned />
 				)}
 				{user && ["client"].includes(user.role) && (
 					<NavBusiness items={data.navBusiness} />

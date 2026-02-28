@@ -6,6 +6,7 @@ type AuthState = {
 	user: User | null;
 	isAuthenticated: boolean;
 	setAuth: (token: string, user: User) => void;
+	updateUser: (data: Partial<User>) => void;
 	logout: () => Promise<void>;
 };
 
@@ -36,6 +37,15 @@ export const useAuthStore = create<AuthState>((set) => ({
 		localStorage.setItem("token", token);
 		localStorage.setItem("user", JSON.stringify(user));
 		set({ token, user, isAuthenticated: true });
+	},
+
+	updateUser: (data) => {
+		set((state) => {
+			if (!state.user) return state;
+			const updatedUser = { ...state.user, ...data };
+			localStorage.setItem("user", JSON.stringify(updatedUser));
+			return { user: updatedUser };
+		});
 	},
 
 	logout: async () => {

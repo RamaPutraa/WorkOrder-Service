@@ -1,9 +1,13 @@
 type Position = {
 	_id: string;
 	name: string;
+	description: string;
+	isActive: boolean;
 	companyId: string;
+	deletedAt: string;
 	createdAt: string;
 	updatedAt: string;
+	__v: number;
 };
 
 type Employee = {

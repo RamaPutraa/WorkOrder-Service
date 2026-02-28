@@ -38,6 +38,7 @@ import DashboardStaff from "@/features/staff/dahsboard-staff";
 import DashboardManager from "@/features/manager/dashboard-manager";
 import CompanyReportWo from "@/features/owner/company-wo/pages/company-report-wo";
 import HistoryStaffInvitations from "@/features/owner/staff-master/pages/history-staff-invitations";
+import InvitationsHistory from "@/features/staff/invitations/pages/invitations-history";
 
 const router = createBrowserRouter([
 	{
@@ -161,7 +162,11 @@ const router = createBrowserRouter([
 		],
 	},
 	{
-		element: <ProtectedRoute allowedRoles={["staff_unassigned"]} />,
+		path: "/dashboard/unassigned",
+		element: (
+			<ProtectedRoute allowedRoles={["staff_unassigned", "staff_company"]} />
+		),
+		errorElement: <ErrorPage />,
 		children: [
 			{
 				element: (
@@ -170,7 +175,14 @@ const router = createBrowserRouter([
 					</RootLayout>
 				),
 				children: [
-					{ path: "/dashboard/unassigned", element: <DashboardStaff /> },
+					{
+						path: "",
+						element: <DashboardStaff />,
+					},
+					{
+						path: "invitations-history",
+						element: <InvitationsHistory />,
+					},
 				],
 			},
 		],
