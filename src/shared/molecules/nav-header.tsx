@@ -18,6 +18,8 @@ import {
 	SidebarMenuItem,
 	useSidebar,
 } from "@/components/ui/sidebar";
+import { useNavigate } from "react-router-dom";
+import { useProfileStore } from "@/store/profileStore";
 
 export function TeamManagement({
 	teams,
@@ -26,10 +28,13 @@ export function TeamManagement({
 		name: string;
 		logo: React.ElementType;
 		plan: string;
+		url: string;
 	}[];
 }) {
 	const { isMobile } = useSidebar();
 	const [activeTeam, setActiveTeam] = React.useState(teams[0]);
+	const navigate = useNavigate();
+	const { profile } = useProfileStore();
 
 	if (!activeTeam) {
 		return null;
@@ -47,8 +52,10 @@ export function TeamManagement({
 								<activeTeam.logo className="size-4" />
 							</div>
 							<div className="grid flex-1 text-left text-sm leading-tight">
-								<span className="truncate font-medium">{activeTeam.name}</span>
-								<span className="truncate text-xs">{activeTeam.plan}</span>
+								<span className="truncate font-medium">Perusahaan</span>
+								<span className="truncate text-xs">
+									{profile?.company?.name}
+								</span>
 							</div>
 							<ChevronsUpDown className="ml-auto" />
 						</SidebarMenuButton>
@@ -58,27 +65,27 @@ export function TeamManagement({
 						align="start"
 						side={isMobile ? "bottom" : "right"}
 						sideOffset={4}>
-						<DropdownMenuLabel className="text-muted-foreground text-xs">
-							Teams
-						</DropdownMenuLabel>
-						{teams.map((team, index) => (
+						{teams.map((team) => (
 							<DropdownMenuItem
 								key={team.name}
-								onClick={() => setActiveTeam(team)}
+								onClick={() => navigate(team.url)}
 								className="gap-2 p-2">
 								<div className="flex size-6 items-center justify-center rounded-md border">
 									<team.logo className="size-3.5 shrink-0" />
 								</div>
 								{team.name}
-								<DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
 							</DropdownMenuItem>
 						))}
 						<DropdownMenuSeparator />
-						<DropdownMenuItem className="gap-2 p-2">
+						<DropdownMenuItem
+							className="gap-2 p-2"
+							onClick={() => navigate("/dashboard/internal/staff")}>
 							<div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
 								<Plus className="size-4" />
 							</div>
-							<div className="text-muted-foreground font-medium">Add team</div>
+							<div className="text-muted-foreground font-medium">
+								Undang Pegawai
+							</div>
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>

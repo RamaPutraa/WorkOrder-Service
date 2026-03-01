@@ -48,3 +48,5 @@ type RegisterStaffResponse = ApiResponse<{
 	user: User;
 	token: string;
 }>;
+
+type GetProfileResponse = ApiResponse<User>;

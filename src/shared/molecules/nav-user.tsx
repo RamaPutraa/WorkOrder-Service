@@ -6,7 +6,9 @@ import {
 	ChevronsUpDown,
 	CreditCard,
 	LogOut,
+	Settings,
 	Sparkles,
+	User,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -27,11 +29,13 @@ import {
 } from "@/components/ui/sidebar";
 import useAuth from "@/features/auth/hooks/useAuth";
 import { useDialogStore } from "@/store/dialogStore";
+import { useNavigate } from "react-router-dom";
 
 export function NavUser() {
 	const { isMobile } = useSidebar();
 	const { user, logout, isAuthenticated } = useAuth();
 	const { showDialog } = useDialogStore();
+	const navigate = useNavigate();
 
 	// jika user belum login, tidak tampilkan apapun
 	if (!isAuthenticated || !user) return null;
@@ -84,28 +88,14 @@ export function NavUser() {
 
 						<DropdownMenuSeparator />
 
-						{/* Contoh tambahan menu */}
 						<DropdownMenuGroup>
-							<DropdownMenuItem>
-								<Sparkles className="mr-2 h-4 w-4" />
-								Upgrade to Pro
-							</DropdownMenuItem>
-						</DropdownMenuGroup>
-
-						<DropdownMenuSeparator />
-
-						<DropdownMenuGroup>
-							<DropdownMenuItem>
-								<BadgeCheck className="mr-2 h-4 w-4" />
-								Account
+							<DropdownMenuItem onClick={() => navigate("/dashboard/account")}>
+								<User className="mr-2 h-4 w-4" />
+								Profile
 							</DropdownMenuItem>
 							<DropdownMenuItem>
-								<CreditCard className="mr-2 h-4 w-4" />
-								Billing
-							</DropdownMenuItem>
-							<DropdownMenuItem>
-								<Bell className="mr-2 h-4 w-4" />
-								Notifications
+								<Settings className="mr-2 h-4 w-4" />
+								Pengaturan
 							</DropdownMenuItem>
 						</DropdownMenuGroup>
 

@@ -30,3 +30,8 @@ export const logoutApi = async () => {
 	const response = await axios.post("/auth/logout");
 	return response.data;
 };
+
+export const getProfileApi = async () => {
+	const response = await axios.get<GetProfileResponse>("/auth/profile");
+	return response.data;
+};

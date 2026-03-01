@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -6,17 +6,21 @@ import {
 	clientRegisterApi,
 	registerCompanyApi,
 	staffRegisterApi,
+	getProfileApi,
 } from "../services/authService";
 import axios from "axios";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
 import { useAuthStore } from "@/store/authStore";
+import { useProfileStore } from "@/store/profileStore";
 import { redirectToRoleDashboard } from "@/lib/auth-helpers";
+import { handleApi } from "@/lib/handle-api";
 
 const useAuth = () => {
 	const navigate = useNavigate();
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const { setAuth, logout, user, token, isAuthenticated } = useAuthStore();
+	const { profile, setProfile } = useProfileStore();
 
 	// 🔹 fungsi login
 	const login = async (data: LoginRequest) => {
@@ -141,12 +145,32 @@ const useAuth = () => {
 		}
 	};
 
+	// 🔹 fungsi get profile
+	const getProfile = useCallback(async () => {
+		setLoading(true);
+		setError(null);
+
+		const { data: res, error } = await handleApi(() => getProfileApi());
+		setLoading(false);
+
+		if (error) {
+			setError(error.message);
+			notifyError("Gagal memuat profil", error.message);
+			return null;
+		}
+		if (res?.data) {
+			setProfile(res.data);
+		}
+		return res?.data;
+	}, []);
+
 	return {
 		clientRegister,
 		registerCompany,
 		staffRegister,
 		login,
 		logout,
+		getProfile,
 		user,
 		token,
 		isAuthenticated,

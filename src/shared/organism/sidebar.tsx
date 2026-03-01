@@ -5,12 +5,18 @@ import {
 	AudioWaveform,
 	BookOpen,
 	Bot,
+	Briefcase,
 	Command,
 	Frame,
 	GalleryVerticalEnd,
 	PieChart,
 	SquareTerminal,
 } from "lucide-react";
+import {
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
+} from "@/components/ui/sidebar";
 
 import { NavSetup } from "../molecules/nav-setup";
 import { NavUser } from "../molecules/nav-user";
@@ -28,25 +34,15 @@ import { NavHelp } from "../molecules/nav-help";
 import useAuth from "@/features/auth/hooks/useAuth";
 import { NavInternalBusiness } from "../molecules/nav-internal-business";
 import { NavStaffBusiness } from "../molecules/nav-menu-staff";
-import { NavUndangan } from "../molecules/nav-menu-invitation";
 
 // This is sample data.
 const data = {
 	teams: [
 		{
-			name: "Acme Inc",
+			name: "Profil Perusahaan",
 			logo: GalleryVerticalEnd,
 			plan: "Enterprise",
-		},
-		{
-			name: "Acme Corp.",
-			logo: AudioWaveform,
-			plan: "Startup",
-		},
-		{
-			name: "Evil Corp.",
-			logo: Command,
-			plan: "Free",
+			url: "/dashboard/internal/company",
 		},
 	],
 	navSetup: [
@@ -208,13 +204,41 @@ const data = {
 	],
 };
 
+// Header sederhana untuk role yang belum/tidak tergabung dalam perusahaan
+function WorkOrderLogo() {
+	return (
+		<SidebarMenu>
+			<SidebarMenuItem>
+				<SidebarMenuButton
+					size="lg"
+					className="pointer-events-none select-none">
+					<div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+						<Briefcase className="size-4" />
+					</div>
+					<div className="grid flex-1 text-left text-sm leading-tight">
+						<span className="truncate font-semibold">Work Order</span>
+						<span className="truncate text-xs text-muted-foreground">
+							Management System
+						</span>
+					</div>
+				</SidebarMenuButton>
+			</SidebarMenuItem>
+		</SidebarMenu>
+	);
+}
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	const { user } = useAuth();
+
+	const isSimpleRole =
+		user?.role === "staff_unassigned" || user?.role === "client";
 
 	return (
 		<Sidebar collapsible="icon" {...props}>
 			<SidebarHeader>
-				<TeamManagement teams={data.teams} />
+				{isSimpleRole ?
+					<WorkOrderLogo />
+				:	<TeamManagement teams={data.teams} />}
 			</SidebarHeader>
 			<SidebarContent>
 				<NavMenu menu={data.navMenu} />

@@ -18,7 +18,7 @@ import FormPage from "@/features/owner/form/pages/view-form";
 import DetailFormPage from "@/features/owner/form/pages/detail-form";
 import PositionPage from "@/features/owner/position/pages/view-position";
 import CreatePositionPage from "@/features/owner/position/pages/create-position";
-import ViewCompany from "@/features/owner/company/pages/view-company";
+import ProfileCompany from "@/features/owner/company/pages/profile-company";
 import ViewService from "@/features/owner/services-wo/pages/view-service";
 import CreateService from "@/features/owner/services-wo/pages/create-service";
 import ClientCompanyServices from "@/features/client/company/pages/company-services";
@@ -39,6 +39,7 @@ import DashboardManager from "@/features/manager/dashboard-manager";
 import CompanyReportWo from "@/features/owner/company-wo/pages/company-report-wo";
 import HistoryStaffInvitations from "@/features/owner/staff-master/pages/history-staff-invitations";
 import InvitationsHistory from "@/features/staff/invitations/pages/invitations-history";
+import ProfilePage from "@/features/auth/pages/profile";
 
 const router = createBrowserRouter([
 	{
@@ -91,7 +92,7 @@ const router = createBrowserRouter([
 					},
 					{
 						path: "company",
-						element: <ViewCompany />,
+						element: <ProfileCompany />,
 					},
 					{
 						path: "services",
@@ -266,6 +267,36 @@ const router = createBrowserRouter([
 			{
 				path: "/company-regis",
 				element: <CompanyRegis />,
+			},
+		],
+	},
+	{
+		path: "/dashboard/account",
+		element: (
+			<ProtectedRoute
+				allowedRoles={[
+					"owner_company",
+					"manager_company",
+					"staff_company",
+					"staff_unassigned",
+					"client",
+				]}
+			/>
+		),
+		errorElement: <ErrorPage />,
+		children: [
+			{
+				element: (
+					<RootLayout>
+						<AppLayout />
+					</RootLayout>
+				),
+				children: [
+					{
+						path: "",
+						element: <ProfilePage />,
+					},
+				],
 			},
 		],
 	},

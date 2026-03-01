@@ -1,6 +1,6 @@
 type InvitedHistory = {
 	_id: string;
-	company: CompanyMinimal;
+	company: Company;
 	role: string;
 	position: {
 		_id: string;

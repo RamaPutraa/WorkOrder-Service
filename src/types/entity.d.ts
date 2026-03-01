@@ -4,8 +4,12 @@ type User = {
 	name: string;
 	email: string;
 	role: string;
-	position: Position;
-	company: CompanyMinimal;
+	deletedAt: string;
+	createdAt: string;
+	updatedAt: string;
+	__v: number;
+	company?: Company;
+	position?: Position;
 };
 
 // potisions
@@ -47,11 +51,20 @@ type CompanyMinimal = {
 	name: string;
 };
 type Company = CompanyMinimal & {
-	ownerId: number;
 	address: string;
 	description: string;
+	managers: User[];
+	staffs: User[];
 	isActive: boolean;
-	createAt: string;
+	deletedAt: string;
+	createdAt: string;
+	updatedAt: string;
+	__v: number;
+	owner: {
+		_id: string;
+		name: string;
+		email: string;
+	};
 };
 
 // Services
