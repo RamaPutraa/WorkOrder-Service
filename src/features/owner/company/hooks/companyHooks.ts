@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import {
+	getCompanyByIdApi,
 	getCompanyProfileApi,
 	updateCompanyApi,
 } from "../services/companyServices";
@@ -8,12 +9,13 @@ import { notifyError, notifySuccess } from "@/lib/toast-helper";
 import { useProfileStore } from "@/store/profileStore";
 
 export const useCompanyProfile = () => {
-	const [company, setCompany] = useState<Company | null>(null);
+	const [company, setCompany] = useState<Company>();
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	useEffect(() => {
 		fetchCompanyProfile();
 	}, []);
+
 	const fetchCompanyProfile = async () => {
 		setLoading(true);
 		setError(null);
@@ -26,7 +28,7 @@ export const useCompanyProfile = () => {
 		}
 		if (res?.data) {
 			const item = Array.isArray(res.data) ? res.data[0] : res.data;
-			setCompany(item ?? null);
+			setCompany(item);
 		}
 	};
 	return {
@@ -34,6 +36,40 @@ export const useCompanyProfile = () => {
 		loading,
 		error,
 		refetch: fetchCompanyProfile,
+	};
+};
+
+export const useCompanyById = (id: string, options?: { lazy?: boolean }) => {
+	const [company, setCompany] = useState<Company>();
+	const [loading, setLoading] = useState(options?.lazy ? false : true);
+	const [error, setError] = useState<string | null>(null);
+
+	useEffect(() => {
+		if (!options?.lazy) {
+			fetchCompanyById();
+		}
+	}, []);
+
+	const fetchCompanyById = async () => {
+		setLoading(true);
+		setError(null);
+		const { data: res, error } = await handleApi(() => getCompanyByIdApi(id));
+		setLoading(false);
+		if (error) {
+			setError(error.message);
+			notifyError("Gagal memuat profil perusahaan", error.message);
+			return;
+		}
+		if (res?.data) {
+			const item = Array.isArray(res.data) ? res.data[0] : res.data;
+			setCompany(item);
+		}
+	};
+	return {
+		company,
+		loading,
+		error,
+		refetch: fetchCompanyById,
 	};
 };
 

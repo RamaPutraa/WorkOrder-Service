@@ -218,7 +218,7 @@ function WorkOrderLogo() {
 					<div className="grid flex-1 text-left text-sm leading-tight">
 						<span className="truncate font-semibold">Work Order</span>
 						<span className="truncate text-xs text-muted-foreground">
-							Management System
+							Manajemen Work Order
 						</span>
 					</div>
 				</SidebarMenuButton>
@@ -230,13 +230,12 @@ function WorkOrderLogo() {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	const { user } = useAuth();
 
-	const isSimpleRole =
-		user?.role === "staff_unassigned" || user?.role === "client";
+	const isSimpleRole = user?.role === "owner_company";
 
 	return (
 		<Sidebar collapsible="icon" {...props}>
 			<SidebarHeader>
-				{isSimpleRole ?
+				{!isSimpleRole ?
 					<WorkOrderLogo />
 				:	<TeamManagement teams={data.teams} />}
 			</SidebarHeader>

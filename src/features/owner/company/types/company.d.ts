@@ -1,4 +1,4 @@
-type GetCompanyProfileResponse = ApiResponse<Company[]>;
+type GetCompanyProfileResponse = ApiResponse<Company>;
 
 type UpdateCompanyRequest = {
 	name: string;

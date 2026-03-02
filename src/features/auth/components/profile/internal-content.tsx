@@ -1,11 +1,26 @@
-import { Building2, Briefcase, Eye, Edit } from "lucide-react";
+import { useState } from "react";
+import { Building2, Briefcase, Eye, Edit, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import CompanyDetailDialog from "./company-detail-dialog";
 
 interface InternalContentProps {
 	profile: User;
 }
 
 export default function InternalContent({ profile }: InternalContentProps) {
+	const [openCompanyDetail, setOpenCompanyDetail] = useState(false);
+	const [fetchTriggered, setFetchTriggered] = useState(false);
+	const [buttonLoading, setButtonLoading] = useState(false);
+
+	const handleOpenCompanyDetail = async () => {
+		setButtonLoading(true);
+		// Simulasi delay singkat agar loading state terlihat sebelum dialog terbuka
+		await new Promise((resolve) => setTimeout(resolve, 300));
+		setFetchTriggered(true);
+		setOpenCompanyDetail(true);
+		setButtonLoading(false);
+	};
+
 	return (
 		<div className="w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
 			{/* Details Section */}
@@ -51,15 +66,28 @@ export default function InternalContent({ profile }: InternalContentProps) {
 			<div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4">
 				<Button
 					variant="outline"
-					className="w-full sm:w-auto flex items-center gap-2 px-6 h-11 rounded-full border-blue-200 text-blue-700 hover:bg-blue-50">
-					<Eye className="w-4 h-4" />
-					Detail Perusahaan
+					className="w-full sm:w-auto flex items-center gap-2 px-6 h-11 rounded-full border-blue-200 text-blue-700 hover:bg-blue-50"
+					disabled={buttonLoading || !profile.company?._id}
+					onClick={handleOpenCompanyDetail}>
+					{buttonLoading ?
+						<Loader2 className="w-4 h-4 animate-spin" />
+					:	<Eye className="w-4 h-4" />}
+					{buttonLoading ? "Memuat..." : "Detail Perusahaan"}
 				</Button>
 				<Button className="w-full sm:w-auto flex items-center gap-2 px-6 h-11 rounded-full bg-blue-600 text-white hover:bg-blue-700 shadow-sm transition-all hover:shadow">
 					<Edit className="w-4 h-4" />
 					Edit Profil
 				</Button>
 			</div>
+
+			{/* Company Detail Dialog */}
+			{fetchTriggered && profile.company?._id && (
+				<CompanyDetailDialog
+					open={openCompanyDetail}
+					onOpenChange={setOpenCompanyDetail}
+					companyId={String(profile.company._id)}
+				/>
+			)}
 		</div>
 	);
 }

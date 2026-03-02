@@ -5,6 +5,13 @@ export const getCompanyProfileApi = async () => {
 	return response.data;
 };
 
+export const getCompanyByIdApi = async (id: string) => {
+	const response = await apiClient.get<GetCompanyProfileResponse>(
+		`/company/${id}`,
+	);
+	return response.data;
+};
+
 export const updateCompanyApi = async (
 	data: UpdateCompanyRequest,
 	id: string,
