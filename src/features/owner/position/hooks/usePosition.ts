@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
 	createPositionApi,
 	getPositionsApi,
+	updatePositionApi,
 } from "../services/positionService";
 import { handleApi } from "@/lib/handle-api";
 
@@ -68,3 +69,29 @@ const usePosition = () => {
 };
 
 export default usePosition;
+
+export const useUpdatePosition = (onSuccess?: () => void) => {
+	const [loading, setLoading] = useState(false);
+
+	const updatePosition = async (id: string, data: UpdatePositionRequest) => {
+		setLoading(true);
+		const { data: res, error } = await handleApi(() =>
+			updatePositionApi(id, data),
+		);
+		setLoading(false);
+
+		if (error) {
+			notifyError("Gagal memperbarui posisi", error.message);
+			return false;
+		}
+
+		notifySuccess(
+			"Berhasil",
+			`Posisi ${res?.data?.name ?? ""} berhasil diperbarui`,
+		);
+		onSuccess?.();
+		return true;
+	};
+
+	return { updatePosition, loading };
+};

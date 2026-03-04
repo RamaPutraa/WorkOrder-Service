@@ -9,3 +9,14 @@ export const createPositionApi = async (data: PositionRequest) => {
 	const response = await axios.post<SinglePositionResponse>("/positions", data);
 	return response.data;
 };
+
+export const updatePositionApi = async (
+	id: string,
+	data: UpdatePositionRequest,
+) => {
+	const response = await axios.put<SinglePositionResponse>(
+		`/positions/${id}`,
+		data,
+	);
+	return response.data;
+};

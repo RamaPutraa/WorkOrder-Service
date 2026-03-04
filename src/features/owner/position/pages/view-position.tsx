@@ -1,16 +1,40 @@
-// import { DataTable } from "@/components/ui/data-table";
 import { DataTable } from "@/components/ui/data-table";
-import { positionColumns } from "../components/position-columns";
+import { createPositionColumns } from "../components/position-columns";
 import usePosition from "../hooks/usePosition";
 import { ChevronLeft, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
+import EditPositionDialog from "../components/edit-position-dialog";
 
 const PositionView = () => {
 	const { fetchPositions, positions, loading, error } = usePosition();
 	const navigate = useNavigate();
+
+	// ── Edit dialog state ──────────────────────────────────────────────────────
+	const [editOpen, setEditOpen] = useState(false);
+	const [selectedPosition, setSelectedPosition] = useState<Position | null>(
+		null,
+	);
+
+	const handleEdit = (position: Position) => {
+		setSelectedPosition(position);
+		setEditOpen(true);
+	};
+
+	const handleDelete = (_position: Position) => {
+		// TODO: implement delete logic
+	};
+
+	const columns = useMemo(
+		() =>
+			createPositionColumns({
+				onEdit: handleEdit,
+				onDelete: handleDelete,
+			}),
+		[],
+	);
 
 	useEffect(() => {
 		void fetchPositions();
@@ -57,13 +81,23 @@ const PositionView = () => {
 				</CardHeader>
 				<CardContent>
 					<DataTable
-						columns={positionColumns}
+						columns={columns}
 						data={positions}
 						loading={loading}
 						loadingMessage="Memuat data posisi..."
 					/>
 				</CardContent>
 			</Card>
+
+			{/* Edit / Update Dialog */}
+			{selectedPosition && (
+				<EditPositionDialog
+					open={editOpen}
+					onOpenChange={setEditOpen}
+					position={selectedPosition}
+					onSuccess={() => void fetchPositions()}
+				/>
+			)}
 		</>
 	);
 };

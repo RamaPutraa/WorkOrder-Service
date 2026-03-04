@@ -1,17 +1,19 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Plus } from "lucide-react";
+import { ArrowRight, ChevronLeft, Plus, ScrollText } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { SectionLoading } from "@/shared/atoms";
 import { useForm } from "../hooks/use-form";
+import PageHeader from "@/shared/atoms/header-content";
 
 const formTypeLabel = (type: string) => {
 	switch (type?.toLowerCase()) {
 		case "report":
 			return "Laporan";
 		case "intake":
-			return "Pelanggan";
+			return "Pengajuan";
 		case "work_order":
 			return "Perintah Kerja";
 		default:
@@ -33,28 +35,14 @@ const ViewForm: React.FC = () => {
 
 	return (
 		<>
-			{/* Header Section */}
-			<div className="flex items-center gap-4 mb-8">
-				<Button
-					onClick={() => navigate(-1)}
-					className="bg-primary hover:bg-primary/90 h-full shrink-0">
-					<ChevronLeft className="size-6" />
-				</Button>
-				<div className="flex-1">
-					<h1 className="text-2xl font-bold">List Data Formulir</h1>
-					<p className="text-muted-foreground text-sm mt-0.5">
-						Berikut merupakan list form yang dimiliki oleh perusahaan.
-					</p>
-				</div>
-
-				{/* Add Button */}
-				<Button
-					className="bg-primary hover:bg-primary/90 "
-					onClick={() => navigate("/dashboard/internal/form/create")}>
-					<Plus className="h-4 w-4 mr-2" />
-					Tambah Form
-				</Button>
-			</div>
+			{/* header */}
+			<PageHeader
+				title="List Data Formulir"
+				subtitle="Berikut merupakan list form yang dimiliki oleh perusahaan."
+				onAddClick={() => navigate("/dashboard/internal/form/create")}
+				addLabel="Tambah Form"
+				backPath={true}
+			/>
 
 			{/* Main Content - Forms Grid */}
 			<div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
@@ -70,50 +58,58 @@ const ViewForm: React.FC = () => {
 						</motion.div>
 					: forms.length > 0 ?
 						forms.map((form) => {
-							const fieldCount = form.fields?.length ?? 0;
 							return (
 								<motion.div
 									key={form._id}
 									initial={{ opacity: 0, y: 16 }}
 									animate={{ opacity: 1, y: 0 }}
 									transition={{ duration: 0.2, ease: "easeOut" }}>
-									<Card className="flex flex-col h-full border rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
-										{/* Top bar */}
-										{/* <div className="h-0.5 w-full bg-border group-hover:bg-primary transition-colors duration-200" /> */}
+									<Card className="group gap-2 flex flex-col h-full bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
+										<CardHeader className="px-6  ">
+											<div className="flex items-start gap-4">
+												{/* Icon */}
+												<div className="shrink-0 p-3 bg-primary/5 text-primary rounded-xl">
+													<ScrollText className="w-6 h-6" />
+												</div>
 
-										<CardHeader className="pt-5 px-5">
-											<div className="flex items-start justify-between gap-2">
-												<h2 className="text-base font-semibold leading-snug line-clamp-2">
-													{form.title}
-												</h2>
-												<span className="shrink-0 text-xs font-medium text-muted-foreground border rounded-full px-2.5 py-0.5 mt-0.5">
-													{formTypeLabel(form.formType)}
-												</span>
+												{/* Text Content */}
+												<div className="flex-1 space-y-1">
+													<h3 className="text-base font-semibold text-slate-900 leading-snug line-clamp-1">
+														{form.title || "Untitled Form"}
+													</h3>
+
+													<p className="text-sm text-slate-500 leading-relaxed line-clamp-1">
+														{form.description || "No description available."}
+													</p>
+												</div>
 											</div>
 										</CardHeader>
 
-										<CardContent className="flex flex-col flex-1 gap-4 px-5 pb-5 pt-0">
-											<p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 flex-1">
-												{form.description || "Tidak ada deskripsi."}
-											</p>
-
-											<div className="flex items-center justify-between pt-3 border-t">
-												<span className="text-sm text-muted-foreground">
-													{fieldCount} field
+										<CardFooter className="px-6 py-2">
+											<div className="w-full pt-1 border-t border-slate-200/70 flex items-center justify-between text-xs text-slate-400">
+												<span className="tracking-wide uppercase">
+													<Badge variant="outline">
+														{formTypeLabel(form.formType)}
+													</Badge>
 												</span>
-												<Button
-													size="sm"
-													variant="outline"
-													onClick={() =>
-														navigate(
-															`/dashboard/internal/form/detail/${form._id}`,
-														)
-													}>
-													Lihat Detail
-													<ChevronLeft className="w-4 h-4 rotate-180 ml-1" />
-												</Button>
+
+												{/* Status Dot */}
+												<div className="flex items-center gap-2">
+													{/* Action */}
+													<Button
+														variant="ghost"
+														size="sm"
+														className="text-xs rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+														onClick={() =>
+															navigate(
+																`/dashboard/internal/form/detail/${form._id}`,
+															)
+														}>
+														Lihat Detail <ArrowRight className="ml-2 h-4 w-4" />
+													</Button>
+												</div>
 											</div>
-										</CardContent>
+										</CardFooter>
 									</Card>
 								</motion.div>
 							);

@@ -16,9 +16,12 @@ type User = {
 type Position = {
 	_id: string;
 	name: string;
+	description: string;
+	isActive: boolean;
 	companyId: number;
-	createAt: string;
-	updateAt: string;
+	createdAt: string;
+	updatedAt: string;
+	__v: number;
 };
 
 // staff item
