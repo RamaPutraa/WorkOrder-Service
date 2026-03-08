@@ -6,7 +6,6 @@ import {
 	Users,
 	UserCheck,
 	Crown,
-	CheckCircle2,
 	XCircle,
 	RefreshCw,
 	Pencil,
@@ -20,7 +19,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {

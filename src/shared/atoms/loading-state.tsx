@@ -1,5 +1,6 @@
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 interface LoadingStateProps {
 	/**
@@ -125,4 +126,111 @@ export function ButtonLoading() {
  */
 export function OverlayLoading({ message }: { message?: string }) {
 	return <LoadingState variant="overlay" size="md" message={message} />;
+}
+
+// ─── Text-based Loading Components ───────────────────────────────────────────
+
+interface TextLoadingProps {
+	/**
+	 * Variant of the text loading
+	 * - blink: Text fades in and out
+	 * - dots: Animated trailing dots ("Memuat", "Memuat.", "Memuat..", "Memuat...")
+	 * - skeleton: Shimmer placeholder bars
+	 */
+	variant?: "blink" | "dots" | "skeleton";
+	/** Text to display (not used for skeleton variant) */
+	message?: string;
+	/** Additional className */
+	className?: string;
+}
+
+/**
+ * Text-only loading indicator — no spinner.
+ *
+ * @example
+ * // Blinking text
+ * <TextLoading variant="blink" message="Memuat data..." />
+ *
+ * // Animated dots
+ * <TextLoading variant="dots" message="Memuat" />
+ *
+ * // Skeleton shimmer (3 bars by default)
+ * <TextLoading variant="skeleton" />
+ */
+export function TextLoading({
+	variant = "dots",
+	message = "Memuat",
+	className,
+}: TextLoadingProps) {
+	if (variant === "blink") {
+		return (
+			<p
+				className={cn(
+					"text-sm text-muted-foreground font-medium animate-pulse",
+					className,
+				)}>
+				{message}
+			</p>
+		);
+	}
+
+	if (variant === "dots") {
+		return <DotsLoading message={message} className={className} />;
+	}
+
+	// skeleton
+	return <SkeletonText className={className} />;
+}
+
+/** Internal: animated dots helper */
+function DotsLoading({
+	message,
+	className,
+}: {
+	message: string;
+	className?: string;
+}) {
+	const [dots, setDots] = useState("");
+
+	useEffect(() => {
+		const interval = setInterval(() => {
+			setDots((prev) => (prev.length >= 3 ? "" : prev + "."));
+		}, 400);
+		return () => clearInterval(interval);
+	}, []);
+
+	return (
+		<p className={cn("text-sm text-muted-foreground font-medium", className)}>
+			{message}
+			<span className="inline-block w-6 text-left">{dots}</span>
+		</p>
+	);
+}
+
+/**
+ * Skeleton shimmer bars — use as placeholder for text content.
+ *
+ * @example
+ * <SkeletonText lines={4} />
+ */
+export function SkeletonText({
+	lines = 2,
+	className,
+}: {
+	lines?: number;
+	className?: string;
+}) {
+	return (
+		<div className={cn("space-y-2", className)}>
+			{Array.from({ length: lines }).map((_, i) => (
+				<div
+					key={i}
+					className={cn(
+						"h-2 rounded-md bg-muted animate-pulse",
+						i === lines - 1 ? "w-2/3" : "w-full",
+					)}
+				/>
+			))}
+		</div>
+	);
 }

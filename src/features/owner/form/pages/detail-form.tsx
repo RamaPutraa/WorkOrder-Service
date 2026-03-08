@@ -1,32 +1,37 @@
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Edit, Trash } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { useForm } from "../hooks/use-form";
 import { Card } from "@/components/ui/card";
 import FormFieldViewer from "@/shared/molecules/form-field-viewer";
 import { SectionLoading } from "@/shared/atoms";
+import PageHeader from "@/shared/atoms/header-content";
+import { TextLoading } from "@/shared/atoms/loading-state";
+import { Edit, Trash } from "lucide-react";
 
 const DetailForm = () => {
-	const navigate = useNavigate();
 	const { detailForm, loading } = useForm();
 
 	return (
 		<>
-			<div className="flex items-center gap-4 mb-8">
-				<Button
-					onClick={() => navigate(-1)}
-					className="bg-primary hover:bg-primary/90 h-full shrink-0">
-					<ChevronLeft className="size-6" />
-				</Button>
-				<div className="flex-1">
-					<h1 className="text-2xl font-bold">
-						Detail Formulir {detailForm?.title}
-					</h1>
-					<p className="text-muted-foreground text-sm mt-0.5">
-						Berikut merupakan detail formulir {detailForm?.title}.
-					</p>
-				</div>
-			</div>
+			{/* header */}
+			<PageHeader
+				title={
+					loading ?
+						<div className="flex items-center gap-1.5">
+							Detail Formulir{" "}
+							<TextLoading variant="dots" message="" className="w-40" />
+						</div>
+					:	`Detail Formulir ${detailForm?.title}`
+				}
+				subtitle={
+					loading ?
+						<div className="flex items-center gap-1.5">
+							Berikut merupakan detail formulir{" "}
+							<TextLoading variant="dots" message="" className="w-40" />
+						</div>
+					:	`Berikut merupakan detail formulir ${detailForm?.title} `
+				}
+				backPath={true}
+			/>
 
 			{/* Main Content - Form Details */}
 			{loading ?

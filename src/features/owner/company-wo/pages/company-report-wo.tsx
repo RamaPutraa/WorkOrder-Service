@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-	ChevronLeft,
 	FileText,
 	Calendar,
 	CheckCircle,
@@ -24,6 +23,7 @@ import FormFieldViewer, {
 	type AnswerValue,
 } from "@/shared/molecules/form-field-viewer";
 import { useDialogStore } from "@/store/dialogStore";
+import PageHeader from "@/shared/atoms/header-content";
 
 const CompanyReportWo = () => {
 	const navigate = useNavigate();
@@ -306,20 +306,11 @@ const CompanyReportWo = () => {
 	return (
 		<>
 			{/* Header Section */}
-
-			<div className="flex items-center gap-4 mb-8">
-				<Button
-					onClick={() => navigate(-1)}
-					className="bg-primary hover:bg-primary/90 h-full shrink-0">
-					<ChevronLeft className="size-6" />
-				</Button>
-				<div className="flex-1">
-					<h1 className="text-2xl font-bold">Laporan Tugas Kerja</h1>
-					<p className="text-muted-foreground text-sm mt-0.5">
-						Kelola formulir laporan dari tugas kerja
-					</p>
-				</div>
-			</div>
+			<PageHeader
+				title="Laporan Tugas Kerja"
+				subtitle="Kelola formulir laporan dari tugas kerja"
+				backPath={true}
+			/>
 
 			{/* Loading State */}
 			{loading && <SectionLoading message="Memuat laporan..." />}

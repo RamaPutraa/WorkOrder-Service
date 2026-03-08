@@ -1,12 +1,12 @@
 import { DataTable } from "@/components/ui/data-table";
 import { createPositionColumns } from "../components/position-columns";
 import usePosition from "../hooks/usePosition";
-import { ChevronLeft, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import EditPositionDialog from "../components/edit-position-dialog";
+import PageHeader from "@/shared/atoms/header-content";
+import { TextLoading } from "@/shared/atoms/loading-state";
 
 const PositionView = () => {
 	const { fetchPositions, positions, loading, error } = usePosition();
@@ -53,26 +53,20 @@ const PositionView = () => {
 	return (
 		<>
 			{/* header */}
-			<div className="flex items-center gap-4 mb-8">
-				<Button
-					onClick={() => navigate(-1)}
-					className="bg-primary hover:bg-primary/90 h-full shrink-0">
-					<ChevronLeft className="size-6" />
-				</Button>
-				<div className="flex-1">
-					<h1 className="text-2xl font-bold">Manajemen Departemen</h1>
-					<p className="text-muted-foreground text-sm mt-0.5">
-						Daftar departemen - Total {positions.length} departemen
-					</p>
-				</div>
-
-				<Button
-					className="bg-primary hover:bg-primary/90"
-					onClick={() => navigate("/dashboard/internal/positions/create")}>
-					<Plus className="h-4 w-4 mr-2" />
-					Tambah Posisi
-				</Button>
-			</div>
+			<PageHeader
+				title="Manajemen Departemen"
+				subtitle={
+					loading ?
+						<div className="flex items-center gap-1.5">
+							Daftar Departemen - Total{" "}
+							<TextLoading variant="dots" message="" className="w-40" />
+						</div>
+					:	`Daftar Departemen - Total ${positions.length} departemen`
+				}
+				onAddClick={() => navigate("/dashboard/internal/positions/create")}
+				addLabel="Tambah Departemen"
+				backPath={true}
+			/>
 
 			{/* Data Table */}
 			<Card>

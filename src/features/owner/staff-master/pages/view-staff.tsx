@@ -2,15 +2,13 @@ import { useState } from "react";
 import { DataTable } from "@/components/ui/data-table";
 import { columns } from "../components/columns";
 import { useStaff } from "../hooks/use-staff";
-import { ChevronLeft, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
 import InviteEmployeeDialog from "../components/invite-employee-dialog";
+import PageHeader from "@/shared/atoms/header-content";
+import { TextLoading } from "@/shared/atoms/loading-state";
 
 const ViewStaff = () => {
 	const { employees, loading, error, refetch } = useStaff();
-	const navigate = useNavigate();
 	const [openInvite, setOpenInvite] = useState(false);
 
 	if (error) {
@@ -26,27 +24,20 @@ const ViewStaff = () => {
 	return (
 		<>
 			{/* header */}
-			<div className="flex items-center gap-4 mb-8">
-				<Button
-					onClick={() => navigate(-1)}
-					className="bg-primary hover:bg-primary/90 h-full shrink-0">
-					<ChevronLeft className="size-6" />
-				</Button>
-				<div className="flex-1">
-					<h1 className="text-2xl font-bold">Manajemen Pegawai</h1>
-					<p className="text-muted-foreground text-sm mt-0.5">
-						Total {employees.length} karyawan
-					</p>
-				</div>
-
-				{/* Add Button */}
-				<Button
-					className="bg-primary hover:bg-primary/90"
-					onClick={() => setOpenInvite(true)}>
-					<Plus className="h-4 w-4 mr-2" />
-					Undang Pegawai
-				</Button>
-			</div>
+			<PageHeader
+				title="Manajemen Pegawai"
+				subtitle={
+					loading ?
+						<div className="flex items-center gap-1.5">
+							Daftar Pegawai - Total{" "}
+							<TextLoading variant="dots" message="" className="w-40" />
+						</div>
+					:	`Daftar Pegawai - Total ${employees.length} pegawai`
+				}
+				onAddClick={() => setOpenInvite(true)}
+				addLabel="Undang Pegawai"
+				backPath={true}
+			/>
 
 			{/* Data Table */}
 			<Card>

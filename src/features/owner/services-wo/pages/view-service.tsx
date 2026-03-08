@@ -1,19 +1,13 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import {
-	CheckCircle,
-	ChevronLeft,
-	Globe,
-	Plus,
-	ShieldCheck,
-	Users,
-	XCircle,
-} from "lucide-react";
+import { ArrowRight, ClipboardList, ScrollText } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Card } from "@/components/ui/card";
+import { Card, CardFooter, CardHeader } from "@/components/ui/card";
 import { SectionLoading } from "@/shared/atoms";
 import { useCreateService } from "../hooks/useCreateService";
+import PageHeader from "@/shared/atoms/header-content";
+import { Badge } from "@/components/ui/badge";
 
 const ViewService: React.FC = () => {
 	const navigate = useNavigate();
@@ -23,6 +17,17 @@ const ViewService: React.FC = () => {
 	useEffect(() => {
 		void fecthServices();
 	}, []);
+
+	const serviceTypeLabel = (type: string) => {
+		switch (type?.toLowerCase()) {
+			case "internal":
+				return "Internal";
+			case "public":
+				return "Publik";
+			default:
+				return type;
+		}
+	};
 
 	if (error) {
 		return (
@@ -34,32 +39,14 @@ const ViewService: React.FC = () => {
 
 	return (
 		<>
-			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-				<div className="flex items-center space-x-4">
-					{/* Back Button */}
-					<Button
-						onClick={() => navigate(-1)}
-						className="bg-primary hover:bg-primary/90 h-full">
-						<ChevronLeft className="size-6" />
-					</Button>
-
-					{/* Title Section */}
-					<div className="flex flex-col space-y-1">
-						<h1 className="text-2xl font-bold">List Data Service</h1>
-						<p className="text-muted-foreground text-sm sm:text-base">
-							Berikut merupakan list service yang dimiliki oleh perusahaan.
-						</p>
-					</div>
-				</div>
-
-				{/* Add Button */}
-				<Button
-					className="bg-primary hover:bg-primary/90 w-full sm:w-auto"
-					onClick={() => navigate("/dashboard/internal/services/create")}>
-					<Plus className="h-4 w-4 mr-2" />
-					Tambah Layanan
-				</Button>
-			</div>
+			{/* header */}
+			<PageHeader
+				title="List Data Layanan"
+				subtitle="Berikut merupakan list layanan yang dimiliki oleh perusahaan."
+				onAddClick={() => navigate("/dashboard/internal/services/create")}
+				addLabel="Tambah Layanan"
+				backPath={true}
+			/>
 
 			{/* Main Content - Services Grid */}
 			<div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
@@ -77,72 +64,76 @@ const ViewService: React.FC = () => {
 						services.map((service) => (
 							<motion.div
 								key={service._id}
-								initial={{ opacity: 0, y: 20 }}
+								initial={{ opacity: 0, y: 16 }}
 								animate={{ opacity: 1, y: 0 }}
-								whileHover={{ scale: 1.02, y: -4 }}
 								transition={{ duration: 0.2, ease: "easeOut" }}>
-								<Card className="p-5 flex flex-col justify-between h-full border shadow-md hover:shadow-lg rounded-lg transition-all duration-200 bg-gradient-to-br from-background to-muted/10">
-									{/* Title & Description */}
-									<div className="space-y-3">
-										<h2 className="text-lg font-bold leading-tight">
-											{service.title}
-										</h2>
-										<p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
-											{service.description}
-										</p>
+								<Card className="group gap-2 flex flex-col h-full bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
+									<CardHeader className=" space-y-4">
+										{/* Baris Atas: Icon, Judul, dan Status */}
+										<div className="flex items-start justify-between gap-4">
+											<div className="flex items-center gap-3 min-w-0">
+												{/* Icon */}
+												<div className="shrink-0 p-2.5 rounded-xl bg-primary/5 text-primary  transition-colors">
+													<ClipboardList className="w-6 h-6" />
+												</div>
 
-										{/* Info Badges */}
-										<div className="flex flex-wrap gap-2 pt-2">
-											{/* Access Type Badge */}
-											{service.accessType === "internal" ?
-												<div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
-													<ShieldCheck className="w-3.5 h-3.5" />
-													<span className="text-xs font-semibold">
-														Internal
-													</span>
-												</div>
-											:	<div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-green-50 text-green-700 border border-green-200">
-													<Globe className="w-3.5 h-3.5" />
-													<span className="text-xs font-semibold">Public</span>
-												</div>
-											}
+												{/* Judul dengan min-height agar sejajar antar card */}
+												<h3 className="text-base font-bold text-slate-900 leading-snug line-clamp-2 min-h-[2.5rem] flex items-center">
+													{service.title || "Untitled Form"}
+												</h3>
+											</div>
 
-											{/* Status Badge */}
-											{service.isActive ?
-												<div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-green-50 text-green-700 border border-green-200">
-													<CheckCircle className="w-3.5 h-3.5" />
-													<span className="text-xs font-semibold">Aktif</span>
-												</div>
-											:	<div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-red-50 text-red-700 border border-red-200">
-													<XCircle className="w-3.5 h-3.5" />
-													<span className="text-xs font-semibold">
-														Nonaktif
-													</span>
-												</div>
-											}
-										</div>
-
-										{/* Staff Required */}
-										<div className="flex items-center gap-2 pt-1">
-											<div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-												<Users className="w-4 h-4" />
-												<span className="font-medium">
-													{service.requiredStaffs?.length ?? 0} posisi staff
-												</span>
+											{/* Status Badge di pojok kanan atas */}
+											<div className="shrink-0 mt-1">
+												{service.isActive ?
+													<div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
+														<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+														<span className="text-[10px] font-bold uppercase tracking-wider">
+															Aktif
+														</span>
+													</div>
+												:	<div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 text-slate-400 border border-slate-100">
+														<span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+														<span className="text-[10px] font-bold uppercase tracking-wider">
+															Nonaktif
+														</span>
+													</div>
+												}
 											</div>
 										</div>
-									</div>
 
-									{/* Button */}
-									<Button
-										asChild
-										variant="outline"
-										className="mt-4 w-full h-10 rounded-lg border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-200 font-medium">
-										<a
-											href={`/dashboard/internal/services/detail/${service._id}`}>
-											Lihat Detail
-										</a>
-									</Button>
+										{/* Deskripsi - Masuk dalam CardContent atau tetap di Header dengan padding yang pas */}
+										<div className="text-sm text-slate-500 leading-relaxed line-clamp-3 min-h-[3.75rem] text-justify">
+											{service.description ||
+												"Tidak ada deskripsi tersedia untuk layanan ini."}
+										</div>
+									</CardHeader>
+
+									<CardFooter className="grid grid-cols-1 text-xs mx-6 border-t border-slate-200/70 p-0">
+										<div className=" flex items-center justify-between text-xs text-slate-400 ">
+											<span className="tracking-wide uppercase">
+												<Badge variant="outline">
+													{serviceTypeLabel(service.accessType)}
+												</Badge>
+											</span>
+
+											{/* Status Dot */}
+											<div className="flex items-center gap-2">
+												{/* Action */}
+												<Button
+													variant="ghost"
+													size="sm"
+													className="text-xs rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+													onClick={() =>
+														navigate(
+															`/dashboard/internal/services/detail/${service._id}`,
+														)
+													}>
+													Lihat Detail <ArrowRight className="ml-2 h-4 w-4" />
+												</Button>
+											</div>
+										</div>
+									</CardFooter>
 								</Card>
 							</motion.div>
 						))

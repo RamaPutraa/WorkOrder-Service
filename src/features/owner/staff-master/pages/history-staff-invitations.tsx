@@ -1,11 +1,10 @@
 import { DataTable } from "@/components/ui/data-table";
 import { invitationColumns } from "../components/invitation-columns";
 import { useStaffHistory } from "../hooks/use-staff-history";
-import { ChevronLeft } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import PageHeader from "@/shared/atoms/header-content";
+import { TextLoading } from "@/shared/atoms/loading-state";
 
 const STATUS_SUMMARY = [
 	{ label: "Menunggu", key: "pending", variant: "outline" as const },
@@ -16,7 +15,6 @@ const STATUS_SUMMARY = [
 
 const HistoryStaffInvitations = () => {
 	const { history, loading, error } = useStaffHistory();
-	const navigate = useNavigate();
 
 	if (error) {
 		return (
@@ -31,19 +29,18 @@ const HistoryStaffInvitations = () => {
 	return (
 		<>
 			{/* Header */}
-			<div className="flex items-center gap-4 mb-8">
-				<Button
-					onClick={() => navigate(-1)}
-					className="bg-primary hover:bg-primary/90 h-full shrink-0">
-					<ChevronLeft className="size-6" />
-				</Button>
-				<div className="flex-1">
-					<h1 className="text-2xl font-bold">Riwayat Undangan</h1>
-					<p className="text-muted-foreground text-sm mt-0.5">
-						Total {history.length} undangan terkirim
-					</p>
-				</div>
-			</div>
+			<PageHeader
+				title="Riwayat Undangan"
+				subtitle={
+					loading ?
+						<div className="flex items-center gap-1.5">
+							Riwayat Undangan - Total{" "}
+							<TextLoading variant="dots" message="" className="w-40" />
+						</div>
+					:	`Daftar Undangan - Total ${history.length} undangan`
+				}
+				backPath={true}
+			/>
 
 			{/* Table */}
 			<Card>

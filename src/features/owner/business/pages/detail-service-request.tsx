@@ -1,8 +1,6 @@
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ChevronLeft, FileText, CheckCircle2, XCircle } from "lucide-react";
+import { FileText, CheckCircle2, XCircle } from "lucide-react";
 import { useBusiness } from "../hooks/use-business";
-import { useNavigate } from "react-router-dom";
 import FormFieldViewer from "@/shared/molecules/form-field-viewer";
 import {
 	Accordion,
@@ -11,30 +9,34 @@ import {
 	AccordionTrigger,
 } from "@/components/ui/accordion";
 import { SectionLoading } from "@/shared/atoms";
+import PageHeader from "@/shared/atoms/header-content";
+import { TextLoading } from "@/shared/atoms/loading-state";
 
 const DetailServiceRequest = () => {
 	const { detailData: detail, loading } = useBusiness();
-	const navigate = useNavigate();
 
 	return (
 		<>
 			{/* Header Section */}
-			<div className="flex items-center gap-4 mb-8">
-				<Button
-					onClick={() => navigate(-1)}
-					className="bg-primary hover:bg-primary/90 h-full">
-					<ChevronLeft className="size-6" />
-				</Button>
-				<div>
-					<h1 className="text-2xl font-bold">
-						Detail Service {detail?.service?.title}
-					</h1>
-					<p className="text-muted-foreground text-sm mt-0.5">
-						Berikut merupakan detail service {detail?.service?.title} yang
-						dimiliki oleh perusahaan.
-					</p>
-				</div>
-			</div>
+			<PageHeader
+				title={
+					!detail ?
+						<div className="flex items-center gap-1.5">
+							Detail Service{" "}
+							<TextLoading variant="dots" message="" className="w-40" />
+						</div>
+					:	`Detail Service ${detail?.service?.title}`
+				}
+				subtitle={
+					!detail ?
+						<div className="flex items-center gap-1.5">
+							Berikut merupakan detail service{" "}
+							<TextLoading variant="dots" message="" className="w-60" />
+						</div>
+					:	`Berikut merupakan detail service ${detail?.service?.title} yang dimiliki oleh perusahaan.`
+				}
+				backPath={true}
+			/>
 
 			{/* Content Area */}
 			{loading || !detail ?

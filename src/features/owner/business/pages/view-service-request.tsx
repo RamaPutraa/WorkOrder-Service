@@ -1,25 +1,20 @@
-import {
-	Card,
-	CardHeader,
-	CardTitle,
-	CardDescription,
-	CardContent,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useBusiness } from "../hooks/use-business";
 import { Button } from "@/components/ui/button";
 import {
 	Calendar,
-	Clock,
 	Eye,
 	CheckCircle,
 	XCircle,
-	ChevronLeft,
 	User,
+	ClipboardPenLine,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDialogStore } from "@/store/dialogStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { SectionLoading } from "@/shared/atoms";
+import PageHeader from "@/shared/atoms/header-content";
+import { TextLoading } from "@/shared/atoms/loading-state";
 
 const ViewServiceRequest = () => {
 	const { data, loading, error, handleReject, handleApprove } = useBusiness();
@@ -38,42 +33,47 @@ const ViewServiceRequest = () => {
 		const s = status.toLowerCase();
 		if (s === "approved")
 			return (
-				<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-medium">
-					<CheckCircle className="w-3 h-3" />
-					Disetujui
-				</span>
+				<div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
+					<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+					<span className="text-[10px] font-bold uppercase tracking-wider">
+						Disetujui
+					</span>
+				</div>
 			);
 		if (s === "rejected")
 			return (
-				<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-50 text-red-600 border border-red-200 text-xs font-medium">
-					<XCircle className="w-3 h-3" />
-					Ditolak
-				</span>
+				<div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-50 text-red-600 border border-red-100">
+					<span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+					<span className="text-[10px] font-bold uppercase tracking-wider">
+						Ditolak
+					</span>
+				</div>
 			);
 		return (
-			<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-xs font-medium">
-				<Clock className="w-3 h-3" />
-				Menunggu
-			</span>
+			<div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-600 border border-amber-100">
+				<span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+				<span className="text-[10px] font-bold uppercase tracking-wider">
+					Menunggu
+				</span>
+			</div>
 		);
 	};
 
 	return (
 		<>
 			{/* Header Section */}
-			<div className="flex items-center gap-4 mb-8">
-				<Button
-					onClick={() => navigate(-1)}
-					className="bg-primary hover:bg-primary/90 h-full">
-					<ChevronLeft className="size-6" />
-				</Button>
-				<div>
-					<h1 className="text-2xl font-bold">Pengajuan Layanan</h1>
-					<p className="text-muted-foreground text-sm mt-0.5">
-						Berikut merupakan layanan yang diajukan oleh pelanggan.
-					</p>
-				</div>
-			</div>
+			<PageHeader
+				title="Pengajuan Layanan"
+				subtitle={
+					loading ?
+						<div className="flex items-center gap-1.5">
+							Daftar Pengajuan Layanan - Total{" "}
+							<TextLoading variant="dots" message="" className="w-4" />{" "}
+						</div>
+					:	`Daftar Pengajuan Layanan - Total ${data?.length || 0} pengajuan layanan`
+				}
+				backPath={true}
+			/>
 
 			{/* Main Content */}
 			<div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
@@ -93,22 +93,36 @@ const ViewServiceRequest = () => {
 								initial={{ opacity: 0, y: 16 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ duration: 0.2, ease: "easeOut" }}>
-								<Card className="flex flex-col h-full border rounded-xl shadow-sm bg-white hover:shadow-md transition-shadow duration-200">
-									<CardHeader className="pb-3">
-										<div className="flex items-start justify-between gap-3">
-											<div className="flex-1 min-w-0">
-												<CardTitle className="text-base font-semibold leading-snug truncate">
-													{item.service?.title}
-												</CardTitle>
-												<CardDescription className="text-sm leading-relaxed line-clamp-2 mt-1">
-													{item.service?.description || "Tidak ada deskripsi"}
-												</CardDescription>
+								<Card className="group gap-2 flex flex-col h-full bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
+									<CardHeader className=" space-y-4">
+										{/* Baris Atas: Icon, Judul, dan Status */}
+										<div className="flex items-start justify-between gap-4">
+											<div className="flex items-center gap-3 min-w-0">
+												{/* Icon */}
+												<div className="shrink-0 p-2.5 rounded-xl bg-primary/5 text-primary  transition-colors">
+													<ClipboardPenLine className="w-6 h-6" />
+												</div>
+
+												{/* Judul dengan min-height agar sejajar antar card */}
+												<h3 className="text-base font-bold text-slate-900 leading-snug line-clamp-2 min-h-[2.5rem] flex items-center">
+													{item.service?.title || "Untitled Form"}
+												</h3>
 											</div>
-											{getStatusBadge(item.status)}
+
+											{/* Status Badge di pojok kanan atas */}
+											<div className="shrink-0 mt-1">
+												{getStatusBadge(item.status)}
+											</div>
+										</div>
+
+										{/* Deskripsi - Masuk dalam CardContent atau tetap di Header dengan padding yang pas */}
+										<div className="text-sm text-slate-500 leading-relaxed line-clamp-3 min-h-[2.75rem] text-justify">
+											{item.service?.description ||
+												"Tidak ada deskripsi tersedia untuk layanan ini."}
 										</div>
 									</CardHeader>
 
-									<CardContent className="pt-0 space-y-4">
+									<CardContent className="space-y-4">
 										{/* Info Row */}
 										<div className="flex items-center gap-6 text-sm text-muted-foreground">
 											<div className="flex items-center gap-1.5">
@@ -134,11 +148,11 @@ const ViewServiceRequest = () => {
 										<div className="border-t" />
 
 										{/* Action Buttons */}
-										<div className="flex gap-2">
+										<div className="flex gap-2 w-full">
 											<Button
 												variant="outline"
 												size="sm"
-												className="flex-1 gap-1.5"
+												className="flex-1 gap-1.5 text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900 transition-colors"
 												onClick={() =>
 													navigate(
 														`/dashboard/internal/business/services/request/detail/${item._id}`,
@@ -149,8 +163,9 @@ const ViewServiceRequest = () => {
 											</Button>
 
 											<Button
+												variant="ghost" // Gunakan ghost agar base style bawaan hilang, kita timpa dengan custom class di bawah
 												size="sm"
-												className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white"
+												className="flex-1 gap-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 transition-colors"
 												onClick={() =>
 													showDialog({
 														title: "Konfirmasi Persetujuan",
@@ -166,8 +181,9 @@ const ViewServiceRequest = () => {
 											</Button>
 
 											<Button
+												variant="ghost"
 												size="sm"
-												className="gap-1.5 bg-red-500 hover:bg-red-600 text-white"
+												className="flex-1 gap-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 hover:text-rose-700 transition-colors"
 												onClick={() =>
 													showDialog({
 														title: "Konfirmasi Penolakan",

@@ -1,14 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useCompanyWo } from "../hooks/use-company-wo";
 import { Button } from "@/components/ui/button";
-import {
-	Calendar,
-	ChevronLeft,
-	User,
-	CheckCircle2,
-	Play,
-	X,
-} from "lucide-react";
+import { Calendar, User, CheckCircle2, Play, X } from "lucide-react";
 import { Separator } from "@radix-ui/react-separator";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -24,6 +17,8 @@ import { notifyError, notifySuccess } from "@/lib/toast-helper";
 import { useDialogStore } from "@/store/dialogStore";
 import { useAuthStore } from "@/store/authStore";
 import { SectionLoading } from "@/shared/atoms";
+import PageHeader from "@/shared/atoms/header-content";
+import { TextLoading } from "@/shared/atoms/loading-state";
 
 const CompanyDetailWo = () => {
 	const navigate = useNavigate();
@@ -44,13 +39,12 @@ const CompanyDetailWo = () => {
 	const [isSticky, setIsSticky] = useState(false);
 	const [isSubmittingReady, setIsSubmittingReady] = useState(false);
 	const [isStarting, setIsStarting] = useState(false);
-
 	// Setelah detailData berhasil load → isi assigned staff ke UI state
-	useEffect(() => {
-		if (detailData) {
-			setAssignedStaffsUI(detailData.assignedStaffs ?? []);
-		}
-	}, [detailData]);
+	// useEffect(() => {
+	// 	if (detailData) {
+	// 		setAssignedStaffsUI(detailData.assignedStaffs ?? []);
+	// 	}
+	// }, [detailData]);
 
 	// Detect scroll for sticky header
 	useEffect(() => {
@@ -124,80 +118,61 @@ const CompanyDetailWo = () => {
 		});
 	};
 
+	const getHeaderSubtitle = () => {
+		if (!detailData) return <TextLoading variant="skeleton" />;
+		switch (currentStatus) {
+			case "drafted":
+				return "Lakukan konfigurasi sebelum memulai perintah kerja.";
+			case "ready":
+				return "Perintah kerja siap untuk dimulai.";
+			case "in_progress":
+				return "Perintah kerja sedang dikerjakan.";
+			case "completed":
+				return "Perintah kerja telah selesai.";
+			default:
+				return "Detail perintah kerja.";
+		}
+	};
+
 	// Get current status
 	const currentStatus = detailData?.status;
 
 	return (
 		<div className="space-y-15">
 			{/* ================= STICKY HEADER ================= */}
-			<div
-				className={`sticky top-0 z-30 bg-background transition-shadow duration-300 ${
-					isSticky ? "shadow-xl rounded-md py-2" : ""
-				}`}>
-				<div className="flex flex-col md:flex-row md:items-center justify-between my-4 px-4 sm:px-6 py-4 relative z-10 gap-4 md:gap-0">
-					<div className="flex items-center space-x-4 sm:space-x-6">
-						<Button
-							onClick={() => navigate(-1)}
-							className="bg-primary hover:bg-primary/90 h-10 sm:h-full shrink-0">
-							<ChevronLeft className="size-5 sm:size-6" />
-						</Button>
-
-						<div className="flex flex-col space-y-1 sm:space-y-2">
-							<h1 className="text-lg sm:text-xl font-bold tracking-tight line-clamp-1">
-								Detail Perintah Kerja
-							</h1>
-							<p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
-								{currentStatus === "drafted" ?
-									"Lakukan konfigurasi sebelum memulai perintah kerja."
-								: currentStatus === "ready" ?
-									"Perintah kerja siap untuk dimulai."
-								: currentStatus === "in_progress" ?
-									"Perintah kerja sedang dikerjakan."
-								: currentStatus === "completed" ?
-									"Perintah kerja telah selesai."
-								:	"Detail perintah kerja."}
-							</p>
-						</div>
-					</div>
-
-					{/* Action Buttons */}
-					{!isReadOnly && (
-						<div className="flex items-center gap-2 sm:gap-3 w-full md:w-auto">
-							{/* Status: drafted - Show "Konfigurasi Selesai" button */}
+			<PageHeader
+				title="Detail Perintah Kerja"
+				subtitle={getHeaderSubtitle()}
+				backPath={true}
+				// Jika butuh sticky, kamu bisa masukkan ke className
+				className={`sticky top-0 z-30 transition-shadow duration-300 ${isSticky ? "shadow-md rounded-b-md px-4 sm:px-6" : ""}`}
+				actionButtons={
+					!isReadOnly && (
+						<>
+							{/* Status: drafted */}
 							{currentStatus === "drafted" && (
-								<>
-									<Button
-										variant="outline"
-										onClick={() => navigate(-1)}
-										className="flex-1 md:flex-none">
-										<X className="h-4 w-4 mr-2" />
-										Batal
-									</Button>
-									<Button
-										variant="outline"
-										className="border-green-500 text-green-600 hover:bg-green-50 flex-1 md:flex-none"
-										onClick={handleMarkReady}
-										disabled={isSubmittingReady}>
-										<CheckCircle2 className="h-4 w-4 mr-2" />
-										{isSubmittingReady ?
-											"Memproses..."
-										:	"Konfigurasi Selesai ✓"}
-									</Button>
-								</>
+								<Button
+									variant="outline"
+									className="border-green-500 text-green-600 hover:bg-green-50 flex-1 md:flex-none rounded-xl"
+									onClick={handleMarkReady}
+									disabled={isSubmittingReady}>
+									<CheckCircle2 className="h-4 w-4 mr-2" />
+									{isSubmittingReady ? "Memproses..." : "Konfigurasi Selesai"}
+								</Button>
 							)}
 
-							{/* Status: ready - Show "Mulai Perintah Kerja" button */}
+							{/* Status: ready */}
 							{currentStatus === "ready" && (
 								<>
 									<Button
 										variant="outline"
 										onClick={() => navigate(-1)}
-										className="flex-1 md:flex-none">
+										className="flex-1 md:flex-none rounded-xl">
 										<X className="h-4 w-4 mr-2" />
 										Batal
 									</Button>
 									<Button
-										className="bg-primary hover:bg-primary/90 flex-1 md:flex-none"
+										className="bg-primary hover:bg-primary/90 flex-1 md:flex-none rounded-xl text-white"
 										onClick={handleStartWorkOrder}
 										disabled={isStarting}>
 										<Play className="h-4 w-4 mr-2" />
@@ -206,22 +181,21 @@ const CompanyDetailWo = () => {
 								</>
 							)}
 
-							{/* Status: in_progress, completed, cancelled - No action buttons, just back */}
+							{/* Status: in_progress, completed, cancelled */}
 							{(currentStatus === "in_progress" ||
 								currentStatus === "completed" ||
 								currentStatus === "cancelled") && (
 								<Button
 									variant="outline"
 									onClick={() => navigate(-1)}
-									className="flex-1 md:flex-none">
-									<ChevronLeft className="h-4 w-4 mr-2" />
+									className="flex-1 md:flex-none rounded-xl">
 									Kembali
 								</Button>
 							)}
-						</div>
-					)}
-				</div>
-			</div>
+						</>
+					)
+				}
+			/>
 
 			{/* ================= CONTENT ================= */}
 			{!detailData ?

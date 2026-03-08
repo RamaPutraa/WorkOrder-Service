@@ -2,20 +2,19 @@ import { useNavigate } from "react-router-dom";
 import { useCompanyWo } from "../hooks/use-company-wo";
 import { Button } from "@/components/ui/button";
 import {
-	ChevronLeft,
 	Calendar,
 	User,
 	Eye,
 	FileText,
 	FileCheck,
 	Ticket,
-	Section,
+	ScrollText,
 } from "lucide-react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "framer-motion";
-import { Skeleton } from "@/components/ui/skeleton";
 import { SectionLoading } from "@/shared/atoms";
+import PageHeader from "@/shared/atoms/header-content";
 
 const CompanyViewWo = () => {
 	const { data, loading, error } = useCompanyWo();
@@ -68,19 +67,11 @@ const CompanyViewWo = () => {
 	return (
 		<>
 			{/* Header Section */}
-			<div className="flex items-center gap-4 mb-8">
-				<Button
-					onClick={() => navigate(-1)}
-					className="bg-primary hover:bg-primary/90 h-full shrink-0">
-					<ChevronLeft className="size-6" />
-				</Button>
-				<div className="flex-1">
-					<h1 className="text-2xl font-bold">Daftar Tugas Kerja</h1>
-					<p className="text-muted-foreground text-sm mt-0.5">
-						Berikut merupakan daftar tugas kerja yang tersedia.
-					</p>
-				</div>
-			</div>
+			<PageHeader
+				title="Daftar Tugas Kerja"
+				subtitle="Berikut merupakan daftar tugas kerja yang tersedia	"
+				backPath={true}
+			/>
 
 			{/* Work Orders Grid */}
 			<div className="grid gap-4 sm:gap-5 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
@@ -108,12 +99,15 @@ const CompanyViewWo = () => {
 									<Card className="flex flex-col h-full border shadow-md hover:shadow-lg rounded-lg transition-all duration-200 bg-gradient-to-br from-background to-muted/10 overflow-hidden">
 										{/* Header */}
 										<CardHeader className="pb-3">
-											<div className="flex items-start justify-between gap-3">
+											<div className="flex items-center justify-between gap-3">
+												<div className="shrink-0 p-3 bg-primary/5 text-primary rounded-xl">
+													<ScrollText className="w-6 h-6" />
+												</div>
 												<div className="flex-1 min-w-0">
 													<h3 className="text-lg font-bold leading-tight mb-1 truncate">
 														{wo.service?.title}
 													</h3>
-													<p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+													<p className="text-sm text-muted-foreground line-clamp-1 leading-relaxed">
 														{wo.service?.description || "-"}
 													</p>
 												</div>
