@@ -5,14 +5,12 @@ import {
 	RootLayout,
 } from "@/shared/templates";
 import LoginPage from "@/features/auth/pages/login-page";
-import RegisterPage from "@/features/auth/pages/client-reg-page";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import DashboardOwner from "@/features/owner/dahsboard-client";
 import DashboardClient from "@/features/client/dashboard-client";
 import LandingPage from "@/features/public/landing-page";
 import ProtectedRoute from "./ProtectedRoute";
 import GuestRoute from "./GuestRoute";
-import CompanyRegis from "@/features/auth/pages/company-reg-page";
 import CreateFormPage from "@/features/owner/form/pages/create-form";
 import FormPage from "@/features/owner/form/pages/view-form";
 import DetailFormPage from "@/features/owner/form/pages/detail-form";
@@ -40,6 +38,9 @@ import CompanyReportWo from "@/features/owner/company-wo/pages/company-report-wo
 import HistoryStaffInvitations from "@/features/owner/staff-master/pages/history-staff-invitations";
 import InvitationsHistory from "@/features/staff/invitations/pages/invitations-history";
 import ProfilePage from "@/features/auth/pages/profile";
+import HeroRegis from "@/features/auth/pages/hero-section-regis";
+import ClientRegisterPage from "@/features/auth/pages/client-reg-page";
+import InternalRegisterPage from "@/features/auth/pages/internal-reg-page";
 
 const router = createBrowserRouter([
 	{
@@ -237,7 +238,7 @@ const router = createBrowserRouter([
 			{
 				element: (
 					<RootLayout>
-						<AuthLayout />
+						<PublicLayout />
 					</RootLayout>
 				),
 				children: [
@@ -247,7 +248,11 @@ const router = createBrowserRouter([
 					},
 					{
 						path: "/register",
-						element: <RegisterPage />,
+						element: <ClientRegisterPage />,
+					},
+					{
+						path: "/company-regis",
+						element: <InternalRegisterPage />,
 					},
 				],
 			},
@@ -265,8 +270,8 @@ const router = createBrowserRouter([
 				element: <LandingPage />,
 			},
 			{
-				path: "/company-regis",
-				element: <CompanyRegis />,
+				path: "/hero-regis",
+				element: <HeroRegis />,
 			},
 		],
 	},

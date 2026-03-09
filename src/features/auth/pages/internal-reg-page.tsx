@@ -1,20 +1,19 @@
 import { ChevronLeft, Building2, Users } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import CompanyRegForm from "./company-reg-form";
-import StaffRegForm from "./staff-reg-form";
+import CompanyRegForm from "../components/form-schema/company-reg-form";
+import StaffRegForm from "../components/form-schema/staff-reg-form";
+import { useNavigate } from "react-router-dom";
 
-type Props = {
-	onBack: () => void;
-};
+const InternalPageForm = () => {
+	const navigate = useNavigate();
 
-const MainCompanyForm = ({ onBack }: Props) => {
 	return (
 		<div className="min-h-screen w-full flex items-center justify-center bg-gray-50">
 			<div className="w-full max-w-lg">
 				{/* Back + Logo */}
 				<div className="mb-8">
 					<button
-						onClick={onBack}
+						onClick={() => navigate(-1)}
 						className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 transition-colors mb-6 group">
 						<ChevronLeft
 							size={16}
@@ -51,8 +50,8 @@ const MainCompanyForm = ({ onBack }: Props) => {
 
 					{/* Tab: Perusahaan */}
 					<TabsContent value="company">
-						<div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-7">
-							<div className="mb-5">
+						<div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-7 ">
+							<div className="mb-5 border-b border-slate-100 pb-5">
 								<h3 className="text-base font-semibold text-gray-900">
 									Akun Perusahaan
 								</h3>
@@ -68,7 +67,7 @@ const MainCompanyForm = ({ onBack }: Props) => {
 					{/* Tab: Pegawai */}
 					<TabsContent value="staff">
 						<div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-7">
-							<div className="mb-5">
+							<div className="mb-5 border-b border-slate-100 pb-5">
 								<h3 className="text-base font-semibold text-gray-900">
 									Akun Pegawai
 								</h3>
@@ -95,4 +94,4 @@ const MainCompanyForm = ({ onBack }: Props) => {
 	);
 };
 
-export default MainCompanyForm;
+export default InternalPageForm;

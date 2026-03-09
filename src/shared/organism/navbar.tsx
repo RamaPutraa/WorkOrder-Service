@@ -62,12 +62,12 @@ const Navbar = ({ showMenu = false }: NavbarProps) => {
 						<AvatarDropdown />
 					:	<div className="hidden md:flex items-center gap-2">
 							<a
-								href="/login/"
+								href="/login"
 								className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50">
 								Masuk
 							</a>
 							<a
-								href="/register"
+								href="/hero-regis"
 								className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md">
 								Daftar
 							</a>
