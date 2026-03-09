@@ -1,4 +1,5 @@
-import { Outlet } from "react-router-dom";
+import React from "react";
+import { Outlet, useLocation, Link } from "react-router-dom";
 // import AppSidebar from "../organism/sidebar";
 // import { SidebarProvider } from "../../components/ui/sidebar";
 import { AppSidebar } from "../organism/sidebar";
@@ -17,7 +18,34 @@ import {
 	SidebarTrigger,
 } from "@/components/ui/sidebar";
 
+const isIdSegment = (segment: string) => {
+	// MongoDB ObjectId (24 hex characters)
+	if (/^[0-9a-fA-F]{24}$/.test(segment)) return true;
+	// UUID (8-4-4-4-12 hex characters)
+	if (
+		/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
+			segment,
+		)
+	)
+		return true;
+	// Pure numeric IDs (e.g., standard SQL IDs, min 1 digit)
+	if (/^\d+$/.test(segment) && segment.length >= 1) return true;
+
+	return false;
+};
+
 const AppLayout = () => {
+	const location = useLocation();
+	const pathnames = location.pathname.split("/").filter((x) => x);
+
+	// Filter out ID segments for visual representation, but keep their original cumulative path
+	const mappedCrumbs = pathnames
+		.map((value, index) => {
+			const to = `/${pathnames.slice(0, index + 1).join("/")}`;
+			return { value, to };
+		})
+		.filter((crumb) => !isIdSegment(crumb.value));
+
 	return (
 		<SidebarProvider>
 			<AppSidebar />
@@ -31,15 +59,37 @@ const AppLayout = () => {
 						/>
 						<Breadcrumb>
 							<BreadcrumbList>
-								<BreadcrumbItem className="hidden md:block">
-									<BreadcrumbLink href="#">
-										Building Your Application
-									</BreadcrumbLink>
-								</BreadcrumbItem>
-								<BreadcrumbSeparator className="hidden md:block" />
-								<BreadcrumbItem>
-									<BreadcrumbPage>Data Fetching</BreadcrumbPage>
-								</BreadcrumbItem>
+								{mappedCrumbs.length === 0 ?
+									<BreadcrumbItem>
+										<BreadcrumbPage>Home</BreadcrumbPage>
+									</BreadcrumbItem>
+								:	mappedCrumbs.map((crumb, index) => {
+										const isLast = index === mappedCrumbs.length - 1;
+										const decodedValue = decodeURIComponent(crumb.value);
+										const title =
+											decodedValue.charAt(0).toUpperCase() +
+											decodedValue.slice(1).replace(/-/g, " ");
+
+										return (
+											<React.Fragment key={crumb.to}>
+												<BreadcrumbItem
+													className={index === 0 ? "hidden md:block" : ""}>
+													{isLast ?
+														<BreadcrumbPage>{title}</BreadcrumbPage>
+													:	<BreadcrumbLink asChild>
+															<Link to={crumb.to}>{title}</Link>
+														</BreadcrumbLink>
+													}
+												</BreadcrumbItem>
+												{!isLast && (
+													<BreadcrumbSeparator
+														className={index === 0 ? "hidden md:block" : ""}
+													/>
+												)}
+											</React.Fragment>
+										);
+									})
+								}
 							</BreadcrumbList>
 						</Breadcrumb>
 					</div>
@@ -51,4 +101,5 @@ const AppLayout = () => {
 		</SidebarProvider>
 	);
 };
+
 export default AppLayout;

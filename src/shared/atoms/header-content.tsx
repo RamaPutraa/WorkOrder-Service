@@ -44,9 +44,9 @@ const PageHeader = ({
 						{title}
 					</h1>
 					{subtitle && (
-						<p className="text-sm text-slate-500 font-medium leading-relaxed line-clamp-1">
+						<div className="text-sm text-slate-500 font-medium leading-relaxed line-clamp-1">
 							{subtitle}
-						</p>
+						</div>
 					)}
 				</div>
 			</div>

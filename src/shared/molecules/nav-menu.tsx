@@ -8,6 +8,8 @@ import {
 	type LucideIcon,
 } from "lucide-react";
 
+import { Link, useLocation } from "react-router-dom";
+
 import {
 	SidebarGroup,
 	SidebarGroupLabel,
@@ -27,21 +29,24 @@ export function NavMenu({
 		icon: LucideIcon;
 	}[];
 }) {
+	const location = useLocation();
 	// const { isMobile } = useSidebar();
 
 	return (
 		<SidebarGroup className="group-data-[collapsible=icon]:hidden">
 			<SidebarGroupLabel>Menu</SidebarGroupLabel>
 			<SidebarMenu>
-				{menu.map((item) => (
-					<SidebarMenuItem key={item.name}>
-						<SidebarMenuButton asChild>
-							<a href={item.url}>
-								<item.icon />
-								<span>{item.name}</span>
-							</a>
-						</SidebarMenuButton>
-						{/* <DropdownMenu>
+				{menu.map((item) => {
+					const isActive = item.url === location.pathname;
+					return (
+						<SidebarMenuItem key={item.name}>
+							<SidebarMenuButton asChild isActive={isActive}>
+								<Link to={item.url}>
+									<item.icon />
+									<span>{item.name}</span>
+								</Link>
+							</SidebarMenuButton>
+							{/* <DropdownMenu>
 							<DropdownMenuTrigger asChild>
 								<SidebarMenuAction showOnHover>
 									<MoreHorizontal />
@@ -67,8 +72,9 @@ export function NavMenu({
 								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu> */}
-					</SidebarMenuItem>
-				))}
+						</SidebarMenuItem>
+					);
+				})}
 				{/* <SidebarMenuItem>
 					<SidebarMenuButton className="text-sidebar-foreground/70">
 						<MoreHorizontal className="text-sidebar-foreground/70" />

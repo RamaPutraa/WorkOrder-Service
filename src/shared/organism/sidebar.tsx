@@ -54,7 +54,6 @@ const data = {
 			title: "Tugas Kerja",
 			url: "#",
 			icon: SquareTerminal,
-			isActive: true,
 			items: [
 				{
 					title: "Template",

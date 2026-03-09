@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ClipboardList, ScrollText } from "lucide-react";
+import { ArrowRight, ClipboardList } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardFooter, CardHeader } from "@/components/ui/card";
 import { SectionLoading } from "@/shared/atoms";
