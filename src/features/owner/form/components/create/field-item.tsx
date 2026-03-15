@@ -9,10 +9,7 @@ import {
 	SelectItem,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-
-// Sub-komponen spesifik per tipe
 import { FieldOption } from "../field-type/field-option";
-
 import { Switch } from "@/components/ui/switch";
 import { Trash2 } from "lucide-react";
 import { FieldText } from "../field-type/field-text";
@@ -48,26 +45,29 @@ export const FieldItem: React.FC<Props> = ({
 	};
 
 	return (
-		<>
-			{/* Header */}
-			<div className="grid items-center grid-cols-5 gap-5">
-				{/* Label input */}
-				<div className="col-span-4">
+		<div className="space-y-4">
+			{/* Question label + type selector */}
+			<div className="flex flex-col sm:flex-row gap-3">
+				{/* Label input — takes most space */}
+				<div className="flex-1 min-w-0">
 					<Input
-						className={`border-0 border-b-2 shadow-none text-lg py-6 focus-visible:ring-0 ${
-							error ? "border-red-500" : "focus-visible:border-primary"
+						className={`h-10 rounded-lg text-sm font-medium ${
+							error ?
+								"border-red-400 focus-visible:ring-red-300"
+							:	"focus-visible:ring-primary/30 focus-visible:border-primary"
 						}`}
 						value={field.label}
 						onChange={(e) => onUpdate({ label: e.target.value })}
-						placeholder="Pertanyaan"
+						placeholder="Tulis pertanyaan di sini..."
 					/>
 				</div>
-				{/* Field type select */}
-				<div className="">
+
+				{/* Type selector — fixed width */}
+				<div className="w-full sm:w-44 shrink-0">
 					<Select
 						value={field.type}
 						onValueChange={(v) => onUpdate({ type: v as Field["type"] })}>
-						<SelectTrigger className="w-full py-6 border-gray-300">
+						<SelectTrigger className="h-10 rounded-lg w-full text-sm border-slate-200">
 							<SelectValue placeholder="Tipe" />
 						</SelectTrigger>
 						<SelectContent>
@@ -82,28 +82,32 @@ export const FieldItem: React.FC<Props> = ({
 				</div>
 			</div>
 
-			<div className="mt-7">{renderField()}</div>
+			{/* Field-type specific sub-fields */}
+			<div>{renderField()}</div>
 
-			{/* Footer actions ala Google Form */}
-			<div className="border-t-1 flex items-center justify-end mt-20 pt-5 space-x-2">
-				{/* Toggle Wajib diisi */}
+			{/* Footer: required toggle + delete */}
+			<div className="flex items-center justify-between pt-3 mt-1 border-t border-slate-100">
 				<div className="flex items-center gap-2">
-					<Label className="text-sm text-muted-foreground">Wajib diisi</Label>
 					<Switch
+						id={`required-${field.order}`}
 						checked={field.required}
-						onCheckedChange={(checked) =>
-							onUpdate({ required: checked === true })
-						}
+						onCheckedChange={(checked) => onUpdate({ required: checked === true })}
 					/>
+					<Label
+						htmlFor={`required-${field.order}`}
+						className="text-xs text-muted-foreground cursor-pointer select-none">
+						Wajib diisi
+					</Label>
 				</div>
 				<Button
 					variant="ghost"
-					size="icon"
+					size="sm"
+					type="button"
 					onClick={onRemove}
-					className="text-gray-500 hover:text-red-500">
-					<Trash2 size={16} />
+					className="h-8 w-8 p-0 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+					<Trash2 size={15} />
 				</Button>
 			</div>
-		</>
+		</div>
 	);
 };

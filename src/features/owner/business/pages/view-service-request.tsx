@@ -8,9 +8,6 @@ import { useBusiness } from "../hooks/use-business";
 import { Button } from "@/components/ui/button";
 import {
 	Calendar,
-	Eye,
-	CheckCircle,
-	XCircle,
 	User,
 	ClipboardPenLine,
 	ArrowRight,

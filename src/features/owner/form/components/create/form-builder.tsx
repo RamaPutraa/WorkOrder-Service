@@ -1,4 +1,4 @@
-import { useState, forwardRef, useImperativeHandle } from "react";
+import { useState, forwardRef, useImperativeHandle, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -18,6 +18,7 @@ import { minFields, required, minLength } from "@/lib/validators";
 import { useNavigate } from "react-router-dom";
 import { handleApi } from "@/lib/handle-api";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
+import { AlertCircle, FileText } from "lucide-react";
 
 export type FormBuilderRef = {
 	submitForm: () => void;
@@ -54,6 +55,13 @@ export const FormBuilder = forwardRef<FormBuilderRef, Props>(
 					],
 				},
 			);
+
+		// Notify parent whenever fields change — avoids setState-during-render warning
+		useEffect(() => {
+			onFieldsChange?.(formData.fields);
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+		}, [formData.fields]);
+
 		const handleAddField = () => {
 			const newField: Field = {
 				order: formData.fields.length + 1,
@@ -65,61 +73,47 @@ export const FormBuilder = forwardRef<FormBuilderRef, Props>(
 				max: null,
 				options: [],
 			};
-
 			const updatedFields = [...formData.fields, newField];
-
-			// Gunakan validateAndSetField agar auto-clear error fields
 			validateAndSetField("fields", updatedFields);
-
-			onFieldsChange?.(updatedFields);
+			// onFieldsChange is handled by the useEffect above
 		};
 
 		const handleRemoveField = (index: number) => {
 			const updatedFields = formData.fields.filter((_, i) => i !== index);
-
 			validateAndSetField("fields", updatedFields);
-
-			onFieldsChange?.(updatedFields);
+			// onFieldsChange is handled by the useEffect above
 		};
 
 		const handleUpdateField = (index: number, updatedField: Partial<Field>) => {
 			setFormData((prev) => {
 				const newFields = [...prev.fields];
 				newFields[index] = { ...newFields[index], ...updatedField };
-				const updated = { ...prev, fields: newFields };
-				onFieldsChange?.(updated.fields);
-				return updated;
+				return { ...prev, fields: newFields };
+				// onFieldsChange is handled by the useEffect above
 			});
 		};
 
 		const handleSubmit = async () => {
 			setHasSubmitted(true);
-
 			if (!validateForm()) {
 				toast.error("Periksa kembali isian form!");
 				return;
 			}
-
 			setIsSubmitting(true);
-
 			const { data: res, error } = await handleApi(() =>
 				createFormApi(formData),
 			);
-
 			setIsSubmitting(false);
-
 			if (error) {
 				console.error(error);
 				notifyError(error.message || "Gagal menyimpan form!");
 				return;
 			}
-
 			const form = res?.data;
 			if (!form) {
-				notifyError("Gagal membuat form", "Data posisi tidak ditemukan");
+				notifyError("Gagal membuat form", "Data form tidak ditemukan");
 				return;
 			}
-
 			notifySuccess("Form berhasil disimpan!");
 			navigate("/dashboard/internal/forms");
 		};
@@ -131,62 +125,86 @@ export const FormBuilder = forwardRef<FormBuilderRef, Props>(
 		}));
 
 		return (
-			<div className="w-full space-y-6 pb-10">
-				<Card className="rounded-2xl shadow-sm border border-gray-200">
-					<CardContent className="p-6 space-y-5">
+			<div className="w-full space-y-6">
+				{/* Info Card */}
+				<Card className="rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden py-0">
+					{/* Card header strip */}
+					<div className="px-5 sm:px-6 py-4 border-b border-slate-100 bg-gradient-to-br from-background to-muted/20">
+						<div className="flex items-center gap-2.5">
+							<div className="shrink-0 p-2 rounded-lg bg-primary/5 text-primary">
+								<FileText className="w-4 h-4" />
+							</div>
+							<div>
+								<h2 className="text-sm font-semibold text-slate-800">
+									Informasi Formulir
+								</h2>
+								<p className="text-xs text-muted-foreground">
+									Isi detail dasar formulir Anda
+								</p>
+							</div>
+						</div>
+					</div>
+
+					<CardContent className="p-5 sm:p-6 space-y-5">
 						{/* Judul Form */}
-						<div className="space-y-2">
+						<div className="space-y-1.5">
 							<Label
-								className={`font-medium ${errors.title ? "text-red-500" : ""}`}>
+								className={`text-sm font-medium ${errors.title ? "text-red-500" : "text-slate-700"}`}>
 								Judul Form
+								<span className="text-red-400 ml-0.5">*</span>
 							</Label>
 							<Input
 								value={formData.title}
 								onChange={(e) => validateAndSetField("title", e.target.value)}
 								placeholder="Contoh: Formulir Pendaftaran"
-								className={`${
+								className={`h-10 rounded-lg ${
 									errors.title ?
-										"border-red-500 focus-visible:ring-red-300"
-									:	""
+										"border-red-400 focus-visible:ring-red-300"
+									:	"focus-visible:ring-primary/30"
 								}`}
 							/>
 							{errors.title && (
-								<p className="text-sm text-red-500">{errors.title}</p>
+								<p className="text-xs text-red-500 flex items-center gap-1">
+									<AlertCircle className="w-3 h-3 shrink-0" />
+									{errors.title}
+								</p>
 							)}
 						</div>
 
 						{/* Deskripsi */}
-						<div className="space-y-2">
+						<div className="space-y-1.5">
 							<Label
-								className={`font-medium ${
-									errors.description ? "text-red-500" : ""
-								}`}>
+								className={`text-sm font-medium ${errors.description ? "text-red-500" : "text-slate-700"}`}>
 								Deskripsi
+								<span className="text-red-400 ml-0.5">*</span>
 							</Label>
 							<Textarea
 								value={formData.description}
 								onChange={(e) =>
 									validateAndSetField("description", e.target.value)
 								}
-								placeholder="Tuliskan deskripsi singkat form..."
-								className={`${
+								placeholder="Tuliskan deskripsi singkat form ini..."
+								rows={3}
+								className={`rounded-lg resize-none ${
 									errors.description ?
-										"border-red-500 focus-visible:ring-red-300"
-									:	""
+										"border-red-400 focus-visible:ring-red-300"
+									:	"focus-visible:ring-primary/30"
 								}`}
 							/>
 							{errors.description && (
-								<p className="text-sm text-red-500">{errors.description}</p>
+								<p className="text-xs text-red-500 flex items-center gap-1">
+									<AlertCircle className="w-3 h-3 shrink-0" />
+									{errors.description}
+								</p>
 							)}
 						</div>
 
-						{/* Form Type (Dropdown) */}
-						<div className="space-y-2">
+						{/* Tipe Form */}
+						<div className="space-y-1.5">
 							<Label
-								className={`font-medium ${
-									errors.formType ? "text-red-500" : ""
-								}`}>
+								className={`text-sm font-medium ${errors.formType ? "text-red-500" : "text-slate-700"}`}>
 								Tipe Form
+								<span className="text-red-400 ml-0.5">*</span>
 							</Label>
 							<Select
 								value={formData.formType}
@@ -194,10 +212,10 @@ export const FormBuilder = forwardRef<FormBuilderRef, Props>(
 									validateAndSetField("formType", value)
 								}>
 								<SelectTrigger
-									className={`w-full ${
+									className={`h-10 rounded-lg w-full ${
 										errors.formType ?
-											"border-red-500 focus:ring-red-500 focus:border-red-300"
-										:	""
+											"border-red-400 focus:ring-red-300"
+										:	"focus:ring-primary/30"
 									}`}>
 									<SelectValue placeholder="Pilih tipe form" />
 								</SelectTrigger>
@@ -208,27 +226,29 @@ export const FormBuilder = forwardRef<FormBuilderRef, Props>(
 								</SelectContent>
 							</Select>
 							{errors.formType && (
-								<p className="text-sm text-red-500">{errors.formType}</p>
+								<p className="text-xs text-red-500 flex items-center gap-1">
+									<AlertCircle className="w-3 h-3 shrink-0" />
+									{errors.formType}
+								</p>
 							)}
 						</div>
 					</CardContent>
 				</Card>
 
-				{/* Field Dinamis */}
+				{/* Dynamic Field List */}
 				<DynamicFields
 					fields={formData.fields}
 					onRemove={handleRemoveField}
 					onUpdate={handleUpdateField}
 					hasSubmitted={hasSubmitted}
 				/>
+
+				{/* Global field error */}
 				{errors.fields && (
-					<Card className="rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition overflow-hidden relative">
-						{/* Garis biru di kiri */}
-						<div className="absolute left-0 top-0 h-full w-1 bg-primary rounded-l-lg" />
-						<div className="p-6">
-							<p className="text-sm text-red-500 mt-1">{errors.fields}</p>
-						</div>
-					</Card>
+					<div className="flex items-start gap-3 p-4 rounded-xl border border-red-200 bg-red-50 text-red-600">
+						<AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+						<p className="text-sm">{errors.fields}</p>
+					</div>
 				)}
 			</div>
 		);
