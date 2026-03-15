@@ -13,7 +13,7 @@ import PageHeader from "@/shared/atoms/header-content";
 const FormCreatePage: React.FC = () => {
 	const formRef = useRef<FormBuilderRef>(null);
 	const [fields, setFields] = useState<Field[]>([]);
-	const isSubmitting = formRef.current?.isSubmitting;
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const fieldsType = (type: string) => {
 		switch (type) {
@@ -44,7 +44,11 @@ const FormCreatePage: React.FC = () => {
 			<div className="flex flex-col lg:flex-row items-start gap-6">
 				{/* Form Builder — full width mobile, flex-1 desktop */}
 				<div className="w-full lg:flex-1 min-w-0">
-					<FormBuilder ref={formRef} onFieldsChange={setFields} />
+					<FormBuilder
+						ref={formRef}
+						onFieldsChange={setFields}
+						onSubmittingChange={setIsSubmitting}
+					/>
 				</div>
 
 				{/* Action Sidebar — full width mobile, sticky sidebar desktop */}

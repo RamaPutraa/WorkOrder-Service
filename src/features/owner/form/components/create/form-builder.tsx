@@ -28,10 +28,11 @@ export type FormBuilderRef = {
 
 type Props = {
 	onFieldsChange?: (fields: Field[]) => void;
+	onSubmittingChange?: (isSubmitting: boolean) => void;
 };
 
 export const FormBuilder = forwardRef<FormBuilderRef, Props>(
-	({ onFieldsChange }, ref) => {
+	({ onFieldsChange, onSubmittingChange }, ref) => {
 		const [isSubmitting, setIsSubmitting] = useState(false);
 		const [hasSubmitted, setHasSubmitted] = useState(false);
 		const navigate = useNavigate();
@@ -61,6 +62,12 @@ export const FormBuilder = forwardRef<FormBuilderRef, Props>(
 			onFieldsChange?.(formData.fields);
 			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [formData.fields]);
+
+		// Sync isSubmitting to parent so the sidebar button can react
+		useEffect(() => {
+			onSubmittingChange?.(isSubmitting);
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+		}, [isSubmitting]);
 
 		const handleAddField = () => {
 			const newField: Field = {
