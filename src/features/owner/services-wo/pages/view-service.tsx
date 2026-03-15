@@ -67,7 +67,7 @@ const ViewService: React.FC = () => {
 								initial={{ opacity: 0, y: 16 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ duration: 0.2, ease: "easeOut" }}>
-								<Card className="group gap-2 flex flex-col h-full bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
+								<Card className="group gap-2 flex flex-col h-full bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
 									<CardHeader className=" space-y-4">
 										{/* Baris Atas: Icon, Judul, dan Status */}
 										<div className="flex items-start justify-between gap-4">

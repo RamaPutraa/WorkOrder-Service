@@ -1,4 +1,9 @@
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import {
+	Card,
+	CardHeader,
+	CardContent,
+	CardFooter,
+} from "@/components/ui/card";
 import { useBusiness } from "../hooks/use-business";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,6 +13,9 @@ import {
 	XCircle,
 	User,
 	ClipboardPenLine,
+	ArrowRight,
+	Check,
+	X,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDialogStore } from "@/store/dialogStore";
@@ -76,147 +84,151 @@ const ViewServiceRequest = () => {
 			/>
 
 			{/* Main Content */}
-			<div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
-				<AnimatePresence mode="wait">
-					{loading ?
-						<motion.div
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							exit={{ opacity: 0 }}
-							className="col-span-full">
-							<SectionLoading message="Memuat data pengajuan layanan..." />
-						</motion.div>
-					: data.length > 0 ?
-						data.map((item) => (
+			<div className="w-full">
+				<div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+					<AnimatePresence mode="wait">
+						{loading ?
 							<motion.div
-								key={item._id}
-								initial={{ opacity: 0, y: 16 }}
-								animate={{ opacity: 1, y: 0 }}
-								transition={{ duration: 0.2, ease: "easeOut" }}>
-								<Card className="group gap-2 flex flex-col h-full bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
-									<CardHeader className=" space-y-4">
-										{/* Baris Atas: Icon, Judul, dan Status */}
-										<div className="flex items-start justify-between gap-4">
-											<div className="flex items-center gap-3 min-w-0">
-												{/* Icon */}
-												<div className="shrink-0 p-2.5 rounded-xl bg-primary/5 text-primary  transition-colors">
-													<ClipboardPenLine className="w-6 h-6" />
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								exit={{ opacity: 0 }}
+								className="col-span-full">
+								<SectionLoading message="Memuat data pengajuan layanan..." />
+							</motion.div>
+						: data.length > 0 ?
+							data.map((item) => (
+								<motion.div
+									key={item._id}
+									initial={{ opacity: 0, y: 16 }}
+									animate={{ opacity: 1, y: 0 }}
+									transition={{ duration: 0.2, ease: "easeOut" }}>
+									<Card className="group flex flex-col h-full bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+										<CardHeader className="px-5 sm:px-6 pt-5 sm:pt-6 space-y-4">
+											<div className="flex items-center justify-between gap-3 min-w-0">
+												{/* Icon & Title Group */}
+												<div className="flex items-center gap-3 flex-1 min-w-0">
+													<div className="shrink-0 p-2.5 sm:p-3 bg-primary/5 text-primary rounded-xl">
+														<ClipboardPenLine className="w-5 h-5 sm:w-6 sm:h-6" />
+													</div>
+													<div className="flex-1 min-w-0">
+														<h3 className="text-sm sm:text-base font-semibold text-slate-900 leading-snug truncate">
+															{item.service?.title || "Untitled Form"}
+														</h3>
+													</div>
 												</div>
 
-												{/* Judul dengan min-height agar sejajar antar card */}
-												<h3 className="text-base font-bold text-slate-900 leading-snug line-clamp-2 min-h-[2.5rem] flex items-center">
-													{item.service?.title || "Untitled Form"}
-												</h3>
+												{/* Status Badge */}
+												<div className="shrink-0">
+													{getStatusBadge(item.status)}
+												</div>
 											</div>
 
-											{/* Status Badge di pojok kanan atas */}
-											<div className="shrink-0 mt-1">
-												{getStatusBadge(item.status)}
+											<p className="text-xs sm:text-sm text-slate-500 leading-relaxed line-clamp-3 md:min-h-[3.75rem]">
+												{item.service?.description ||
+													"Tidak ada deskripsi tersedia untuk layanan ini."}
+											</p>
+										</CardHeader>
+
+										<CardContent className="px-6 py-2 mt-auto flex flex-col justify-end">
+											{/* Info Row (Client & Date) */}
+											<div className=""></div>
+											<div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
+												<div className="flex items-center gap-1.5">
+													<User className="w-3.5 h-3.5 shrink-0" />
+													<span className="truncate max-w-[120px] sm:max-w-none">
+														{item.client?.name ?? "-"}
+													</span>
+												</div>
+												<div className="flex items-center gap-1.5">
+													<Calendar className="w-3.5 h-3.5 shrink-0" />
+													<span>
+														{new Date(item.createdAt).toLocaleDateString(
+															"id-ID",
+															{
+																day: "2-digit",
+																month: "short",
+																year: "numeric",
+															},
+														)}
+													</span>
+												</div>
 											</div>
-										</div>
 
-										{/* Deskripsi - Masuk dalam CardContent atau tetap di Header dengan padding yang pas */}
-										<div className="text-sm text-slate-500 leading-relaxed line-clamp-3 min-h-[2.75rem] text-justify">
-											{item.service?.description ||
-												"Tidak ada deskripsi tersedia untuk layanan ini."}
-										</div>
-									</CardHeader>
+											{/* Divider */}
+										</CardContent>
+										<CardFooter className="px-5 sm:px-6 py-4 mt-auto border-t border-slate-200/70">
+											<div className="w-full flex flex-col lg:flex-row items-stretch lg:items-center gap-2">
+												{/* Tombol Terima & Tolak */}
+												<div className="flex gap-2 flex-1">
+													<Button
+														size="sm"
+														className="flex-1 gap-1.5 font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl px-3 h-9 shadow-sm shadow-blue-200 transition-all flex items-center justify-center active:scale-95"
+														onClick={() =>
+															showDialog({
+																title: "Konfirmasi Persetujuan",
+																description:
+																	"Apakah kamu yakin ingin menyetujui layanan ini?",
+																confirmText: "Setujui",
+																cancelText: "Batal",
+																onConfirm: () => handleApprove(item._id),
+															})
+														}>
+														<Check className="w-4 h-4 shrink-0" />
+														<span>Terima</span>
+													</Button>
 
-									<CardContent className="space-y-4">
-										{/* Info Row */}
-										<div className="flex items-center gap-6 text-sm text-muted-foreground">
-											<div className="flex items-center gap-1.5">
-												<User className="w-3.5 h-3.5" />
-												<span>{item.client?.name ?? "-"}</span>
+													<Button
+														size="sm"
+														className="flex-1 gap-1.5 font-semibold text-white bg-red-600 hover:bg-red-700 rounded-xl px-3 h-9 shadow-sm shadow-red-200 transition-all flex items-center justify-center active:scale-95"
+														onClick={() =>
+															showDialog({
+																title: "Konfirmasi Penolakan",
+																description:
+																	"Apakah kamu yakin ingin menolak layanan ini?",
+																confirmText: "Tolak",
+																cancelText: "Batal",
+																onConfirm: () => handleReject(item._id),
+															})
+														}>
+														<X className="w-4 h-4 shrink-0" />
+														<span>Tolak</span>
+													</Button>
+												</div>
+
+												{/* Tombol Lihat Detail */}
+												<Button
+													variant="outline"
+													size="sm"
+													className="w-full sm:w-auto text-xs rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors flex items-center justify-center gap-1"
+													onClick={() =>
+														navigate(
+															`/dashboard/internal/business/services/request/detail/${item._id}`,
+														)
+													}>
+													Lihat Detail
+													<ArrowRight className="ml-1 h-4 w-4 shrink-0" />
+												</Button>
 											</div>
-											<div className="flex items-center gap-1.5">
-												<Calendar className="w-3.5 h-3.5" />
-												<span>
-													{new Date(item.createdAt).toLocaleDateString(
-														"id-ID",
-														{
-															day: "2-digit",
-															month: "short",
-															year: "numeric",
-														},
-													)}
-												</span>
-											</div>
-										</div>
-
-										{/* Divider */}
-										<div className="border-t" />
-
-										{/* Action Buttons */}
-										<div className="flex gap-2 w-full">
-											<Button
-												variant="outline"
-												size="sm"
-												className="flex-1 gap-1.5 text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-												onClick={() =>
-													navigate(
-														`/dashboard/internal/business/services/request/detail/${item._id}`,
-													)
-												}>
-												<Eye className="w-4 h-4" />
-												Lihat Detail
-											</Button>
-
-											<Button
-												variant="ghost" // Gunakan ghost agar base style bawaan hilang, kita timpa dengan custom class di bawah
-												size="sm"
-												className="flex-1 gap-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 transition-colors"
-												onClick={() =>
-													showDialog({
-														title: "Konfirmasi Persetujuan",
-														description:
-															"Apakah kamu yakin ingin menyetujui layanan ini?",
-														confirmText: "Setujui",
-														cancelText: "Batal",
-														onConfirm: () => handleApprove(item._id),
-													})
-												}>
-												<CheckCircle className="w-4 h-4" />
-												Terima
-											</Button>
-
-											<Button
-												variant="ghost"
-												size="sm"
-												className="flex-1 gap-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 hover:text-rose-700 transition-colors"
-												onClick={() =>
-													showDialog({
-														title: "Konfirmasi Penolakan",
-														description:
-															"Apakah kamu yakin ingin menolak layanan ini?",
-														confirmText: "Tolak",
-														cancelText: "Batal",
-														onConfirm: () => handleReject(item._id),
-													})
-												}>
-												<XCircle className="w-4 h-4" />
-												Tolak
-											</Button>
-										</div>
-									</CardContent>
+										</CardFooter>
+									</Card>
+								</motion.div>
+							))
+						:	<motion.div
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								className="col-span-full">
+								<Card className="p-8 sm:p-12 text-center border-dashed border-2 rounded-xl">
+									<p className="text-muted-foreground">
+										Belum ada pengajuan layanan.
+									</p>
+									<p className="text-sm text-muted-foreground mt-1">
+										Pengajuan layanan dari pelanggan akan muncul di sini.
+									</p>
 								</Card>
 							</motion.div>
-						))
-					:	<motion.div
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							className="col-span-full">
-							<Card className="p-12 text-center border-dashed border-2 rounded-xl">
-								<p className="text-muted-foreground">
-									Belum ada pengajuan layanan.
-								</p>
-								<p className="text-sm text-muted-foreground mt-1">
-									Pengajuan layanan dari pelanggan akan muncul di sini.
-								</p>
-							</Card>
-						</motion.div>
-					}
-				</AnimatePresence>
+						}
+					</AnimatePresence>
+				</div>
 			</div>
 		</>
 	);
