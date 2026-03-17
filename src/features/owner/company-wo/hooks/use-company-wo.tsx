@@ -5,8 +5,9 @@ import {
 	getInternalCompanyWorkOrders,
 } from "../services/company-wo-service";
 import { notifyError } from "@/lib/toast-helper";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState, useMemo } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
+import { type FilterConfig } from "@/shared/molecules/generic-filter";
 
 export const useCompanyWo = () => {
 	const { id } = useParams<{ id: string }>();
@@ -75,10 +76,80 @@ export const useCompanyWo = () => {
 		if (id) fecthDetailInternalCompanyWorkOrder(id);
 	}, []);
 
+	// ─── Filter Logic ──────────────────────────────────────────────────────────
+	const [searchParams] = useSearchParams();
+	const searchQuery = (searchParams.get("search") || "").toLowerCase();
+	const statusQuery = searchParams.get("status") || "";
+	const dateFromQuery = searchParams.get("date");
+	const dateToQuery = searchParams.get("date_end");
+
+	// Menyaring data yang asli (Front-end filtering)
+	const filteredData = useMemo(() => {
+		return data.filter((wo) => {
+			const matchesSearch =
+				!searchQuery ||
+				wo.service?.title.toLowerCase().includes(searchQuery) ||
+				wo.service?.description?.toLowerCase().includes(searchQuery);
+
+			const matchesStatus =
+				!statusQuery || wo.status.toLowerCase() === statusQuery;
+
+			let matchesDate = true;
+			if (dateFromQuery) {
+				const woDate = new Date(wo.createdAt).getTime();
+				const fromDate = new Date(dateFromQuery).getTime();
+
+				// Set the end date to the end of the day if it exists, otherwise use fromDate
+				const toDate =
+					dateToQuery ?
+						new Date(dateToQuery).setHours(23, 59, 59, 999)
+					:	new Date(dateFromQuery).setHours(23, 59, 59, 999);
+
+				matchesDate = woDate >= fromDate && woDate <= toDate;
+			}
+
+			return matchesSearch && matchesStatus && matchesDate;
+		});
+	}, [data, searchQuery, statusQuery, dateFromQuery, dateToQuery]);
+
+	// Konfigurasi Field yang dilempar ke komponen GenericFilter
+	const filterConfig: FilterConfig[] = useMemo(
+		() => [
+			{
+				id: "search",
+				label: "Judul/Deskripsi",
+				type: "text",
+				placeholder: "Cari judul tugas kerja...",
+			},
+			{
+				id: "date",
+				label: "Tanggal Dibuat",
+				type: "date-range",
+				placeholder: "Pilih rentang waktu",
+			},
+			{
+				id: "status",
+				label: "Status",
+				type: "select",
+				placeholder: "Semua Status",
+				options: [
+					{ label: "Dirancang", value: "drafted" },
+					{ label: "Siap Dikerjakan", value: "ready" },
+					{ label: "Sedang Dikerjakan", value: "in_progress" },
+					{ label: "Selesai", value: "completed" },
+					{ label: "Dibatalkan", value: "cancelled" },
+				],
+			},
+		],
+		[],
+	);
+
 	return {
 		employees,
-		data,
 		detailData,
+		data,
+		filteredData,
+		filterConfig,
 		loading,
 		error,
 		fetchInternalCompanyWorkOrders,

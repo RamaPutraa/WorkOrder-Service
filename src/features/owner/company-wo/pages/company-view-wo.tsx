@@ -15,9 +15,10 @@ import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "framer-motion";
 import { SectionLoading } from "@/shared/atoms";
 import PageHeader from "@/shared/atoms/header-content";
+import { GenericFilter } from "@/shared/molecules/generic-filter";
 
 const CompanyViewWo = () => {
-	const { data, loading, error } = useCompanyWo();
+	const { filteredData, filterConfig, loading, error } = useCompanyWo();
 	const navigate = useNavigate();
 
 	if (error) {
@@ -73,6 +74,10 @@ const CompanyViewWo = () => {
 				backPath={true}
 			/>
 
+			<div className="mb-6">
+				<GenericFilter config={filterConfig} clearLabel="Reset Pencarian" />
+			</div>
+
 			{/* Work Orders Grid */}
 			<div className="grid gap-4 sm:gap-5 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
 				<AnimatePresence mode="wait">
@@ -85,8 +90,8 @@ const CompanyViewWo = () => {
 							className="col-span-full">
 							<SectionLoading message="Memuat data tugas kerja..." />
 						</motion.div>
-					: data.length > 0 ?
-						data.map((wo) => {
+					: filteredData.length > 0 ?
+						filteredData.map((wo) => {
 							const statusConfig = getStatusConfig(wo.status);
 
 							return (
