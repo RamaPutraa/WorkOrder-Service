@@ -53,6 +53,7 @@ import {
 	inviteEmployeeSchema,
 	type InviteEmployeeFormValues,
 } from "../schemas/staff-schema";
+import { ConfirmLeaveDialog } from "@/shared/molecules/confirm-leave-dialog";
 
 const ROLE_OPTIONS = [
 	{ value: "manager_company", label: "Manager Perusahaan" },
@@ -72,8 +73,8 @@ const InviteEmployeeDialog = ({
 	onOpenChange,
 	onSuccess,
 }: InviteEmployeeDialogProps) => {
-	// Track which posisi popover is open per index
 	const [positionOpen, setPositionOpen] = useState<Record<number, boolean>>({});
+	const [showConfirmClose, setShowConfirmClose] = useState(false);
 
 	const handleSuccess = () => {
 		onOpenChange(false);
@@ -100,6 +101,7 @@ const InviteEmployeeDialog = ({
 			fetchPositions();
 			form.reset({ invites: [EMPTY_INVITE] });
 			setPositionOpen({});
+			setShowConfirmClose(false);
 		}
 	}, [open]);
 
@@ -110,9 +112,30 @@ const InviteEmployeeDialog = ({
 		invite(data);
 	};
 
+	const { isDirty, isSubmitSuccessful } = form.formState;
+	const hasUnsavedChanges = isDirty && !isSubmitSuccessful;
+
+	const handleOpenChange = (newOpen: boolean) => {
+		if (!newOpen && hasUnsavedChanges) {
+			setShowConfirmClose(true);
+		} else {
+			onOpenChange(newOpen);
+		}
+	};
+
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-[460px] p-0 overflow-hidden rounded-2xl">
+		<>
+			<ConfirmLeaveDialog 
+				isDirty={hasUnsavedChanges && open} 
+				isOpen={showConfirmClose}
+				onCancel={() => setShowConfirmClose(false)}
+				onConfirm={() => {
+					setShowConfirmClose(false);
+					onOpenChange(false);
+				}}
+			/>
+			<Dialog open={open} onOpenChange={handleOpenChange}>
+				<DialogContent className="sm:max-w-[460px] p-0 overflow-hidden rounded-2xl">
 				{/* Header */}
 				<div className="bg-gradient-to-br from-blue-600 to-blue-500 px-6 pt-6 pb-5">
 					<div className="flex items-center gap-3 mb-1">
@@ -304,7 +327,7 @@ const InviteEmployeeDialog = ({
 									type="button"
 									variant="ghost"
 									size="sm"
-									onClick={() => onOpenChange(false)}
+									onClick={() => handleOpenChange(false)}
 									disabled={loading}
 									className="text-gray-500">
 									Batal
@@ -325,6 +348,7 @@ const InviteEmployeeDialog = ({
 				</Form>
 			</DialogContent>
 		</Dialog>
+		</>
 	);
 };
 

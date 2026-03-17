@@ -19,6 +19,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import PageHeader from "@/shared/atoms/header-content";
 import { Switch } from "@/components/ui/switch";
+import { ConfirmLeaveDialog } from "@/shared/molecules/confirm-leave-dialog";
 
 const CreatePosition: React.FC = () => {
 	const { createPosition, loading } = usePosition();
@@ -46,11 +47,15 @@ const CreatePosition: React.FC = () => {
 		},
 	];
 
-	const onSubmit = (data: z.infer<typeof positionSchema>) =>
-		createPosition(data);
+	const onSubmit = async (data: z.infer<typeof positionSchema>) => {
+		await createPosition(data);
+	};
+
+	const { isDirty, isSubmitSuccessful } = form.formState;
 
 	return (
 		<>
+			<ConfirmLeaveDialog isDirty={isDirty && !isSubmitSuccessful} />
 			<PageHeader
 				title="Tambah Departemen"
 				subtitle="Lengkapi informasi departemen yang akan ditambahkan ke sistem."

@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { handleApi } from "@/lib/handle-api";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
 import { AlertCircle, FileText } from "lucide-react";
+import { ConfirmLeaveDialog } from "@/shared/molecules/confirm-leave-dialog";
 
 export type FormBuilderRef = {
 	submitForm: () => void;
@@ -35,6 +36,7 @@ export const FormBuilder = forwardRef<FormBuilderRef, Props>(
 	({ onFieldsChange, onSubmittingChange }, ref) => {
 		const [isSubmitting, setIsSubmitting] = useState(false);
 		const [hasSubmitted, setHasSubmitted] = useState(false);
+		const [isSuccess, setIsSuccess] = useState(false);
 		const navigate = useNavigate();
 		const { formData, setFormData, errors, validateForm, validateAndSetField } =
 			useValidation<CreateFormRequest>(
@@ -122,6 +124,7 @@ export const FormBuilder = forwardRef<FormBuilderRef, Props>(
 				return;
 			}
 			notifySuccess("Form berhasil disimpan!");
+			setIsSuccess(true);
 			navigate("/dashboard/internal/forms");
 		};
 
@@ -131,8 +134,16 @@ export const FormBuilder = forwardRef<FormBuilderRef, Props>(
 			isSubmitting,
 		}));
 
+		const isDirty =
+			!isSuccess &&
+			(formData.title !== "" ||
+				formData.description !== "" ||
+				formData.formType !== "" ||
+				formData.fields.length > 0);
+
 		return (
 			<div className="w-full space-y-6">
+				<ConfirmLeaveDialog isDirty={isDirty} />
 				{/* Info Card */}
 				<Card className="rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden py-0">
 					{/* Card header strip */}
