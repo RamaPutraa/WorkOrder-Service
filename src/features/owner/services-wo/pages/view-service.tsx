@@ -9,6 +9,7 @@ import { useCreateService } from "../hooks/useCreateService";
 import PageHeader from "@/shared/atoms/header-content";
 import { Badge } from "@/components/ui/badge";
 import { GenericFilter } from "@/shared/molecules/generic-filter";
+import { EmptyData } from "@/shared/molecules/empty-data";
 
 const ViewService: React.FC = () => {
 	const navigate = useNavigate();
@@ -147,14 +148,7 @@ const ViewService: React.FC = () => {
 							initial={{ opacity: 0 }}
 							animate={{ opacity: 1 }}
 							className="col-span-full">
-							<Card className="p-12 text-center border-dashed border-2 rounded-lg">
-								<p className="text-muted-foreground text-base">
-									Tidak ada data service tersedia.
-								</p>
-								<p className="text-sm text-muted-foreground mt-2">
-									Klik tombol "Tambah Layanan" untuk membuat service baru.
-								</p>
-							</Card>
+							<EmptyData />
 						</motion.div>
 					}
 				</AnimatePresence>

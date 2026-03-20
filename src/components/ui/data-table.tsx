@@ -24,6 +24,7 @@ import { useState } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 import { SectionLoading } from "@/shared/atoms";
+import { EmptyData } from "@/shared/molecules/empty-data";
 
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
@@ -119,7 +120,7 @@ export function DataTable<TData, TValue>({
 								<TableCell
 									colSpan={columns.length}
 									className="h-24 text-center">
-									Tidak ada data.
+									<EmptyData />
 								</TableCell>
 							</TableRow>
 						}

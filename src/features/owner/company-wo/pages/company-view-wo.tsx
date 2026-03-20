@@ -5,7 +5,6 @@ import {
 	Calendar,
 	User,
 	Eye,
-	FileText,
 	FileCheck,
 	Ticket,
 	ScrollText,
@@ -16,6 +15,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { SectionLoading } from "@/shared/atoms";
 import PageHeader from "@/shared/atoms/header-content";
 import { GenericFilter } from "@/shared/molecules/generic-filter";
+import { EmptyData } from "@/shared/molecules/empty-data";
 
 const CompanyViewWo = () => {
 	const { filteredData, filterConfig, loading, error } = useCompanyWo();
@@ -215,21 +215,7 @@ const CompanyViewWo = () => {
 							initial={{ opacity: 0 }}
 							animate={{ opacity: 1 }}
 							className="col-span-full">
-							<Card className="p-12 text-center border-dashed border-2 rounded-lg">
-								<div className="flex flex-col items-center gap-3">
-									<div className="p-4 rounded-full bg-muted">
-										<FileText className="w-8 h-8 text-muted-foreground" />
-									</div>
-									<div>
-										<p className="text-base font-medium text-muted-foreground">
-											Belum ada data work order
-										</p>
-										<p className="text-sm text-muted-foreground mt-1">
-											Work order akan muncul di sini setelah dibuat
-										</p>
-									</div>
-								</div>
-							</Card>
+							<EmptyData />
 						</motion.div>
 					}
 				</AnimatePresence>

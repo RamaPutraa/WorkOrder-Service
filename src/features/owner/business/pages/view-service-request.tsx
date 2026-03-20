@@ -21,6 +21,7 @@ import { SectionLoading } from "@/shared/atoms";
 import PageHeader from "@/shared/atoms/header-content";
 import { TextLoading } from "@/shared/atoms/loading-state";
 import { GenericFilter } from "@/shared/molecules/generic-filter";
+import { EmptyData } from "@/shared/molecules/empty-data";
 
 const ViewServiceRequest = () => {
 	const {
@@ -227,14 +228,7 @@ const ViewServiceRequest = () => {
 								initial={{ opacity: 0 }}
 								animate={{ opacity: 1 }}
 								className="col-span-full">
-								<Card className="p-8 sm:p-12 text-center border-dashed border-2 rounded-xl">
-									<p className="text-muted-foreground">
-										Belum ada pengajuan layanan.
-									</p>
-									<p className="text-sm text-muted-foreground mt-1">
-										Pengajuan layanan dari pelanggan akan muncul di sini.
-									</p>
-								</Card>
+								<EmptyData />
 							</motion.div>
 						}
 					</AnimatePresence>
