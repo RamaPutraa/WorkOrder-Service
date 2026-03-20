@@ -46,6 +46,8 @@ type Form = {
 	description: string;
 	formType: string;
 	fields: Field[];
+	createdAt: string;
+	updatedAt: string;
 };
 
 // Companies

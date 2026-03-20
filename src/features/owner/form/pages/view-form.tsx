@@ -1,12 +1,14 @@
 import { Card, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ScrollText } from "lucide-react";
+import { ArrowRight, ScrollText, CalendarDays } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { SectionLoading } from "@/shared/atoms";
 import { useForm } from "../hooks/use-form";
 import PageHeader from "@/shared/atoms/header-content";
+import { GenericFilter } from "@/shared/molecules/generic-filter";
+import { EmptyData } from "@/shared/molecules/empty-data";
 
 const formTypeLabel = (type: string) => {
 	switch (type?.toLowerCase()) {
@@ -22,7 +24,7 @@ const formTypeLabel = (type: string) => {
 };
 
 const ViewForm: React.FC = () => {
-	const { forms, loading, error } = useForm();
+	const { loading, error, filterConfig, filteredData } = useForm();
 	const navigate = useNavigate();
 
 	if (error) {
@@ -40,12 +42,16 @@ const ViewForm: React.FC = () => {
 				title="List Data Formulir"
 				subtitle="Berikut merupakan list form yang dimiliki oleh perusahaan."
 				onAddClick={() => navigate("/dashboard/internal/form/create")}
-				addLabel="Tambah Form"
+				addLabel="Tambah Formulir"
 				backPath={true}
 			/>
 
+			<div className="mb-6">
+				<GenericFilter config={filterConfig} />
+			</div>
+
 			{/* Main Content - Forms Grid */}
-			<div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+			<div className="grid gap-4 sm:gap-5 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
 				<AnimatePresence mode="wait">
 					{loading ?
 						<motion.div
@@ -56,8 +62,8 @@ const ViewForm: React.FC = () => {
 							className="col-span-full">
 							<SectionLoading message="Memuat data form..." />
 						</motion.div>
-					: forms.length > 0 ?
-						forms.map((form) => {
+					: filteredData.length > 0 ?
+						filteredData.map((form) => {
 							return (
 								<motion.div
 									key={form._id}
@@ -82,22 +88,37 @@ const ViewForm: React.FC = () => {
 														{form.description || "No description available."}
 													</p>
 												</div>
-											</div>
-										</CardHeader>
-
-										<CardFooter className="px-6 py-2">
-											<div className="w-full pt-1 border-t border-slate-200/70 flex items-center justify-between text-xs text-slate-400">
 												<span className="tracking-wide uppercase">
 													<Badge variant="outline">
 														{formTypeLabel(form.formType)}
 													</Badge>
 												</span>
+											</div>
+										</CardHeader>
+
+										<CardFooter className="px-6 py-2">
+											<div className="w-full pt-4 border-t border-slate-200/70 flex items-center justify-between text-xs text-slate-400">
+												{form.createdAt && (
+													<div className="flex items-center gap-1.5 text-xs text-slate-400 mt-1">
+														<CalendarDays className="w-3.5 h-3.5 shrink-0" />
+														<span>
+															{new Date(form.createdAt).toLocaleDateString(
+																"id-ID",
+																{
+																	day: "numeric",
+																	month: "long",
+																	year: "numeric",
+																},
+															)}
+														</span>
+													</div>
+												)}
 
 												{/* Status Dot */}
 												<div className="flex items-center gap-2">
 													{/* Action */}
 													<Button
-														variant="ghost"
+														variant="outline"
 														size="sm"
 														className="text-xs rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
 														onClick={() =>
@@ -118,14 +139,7 @@ const ViewForm: React.FC = () => {
 							initial={{ opacity: 0 }}
 							animate={{ opacity: 1 }}
 							className="col-span-full">
-							<Card className="p-12 text-center border-dashed border-2 rounded-lg">
-								<p className="text-muted-foreground text-base">
-									Tidak ada data form.
-								</p>
-								<p className="text-sm text-muted-foreground mt-2">
-									Klik tombol "Tambah Form" untuk membuat form baru.
-								</p>
-							</Card>
+							<EmptyData />
 						</motion.div>
 					}
 				</AnimatePresence>

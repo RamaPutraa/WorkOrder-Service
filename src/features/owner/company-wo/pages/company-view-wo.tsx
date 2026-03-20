@@ -75,7 +75,7 @@ const CompanyViewWo = () => {
 			/>
 
 			<div className="mb-6">
-				<GenericFilter config={filterConfig} clearLabel="Reset Pencarian" />
+				<GenericFilter config={filterConfig} />
 			</div>
 
 			{/* Work Orders Grid */}

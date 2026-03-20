@@ -22,6 +22,7 @@ import CreateService from "@/features/owner/services-wo/pages/create-service";
 import ClientCompanyServices from "@/features/client/company/pages/company-services";
 import PublicServicePage from "@/features/client/services-wo/pages/service-request";
 import ErrorPage from "@/shared/errors/templates/error-page";
+import NotFoundPage from "@/shared/errors/templates/not-found-page";
 import DetailService from "@/features/owner/services-wo/pages/detail-service";
 import ServiceSubmitPage from "@/features/client/services-wo/pages/services-submit";
 import ServiceDetailSubmit from "@/features/client/services-wo/pages/services-detail-submit";
@@ -307,7 +308,7 @@ const router = createBrowserRouter([
 	},
 	{
 		path: "*",
-		element: <ErrorPage status={404} />, // handle 404 juga
+		element: <NotFoundPage />,
 	},
 ]);
 

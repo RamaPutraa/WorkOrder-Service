@@ -8,10 +8,12 @@ import { SectionLoading } from "@/shared/atoms";
 import { useCreateService } from "../hooks/useCreateService";
 import PageHeader from "@/shared/atoms/header-content";
 import { Badge } from "@/components/ui/badge";
+import { GenericFilter } from "@/shared/molecules/generic-filter";
 
 const ViewService: React.FC = () => {
 	const navigate = useNavigate();
-	const { services, loading, error, fecthServices } = useCreateService();
+	const { loading, error, fecthServices, filteredData, filterConfig } =
+		useCreateService();
 
 	// Lazy loading - fetch services on mount
 	useEffect(() => {
@@ -48,6 +50,10 @@ const ViewService: React.FC = () => {
 				backPath={true}
 			/>
 
+			<div className="mb-6">
+				<GenericFilter config={filterConfig} />
+			</div>
+
 			{/* Main Content - Services Grid */}
 			<div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
 				<AnimatePresence mode="wait">
@@ -60,8 +66,8 @@ const ViewService: React.FC = () => {
 							className="col-span-full">
 							<SectionLoading message="Memuat data service..." />
 						</motion.div>
-					: services.length > 0 ?
-						services.map((service) => (
+					: filteredData.length > 0 ?
+						filteredData.map((service) => (
 							<motion.div
 								key={service._id}
 								initial={{ opacity: 0, y: 16 }}
@@ -121,7 +127,7 @@ const ViewService: React.FC = () => {
 											<div className="flex items-center gap-2">
 												{/* Action */}
 												<Button
-													variant="ghost"
+													variant="outline"
 													size="sm"
 													className="text-xs rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
 													onClick={() =>

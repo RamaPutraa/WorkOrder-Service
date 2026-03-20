@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useState, useMemo } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
 
 // API services
@@ -14,6 +14,7 @@ import {
 	getServicesWoApi,
 } from "@/features/owner/services-wo/services/servicesWo";
 import { handleApi } from "@/lib/handle-api";
+import { type FilterConfig } from "@/shared/molecules/generic-filter";
 
 // === Types ===
 type Status = {
@@ -414,8 +415,56 @@ export const useCreateService = () => {
 		setDetailService(res?.data || null);
 	};
 
-	// Lazy Loading Pattern - Pages control when to fetch data
-	// No useEffect here - each page will call fetch functions as needed
+	const [searchParams] = useSearchParams();
+	const searchQuery = (searchParams.get("search") || "").toLowerCase();
+	const accessTypeQuery = searchParams.get("accessType") || "";
+	const statusQuery = searchParams.get("status") || "";
+
+	const filteredData = useMemo(() => {
+		return services.filter((service) => {
+			const matchesSearch =
+				!searchQuery ||
+				service.title.toLowerCase().includes(searchQuery) ||
+				service.description.toLowerCase().includes(searchQuery);
+			const matchesFormType =
+				!accessTypeQuery || service.accessType === accessTypeQuery;
+			const matchesStatus =
+				!statusQuery || service.isActive === (statusQuery === "true");
+			return matchesSearch && matchesFormType && matchesStatus;
+		});
+	}, [services, searchQuery, accessTypeQuery, statusQuery]);
+
+	const filterConfig: FilterConfig[] = useMemo(
+		() => [
+			{
+				id: "search",
+				label: "Judul/Deskripsi",
+				type: "text",
+				placeholder: "Cari judul formulir...",
+			},
+			{
+				id: "accessType",
+				label: "Jenis Layanan",
+				type: "select",
+				placeholder: "Semua Jenis Layanan",
+				options: [
+					{ label: "Internal", value: "internal" },
+					{ label: "Publik", value: "public" },
+				],
+			},
+			{
+				id: "status",
+				label: "Status",
+				type: "select",
+				placeholder: "Semua Status",
+				options: [
+					{ label: "Aktif", value: "true" },
+					{ label: "Tidak Aktif", value: "false" },
+				],
+			},
+		],
+		[],
+	);
 
 	return {
 		// === STATE ===
@@ -442,6 +491,8 @@ export const useCreateService = () => {
 		creating,
 		services,
 		detailService,
+		filteredData,
+		filterConfig,
 
 		// === SETTERS ===
 		setTitle,

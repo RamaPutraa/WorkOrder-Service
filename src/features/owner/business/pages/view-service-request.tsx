@@ -20,9 +20,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { SectionLoading } from "@/shared/atoms";
 import PageHeader from "@/shared/atoms/header-content";
 import { TextLoading } from "@/shared/atoms/loading-state";
+import { GenericFilter } from "@/shared/molecules/generic-filter";
 
 const ViewServiceRequest = () => {
-	const { data, loading, error, handleReject, handleApprove } = useBusiness();
+	const {
+		data,
+		loading,
+		error,
+		handleReject,
+		handleApprove,
+		filteredData,
+		filterConfig,
+	} = useBusiness();
 	const navigate = useNavigate();
 	const { showDialog } = useDialogStore();
 
@@ -80,6 +89,10 @@ const ViewServiceRequest = () => {
 				backPath={true}
 			/>
 
+			<div className="mb-6">
+				<GenericFilter config={filterConfig} />
+			</div>
+
 			{/* Main Content */}
 			<div className="w-full">
 				<div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
@@ -92,8 +105,8 @@ const ViewServiceRequest = () => {
 								className="col-span-full">
 								<SectionLoading message="Memuat data pengajuan layanan..." />
 							</motion.div>
-						: data.length > 0 ?
-							data.map((item) => (
+						: filteredData.length > 0 ?
+							filteredData.map((item) => (
 								<motion.div
 									key={item._id}
 									initial={{ opacity: 0, y: 16 }}

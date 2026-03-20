@@ -7,7 +7,9 @@ import {
 	getDetailInternalBusinessServiceRequestApi,
 	rejectInternalBusinessServiceRequestApi,
 } from "../services/internal-business-services";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
+import { useMemo } from "react";
+import { type FilterConfig } from "@/shared/molecules/generic-filter";
 
 export const useBusiness = () => {
 	const { id } = useParams<{ id: string }>();
@@ -22,7 +24,7 @@ export const useBusiness = () => {
 		setLoading(true);
 		setError(null);
 		const { data: res, error } = await handleApi(() =>
-			getAllInternalBusinessServiceRequestApi()
+			getAllInternalBusinessServiceRequestApi(),
 		);
 		setLoading(false);
 		if (error) {
@@ -45,7 +47,7 @@ export const useBusiness = () => {
 		setLoading(true);
 		setError(null);
 		const { data: res, error } = await handleApi(() =>
-			getDetailInternalBusinessServiceRequestApi(id)
+			getDetailInternalBusinessServiceRequestApi(id),
 		);
 
 		setLoading(false);
@@ -59,7 +61,7 @@ export const useBusiness = () => {
 	};
 
 	const asInputValue = (
-		val: string | number | string[] | File | undefined
+		val: string | number | string[] | File | undefined,
 	): string | number => {
 		if (val instanceof File) return val.name; // file ditampilkan sebagai nama file
 		if (Array.isArray(val)) return val.join(", "); // array jadi "a, b, c"
@@ -77,7 +79,7 @@ export const useBusiness = () => {
 		setError(null);
 
 		const { data: res, error } = await handleApi(() =>
-			rejectInternalBusinessServiceRequestApi(id)
+			rejectInternalBusinessServiceRequestApi(id),
 		);
 		setLoading(false);
 
@@ -99,7 +101,7 @@ export const useBusiness = () => {
 		setLoading(true);
 		setError(null);
 		const { data: res, error } = await handleApi(() =>
-			approveInternalBusinessServiceRequestApi(id)
+			approveInternalBusinessServiceRequestApi(id),
 		);
 		setLoading(false);
 		if (error) {
@@ -116,12 +118,80 @@ export const useBusiness = () => {
 		if (id) fetchDetailInternalServiceRequest();
 	}, [id]);
 
+	// filter logic
+	const [searchParams] = useSearchParams();
+	const searchQuery = (searchParams.get("search") || "").toLowerCase();
+	const statusQuery = searchParams.get("status") || "";
+	const dateFromQuery = searchParams.get("date");
+	const dateToQuery = searchParams.get("date_end");
+
+	// Menyaring data yang asli (Front-end filtering)
+	const filteredData = useMemo(() => {
+		return data.filter((csr) => {
+			const matchesSearch =
+				!searchQuery ||
+				csr.service?.title.toLowerCase().includes(searchQuery) ||
+				csr.service?.description?.toLowerCase().includes(searchQuery);
+
+			const matchesStatus =
+				!statusQuery || csr.status.toLowerCase() === statusQuery;
+
+			let matchesDate = true;
+			if (dateFromQuery) {
+				const csrDate = new Date(csr.createdAt).getTime();
+				const fromDate = new Date(dateFromQuery).getTime();
+
+				// Set the end date to the end of the day if it exists, otherwise use fromDate
+				const toDate =
+					dateToQuery ?
+						new Date(dateToQuery).setHours(23, 59, 59, 999)
+					:	new Date(dateFromQuery).setHours(23, 59, 59, 999);
+
+				matchesDate = csrDate >= fromDate && csrDate <= toDate;
+			}
+
+			return matchesSearch && matchesStatus && matchesDate;
+		});
+	}, [data, searchQuery, statusQuery, dateFromQuery, dateToQuery]);
+
+	// Konfigurasi Field yang dilempar ke komponen GenericFilter
+	const filterConfig: FilterConfig[] = useMemo(
+		() => [
+			{
+				id: "search",
+				label: "Judul/Deskripsi",
+				type: "text",
+				placeholder: "Cari judul tugas kerja...",
+			},
+			{
+				id: "date",
+				label: "Tanggal Dibuat",
+				type: "date-range",
+				placeholder: "Pilih rentang waktu",
+			},
+			{
+				id: "status",
+				label: "Status",
+				type: "select",
+				placeholder: "Semua Status",
+				options: [
+					{ label: "Menunggu Persetujuan", value: "pending" },
+					{ label: "Disetujui", value: "approved" },
+					{ label: "Ditolak", value: "rejected" },
+				],
+			},
+		],
+		[],
+	);
+
 	return {
 		id,
 		detailData,
 		data,
 		loading,
 		error,
+		filteredData,
+		filterConfig,
 		fetchInternalServiceRequests,
 		asInputValue,
 		fetchDetailInternalServiceRequest,
