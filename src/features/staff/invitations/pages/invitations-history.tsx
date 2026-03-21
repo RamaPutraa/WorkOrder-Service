@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import StaffConfirmPage from "../components/staff-confirm";
+import { SectionLoading } from "@/shared/atoms";
 
 const STATUS_SUMMARY = [
 	{ label: "Menunggu", key: "pending", variant: "outline" as const },
@@ -17,6 +19,7 @@ const InvitationsHistory = () => {
 		history,
 		loading,
 		error,
+		isAlreadyAccepted,
 		handleAccept,
 		handleReject,
 		actionLoadingId,
@@ -29,6 +32,13 @@ const InvitationsHistory = () => {
 		actionLoadingId,
 	});
 
+	if (loading) {
+		return (
+			<div className="flex items-center justify-center min-h-[60vh]">
+				<SectionLoading message="Memuat riwayat undangan..." />
+			</div>
+		);
+	}
 	if (error) {
 		return (
 			<div className="p-6">
@@ -37,6 +47,9 @@ const InvitationsHistory = () => {
 				</div>
 			</div>
 		);
+	}
+	if (isAlreadyAccepted) {
+		return <StaffConfirmPage />;
 	}
 
 	return (
@@ -55,7 +68,6 @@ const InvitationsHistory = () => {
 					</p>
 				</div>
 			</div>
-
 			{/* Table */}
 			<Card>
 				<CardHeader>
@@ -63,7 +75,8 @@ const InvitationsHistory = () => {
 				</CardHeader>
 				<CardContent>
 					{/* Status summary chips */}
-					{!loading && history.length > 0 && (
+					{/* {!loading && history.length > 0 && ( */}
+					{history.length > 0 && (
 						<div className="flex flex-wrap gap-2 mb-5">
 							{STATUS_SUMMARY.map(({ label, key, variant }) => {
 								const count = history.filter((h) => h.status === key).length;

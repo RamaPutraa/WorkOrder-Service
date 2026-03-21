@@ -13,6 +13,7 @@ export const useInvitations = () => {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+	const [isAlreadyAccepted, setIsAlreadyAccepted] = useState(false);
 	const updateUser = useAuthStore((state) => state.updateUser);
 
 	useEffect(() => {
@@ -22,13 +23,16 @@ export const useInvitations = () => {
 	const fetchHistory = async () => {
 		setLoading(true);
 		setError(null);
+		setIsAlreadyAccepted(false);
 
 		const { data: res, error } = await handleApi(() => getInvitedHistory());
 
-		console.log("Response dari API:", res);
-
 		setLoading(false);
 		if (error) {
+			if (error.code === 403) {
+				setIsAlreadyAccepted(true);
+				return;
+			}
 			setError(error.message);
 			notifyError("Gagal memuat riwayat undangan", error.message);
 			return;
@@ -84,6 +88,7 @@ export const useInvitations = () => {
 		loading,
 		error,
 		actionLoadingId,
+		isAlreadyAccepted,
 		handleAccept,
 		handleReject,
 		refetch: fetchHistory,

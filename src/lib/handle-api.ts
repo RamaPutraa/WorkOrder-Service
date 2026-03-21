@@ -2,6 +2,7 @@ import axios from "axios";
 
 type ApiError = {
 	message: string;
+	code?: number;
 	errors?: Record<string, string[]>;
 };
 
@@ -14,16 +15,18 @@ export async function handleApi<T>(callback: () => Promise<T>) {
 		return { data: res, error: null as ApiError | null };
 	} catch (err) {
 		let message = "Terjadi kesalahan tidak diketahui";
+		let code: number | undefined;
 		let errors: Record<string, string[]> | undefined;
 
 		if (axios.isAxiosError(err)) {
 			const backend = err.response?.data;
 			message = backend?.message || err.message;
+			code = backend?.code || err.response?.status;
 			errors = backend?.errors;
 		} else if (err instanceof Error) {
 			message = err.message;
 		}
 
-		return { data: null as T | null, error: { message, errors } };
+		return { data: null as T | null, error: { message, code, errors } };
 	}
 }
