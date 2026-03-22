@@ -21,14 +21,20 @@ const ViewService: React.FC = () => {
 		void fecthServices();
 	}, []);
 
-	const serviceTypeLabel = (type: string) => {
-		switch (type?.toLowerCase()) {
+	const serviceTypeLabel = (type: any) => {
+		const strType = String(type).toLowerCase();
+		switch (strType) {
 			case "internal":
+			case "2":
 				return "Internal";
 			case "public":
+			case "0":
 				return "Publik";
+			case "member_only":
+			case "1":
+				return "Berlangganan";
 			default:
-				return type;
+				return strType;
 		}
 	};
 

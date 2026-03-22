@@ -73,58 +73,53 @@ type Company = CompanyMinimal & {
 };
 
 // Services
+enum serviceAccessType {
+	public,
+	member_only,
+	internal,
+}
+
+enum serviceRequestApprovalAccessType {
+	auto,
+	manager,
+}
+
+enum workOrderApprovalAccessType {
+	auto,
+	staff_pic,
+}
+
+enum workReportApprovalAccessType {
+	auto,
+	manager,
+}
+
 type Service = {
 	_id: string;
+	serviceKey: string;
 	companyId: string;
 	title: string;
 	description: string;
-	accessType: string;
+	accessType: serviceAccessType;
 	isActive: boolean;
+	serviceRequestConfig: {
+		intakeForm: Form;
+		reviewForm: Form;
+		serviceRequestApprovalAccessType: serviceRequestApprovalAccessType;
+		reviewNeed: boolean;
+	};
 
-	requiredStaffs: {
-		position: {
-			_id: string;
-			name: string;
-		};
-		minimumStaff: number;
-		maximumStaff: number;
-	}[];
-
-	workOrderForms: {
-		order: number;
-		fillableByRoles: string[];
-		viewableByRoles: string[];
-		fillableByPositions: {
-			_id: string;
-			name: string;
-		}[];
-		viewableByPositions: {
-			_id: string;
-			name: string;
-		}[];
-		form: Form;
-	}[];
-
-	reportForms: {
-		order: number;
-		fillableByRoles: string[];
-		viewableByRoles: string[];
-		fillableByPositions: {
-			_id: string;
-			name: string;
-		}[];
-		viewableByPositions: {
-			_id: string;
-			name: string;
-		}[];
-		form: Form;
-	}[];
-
-	clientIntakeForms: {
-		order: number;
-		form: Form;
-	}[];
-
+	workOrdersConfig: [
+		{
+			workOrderForm: Form;
+			workReportForm: Form;
+			positionsOnDuty: Position;
+			workOrderApprovalAccessType: workOrderApprovalAccessType;
+			workReportApprovalAccessType: workReportApprovalAccessType;
+			minStaff: number;
+			maxStaff: number;
+		},
+	];
 	createdAt: string;
 	updatedAt: string;
 };

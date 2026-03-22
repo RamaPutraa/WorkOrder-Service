@@ -4,10 +4,7 @@ import { notifyError, notifySuccess } from "@/lib/toast-helper";
 
 // API services
 import { getPositionsApi } from "@/features/owner/position/services/positionService";
-import {
-	getFormsApi,
-	getFormByIdApi,
-} from "@/features/owner/form/services/formService";
+import { getFormsApi } from "@/features/owner/form/services/formService";
 import {
 	createServiceApi,
 	getServiceByIdApi,
@@ -16,75 +13,100 @@ import {
 import { handleApi } from "@/lib/handle-api";
 import { type FilterConfig } from "@/shared/molecules/generic-filter";
 
-// === Types ===
+// ===========================
+// === Types (local) ===
+// ===========================
 type Status = {
 	value: string;
 	label: string;
 };
 
-type RoleConfig = {
-	fillableByRoles: string[];
-	fillableByPositionIds: string[];
-	viewableByRoles: string[];
-	viewableByPositionIds: string[];
+export type WorkOrderConfigItem = {
+	positionId: string;
+	workOrderFormId: string;
+	workReportFormId: string;
+	workOrderApprovalType: "auto" | "staff_pic";
+	workReportApprovalType: "auto" | "manager";
+	minStaff: number;
+	maxStaff: number;
 };
-export type FormType = "report" | "workOrder" | "intake";
+
 export const useCreateService = () => {
 	const navigate = useNavigate();
 
-	// === States dasar ===
+	// === Route Params ===
 	const { id } = useParams<{ id?: string }>();
+
+	// === Loading / Error ===
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [creating, setCreating] = useState(false);
+
+	// === List data ===
 	const [services, setServices] = useState<Service[]>([]);
 	const [detailService, setDetailService] = useState<Service | null>(null);
 
-	// === Form fields ===
+	// === Base form fields ===
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
-	const [accessType, setAccessType] = useState("");
+	const [accessType, setAccessType] = useState<string>("");
 	const [selectedStatus, setSelectedStatus] = useState<Status | null>(null);
 	const [openStatus, setOpenStatus] = useState(false);
 
-	// === Data dropdown ===
-	const [positions, setPositions] = useState<Position[]>([]);
-	const [forms, setForms] = useState<Form[]>([]);
-
-	// Static data - no need for state
-	const availableRoles = [
-		{ value: "manager_company", label: "Manager" },
-		{ value: "staff_company", label: "Staff" },
-		{ value: "client", label: "Client" },
-	];
-
-	const loadingPositions = loading;
-	const errorPositions = error;
-
-	// === Staff dan form ===
-	const [selectedStaff, setSelectedStaff] = useState<Staff[]>([]);
-	const [selectedForms, setSelectedForms] = useState<Form[]>([]);
-	const [selectedReportForms, setSelectedReportForms] = useState<Form[]>([]);
-	const [selectedIntakeForms, setSelectedIntakForms] = useState<Form[]>([]);
-
-	// === Config akses form ===
-	const [formAccessConfig, setFormAccessConfig] = useState<
-		Record<string, RoleConfig>
-	>({});
-	const [formAccessConfigReport, setFormAccessConfigReport] = useState<
-		Record<string, RoleConfig>
-	>({});
-	const [formAccessConfigIntake, setFormAccessConfigIntake] = useState<
-		Record<string, RoleConfig>
-	>({});
-
-	// === Status options ===
 	const statuses: Status[] = [
 		{ value: "true", label: "Aktif" },
 		{ value: "false", label: "Non-Aktif" },
 	];
 
-	// === Fetch data ===
+	// === Dropdown data ===
+	const [positions, setPositions] = useState<Position[]>([]);
+	const [forms, setForms] = useState<Form[]>([]);
+
+	// === serviceRequestConfig ===
+	const [intakeFormId, setIntakeFormId] = useState<string>("");
+	const [reviewFormId, setReviewFormId] = useState<string>("");
+	const [serviceRequestApprovalType, setServiceRequestApprovalType] = useState<
+		"auto" | "manager"
+	>("auto");
+	const [reviewNeed, setReviewNeed] = useState<boolean>(false);
+
+	// === workOrdersConfig[] ===
+	const [workOrdersConfig, setWorkOrdersConfig] = useState<
+		WorkOrderConfigItem[]
+	>([]);
+
+	const addWorkOrderConfig = () => {
+		setWorkOrdersConfig((prev) => [
+			...prev,
+			{
+				positionId: "",
+				workOrderFormId: "",
+				workReportFormId: "",
+				workOrderApprovalType: "auto",
+				workReportApprovalType: "auto",
+				minStaff: 1,
+				maxStaff: 1,
+			},
+		]);
+	};
+
+	const removeWorkOrderConfig = (index: number) => {
+		setWorkOrdersConfig((prev) => prev.filter((_, i) => i !== index));
+	};
+
+	const updateWorkOrderConfig = (
+		index: number,
+		field: keyof WorkOrderConfigItem,
+		value: string | number,
+	) => {
+		setWorkOrdersConfig((prev) =>
+			prev.map((item, i) =>
+				i === index ? { ...item, [field]: value } : item,
+			),
+		);
+	};
+
+	// === Fetch Data ===
 	const fetchPositions = async () => {
 		try {
 			setLoading(true);
@@ -110,190 +132,6 @@ export const useCreateService = () => {
 		setForms(res?.data || []);
 	};
 
-	// === Staff handler ===
-	const toggleStaff = (pos: Position) => {
-		setSelectedStaff((prev) => {
-			const exists = prev.some((s) => s.positionId === pos._id);
-			if (exists) return prev.filter((s) => s.positionId !== pos._id);
-			return [
-				...prev,
-				{ positionId: pos._id, minimumStaff: 1, maximumStaff: 1 },
-			];
-		});
-	};
-
-	// === Form handler ===
-	const toggleForm = async (form: Form) => {
-		const alreadySelected = selectedForms.some((f) => f._id === form._id);
-		if (alreadySelected) {
-			setSelectedForms((prev) => prev.filter((f) => f._id !== form._id));
-			return;
-		}
-
-		setLoading(true);
-		const { data: res, error } = await handleApi(() =>
-			getFormByIdApi(form._id),
-		);
-		setLoading(false);
-
-		if (error) {
-			setError("Gagal memuat detail form");
-			notifyError("Gagal memuat detail form", error.message);
-			return;
-		}
-
-		const detailedForm = res?.data;
-		if (!detailedForm) return;
-		console.log(detailedForm);
-		if (detailedForm) {
-			setSelectedForms((prev) => [...prev, detailedForm]);
-		}
-		console.log(detailedForm);
-	};
-
-	const toggleReportForm = async (form: Form) => {
-		const alreadySelected = selectedReportForms.some((f) => f._id === form._id);
-		if (alreadySelected) {
-			setSelectedReportForms((prev) => prev.filter((f) => f._id !== form._id));
-			return;
-		}
-
-		setLoading(true);
-		const { data: res, error } = await handleApi(() =>
-			getFormByIdApi(form._id),
-		);
-		setLoading(false);
-
-		if (error) {
-			setError("Gagal memuat detail report form");
-			notifyError("Gagal memuat detail report form", error.message);
-			return;
-		}
-
-		const detailedForm = res?.data;
-		if (detailedForm) {
-			setSelectedReportForms((prev) => [...prev, detailedForm]);
-		}
-	};
-
-	const toggleIntakeForm = async (form: Form) => {
-		const alreadySelected = selectedIntakeForms.some((f) => f._id === form._id);
-		if (alreadySelected) {
-			setSelectedIntakForms((prev) => prev.filter((f) => f._id !== form._id));
-			return;
-		}
-
-		setLoading(true);
-		const { data: res, error } = await handleApi(() =>
-			getFormByIdApi(form._id),
-		);
-		setLoading(false);
-
-		if (error) {
-			setError("Gagal memuat detail intake form");
-			notifyError("Gagal memuat detail intake form", error.message);
-			return;
-		}
-
-		const detailedForm = res?.data;
-		if (detailedForm) {
-			setSelectedIntakForms((prev) => [...prev, detailedForm]);
-		}
-	};
-
-	// Helper universal untuk memilih state setter berdasarkan tipe form
-	const getSetter = (
-		type: FormType,
-	): React.Dispatch<React.SetStateAction<Record<string, RoleConfig>>> => {
-		switch (type) {
-			case "report":
-				return setFormAccessConfigReport;
-			case "workOrder":
-				return setFormAccessConfig;
-			case "intake":
-			default:
-				return setFormAccessConfigIntake;
-		}
-	};
-
-	const toggleRoleFill = (formId: string, role: string, type: FormType) => {
-		const setter = getSetter(type);
-		setter((prev) => {
-			const current = prev[formId] || {
-				fillableByRoles: [],
-				fillableByPositionIds: [],
-				viewableByRoles: [],
-				viewableByPositionIds: [],
-			};
-			const updated = {
-				...current,
-				fillableByRoles:
-					current.fillableByRoles.includes(role) ?
-						current.fillableByRoles.filter((r) => r !== role)
-					:	[...current.fillableByRoles, role],
-			};
-			return { ...prev, [formId]: updated };
-		});
-	};
-
-	const toggleRoleView = (formId: string, role: string, type: FormType) => {
-		const setter = getSetter(type);
-		setter((prev) => {
-			const current = prev[formId] || {
-				fillableByRoles: [],
-				fillableByPositionIds: [],
-				viewableByRoles: [],
-				viewableByPositionIds: [],
-			};
-			const updated = {
-				...current,
-				viewableByRoles:
-					current.viewableByRoles.includes(role) ?
-						current.viewableByRoles.filter((r) => r !== role)
-					:	[...current.viewableByRoles, role],
-			};
-			return { ...prev, [formId]: updated };
-		});
-	};
-
-	const toggleFillablePosition = (
-		formId: string,
-		posId: string,
-		type: FormType,
-	) => {
-		const setter = getSetter(type);
-		setter((prev) => {
-			const current = prev[formId]!;
-			const updated = {
-				...current,
-				fillableByPositionIds:
-					current.fillableByPositionIds.includes(posId) ?
-						current.fillableByPositionIds.filter((id) => id !== posId)
-					:	[...current.fillableByPositionIds, posId],
-			};
-			return { ...prev, [formId]: updated };
-		});
-	};
-
-	const toggleViewablePosition = (
-		formId: string,
-		posId: string,
-		type: FormType,
-	) => {
-		const setter = getSetter(type);
-		setter((prev) => {
-			const current = prev[formId]!;
-			const updated = {
-				...current,
-				viewableByPositionIds:
-					current.viewableByPositionIds.includes(posId) ?
-						current.viewableByPositionIds.filter((id) => id !== posId)
-					:	[...current.viewableByPositionIds, posId],
-			};
-			return { ...prev, [formId]: updated };
-		});
-	};
-
 	// === Submit ===
 	const createService = async () => {
 		setCreating(true);
@@ -304,8 +142,26 @@ export const useCreateService = () => {
 			setCreating(false);
 			return;
 		}
-		if (selectedStaff.length === 0) {
-			notifyError("Gagal menyimpan", "Pilih minimal satu staff");
+		if (!accessType) {
+			notifyError("Gagal menyimpan", "Pilih tipe akses layanan");
+			setCreating(false);
+			return;
+		}
+		if (!intakeFormId) {
+			notifyError("Gagal menyimpan", "Pilih intake form untuk service request");
+			setCreating(false);
+			return;
+		}
+		if (workOrdersConfig.length === 0) {
+			notifyError("Gagal menyimpan", "Tambahkan minimal satu konfigurasi work order");
+			setCreating(false);
+			return;
+		}
+		const incompleteWO = workOrdersConfig.some(
+			(c) => !c.positionId || !c.workOrderFormId || !c.workReportFormId,
+		);
+		if (incompleteWO) {
+			notifyError("Gagal menyimpan", "Lengkapi semua konfigurasi work order");
 			setCreating(false);
 			return;
 		}
@@ -313,42 +169,25 @@ export const useCreateService = () => {
 		const payload: CreateServiceRequest = {
 			title,
 			description,
+			accessType: accessType as unknown as accessTypeService,
 			isActive: selectedStatus?.value === "true",
-			accessType,
-			requiredStaffs: selectedStaff.map((s) => ({
-				positionId: s.positionId,
-				minimumStaff: s.minimumStaff,
-				maximumStaff: s.maximumStaff,
-			})),
-			workOrderForms: selectedForms.map((form, i) => {
-				const cfg = formAccessConfig[form._id] || {
-					fillableByRoles: [],
-					viewableByRoles: [],
-					fillableByPositionIds: [],
-					viewableByPositionIds: [],
-				};
-				return {
-					order: i + 1,
-					formId: form._id,
-					...cfg,
-				};
-			}),
-			reportForms: selectedReportForms.map((form, i) => {
-				const cfg = formAccessConfigReport[form._id] || {
-					fillableByRoles: [],
-					viewableByRoles: [],
-					fillableByPositionIds: [],
-					viewableByPositionIds: [],
-				};
-				return {
-					order: i + 1,
-					formId: form._id,
-					...cfg,
-				};
-			}),
-			clientIntakeForms: selectedIntakeForms.map((form, i) => ({
-				order: i + 1,
-				formId: form._id,
+			serviceRequestConfig: {
+				intakeFormId,
+				reviewFormId,
+				serviceRequestApprovalAccessType:
+					serviceRequestApprovalType as unknown as serviceRequestApprovalAccessType,
+				reviewNeed,
+			},
+			workOrdersConfig: workOrdersConfig.map((c) => ({
+				positionId: c.positionId,
+				workOrderFormId: c.workOrderFormId,
+				workReportFormId: c.workReportFormId,
+				workOrderApprovalAccessType:
+					c.workOrderApprovalType as unknown as workOrderRequestApprovalAccessType,
+				workReportApprovalAcessType:
+					c.workReportApprovalType as unknown as workReportRequestApprovalAccessType,
+				minStaff: c.minStaff,
+				maxStaff: c.maxStaff,
 			})),
 		};
 
@@ -369,12 +208,12 @@ export const useCreateService = () => {
 			notifyError("Gagal menyimpan", "Data layanan tidak ditemukan");
 			return;
 		}
-		console.log(service);
 
 		notifySuccess("Layanan berhasil disimpan");
 		navigate("/dashboard/internal/services");
 	};
 
+	// === Fetch List Services ===
 	const fecthServices = async () => {
 		setLoading(true);
 		setError(null);
@@ -391,7 +230,7 @@ export const useCreateService = () => {
 		setServices(res?.data ?? []);
 	};
 
-	// get detail services
+	// === Get Detail Service ===
 	const getDetailService = async () => {
 		if (!id) {
 			setError("ID layanan tidak ditemukan");
@@ -403,11 +242,9 @@ export const useCreateService = () => {
 		setError(null);
 
 		const { data: res, error } = await handleApi(() => getServiceByIdApi(id));
-
 		setLoading(false);
 
 		if (error) {
-			console.log(error);
 			setError(error.message);
 			notifyError("Gagal memuat data layanan", error.message);
 			return;
@@ -415,6 +252,7 @@ export const useCreateService = () => {
 		setDetailService(res?.data || null);
 	};
 
+	// === Filter (for view-service page) ===
 	const [searchParams] = useSearchParams();
 	const searchQuery = (searchParams.get("search") || "").toLowerCase();
 	const accessTypeQuery = searchParams.get("accessType") || "";
@@ -427,7 +265,8 @@ export const useCreateService = () => {
 				service.title.toLowerCase().includes(searchQuery) ||
 				service.description.toLowerCase().includes(searchQuery);
 			const matchesFormType =
-				!accessTypeQuery || service.accessType === accessTypeQuery;
+				!accessTypeQuery ||
+				(service.accessType as unknown as string) === accessTypeQuery;
 			const matchesStatus =
 				!statusQuery || service.isActive === (statusQuery === "true");
 			return matchesSearch && matchesFormType && matchesStatus;
@@ -440,7 +279,7 @@ export const useCreateService = () => {
 				id: "search",
 				label: "Judul/Deskripsi",
 				type: "text",
-				placeholder: "Cari judul formulir...",
+				placeholder: "Cari judul layanan...",
 			},
 			{
 				id: "accessType",
@@ -450,6 +289,7 @@ export const useCreateService = () => {
 				options: [
 					{ label: "Internal", value: "internal" },
 					{ label: "Publik", value: "public" },
+					{ label: "Member Only", value: "member_only" },
 				],
 			},
 			{
@@ -470,6 +310,7 @@ export const useCreateService = () => {
 		// === STATE ===
 		loading,
 		error,
+		creating,
 		title,
 		description,
 		accessType,
@@ -478,17 +319,14 @@ export const useCreateService = () => {
 		statuses,
 		positions,
 		forms,
-		selectedForms,
-		selectedReportForms,
-		selectedIntakeForms,
-		selectedStaff,
-		availableRoles,
-		formAccessConfig,
-		formAccessConfigReport,
-		formAccessConfigIntake,
-		loadingPositions,
-		errorPositions,
-		creating,
+		// service request config
+		intakeFormId,
+		reviewFormId,
+		serviceRequestApprovalType,
+		reviewNeed,
+		// work orders
+		workOrdersConfig,
+		// list / detail
 		services,
 		detailService,
 		filteredData,
@@ -500,7 +338,10 @@ export const useCreateService = () => {
 		setAccessType,
 		setSelectedStatus,
 		setOpenStatus,
-		setSelectedStaff,
+		setIntakeFormId,
+		setReviewFormId,
+		setServiceRequestApprovalType,
+		setReviewNeed,
 		setDetailService,
 
 		// === HANDLERS ===
@@ -508,14 +349,9 @@ export const useCreateService = () => {
 		fetchForms,
 		fecthServices,
 		getDetailService,
-		toggleStaff,
-		toggleForm,
-		toggleReportForm,
-		toggleIntakeForm,
-		toggleRoleFill,
-		toggleRoleView,
-		toggleFillablePosition,
-		toggleViewablePosition,
+		addWorkOrderConfig,
+		removeWorkOrderConfig,
+		updateWorkOrderConfig,
 		createService,
 	};
 };

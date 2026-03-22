@@ -1,69 +1,66 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useCreateService } from "../hooks/useCreateService";
-import { CardServiceInfo } from "../components/create/service-info";
-import { CardWorkOrderForm } from "../components/create/workorder-form";
-import { CardIntakeForm } from "../components/create/intake-form";
-import { CardReportForm } from "../components/create/report-form";
 import { ChevronLeft, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
-import React from "react";
+
+import { useCreateService } from "../hooks/useCreateService";
+import { CardServiceInfo } from "../components/create/service-info";
+import { CardServiceRequestConfig } from "../components/create/service-request-config";
+import { CardWorkOrdersConfig } from "../components/create/work-orders-config";
+import PageHeader from "@/shared/atoms/header-content";
 
 const CreateService: React.FC = () => {
 	const navigate = useNavigate();
 	const {
-		// form dasar
-		title,
-		description,
-		accessType,
-		selectedStatus,
-		openStatus,
-		statuses,
-		selectedStaff,
-		positions,
-		loadingPositions,
-		errorPositions,
-
-		// form logic
-		forms,
-		selectedForms,
-		selectedReportForms,
-		selectedIntakeForms,
-		availableRoles,
-		formAccessConfig,
-		formAccessConfigReport,
-		formAccessConfigIntake,
-
-		// handlers dari hook
-		setTitle,
-		setDescription,
-		setAccessType,
-		setSelectedStatus,
-		setOpenStatus,
-		setSelectedStaff,
-		fetchPositions,
-		fetchForms,
-		toggleStaff,
-		toggleForm,
-		toggleReportForm,
-		toggleIntakeForm,
-		toggleRoleFill,
-		toggleRoleView,
-		toggleFillablePosition,
-		toggleViewablePosition,
-		createService,
+		// UI states
 		creating,
+		loading,
+
+		// Base Form
+		title,
+		setTitle,
+		description,
+		setDescription,
+		accessType,
+		setAccessType,
+		selectedStatus,
+		setSelectedStatus,
+		statuses,
+
+		// Service Request Config
+		intakeFormId,
+		setIntakeFormId,
+		reviewFormId,
+		setReviewFormId,
+		serviceRequestApprovalType,
+		setServiceRequestApprovalType,
+		reviewNeed,
+		setReviewNeed,
+
+		// Work Orders Config
+		workOrdersConfig,
+		addWorkOrderConfig,
+		removeWorkOrderConfig,
+		updateWorkOrderConfig,
+
+		// Dropdowns Data
+		positions,
+		fetchPositions,
+		forms,
+		fetchForms,
+
+		// Action
+		createService,
 	} = useCreateService();
 
-	// Lazy loading - fetch positions and forms on mount
 	useEffect(() => {
 		void fetchPositions();
 		void fetchForms();
 	}, []);
 
 	const [activeStep, setActiveStep] = React.useState<
-		"info" | "intake" | "workOrder" | "report"
+		"info" | "serviceConfig" | "workOrderConfig"
 	>("info");
 
 	const steps = [
@@ -73,19 +70,14 @@ const CreateService: React.FC = () => {
 			description: "Detail dasar layanan",
 		},
 		{
-			id: "intake",
-			label: "Intake Form",
-			description: "Formulir data awal klien",
+			id: "serviceConfig",
+			label: "Konfigurasi Formulir Permintaan",
+			description: "Pengajuan dan persetujuan klien",
 		},
 		{
-			id: "workOrder",
-			label: "Work Order Form",
-			description: "Formulir instruksi kerja",
-		},
-		{
-			id: "report",
-			label: "Laporan & Berita Acara",
-			description: "Formulir hasil pekerjaan",
+			id: "workOrderConfig",
+			label: "Konfigurasi Formulir Perintah Kerja",
+			description: "Alur kerja dan pelaporan staf",
 		},
 	] as const;
 
@@ -102,110 +94,57 @@ const CreateService: React.FC = () => {
 						className="h-full">
 						<CardServiceInfo
 							title={title}
-							description={description}
-							accessType={accessType}
-							selectedStatus={selectedStatus}
-							openStatus={openStatus}
-							statuses={statuses}
-							selectedStaff={selectedStaff}
-							positions={positions}
-							loading={loadingPositions}
-							error={errorPositions}
 							setTitle={setTitle}
+							description={description}
 							setDescription={setDescription}
+							accessType={accessType}
 							setAccessType={setAccessType}
+							selectedStatus={selectedStatus}
 							setSelectedStatus={setSelectedStatus}
-							setOpenStatus={setOpenStatus}
-							setSelectedStaff={setSelectedStaff}
-							toggleStaff={toggleStaff}
-							fetchPositions={fetchPositions}
+							statuses={statuses}
 						/>
 					</motion.div>
 				);
-			case "intake":
+			case "serviceConfig":
 				return (
 					<motion.div
-						key="intake"
+						key="serviceConfig"
 						initial={{ opacity: 0, x: 20 }}
 						animate={{ opacity: 1, x: 0 }}
 						exit={{ opacity: 0, x: -20 }}
 						transition={{ duration: 0.2 }}
 						className="h-full">
-						<CardIntakeForm
+						<CardServiceRequestConfig
 							forms={forms}
-							positions={positions}
-							selectedIntakeForms={selectedIntakeForms}
-							selectedStaff={selectedStaff}
-							availableRoles={availableRoles}
-							formAccessConfigIntake={formAccessConfigIntake}
-							loading={loadingPositions}
-							toggleIntakeForm={toggleIntakeForm}
+							loading={loading}
+							intakeFormId={intakeFormId}
+							setIntakeFormId={setIntakeFormId}
+							reviewFormId={reviewFormId}
+							setReviewFormId={setReviewFormId}
+							serviceRequestApprovalType={serviceRequestApprovalType}
+							setServiceRequestApprovalType={setServiceRequestApprovalType}
+							reviewNeed={reviewNeed}
+							setReviewNeed={setReviewNeed}
 						/>
 					</motion.div>
 				);
-			case "workOrder":
+			case "workOrderConfig":
 				return (
 					<motion.div
-						key="workOrder"
+						key="workOrderConfig"
 						initial={{ opacity: 0, x: 20 }}
 						animate={{ opacity: 1, x: 0 }}
 						exit={{ opacity: 0, x: -20 }}
 						transition={{ duration: 0.2 }}
 						className="h-full">
-						<CardWorkOrderForm
+						<CardWorkOrdersConfig
 							forms={forms}
 							positions={positions}
-							selectedForms={selectedForms}
-							selectedStaff={selectedStaff}
-							availableRoles={availableRoles}
-							formAccessConfig={formAccessConfig}
-							loading={loadingPositions}
-							toggleForm={toggleForm}
-							toggleRoleFill={(formId, role) =>
-								toggleRoleFill(formId, role, "workOrder")
-							}
-							toggleRoleView={(formId, role) =>
-								toggleRoleView(formId, role, "workOrder")
-							}
-							toggleFillablePosition={(formId, posId) =>
-								toggleFillablePosition(formId, posId, "workOrder")
-							}
-							toggleViewablePosition={(formId, posId) =>
-								toggleViewablePosition(formId, posId, "workOrder")
-							}
-						/>
-					</motion.div>
-				);
-			case "report":
-				return (
-					<motion.div
-						key="report"
-						initial={{ opacity: 0, x: 20 }}
-						animate={{ opacity: 1, x: 0 }}
-						exit={{ opacity: 0, x: -20 }}
-						transition={{ duration: 0.2 }}
-						className="h-[calc(100vh-10rem)]">
-						<CardReportForm
-							forms={forms}
-							positions={positions}
-							selectedReportForms={selectedReportForms}
-							selectedStaff={selectedStaff}
-							availableRoles={availableRoles}
-							formAccessConfigReport={formAccessConfigReport}
-							loading={loadingPositions}
-							toggleReportForm={toggleReportForm}
-							toggleRoleFill={(formId, role) =>
-								toggleRoleFill(formId, role, "report")
-							}
-							toggleRoleView={(formId, role) =>
-								toggleRoleView(formId, role, "report")
-							}
-							toggleFillablePosition={(formId, posId) =>
-								toggleFillablePosition(formId, posId, "report")
-							}
-							toggleViewablePosition={(formId, posId) =>
-								toggleViewablePosition(formId, posId, "report")
-							}
+							loading={loading}
+							workOrdersConfig={workOrdersConfig}
+							addWorkOrderConfig={addWorkOrderConfig}
+							removeWorkOrderConfig={removeWorkOrderConfig}
+							updateWorkOrderConfig={updateWorkOrderConfig}
 						/>
 					</motion.div>
 				);
@@ -215,40 +154,19 @@ const CreateService: React.FC = () => {
 	};
 
 	return (
-		<div className=" h-[calc(100vh-4rem)] flex flex-col">
-			{/* Header Section */}
-			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 shrink-0">
-				<div className="flex items-center gap-4">
-					<Button
-						onClick={() => navigate(-1)}
-						size="icon"
-						className="bg-primary hover:bg-primary/90 h-10 w-10 shrink-0 sm:h-12 sm:w-12 rounded-lg">
-						<ChevronLeft className="size-5 sm:size-6" />
-					</Button>
-					<div className="flex flex-col space-y-1">
-						<h1 className="text-xl sm:text-2xl font-bold tracking-tight">
-							Buat Layanan Baru
-						</h1>
-						<p className="text-sm text-muted-foreground line-clamp-1 sm:line-clamp-none">
-							Konfigurasi layanan work order langkah demi langkah.
-						</p>
-					</div>
-				</div>
-				<div className="flex items-center gap-3 w-full sm:w-auto">
-					<Button
-						onClick={createService}
-						disabled={creating}
-						className="flex-1 sm:flex-none gap-2 min-w-[140px]">
-						{creating && <Loader2 className="w-4 h-4 animate-spin" />}
-						{creating ? "Menyimpan..." : "Simpan Layanan"}
-					</Button>
-				</div>
-			</div>
+		<div className="h-full flex flex-col">
+			<PageHeader
+				title="Buat Layanan Baru"
+				subtitle="Konfigurasi layanan work order secara ringkas dan efisien."
+				backPath={true}
+				addLabel="Simpan Layanan"
+				onAddClick={createService}
+			/>
 
 			{/* Main Layout - Split View */}
-			<div className="flex flex-col lg:flex-row gap-8 h-full min-h-0 overflow-hidden">
+			<div className="flex flex-col lg:flex-row gap-8 min-h-0 overflow-hidden">
 				{/* Sidebar Navigation */}
-				<aside className="w-full lg:w-72 shrink-0 overflow-y-auto scrollbar-hide">
+				<aside className="w-full  lg:w-72 shrink-0 overflow-y-auto scrollbar-hide">
 					<nav className="flex flex-col space-y-2 lg:sticky lg:top-0">
 						{steps.map((step, index) => {
 							const isActive = activeStep === step.id;
@@ -289,7 +207,7 @@ const CreateService: React.FC = () => {
 				</aside>
 
 				{/* Content Area */}
-				<main className="flex-1 min-w-0 h-full overflow-hidden">
+				<main className="flex-1 min-w-0 h-[calc(100vh-280px)] overflow-y-auto border border-slate-200 shadow-sm rounded-lg bg-white">
 					<AnimatePresence mode="wait">{renderContent()}</AnimatePresence>
 				</main>
 			</div>

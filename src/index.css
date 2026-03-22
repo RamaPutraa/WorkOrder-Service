@@ -114,6 +114,8 @@
 	* {
 		@apply border-border outline-ring/50;
 		--font-sans: "Poppins", sans-serif;
+		scrollbar-width: thin;
+		scrollbar-color: var(--chart-2) transparent;
 	}
 	body {
 		@apply bg-background text-foreground;

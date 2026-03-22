@@ -34,17 +34,47 @@ type IntakeForms = {
 // ==========================
 // === REQUEST & RESPONSE ===
 // ==========================
+enum accessTypeService {
+	public,
+	member_only,
+	internal,
+}
 
+enum serviceRequestApprovalAccessType {
+	auto,
+	manager,
+}
+
+enum workOrderRequestApprovalAccessType {
+	auto,
+	staff_pic,
+}
+
+enum workReportRequestApprovalAccessType {
+	auto,
+	manager,
+}
 // request service (payload ke backend)
 type CreateServiceRequest = {
 	title: string;
 	description: string;
+	accessType: accessTypeService;
 	isActive: boolean;
-	accessType: string;
-	requiredStaffs: Staff[];
-	workOrderForms: OrderForms[];
-	reportForms: ReportForms[];
-	clientIntakeForms: IntakeForms[];
+	serviceRequestConfig: {
+		intakeFormId: string;
+		reviewFormId: string;
+		serviceRequestApprovalAccessType: serviceRequestApprovalAccessType;
+		reviewNeed: boolean;
+	};
+	workOrdersConfig: {
+		positionId: string;
+		workOrderFormId: string;
+		workReportFormId: string;
+		workOrderApprovalAccessType: workOrderRequestApprovalAccessType;
+		workReportApprovalAcessType: workReportRequestApprovalAccessType;
+		minStaff: number;
+		maxStaff: number;
+	}[];
 };
 
 // response service (response dari backend)

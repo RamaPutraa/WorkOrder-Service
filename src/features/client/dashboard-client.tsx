@@ -1,4 +1,10 @@
-import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+import {
+	Card,
+	CardHeader,
+	CardContent,
+	CardTitle,
+	CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -15,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 import { handleApi } from "@/lib/handle-api";
 import { notifyError } from "@/lib/toast-helper";
 import { Badge } from "@/components/ui/badge";
+import { motion, AnimatePresence } from "framer-motion";
 
 const metrics = [
 	{
@@ -170,61 +177,101 @@ const DashboardClient = () => {
 					</div>
 
 					{/* Companies Grid */}
-					{loading ?
-						<div className="flex items-center justify-center py-12">
-							<div className="text-center space-y-3">
-								<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto" />
-								<p className="text-sm text-muted-foreground">
-									Memuat data perusahaan...
-								</p>
-							</div>
-						</div>
-					: filteredCompanies.length === 0 ?
-						<div className="text-center py-12">
-							<Building2 className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-							<p className="text-lg font-medium text-gray-600">
-								Tidak ada perusahaan ditemukan
-							</p>
-							<p className="text-sm text-muted-foreground mt-1">
-								Coba ubah kata kunci pencarian Anda
-							</p>
-						</div>
-					:	<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-							{filteredCompanies.map((company) => (
-								<Card
-									key={company._id}
-									className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 hover:border-primary/50 overflow-hidden">
-									<CardHeader className="space-y-3">
-										<div className="flex items-start gap-3">
-											<div className="p-3 bg-blue-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
-												<Building2 className="w-6 h-6 text-white" />
-											</div>
-											<div className="flex-1 min-w-0">
-												<CardTitle className="text-md font-bold truncate group-hover:text-primary transition-colors">
-													{company.name}
-												</CardTitle>
-												<p className="text-sm text-muted-foreground line-clamp-1 mt-1">
-													{company.description || "Tidak ada deskripsi"}
-												</p>
-											</div>
-										</div>
-									</CardHeader>
-									<CardContent>
-										<Button
-											onClick={() =>
-												navigate(
-													`/dashboard/client/company/${company._id}/services`,
-												)
-											}
-											className="w-full group/btn bg-blue-600 hover:bg-blue-700 shadow-md">
-											<span>Lihat Layanan</span>
-											<ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
-										</Button>
-									</CardContent>
-								</Card>
-							))}
-						</div>
-					}
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+						<AnimatePresence mode="wait">
+							{loading ?
+								<motion.div
+									key="loading"
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									exit={{ opacity: 0 }}
+									transition={{ duration: 0.3 }}
+									className="col-span-full flex items-center justify-center py-12">
+									<div className="text-center space-y-3">
+										<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto" />
+										<p className="text-sm text-muted-foreground">
+											Memuat data perusahaan...
+										</p>
+									</div>
+								</motion.div>
+							: filteredCompanies.length === 0 ?
+								<motion.div
+									key="empty"
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									exit={{ opacity: 0 }}
+									transition={{ duration: 0.3 }}
+									className="col-span-full text-center py-12">
+									<Building2 className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+									<p className="text-lg font-medium text-gray-600">
+										Tidak ada perusahaan ditemukan
+									</p>
+									<p className="text-sm text-muted-foreground mt-1">
+										Coba ubah kata kunci pencarian Anda
+									</p>
+								</motion.div>
+							:	filteredCompanies.map((company) => (
+									<motion.div
+										key={company._id}
+										initial={{ opacity: 0, y: 16 }}
+										animate={{ opacity: 1, y: 0 }}
+										transition={{ duration: 0.2, ease: "easeOut" }}>
+										<Card className="group gap-2 flex flex-col h-full bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+											<CardHeader className="space-y-4">
+												{/* Baris Atas: Icon, Judul, dan Status */}
+												<div className="flex items-start justify-between gap-4">
+													<div className="p-3 bg-primary/5 text-primary rounded-xl">
+														<Building2 className="w-6 h-6 " />
+													</div>
+													<div className="flex-1 min-w-0">
+														<CardTitle className="text-md font-bold truncate">
+															{company.name}
+														</CardTitle>
+														<p className="text-sm text-muted-foreground line-clamp-1 mt-1">
+															{company.address || "Tidak ada alamat"}
+														</p>
+													</div>
+												</div>
+
+												{/* Deskripsi - Masuk dalam CardContent atau tetap di Header dengan padding yang pas */}
+												<div className="text-sm text-slate-500 leading-relaxed line-clamp-3 min-h-[3.75rem] text-justify">
+													{company.description ||
+														"Tidak ada deskripsi tersedia untuk layanan ini."}
+												</div>
+											</CardHeader>
+
+											<CardFooter className="grid grid-cols-1 text-xs border-t border-slate-200/70">
+												<div className="mx-6">
+													<Button
+														onClick={() =>
+															navigate(
+																`/dashboard/client/company/${company._id}/services`,
+															)
+														}
+														className="w-full group/btn bg-blue-600 hover:bg-blue-700 shadow-md">
+														<span>Lihat Layanan</span>
+														<ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+													</Button>
+												</div>
+											</CardFooter>
+											{/* <CardContent className="mt-auto">
+												<Button
+													onClick={() =>
+														navigate(
+															`/dashboard/client/company/${company._id}/services`,
+														)
+													}
+													className="w-full group/btn bg-blue-600 hover:bg-blue-700 shadow-md">
+													<span>Lihat Layanan</span>
+													<ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+												</Button>
+											</CardContent> */}
+										</Card>
+									</motion.div>
+								))
+							}
+						</AnimatePresence>
+					</div>
 				</CardContent>
 			</Card>
 		</div>

@@ -2,9 +2,10 @@ import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroImage from "../../../assets/images/hero_image.jpg";
 import { useAuthStore } from "@/store/authStore";
+import { redirectToRoleDashboard } from "@/lib/auth-helpers";
 
 const HeroSection = () => {
-	const { isAuthenticated } = useAuthStore();
+	const { isAuthenticated, user } = useAuthStore();
 
 	return (
 		<section className="relative min-h-screen flex items-center bg-white">
@@ -37,7 +38,6 @@ const HeroSection = () => {
 
 					<div className="flex flex-wrap gap-4">
 						{!isAuthenticated ?
-							// TODO: arahkan dashboard ke masing masing dashboard role
 							<>
 								<Link
 									to="/hero-regis"
@@ -46,13 +46,13 @@ const HeroSection = () => {
 									<ArrowRight size={16} />
 								</Link>
 								<Link
-									to="/dashboard"
+									to="/login"
 									className="inline-flex items-center gap-2 px-6 py-3.5 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-xl transition-all duration-200 border border-gray-200 hover:border-blue-300 text-sm">
 									Masuk ke Dasbor
 								</Link>
 							</>
 						:	<Link
-								to="/dashboard"
+								to={user?.role ? redirectToRoleDashboard(user.role) : "/login"}
 								className="inline-flex items-center gap-2 px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5 text-sm">
 								Masuk ke Dasbor
 								<ArrowRight size={16} />
