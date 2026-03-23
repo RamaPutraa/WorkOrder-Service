@@ -27,7 +27,9 @@ export const ConfirmLeaveDialog: React.FC<ConfirmLeaveDialogProps> = ({
 }) => {
 	const blocker = useBlocker(
 		({ currentLocation, nextLocation }) =>
-			isDirty && currentLocation.pathname !== nextLocation.pathname,
+			isDirty &&
+			currentLocation.pathname !== nextLocation.pathname &&
+			!(window as any).__isSubmittingSuccess,
 	);
 
 	// Kombinasi state: Diblokir oleh router ATAU dibuka secara manual via props
