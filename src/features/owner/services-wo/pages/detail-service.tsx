@@ -1,248 +1,555 @@
-import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import {
-	CheckCircle,
-	ChevronLeft,
-	ClipboardList,
-	Edit,
-	FileText,
-	Trash,
-	Users,
-} from "lucide-react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCreateService } from "../hooks/useCreateService";
-import { Card } from "@/components/ui/card";
+import {
+	ArrowLeft,
+	CalendarDays,
+	CheckCircle2,
+	Circle,
+	ClipboardCheck,
+	Eye,
+	FileText,
+	Globe,
+	Lock,
+	Pencil,
+	ScrollText,
+	Settings2,
+	Trash2,
+	Users2,
+	XCircle,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogDescription,
+} from "@/components/ui/dialog";
+import { SectionLoading, TextLoading } from "@/shared/atoms/loading-state";
+import PageHeader from "@/shared/atoms/header-content";
+import { EmptyData } from "@/shared/molecules/empty-data";
+import FormFieldViewer from "@/shared/molecules/form-field-viewer";
 
-const DetailService = () => {
-	const navigate = useNavigate();
-	const { detailService, getDetailService } = useCreateService();
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-	// Lazy loading - fetch service details on mount
-	useEffect(() => {
-		void getDetailService();
-	}, []);
+const accessTypeLabel: Record<
+	string,
+	{ label: string; icon: React.ReactNode }
+> = {
+	public: { label: "Publik", icon: <Globe className="size-3.5" /> },
+	member_only: { label: "Member Only", icon: <Lock className="size-3.5" /> },
+	internal: { label: "Internal", icon: <Lock className="size-3.5" /> },
+};
+
+const approvalLabel: Record<string, string> = {
+	auto: "Otomatis",
+	manager: "Persetujuan Manager",
+	staff_pic: "Persetujuan Staff PIC",
+};
+
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+const SectionHeader = ({
+	icon,
+	title,
+	subtitle,
+}: {
+	icon: React.ReactNode;
+	title: string;
+	subtitle: string;
+}) => (
+	<div className="flex items-center gap-2 mb-4">
+		<div className="flex items-center justify-center size-10 rounded-lg bg-primary/10 text-primary shrink-0">
+			{icon}
+		</div>
+		<div className="space-y-1">
+			<h3 className="font-semibold text-muted-foreground text-sm tracking-wide uppercase ">
+				{title}
+			</h3>
+			<p className="text-sm text-muted-foreground">{subtitle}</p>
+		</div>
+	</div>
+);
+
+const formTypeLabel = (type: string) => {
+	switch (type?.toLowerCase()) {
+		case "report":
+			return "Formulir Laporan";
+		case "intake":
+			return "Formulir Permintaan";
+		case "work_order":
+			return "Formulir Perintah Kerja";
+		case "review":
+			return "Formulir Ulasan";
+		default:
+			return type;
+	}
+};
+
+const FormCard = ({
+	order,
+	title,
+	description,
+	formType,
+	fields,
+}: {
+	order?: number;
+	title: string;
+	description: string;
+	formType: string;
+	fields?: { label: string; type: string }[] | any[];
+}) => {
+	const [open, setOpen] = useState(false);
 
 	return (
 		<>
-			{/* Header Navigasi */}
-			<div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-8">
-				<div className="flex items-center space-x-4">
-					<Button
-						onClick={() => navigate(-1)}
-						className="bg-primary hover:bg-primary/90 h-full">
-						<ChevronLeft className="size-6" />
-					</Button>
-					<div className="flex flex-col space-y-1">
-						<h1 className="text-2xl font-bold">
-							Detail Service {detailService?.title}
-						</h1>
-						<p className="text-muted-foreground text-sm sm:text-base">
-							Berikut merupakan detail service {detailService?.title} yang
-							dimiliki oleh perusahaan.
-						</p>
+			<div className="group rounded-xl border bg-card p-4 hover:border-primary/40 transition-colors h-full flex flex-col gap-3">
+				{/* Form type label */}
+				<p className="text-xs font-medium uppercase text-muted-foreground tracking-wide">
+					{formTypeLabel(formType)}
+				</p>
+
+				{/* Icon + title block */}
+				<div className="flex items-center gap-3">
+					<div className="shrink-0 p-3 bg-primary/5 text-primary rounded-xl">
+						<ScrollText className="w-5 h-5" />
 					</div>
+					{order !== undefined && (
+						<span className="flex items-center justify-center size-6 rounded-full bg-primary/10 text-primary text-xs font-semibold shrink-0">
+							{order}
+						</span>
+					)}
+					<div className="flex-1 min-w-0">
+						<p className="font-semibold text-sm truncate">{title}</p>
+						{description && (
+							<p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+								{description}
+							</p>
+						)}
+					</div>
+				</div>
+				{/* Footer: field count + button */}
+				<div className="mt-auto pt-3 border-t flex items-center justify-between gap-2">
+					<span className="text-xs text-muted-foreground">
+						{fields && fields.length > 0 ?
+							`${fields.length} field tersedia`
+						:	"Tidak ada field"}
+					</span>
+					{fields && fields.length > 0 && (
+						<Button
+							size="sm"
+							variant="outline"
+							className="h-7 gap-1.5 text-xs"
+							onClick={() => setOpen(true)}>
+							<Eye className="size-3" />
+							Lihat Detail
+						</Button>
+					)}
 				</div>
 			</div>
 
-			<div className="space-y-8">
-				{/* Informasi Utama */}
-				<Card className="shadow-md border rounded-lg overflow-hidden">
-					{/* Card Header with Actions */}
-					<div className="p-5 lg:p-6 border-b bg-gradient-to-br from-background to-muted/20">
-						<div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-							<div className="flex-1 space-y-3">
-								<div className="flex items-center gap-3 flex-wrap">
-									<FileText className="size-6 text-primary shrink-0" />
-									<h2 className="text-xl font-bold">{detailService?.title}</h2>
-									{detailService?.isActive ?
-										<div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-green-50 text-green-700 border border-green-200">
-											<CheckCircle className="w-3.5 h-3.5" />
-											<span className="text-xs font-semibold">Aktif</span>
-										</div>
-									:	<div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-gray-50 text-gray-700 border border-gray-200">
-											<span className="text-xs font-semibold">Nonaktif</span>
-										</div>
-									}
+			{/* Dialog */}
+			<Dialog open={open} onOpenChange={setOpen}>
+				<DialogContent className="max-w-xl max-h-[80vh] overflow-y-auto pt-10">
+					<DialogHeader>
+						<div className="flex items-center justify-between gap-2.5 mb-1">
+							<div className="flex items-center gap-2">
+								<div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
+									<ScrollText className="size-4" />
 								</div>
+								<DialogTitle className="text-base">{title}</DialogTitle>
+							</div>
+							<Badge
+								variant="secondary"
+								className="text-[10px] mt-1 capitalize">
+								{formTypeLabel(formType)}
+							</Badge>
+						</div>
+						{description && (
+							<DialogDescription className="text-xs leading-relaxed">
+								{description}
+							</DialogDescription>
+						)}
+					</DialogHeader>
+
+					<Separator />
+
+					<div className="space-y-3 pt-1">
+						{fields?.map((field, idx) => (
+							<div
+								key={idx}
+								className="p-4 border rounded-xl bg-muted/20 hover:bg-muted/40 transition-colors">
+								<FormFieldViewer field={field} answer={null} readOnly />
+							</div>
+						))}
+					</div>
+				</DialogContent>
+			</Dialog>
+		</>
+	);
+};
+
+// ─── Main Component ───────────────────────────────────────────────────────────
+
+const DetailService = () => {
+	const { detailService, loading } = useCreateService();
+
+	const accessInfo = accessTypeLabel[
+		detailService?.accessType as unknown as string
+	] ?? {
+		label: String(detailService?.accessType),
+		icon: <Globe className="size-4" />,
+	};
+
+	const formatDate = (iso: string) =>
+		new Date(iso).toLocaleDateString("id-ID", {
+			day: "numeric",
+			month: "long",
+			year: "numeric",
+		});
+
+	return (
+		<>
+			{/* ── Header ── */}
+			<PageHeader
+				title={
+					loading ?
+						<div className="flex items-center gap-1.5">
+							Detail Layanan{" "}
+							<TextLoading variant="dots" message="" className="w-40" />
+						</div>
+					:	`Detail Layanan ${detailService?.title}`
+				}
+				subtitle={
+					loading ?
+						<div className="flex items-center gap-1.5">
+							Berikut merupakan detail layanan{" "}
+							<TextLoading variant="dots" message="" className="w-40" />
+						</div>
+					:	`Berikut merupakan detail layanan ${detailService?.title} `
+				}
+				backPath={true}
+			/>
+
+			{loading ?
+				<SectionLoading message="Memuat detail layanan..." />
+			: !detailService ?
+				<div className="my-10">
+					<EmptyData />
+				</div>
+			:	<div className="space-y-8">
+					{/* ── Overview Card ── */}
+					<section className="rounded-2xl border bg-card overflow-hidden shadow-xs">
+						<div className="p-6 space-y-5">
+							{/* Title row */}
+							<div className="flex items-start justify-between gap-4">
+								<div className="space-y-1 flex-1 min-w-0">
+									<p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
+										Nama Layanan
+									</p>
+									<h2 className="text-lg font-bold tracking-tight text-foreground leading-snug">
+										{detailService.title}
+									</h2>
+								</div>
+								{/* Status badge */}
+								{detailService.isActive ?
+									<Badge
+										variant="outline"
+										className="flex items-center gap-1.5 text-emerald-700 border-emerald-200 bg-emerald-50 dark:bg-emerald-950/30 dark:border-emerald-800 dark:text-emerald-400 text-[11px] font-semibold px-2.5 py-1 rounded-full shrink-0">
+										<span className="relative flex h-1.5 w-1.5">
+											<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+											<span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
+										</span>
+										Aktif
+									</Badge>
+								:	<Badge
+										variant="outline"
+										className="flex items-center gap-1.5 text-muted-foreground border-border bg-muted/30 text-[11px] font-semibold px-2.5 py-1 rounded-full shrink-0">
+										<span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/50 inline-block" />
+										Nonaktif
+									</Badge>
+								}
+							</div>
+
+							{/* Description */}
+							{detailService.description && (
 								<p className="text-sm text-muted-foreground leading-relaxed">
-									{detailService?.description}
+									{detailService.description}
 								</p>
-								<div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 w-fit">
-									<span className="text-xs font-semibold">Tipe Akses:</span>
-									<span className="text-xs font-bold capitalize">
-										{detailService?.accessType}
-									</span>
+							)}
+
+							<Separator className="opacity-50" />
+
+							{/* Meta grid */}
+							<div className="grid sm:grid-cols-3 gap-4">
+								{/* Created At */}
+								<div className="flex items-center gap-2.5">
+									<div className="size-8 rounded-lg bg-primary/5 text-primary flex items-center justify-center shrink-0">
+										<CalendarDays className="size-4" />
+									</div>
+									<div>
+										<p className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground">
+											Dibuat
+										</p>
+										<p className="text-xs font-medium mt-0.5">
+											{formatDate(detailService.createdAt)}
+										</p>
+									</div>
+								</div>
+
+								{/* Access */}
+								<div className="flex items-center gap-2.5">
+									<div className="size-8 rounded-lg bg-primary/5 text-primary flex items-center justify-center shrink-0">
+										{accessInfo.icon}
+									</div>
+									<div>
+										<p className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground">
+											Akses
+										</p>
+										<p className="text-xs font-medium mt-0.5">
+											{accessInfo.label}
+										</p>
+									</div>
 								</div>
 							</div>
 
-							<div className="flex gap-2 sm:flex-shrink-0">
-								<Button
-									variant="outline"
-									size="sm"
-									className="flex-1 sm:flex-none h-10 px-4 rounded-lg border-2 hover:bg-muted transition-colors">
-									<Edit className="w-4 h-4 sm:mr-2" />
-									<span className="hidden sm:inline">Edit</span>
-								</Button>
-								<Button
-									variant="destructive"
-									size="sm"
-									className="flex-1 sm:flex-none h-10 px-4 rounded-lg transition-colors">
-									<Trash className="w-4 h-4 sm:mr-2" />
-									<span className="hidden sm:inline">Delete</span>
-								</Button>
+							<Separator className="opacity-50" />
+
+							{/* Approval config */}
+							<div className="space-y-3">
+								<div className="flex items-center gap-2">
+									<Settings2 className="size-3.5 text-muted-foreground" />
+									<p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+										Konfigurasi Persetujuan
+									</p>
+								</div>
+
+								<div className="grid sm:grid-cols-2 gap-3">
+									{/* Tipe Persetujuan */}
+									<div className="rounded-xl border bg-muted/20 px-4 py-3 space-y-1 hover:bg-muted/40 transition-colors">
+										<p className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground ">
+											Tipe Persetujuan
+										</p>
+										<p className="text-sm font-medium">
+											{approvalLabel[
+												detailService.serviceRequestConfig
+													?.serviceRequestApprovalAccessType as unknown as string
+											] ??
+												String(
+													detailService.serviceRequestConfig
+														?.serviceRequestApprovalAccessType,
+												)}
+										</p>
+									</div>
+
+									{/* Review Diperlukan */}
+									<div className="rounded-xl border bg-muted/20 px-4 py-3 space-y-1 hover:bg-muted/40 transition-colors">
+										<p className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground ">
+											Review Diperlukan
+										</p>
+										<div className="flex items-center gap-1.5">
+											{detailService.serviceRequestConfig?.reviewNeed ?
+												<>
+													<CheckCircle2 className="size-4 text-emerald-500 shrink-0" />
+													<p className="text-sm font-medium">Ya, diperlukan</p>
+												</>
+											:	<>
+													<XCircle className="size-4 text-muted-foreground shrink-0" />
+													<p className="text-sm font-medium text-muted-foreground">
+														Tidak diperlukan
+													</p>
+												</>
+											}
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
-					</div>
+					</section>
 
-					{/* Card Content */}
-					<div className="p-5 lg:p-6">
-						{/* Required Staff */}
-						<div className="space-y-3">
-							<h3 className="font-semibold text-base flex items-center gap-2">
-								<Users className="size-5 text-primary" />
-								Pegawai yang Diperlukan
-							</h3>
-							{detailService?.requiredStaffs?.length ?
-								<div className="grid gap-3 sm:grid-cols-2">
-									{detailService.requiredStaffs.map((staff, i) => (
+					{/* ── Service Request Config ── */}
+					<section className="space-y-5">
+						<SectionHeader
+							icon={<ClipboardCheck className="size-4" />}
+							title="Formulir Permintaan Layanan"
+							subtitle="Berikut merupakan detail formulir yang akan diisi oleh pengguna saat mengajukan permintaan layanan dan juga formulir yang akan diisi untuk meninjau permintaan layanan."
+						/>
+
+						<div className="grid lg:grid-cols-2 gap-4">
+							{/* Intake Form */}
+							<div className="intake">
+								{detailService.serviceRequestConfig?.intakeForm ?
+									<FormCard
+										title={detailService.serviceRequestConfig.intakeForm.title}
+										description={
+											detailService.serviceRequestConfig.intakeForm.description
+										}
+										formType={
+											detailService.serviceRequestConfig.intakeForm.formType
+										}
+										fields={
+											detailService.serviceRequestConfig.intakeForm.fields
+										}
+									/>
+								:	<div className="rounded-xl border border-dashed p-4 flex items-center justify-center text-sm text-muted-foreground italic bg-muted/10 h-full min-h-[100px]">
+										Formulir permintaan tidak tersedia.
+									</div>
+								}
+							</div>
+
+							{/* Review Form */}
+							<div className="review">
+								{detailService.serviceRequestConfig?.reviewForm ?
+									<FormCard
+										title={detailService.serviceRequestConfig.reviewForm.title}
+										description={
+											detailService.serviceRequestConfig.reviewForm.description
+										}
+										formType={
+											detailService.serviceRequestConfig.reviewForm.formType
+										}
+										fields={
+											detailService.serviceRequestConfig.reviewForm.fields
+										}
+									/>
+								:	<div className="rounded-xl border border-dashed p-4 flex items-center justify-center text-sm text-muted-foreground italic bg-muted/10 h-full min-h-[100px]">
+										Formulir ulasan tidak tersedia.
+									</div>
+								}
+							</div>
+						</div>
+					</section>
+
+					{/* ── Work Orders Config ── */}
+					{detailService.workOrdersConfig &&
+						detailService.workOrdersConfig.length > 0 && (
+							<section className="space-y-4">
+								<SectionHeader
+									icon={<Settings2 className="size-4" />}
+									title="Detail Konfigurasi Perintah Kerja"
+									subtitle="Berikut merupakan detail konfigurasi perintah kerja yang akan dikerjakan oleh pegawai."
+								/>
+
+								<div className="space-y-5">
+									{detailService.workOrdersConfig.map((wo, i) => (
 										<div
 											key={i}
-											className="border rounded-lg p-4 bg-muted/30 hover:bg-muted/50 transition-colors flex justify-between items-center">
-											<div className="flex-1">
-												<p className="font-semibold text-sm">
-													{staff.position?.name}
-												</p>
-												<p className="text-xs text-muted-foreground mt-1">
-													Min: {staff.minimumStaff} - Max: {staff.maximumStaff}{" "}
-													orang
-												</p>
+											className="rounded-2xl border bg-card p-5 lg:p-6 shadow-sm">
+											{/* Grid 3 Kolom */}
+											<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+												{/* ── Kolom 1: Posisi & Persetujuan ── */}
+												<div className="flex flex-col space-y-6 lg:border-r lg:pr-8 border-border/50">
+													{/* Card Informasi Penugasan */}
+													<div className="space-y-3">
+														<p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+															<Users2 className="size-3.5" />
+															Informasi Penugasan
+														</p>
+														<div className="flex items-start gap-4 p-4 rounded-xl border bg-primary/5 hover:bg-primary/10 transition-colors">
+															<div className="size-10 rounded-lg bg-primary/15 text-primary flex items-center justify-center shrink-0">
+																<Users2 className="size-5" />
+															</div>
+															<div className="flex-1 min-w-0 space-y-2">
+																<div>
+																	<p className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground">
+																		Posisi Penanggung Jawab
+																	</p>
+																	<p className="font-semibold text-base truncate mt-0.5 text-foreground">
+																		{wo.positionsOnDuty?.name ?? "—"}
+																	</p>
+																</div>
+																<Badge
+																	variant="secondary"
+																	className="text-xs bg-background/80 hover:bg-background border-muted">
+																	{wo.minStaff} – {wo.maxStaff} Orang
+																</Badge>
+															</div>
+														</div>
+													</div>
+
+													{/* Card Approval / Persetujuan */}
+													<div className="space-y-3 mt-auto">
+														<p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+															<CheckCircle2 className="size-3.5" />
+															Hak Akses Persetujuan
+														</p>
+														<div className="grid grid-cols-2 gap-3">
+															<div className="rounded-xl border bg-muted/20 p-3 flex flex-col justify-center gap-1 hover:border-primary/30 transition-colors">
+																<p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
+																	Tugas Kerja
+																</p>
+																<p className="text-xs font-semibold">
+																	{approvalLabel[
+																		wo.workOrderApprovalAccessType as unknown as string
+																	] ?? String(wo.workOrderApprovalAccessType)}
+																</p>
+															</div>
+															<div className="rounded-xl border bg-muted/20 p-3 flex flex-col justify-center gap-1 hover:border-primary/30 transition-colors">
+																<p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
+																	Pelaporan
+																</p>
+																<p className="text-xs font-semibold">
+																	{approvalLabel[
+																		wo.workReportApprovalAccessType as unknown as string
+																	] ?? String(wo.workReportApprovalAccessType)}
+																</p>
+															</div>
+														</div>
+													</div>
+												</div>
+
+												{/* ── Kolom 2: Form Perintah Kerja ── */}
+												<div className="flex flex-col space-y-3">
+													<p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+														<FileText className="size-3.5" />
+														Work Order Form
+													</p>
+													<div className="flex-1">
+														{wo.workOrderForm ?
+															<FormCard
+																title={wo.workOrderForm.title}
+																description={wo.workOrderForm.description}
+																formType={wo.workOrderForm.formType}
+																fields={(wo.workOrderForm as any).fields}
+															/>
+														:	<div className="rounded-xl border border-dashed p-4 flex items-center justify-center text-sm text-muted-foreground italic bg-muted/10 h-full min-h-[120px]">
+																Tidak tersedia
+															</div>
+														}
+													</div>
+												</div>
+
+												{/* ── Kolom 3: Form Laporan Kerja ── */}
+												<div className="flex flex-col space-y-3">
+													<p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+														<ClipboardCheck className="size-3.5" />
+														Work Report Form
+													</p>
+													<div className="flex-1">
+														{wo.workReportForm ?
+															<FormCard
+																title={wo.workReportForm.title}
+																description={wo.workReportForm.description}
+																formType={wo.workReportForm.formType}
+																fields={(wo.workReportForm as any).fields}
+															/>
+														:	<div className="rounded-xl border border-dashed p-4 flex items-center justify-center text-sm text-muted-foreground italic bg-muted/10 h-full min-h-[120px]">
+																Tidak tersedia
+															</div>
+														}
+													</div>
+												</div>
 											</div>
-											<CheckCircle className="size-5 text-green-600 shrink-0 ml-2" />
 										</div>
 									))}
 								</div>
-							:	<p className="text-sm text-muted-foreground italic">
-									Tidak ada kebutuhan staf spesifik.
-								</p>
-							}
-						</div>
-					</div>
-				</Card>
-
-				{/* Client Intake Forms */}
-				{(detailService?.clientIntakeForms?.length ?? 0) > 0 && (
-					<Card className="shadow-md border rounded-lg overflow-hidden">
-						<div className="p-5 lg:p-6 border-b bg-gradient-to-br from-background to-muted/20">
-							<h3 className="font-semibold text-lg flex items-center gap-2">
-								<ClipboardList className="size-5 text-primary" />
-								Client Intake Forms
-							</h3>
-						</div>
-						<div className="p-5 lg:p-6 grid gap-3 sm:grid-cols-2">
-							{detailService?.clientIntakeForms?.map((item, i) => (
-								<div
-									key={i}
-									className="border rounded-lg p-4 bg-muted/30 hover:bg-muted/50 transition-colors flex flex-col space-y-2">
-									<div className="flex items-start gap-2">
-										<div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-semibold shrink-0">
-											{item.order}
-										</div>
-										<div className="flex-1">
-											<span className="font-semibold text-sm">
-												{item.form.title}
-											</span>
-											<p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-												{item.form.description}
-											</p>
-										</div>
-									</div>
-									<div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-primary/10 text-primary border border-primary/20 w-fit">
-										<span className="text-xs font-semibold capitalize">
-											{item.form.formType}
-										</span>
-									</div>
-								</div>
-							))}
-						</div>
-					</Card>
-				)}
-
-				{/* Work Order Forms */}
-				{(detailService?.workOrderForms?.length ?? 0) > 0 && (
-					<Card className="shadow-md border rounded-lg overflow-hidden">
-						<div className="p-5 lg:p-6 border-b bg-gradient-to-br from-background to-muted/20">
-							<h3 className="font-semibold text-lg flex items-center gap-2">
-								<FileText className="size-5 text-primary" />
-								Work Order Forms
-							</h3>
-						</div>
-						<div className="p-5 lg:p-6 grid gap-3 sm:grid-cols-2">
-							{detailService?.workOrderForms?.map((wo, i) => (
-								<div
-									key={i}
-									className="border rounded-lg p-4 bg-muted/30 hover:bg-muted/50 transition-colors flex flex-col space-y-2">
-									<div className="flex items-start gap-2">
-										<div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-semibold shrink-0">
-											{wo.order}
-										</div>
-										<div className="flex-1">
-											<span className="font-semibold text-sm">
-												{wo.form.title}
-											</span>
-											<p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-												{wo.form.description}
-											</p>
-										</div>
-									</div>
-									<div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-primary/10 text-primary border border-primary/20 w-fit">
-										<span className="text-xs font-semibold capitalize">
-											{wo.form.formType}
-										</span>
-									</div>
-								</div>
-							))}
-						</div>
-					</Card>
-				)}
-
-				{/* Report Forms */}
-				{(detailService?.reportForms?.length ?? 0) > 0 && (
-					<Card className="shadow-md border rounded-lg overflow-hidden">
-						<div className="p-5 lg:p-6 border-b bg-gradient-to-br from-background to-muted/20">
-							<h3 className="font-semibold text-lg flex items-center gap-2">
-								<FileText className="size-5 text-primary" />
-								Report Forms
-							</h3>
-						</div>
-						<div className="p-5 lg:p-6 grid gap-3 sm:grid-cols-2">
-							{detailService?.reportForms?.map((rf, i) => (
-								<div
-									key={i}
-									className="border rounded-lg p-4 bg-muted/30 hover:bg-muted/50 transition-colors flex flex-col space-y-2">
-									<div className="flex items-start gap-2">
-										<div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-semibold shrink-0">
-											{rf.order}
-										</div>
-										<div className="flex-1">
-											<span className="font-semibold text-sm">
-												{rf.form.title}
-											</span>
-											<p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-												{rf.form.description}
-											</p>
-										</div>
-									</div>
-									<div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-primary/10 text-primary border border-primary/20 w-fit">
-										<span className="text-xs font-semibold capitalize">
-											{rf.form.formType}
-										</span>
-									</div>
-								</div>
-							))}
-						</div>
-					</Card>
-				)}
-			</div>
+							</section>
+						)}
+				</div>
+			}
 		</>
 	);
 };

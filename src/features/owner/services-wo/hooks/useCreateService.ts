@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
 
@@ -100,9 +100,7 @@ export const useCreateService = () => {
 		value: string | number,
 	) => {
 		setWorkOrdersConfig((prev) =>
-			prev.map((item, i) =>
-				i === index ? { ...item, [field]: value } : item,
-			),
+			prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)),
 		);
 	};
 
@@ -153,7 +151,10 @@ export const useCreateService = () => {
 			return;
 		}
 		if (workOrdersConfig.length === 0) {
-			notifyError("Gagal menyimpan", "Tambahkan minimal satu konfigurasi work order");
+			notifyError(
+				"Gagal menyimpan",
+				"Tambahkan minimal satu konfigurasi work order",
+			);
 			setCreating(false);
 			return;
 		}
@@ -251,6 +252,12 @@ export const useCreateService = () => {
 		}
 		setDetailService(res?.data || null);
 	};
+
+	useEffect(() => {
+		if (id) {
+			getDetailService();
+		}
+	}, [id]);
 
 	// === Filter (for view-service page) ===
 	const [searchParams] = useSearchParams();
