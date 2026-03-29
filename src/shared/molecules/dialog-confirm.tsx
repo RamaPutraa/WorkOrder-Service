@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { useDialogStore } from "@/store/dialogStore";
+import { ButtonLoading } from "@/shared/atoms/loading-state";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -11,6 +13,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export default function ConfirmDialog() {
+	const [loading, setLoading] = useState(false);
 	const { isOpen, config, closeDialog } = useDialogStore();
 
 	if (!config) return null;
@@ -28,13 +31,28 @@ export default function ConfirmDialog() {
 					)}
 				</AlertDialogHeader>
 				<AlertDialogFooter>
-					<AlertDialogCancel>{cancelText || "Batal"}</AlertDialogCancel>
+					<AlertDialogCancel disabled={loading}>
+						{cancelText || "Batal"}
+					</AlertDialogCancel>
 					<AlertDialogAction
-						onClick={() => {
-							onConfirm?.();
-							closeDialog();
+						disabled={loading}
+						onClick={async (e) => {
+							if (onConfirm) {
+								e.preventDefault(); // Mencegah dialog tertutup otomatis
+								try {
+									setLoading(true);
+									await onConfirm();
+								} finally {
+									setLoading(false);
+									closeDialog();
+								}
+							} else {
+								closeDialog();
+							}
 						}}>
-						{confirmText || "Ya"}
+						{loading ?
+							<ButtonLoading />
+						:	confirmText || "Ya"}
 					</AlertDialogAction>
 				</AlertDialogFooter>
 			</AlertDialogContent>

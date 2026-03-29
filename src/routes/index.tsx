@@ -1,9 +1,4 @@
-import {
-	AppLayout,
-	AuthLayout,
-	PublicLayout,
-	RootLayout,
-} from "@/shared/templates";
+import { AppLayout, PublicLayout, RootLayout } from "@/shared/templates";
 import LoginPage from "@/features/auth/pages/login-page";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import DashboardOwner from "@/features/owner/dahsboard-client";
@@ -19,6 +14,7 @@ import CreatePositionPage from "@/features/owner/position/pages/create-position"
 import ProfileCompany from "@/features/owner/company/pages/profile-company";
 import ViewService from "@/features/owner/services-wo/pages/view-service";
 import CreateService from "@/features/owner/services-wo/pages/create-service";
+import EditService from "@/features/owner/services-wo/pages/edit-service";
 import ClientCompanyServices from "@/features/client/company/pages/company-services";
 import PublicServicePage from "@/features/client/services-wo/pages/service-request";
 import ErrorPage from "@/shared/errors/templates/error-page";
@@ -42,6 +38,7 @@ import ProfilePage from "@/features/auth/pages/profile";
 import HeroRegis from "@/features/auth/pages/hero-section-regis";
 import ClientRegisterPage from "@/features/auth/pages/client-reg-page";
 import InternalRegisterPage from "@/features/auth/pages/internal-reg-page";
+import ViewMemberCodes from "@/features/owner/membercodes/pages/view-membercode";
 
 const router = createBrowserRouter([
 	{
@@ -105,6 +102,10 @@ const router = createBrowserRouter([
 						element: <CreateService />,
 					},
 					{
+						path: "services/edit/:id",
+						element: <EditService />,
+					},
+					{
 						path: "services/detail/:id",
 						element: <DetailService />,
 					},
@@ -127,6 +128,10 @@ const router = createBrowserRouter([
 					{
 						path: "workorders/:id/report",
 						element: <CompanyReportWo />,
+					},
+					{
+						path: "membercodes",
+						element: <ViewMemberCodes />,
 					},
 				],
 			},

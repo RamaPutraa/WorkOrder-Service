@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCreateService } from "../hooks/useCreateService";
+import { toggleServiceActiveApi } from "../services/servicesWo";
+import { useServiceStore } from "@/store/serviceStore";
+import { useDialogStore } from "@/store/dialogStore";
+import { notifyError, notifySuccess } from "@/lib/toast-helper";
+import { Switch } from "@/components/ui/switch";
 import {
 	ArrowLeft,
 	CalendarDays,
@@ -195,7 +200,31 @@ const FormCard = ({
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 const DetailService = () => {
-	const { detailService, loading } = useCreateService();
+	const navigate = useNavigate();
+	const { detailService, loading, getDetailService } = useCreateService();
+	const { showDialog } = useDialogStore();
+	const clearServiceCache = useServiceStore((state) => state.clearCache);
+
+	const handleToggleActive = () => {
+		if (!detailService) return;
+
+		showDialog({
+			title: "Konfirmasi Ubah Status",
+			description: `Apakah Anda yakin ingin ${detailService.isActive ? "menonaktifkan" : "mengaktifkan"} layanan ini?`,
+			onConfirm: async () => {
+				try {
+					await toggleServiceActiveApi(detailService._id, {
+						isActive: !detailService.isActive,
+					});
+					clearServiceCache();
+					await getDetailService();
+					notifySuccess("Status layanan berhasil diubah");
+				} catch (error: any) {
+					notifyError("Gagal mengubah status layanan", error.message);
+				}
+			},
+		});
+	};
 
 	const accessInfo = accessTypeLabel[
 		detailService?.accessType as unknown as string
@@ -232,6 +261,12 @@ const DetailService = () => {
 					:	`Berikut merupakan detail layanan ${detailService?.title} `
 				}
 				backPath={true}
+				addLabel="Edit Layanan"
+				addIcon={<Pencil className="size-4" />}
+				loading={loading}
+				onAddClick={() =>
+					navigate(`/dashboard/internal/services/edit/${detailService?._id}`)
+				}
 			/>
 
 			{loading ?
@@ -255,23 +290,16 @@ const DetailService = () => {
 									</h2>
 								</div>
 								{/* Status badge */}
-								{detailService.isActive ?
-									<Badge
-										variant="outline"
-										className="flex items-center gap-1.5 text-emerald-700 border-emerald-200 bg-emerald-50 dark:bg-emerald-950/30 dark:border-emerald-800 dark:text-emerald-400 text-[11px] font-semibold px-2.5 py-1 rounded-full shrink-0">
-										<span className="relative flex h-1.5 w-1.5">
-											<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-											<span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
-										</span>
-										Aktif
-									</Badge>
-								:	<Badge
-										variant="outline"
-										className="flex items-center gap-1.5 text-muted-foreground border-border bg-muted/30 text-[11px] font-semibold px-2.5 py-1 rounded-full shrink-0">
-										<span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/50 inline-block" />
-										Nonaktif
-									</Badge>
-								}
+								<div className="flex items-center gap-3 shrink-0 bg-muted/20 px-4 py-2 rounded-xl border">
+									<Switch
+										checked={detailService.isActive}
+										onCheckedChange={handleToggleActive}
+									/>
+									<span
+										className={`text-sm font-semibold ${detailService.isActive ? "text-emerald-600" : "text-slate-500"}`}>
+										{detailService.isActive ? "Aktif" : "Nonaktif"}
+									</span>
+								</div>
 							</div>
 
 							{/* Description */}

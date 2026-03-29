@@ -20,6 +20,7 @@ type CardServiceInfoProps = {
 	setDescription: (val: string) => void;
 	setAccessType: (val: string) => void;
 	setSelectedStatus: (val: Status | null) => void;
+	isEditMode?: boolean;
 };
 
 const accessTypeOptions = [
@@ -53,6 +54,7 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 	setDescription,
 	setAccessType,
 	setSelectedStatus,
+	isEditMode = false,
 }) => {
 	const isActive = selectedStatus?.value === "true";
 
@@ -138,6 +140,7 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 				</div>
 
 				{/* Status */}
+				{!isEditMode && (
 				<div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-slate-50/50">
 					<div className="space-y-0.5">
 						<p className="text-sm font-medium text-slate-700">Status Layanan</p>
@@ -155,6 +158,7 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 						}}
 					/>
 				</div>
+				)}
 			</div>
 		</div>
 	);

@@ -9,6 +9,7 @@ import {
 	GalleryVerticalEnd,
 	PieChart,
 	SquareTerminal,
+	Ticket,
 } from "lucide-react";
 import {
 	SidebarMenu,
@@ -49,7 +50,6 @@ const data = {
 			url: "",
 			icon: BookOpen,
 		},
-
 		{
 			title: "Tugas Kerja",
 			url: "#",
@@ -87,6 +87,11 @@ const data = {
 					url: "/dashboard/internal/staff/history-invitations",
 				},
 			],
+		},
+		{
+			title: "Kode Berlangganan",
+			url: "/dashboard/internal/membercodes",
+			icon: Ticket,
 		},
 	],
 	navBusiness: [

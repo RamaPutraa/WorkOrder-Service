@@ -1,17 +1,15 @@
-import { useState, useMemo, useEffect } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
 
 // API services
 import { getPositionsApi } from "@/features/owner/position/services/positionService";
 import { getFormsApi } from "@/features/owner/form/services/formService";
 import {
-	createServiceApi,
+	updateServiceApi,
 	getServiceByIdApi,
-	getServicesWoApi,
 } from "@/features/owner/services-wo/services/servicesWo";
 import { handleApi } from "@/lib/handle-api";
-import { type FilterConfig } from "@/shared/molecules/generic-filter";
 import { useServiceStore } from "@/store/serviceStore";
 
 // ===========================
@@ -32,7 +30,7 @@ export type WorkOrderConfigItem = {
 	maxStaff: number;
 };
 
-export const useCreateService = () => {
+export const useEditService = () => {
 	const navigate = useNavigate();
 
 	// === Route Params ===
@@ -41,19 +39,15 @@ export const useCreateService = () => {
 	// === Loading / Error ===
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	const [creating, setCreating] = useState(false);
+	const [updating, setUpdating] = useState(false);
 
 	// === Cache Store ===
 	const serviceStore = useServiceStore();
 
-	// === List data (dari store atau local state) ===
-	const [services, setServices] = useState<Service[]>(
-		serviceStore.isServicesStale() ? [] : serviceStore.services,
-	);
 	const [detailService, setDetailService] = useState<Service | null>(
-		id && !serviceStore.isDetailStale(id)
-			? (serviceStore.detailCache[id]?.data ?? null)
-			: null,
+		id && !serviceStore.isDetailStale(id) ?
+			(serviceStore.detailCache[id]?.data ?? null)
+		:	null,
 	);
 
 	// === Base form fields ===
@@ -62,6 +56,7 @@ export const useCreateService = () => {
 	const [accessType, setAccessType] = useState<string>("");
 	const [selectedStatus, setSelectedStatus] = useState<Status | null>(null);
 	const [openStatus, setOpenStatus] = useState(false);
+	const [isActive, setIsActive] = useState<boolean>(true); // keep track but not change
 
 	const statuses: Status[] = [
 		{ value: "true", label: "Aktif" },
@@ -140,40 +135,120 @@ export const useCreateService = () => {
 		setForms(res?.data || []);
 	};
 
+	const populateData = (service: Service) => {
+		setTitle(service.title);
+		setDescription(service.description);
+		setAccessType(service.accessType as unknown as string);
+		setIsActive(service.isActive === true || service.isActive === "true" as any);
+
+		if (service.serviceRequestConfig) {
+			setIntakeFormId(service.serviceRequestConfig.intakeForm?._id || "");
+			setReviewFormId(service.serviceRequestConfig.reviewForm?._id || "");
+			setServiceRequestApprovalType(
+				service.serviceRequestConfig
+					.serviceRequestApprovalAccessType as unknown as "auto" | "manager",
+			);
+			setReviewNeed(service.serviceRequestConfig.reviewNeed || false);
+		}
+
+		if (service.workOrdersConfig) {
+			setWorkOrdersConfig(
+				service.workOrdersConfig.map((c) => ({
+					positionId: c.positionsOnDuty?._id || "",
+					workOrderFormId: c.workOrderForm?._id || "",
+					workReportFormId: c.workReportForm?._id || "",
+					workOrderApprovalType: c.workOrderApprovalAccessType as unknown as
+						| "auto"
+						| "staff_pic",
+					workReportApprovalType: c.workReportApprovalAccessType as unknown as
+						| "auto"
+						| "manager",
+					minStaff: c.minStaff,
+					maxStaff: c.maxStaff,
+				})),
+			);
+		}
+	};
+
+	// === Get Detail Service (dengan cache 5 menit) ===
+	const getDetailService = async () => {
+		if (!id) {
+			setError("ID layanan tidak ditemukan");
+			notifyError("Gagal memuat data layanan", "ID layanan tidak ditemukan");
+			return;
+		}
+
+		// Gunakan cache detail jika masih fresh untuk ID ini
+		if (!serviceStore.isDetailStale(id) && serviceStore.detailCache[id]?.data) {
+			const data = serviceStore.detailCache[id]!.data;
+			setDetailService(data);
+			populateData(data);
+			return;
+		}
+
+		setLoading(true);
+		setError(null);
+
+		const { data: res, error } = await handleApi(() => getServiceByIdApi(id));
+		setLoading(false);
+
+		if (error) {
+			setError(error.message);
+			notifyError("Gagal memuat data layanan", error.message);
+			return;
+		}
+
+		const detail = res?.data || null;
+		setDetailService(detail);
+		if (detail) {
+			serviceStore.setDetailService(id, detail); // simpan ke cache
+			populateData(detail);
+		}
+	};
+
+	useEffect(() => {
+		if (id) {
+			getDetailService();
+		}
+	}, [id]);
+
 	// === Submit ===
-	const createService = async () => {
-		setCreating(true);
+	const updateService = async () => {
+		setUpdating(true);
 		setError(null);
 
 		if (!title.trim() || !description.trim()) {
-			notifyError("Gagal menyimpan", "Judul dan deskripsi wajib diisi");
-			setCreating(false);
+			notifyError("Gagal mengupdate", "Judul dan deskripsi wajib diisi");
+			setUpdating(false);
 			return;
 		}
 		if (!accessType) {
-			notifyError("Gagal menyimpan", "Pilih tipe akses layanan");
-			setCreating(false);
+			notifyError("Gagal mengupdate", "Pilih tipe akses layanan");
+			setUpdating(false);
 			return;
 		}
 		if (!intakeFormId) {
-			notifyError("Gagal menyimpan", "Pilih intake form untuk service request");
-			setCreating(false);
+			notifyError(
+				"Gagal mengupdate",
+				"Pilih intake form untuk service request",
+			);
+			setUpdating(false);
 			return;
 		}
 		if (workOrdersConfig.length === 0) {
 			notifyError(
-				"Gagal menyimpan",
+				"Gagal mengupdate",
 				"Tambahkan minimal satu konfigurasi work order",
 			);
-			setCreating(false);
+			setUpdating(false);
 			return;
 		}
 		const incompleteWO = workOrdersConfig.some(
 			(c) => !c.positionId || !c.workOrderFormId || !c.workReportFormId,
 		);
 		if (incompleteWO) {
-			notifyError("Gagal menyimpan", "Lengkapi semua konfigurasi work order");
-			setCreating(false);
+			notifyError("Gagal mengupdate", "Lengkapi semua konfigurasi work order");
+			setUpdating(false);
 			return;
 		}
 
@@ -181,7 +256,7 @@ export const useCreateService = () => {
 			title,
 			description,
 			accessType: accessType as unknown as accessTypeService,
-			isActive: selectedStatus?.value === "true",
+			isActive: Boolean(isActive), // Ensure strict boolean type
 			serviceRequestConfig: {
 				intakeFormId,
 				reviewFormId,
@@ -203,148 +278,38 @@ export const useCreateService = () => {
 		};
 
 		const { data: res, error } = await handleApi(() =>
-			createServiceApi(payload),
+			updateServiceApi(id!, payload),
 		);
-		setCreating(false);
+		setUpdating(false);
 
 		if (error) {
 			setError(error.message);
-			notifyError("Gagal menyimpan", error.message);
+			notifyError("Gagal mengupdate", error.message);
 			console.log("Detail validasi:", error.errors);
 			return;
 		}
 
-		const service = res?.data;
-		if (!service) {
-			notifyError("Gagal menyimpan", "Data layanan tidak ditemukan");
-			return;
+		// Hapus cache list agar halaman view-service refresh
+		// tapi langsung populate cache detail dengan data terbaru dari response
+		// supaya halaman detail tidak perlu fetch ulang
+		serviceStore.clearCache();
+		// Cek apakah response berupa object { service: ... } atau langsung object Service
+		const updatedService = ((res?.data as any)?.service || res?.data) as
+			| Service
+			| undefined;
+		if (updatedService && id) {
+			serviceStore.setDetailService(id, updatedService);
 		}
 
-		notifySuccess("Layanan berhasil disimpan");
-		navigate("/dashboard/internal/services");
+		notifySuccess("Layanan berhasil diupdate");
+		navigate(-1);
 	};
-
-	// === Fetch List Services (dengan cache 5 menit) ===
-	const fecthServices = async () => {
-		// Gunakan cache jika masih fresh (< 5 menit)
-		if (!serviceStore.isServicesStale()) {
-			setServices(serviceStore.services);
-			return;
-		}
-
-		setLoading(true);
-		setError(null);
-
-		const { data: res, error } = await handleApi(() => getServicesWoApi());
-		setLoading(false);
-
-		if (error) {
-			setError(error.message);
-			notifyError("Gagal memuat data layanan", error.message);
-			return;
-		}
-
-		const data = res?.data ?? [];
-		setServices(data);
-		serviceStore.setServices(data); // simpan ke cache beserta timestamp
-	};
-
-	// === Get Detail Service (dengan cache 5 menit) ===
-	const getDetailService = async () => {
-		if (!id) {
-			setError("ID layanan tidak ditemukan");
-			notifyError("Gagal memuat data layanan", "ID layanan tidak ditemukan");
-			return;
-		}
-
-		// Gunakan cache detail jika masih fresh untuk ID ini
-		if (!serviceStore.isDetailStale(id)) {
-			setDetailService(serviceStore.detailCache[id]?.data ?? null);
-			return;
-		}
-
-		setLoading(true);
-		setError(null);
-
-		const { data: res, error } = await handleApi(() => getServiceByIdApi(id));
-		setLoading(false);
-
-		if (error) {
-			setError(error.message);
-			notifyError("Gagal memuat data layanan", error.message);
-			return;
-		}
-
-		const detail = res?.data || null;
-		setDetailService(detail);
-		if (detail) serviceStore.setDetailService(id, detail); // simpan ke cache
-	};
-
-	useEffect(() => {
-		if (id) {
-			getDetailService();
-		}
-	}, [id]);
-
-	// === Filter (for view-service page) ===
-	const [searchParams] = useSearchParams();
-	const searchQuery = (searchParams.get("search") || "").toLowerCase();
-	const accessTypeQuery = searchParams.get("accessType") || "";
-	const statusQuery = searchParams.get("status") || "";
-
-	const filteredData = useMemo(() => {
-		return services.filter((service) => {
-			const matchesSearch =
-				!searchQuery ||
-				service.title.toLowerCase().includes(searchQuery) ||
-				service.description.toLowerCase().includes(searchQuery);
-			const matchesFormType =
-				!accessTypeQuery ||
-				(service.accessType as unknown as string) === accessTypeQuery;
-			const matchesStatus =
-				!statusQuery || service.isActive === (statusQuery === "true");
-			return matchesSearch && matchesFormType && matchesStatus;
-		});
-	}, [services, searchQuery, accessTypeQuery, statusQuery]);
-
-	const filterConfig: FilterConfig[] = useMemo(
-		() => [
-			{
-				id: "search",
-				label: "Judul/Deskripsi",
-				type: "text",
-				placeholder: "Cari judul layanan...",
-			},
-			{
-				id: "accessType",
-				label: "Jenis Layanan",
-				type: "select",
-				placeholder: "Semua Jenis Layanan",
-				options: [
-					{ label: "Internal", value: "internal" },
-					{ label: "Publik", value: "public" },
-					{ label: "Member Only", value: "member_only" },
-				],
-			},
-			{
-				id: "status",
-				label: "Status",
-				type: "select",
-				placeholder: "Semua Status",
-				options: [
-					{ label: "Aktif", value: "true" },
-					{ label: "Tidak Aktif", value: "false" },
-				],
-			},
-		],
-		[],
-	);
 
 	return {
 		// === STATE ===
 		loading,
 		error,
-		creating,
+		updating,
 		title,
 		description,
 		accessType,
@@ -360,11 +325,7 @@ export const useCreateService = () => {
 		reviewNeed,
 		// work orders
 		workOrdersConfig,
-		// list / detail
-		services,
 		detailService,
-		filteredData,
-		filterConfig,
 
 		// === SETTERS ===
 		setTitle,
@@ -381,13 +342,10 @@ export const useCreateService = () => {
 		// === HANDLERS ===
 		fetchPositions,
 		fetchForms,
-		fecthServices,
-		getDetailService,
 		addWorkOrderConfig,
 		removeWorkOrderConfig,
 		updateWorkOrderConfig,
-		createService,
-		// Cache
-		clearServiceCache: serviceStore.clearCache,
+		updateService,
+		getDetailService,
 	};
 };

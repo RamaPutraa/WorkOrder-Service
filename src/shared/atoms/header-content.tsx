@@ -2,15 +2,18 @@ import React from "react";
 import { ChevronLeft, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { ButtonLoading } from "@/shared/atoms/loading-state";
 
 interface PageHeaderProps {
 	title: React.ReactNode;
 	subtitle?: React.ReactNode;
 	onAddClick?: () => void;
 	addLabel?: string;
+	addIcon?: React.ReactNode; // Tambahan: Icon kustom
+	loading?: boolean; // Tambahan: Loading state
 	backPath?: boolean;
-	actionButtons?: React.ReactNode; // Tambahan: Untuk tombol kustom
-	className?: string; // Tambahan: Untuk styling spesifik seperti sticky
+	actionButtons?: React.ReactNode;
+	className?: string;
 }
 
 const PageHeader = ({
@@ -18,6 +21,8 @@ const PageHeader = ({
 	subtitle,
 	onAddClick,
 	addLabel = "Tambah Data",
+	addIcon = <Plus className="w-4 h-4" />,
+	loading = false,
 	backPath,
 	actionButtons,
 	className = "",
@@ -60,9 +65,14 @@ const PageHeader = ({
 					onAddClick && (
 						<Button
 							onClick={onAddClick}
-							className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl px-5 h-11 shadow-sm shadow-blue-200 transition-all flex items-center gap-2 active:scale-95">
-							<Plus className="w-4 h-4" />
-							<span className="font-semibold text-sm">{addLabel}</span>
+							disabled={loading}
+							className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl px-5 h-11 shadow-sm shadow-blue-200 transition-all flex items-center gap-2 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed">
+							{loading ?
+								<ButtonLoading />
+							:	addIcon}
+							<span className="font-semibold text-sm">
+								{loading ? "Memuat..." : addLabel}
+							</span>
 						</Button>
 					)
 				}
