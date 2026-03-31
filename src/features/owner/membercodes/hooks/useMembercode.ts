@@ -2,7 +2,6 @@ import { useState, useCallback } from "react";
 import { handleApi } from "@/lib/handle-api";
 import { getMembercodesApi } from "../services/membercodeService";
 import { notifyError } from "@/lib/toast-helper";
-import type { Membercode } from "../types/membercode";
 import { useMembercodeStore } from "@/store/membercodeStore";
 
 export const useMembercode = () => {

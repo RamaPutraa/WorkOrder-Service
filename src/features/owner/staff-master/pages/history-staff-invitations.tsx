@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { DataTable } from "@/components/ui/data-table";
 import { invitationColumns } from "../components/invitation-columns";
 import { useStaffHistory } from "../hooks/use-staff-history";
@@ -14,7 +15,11 @@ const STATUS_SUMMARY = [
 ];
 
 const HistoryStaffInvitations = () => {
-	const { history, loading, error } = useStaffHistory();
+	const { history, loading, error, fetchHistory } = useStaffHistory();
+
+	useEffect(() => {
+		void fetchHistory();
+	}, [fetchHistory]);
 
 	if (error) {
 		return (

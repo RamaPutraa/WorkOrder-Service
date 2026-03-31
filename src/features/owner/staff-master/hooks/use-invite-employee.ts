@@ -2,12 +2,13 @@ import { useState } from "react";
 import { inviteEmployee } from "../services/staff-service";
 import { handleApi } from "@/lib/handle-api";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
+import { useStaffHistoryStore } from "@/store/staffStore";
 
 export const useInviteEmployee = (onSuccess?: () => void) => {
+	const { clearStaffHistorys } = useStaffHistoryStore();
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	// 🔹 API expects: { invites: [{ email, role, positionId }, ...] }
 	const invite = async (data: InvitationEmployeeRequest) => {
 		setLoading(true);
 		setError(null);
@@ -33,6 +34,7 @@ export const useInviteEmployee = (onSuccess?: () => void) => {
 			`${count} pegawai telah diundang ke perusahaan`,
 		);
 
+		clearStaffHistorys();
 		onSuccess?.();
 	};
 

@@ -1,23 +1,29 @@
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { getInvitationsHistory } from "../services/staff-service";
 import { handleApi } from "@/lib/handle-api";
 import { notifyError } from "@/lib/toast-helper";
+import { useStaffHistoryStore } from "@/store/staffStore";
 
 export const useStaffHistory = () => {
-	const [history, setHistory] = useState<InvitationsHistory[]>([]);
-	const [loading, setLoading] = useState(true);
+	const store = useStaffHistoryStore();
+
+	const [history, setHistory] = useState<InvitationsHistory[]>(
+		store.isStaffHistoryStale() ? [] : store.staffHistorys,
+	);
+	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	useEffect(() => {
-		fetchHistory();
-	}, []);
+	const fetchHistory = useCallback(async () => {
+		// Gunakan cache jika masih fresh (< 5 menit)
+		if (!store.isStaffHistoryStale()) {
+			setHistory(store.staffHistorys);
+			return;
+		}
 
-	const fetchHistory = async () => {
 		setLoading(true);
 		setError(null);
 
 		const { data: res, error } = await handleApi(() => getInvitationsHistory());
-
 		setLoading(false);
 
 		if (error) {
@@ -26,15 +32,16 @@ export const useStaffHistory = () => {
 			return;
 		}
 
-		if (res?.data?.invitations) {
-			setHistory(res.data.invitations);
-		}
-	};
+		const data = res?.data || [];
+		setHistory(data);
+		store.setStaffHistorys(data); // Simpan ke cache beserta timestamp
+	}, [store]);
 
 	return {
 		history,
 		loading,
 		error,
-		refetch: fetchHistory,
+		fetchHistory,
 	};
 };
+

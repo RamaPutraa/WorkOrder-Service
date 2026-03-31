@@ -1,9 +1,4 @@
 import apiClient from "@/lib/api";
-import type {
-	GetMembercodesResponse,
-	CreateMembercodeRequest,
-	CreateMembercodesResponse,
-} from "../types/membercode";
 
 export const getMembercodesApi = async () => {
 	const response =

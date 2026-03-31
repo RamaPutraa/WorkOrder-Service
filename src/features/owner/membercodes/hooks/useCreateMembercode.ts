@@ -3,7 +3,6 @@ import { handleApi } from "@/lib/handle-api";
 import { createMembercodeApi } from "../services/membercodeService";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
 import { useNavigate } from "react-router-dom";
-import type { CreateMembercodeRequest } from "../types/membercode";
 import { useMembercodeStore } from "@/store/membercodeStore";
 
 export const useCreateMembercode = () => {

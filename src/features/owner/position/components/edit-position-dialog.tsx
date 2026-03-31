@@ -21,7 +21,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Briefcase, FileText, Save, LoaderCircle } from "lucide-react";
-import { useUpdatePosition } from "../hooks/usePosition";
+import usePosition from "../hooks/usePosition";
 import { ConfirmLeaveDialog } from "@/shared/molecules/confirm-leave-dialog";
 
 // ─── Schema ───────────────────────────────────────────────────────────────────
@@ -51,7 +51,7 @@ const EditPositionDialog = ({
 
 	const [showConfirmClose, setShowConfirmClose] = useState(false);
 
-	const { updatePosition, loading } = useUpdatePosition(() => {
+	const { updatePosition, loading } = usePosition(() => {
 		onOpenChange(false);
 		onSuccess();
 	});

@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import type { Membercode } from "@/features/owner/membercodes/types/membercode";
 
 const CACHE_TTL = 5 * 60 * 1000; // 5 menit dalam milidetik
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DataTable } from "@/components/ui/data-table";
 import { columns } from "../components/columns";
 import { useStaff } from "../hooks/use-staff";
@@ -8,8 +8,12 @@ import PageHeader from "@/shared/atoms/header-content";
 import { TextLoading } from "@/shared/atoms/loading-state";
 
 const ViewStaff = () => {
-	const { employees, loading, error, refetch } = useStaff();
+	const { employees, loading, error, fetchEmployees } = useStaff();
 	const [openInvite, setOpenInvite] = useState(false);
+
+	useEffect(() => {
+		void fetchEmployees();
+	}, [fetchEmployees]);
 
 	if (error) {
 		return (
@@ -58,7 +62,7 @@ const ViewStaff = () => {
 			<InviteEmployeeDialog
 				open={openInvite}
 				onOpenChange={setOpenInvite}
-				onSuccess={refetch}
+				onSuccess={fetchEmployees}
 			/>
 		</>
 	);

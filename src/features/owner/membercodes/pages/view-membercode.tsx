@@ -9,7 +9,6 @@ import {
 	Check,
 	Hash,
 	Users,
-	Layers,
 } from "lucide-react";
 import { useMembercode } from "../hooks/useMembercode";
 import { SectionLoading } from "@/shared/atoms/loading-state";

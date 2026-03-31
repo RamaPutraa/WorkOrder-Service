@@ -33,28 +33,34 @@ type CompanyEmployeesResponse = ApiResponse<Employee[]> & {
 };
 
 // TODO: global type
+type InvitationStatus = "pending" | "accepted" | "rejected" | "expired";
+
 type InvitationsHistory = {
 	_id: string;
 	role: string;
-	status: string;
+	positionId: string;
+	status: InvitationStatus;
 	expiresAt: string;
+	deletedAt: string;
 	createdAt: string;
 	updatedAt: string;
-	company: CompanyMinimal;
+	__v: number;
+	position: {
+		_id: string;
+		name: string;
+	};
+	company: {
+		_id: string;
+		name: string;
+	};
 	user: {
 		_id: string;
 		name: string;
 		email: string;
 	};
-	position: {
-		_id: string;
-		name: string;
-	};
 };
 
-type InvitationsHistoryResponse = ApiResponse<{
-	invitations: InvitationsHistory[];
-}>;
+type InvitationsHistoryResponse = ApiResponse<InvitationsHistory[]>;
 
 type InvitedItem = {
 	user: {

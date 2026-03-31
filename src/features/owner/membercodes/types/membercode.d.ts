@@ -1,4 +1,4 @@
-export type Membercode = {
+type Membercode = {
 	_id: string;
 	code: string;
 	isClaimed: boolean;
@@ -16,11 +16,11 @@ export type Membercode = {
 	updatedAt: string;
 };
 
-export type GetMembercodesResponse = ApiResponse<Membercode[]>;
+type GetMembercodesResponse = ApiResponse<Membercode[]>;
 
-export type CreateMembercodeRequest = {
+type CreateMembercodeRequest = {
 	amount: number;
 	prefix: string;
 };
 
-export type CreateMembercodesResponse = ApiResponse<Membercode[]>;
+type CreateMembercodesResponse = ApiResponse<Membercode[]>;

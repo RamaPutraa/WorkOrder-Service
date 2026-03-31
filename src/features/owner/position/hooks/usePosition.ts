@@ -7,12 +7,16 @@ import {
 	updatePositionApi,
 } from "../services/positionService";
 import { handleApi } from "@/lib/handle-api";
+import { usePositionStore } from "@/store/potisionStore";
 
-const usePosition = () => {
+const usePosition = (onSuccess?: () => void) => {
+	const store = usePositionStore();
 	const navigate = useNavigate();
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	const [positions, setPositions] = useState<Position[]>([]);
+	const [positions, setPositions] = useState<Position[]>(
+		store.isPositionsStale() ? [] : store.positions,
+	);
 
 	// create position
 	const createPosition = async (data: PositionRequest) => {
@@ -40,10 +44,15 @@ const usePosition = () => {
 			"Posisi berhasil dibuat",
 			`Posisi ${position.name} telah ditambahkan`,
 		);
-		navigate("/dashboard/internal/positions");
+		store.clearPositions();
+		navigate(-1);
 	};
 
 	const fetchPositions = async () => {
+		if (!store.isPositionsStale()) {
+			setPositions(store.positions);
+			return;
+		}
 		setLoading(true);
 		setError(null);
 
@@ -57,21 +66,8 @@ const usePosition = () => {
 		}
 
 		setPositions(res?.data || []);
+		store.setPositions(res?.data || []);
 	};
-
-	return {
-		createPosition,
-		fetchPositions,
-		positions,
-		loading,
-		error,
-	};
-};
-
-export default usePosition;
-
-export const useUpdatePosition = (onSuccess?: () => void) => {
-	const [loading, setLoading] = useState(false);
 
 	const updatePosition = async (id: string, data: UpdatePositionRequest) => {
 		setLoading(true);
@@ -89,9 +85,19 @@ export const useUpdatePosition = (onSuccess?: () => void) => {
 			"Berhasil",
 			`Posisi ${res?.data?.name ?? ""} berhasil diperbarui`,
 		);
+		store.clearPositions();
 		onSuccess?.();
 		return true;
 	};
 
-	return { updatePosition, loading };
+	return {
+		createPosition,
+		fetchPositions,
+		positions,
+		loading,
+		error,
+		updatePosition,
+	};
 };
+
+export default usePosition;

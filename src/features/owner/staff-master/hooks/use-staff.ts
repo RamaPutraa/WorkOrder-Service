@@ -1,18 +1,22 @@
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { getCompanyEmployees } from "../services/staff-service";
 import { handleApi } from "@/lib/handle-api";
 import { notifyError } from "@/lib/toast-helper";
+import { useStaffCompanyStore } from "@/store/staffStore";
 
 export const useStaff = () => {
-	const [employees, setEmployees] = useState<Employee[]>([]);
-	const [loading, setLoading] = useState(true);
+	const store = useStaffCompanyStore();
+	const [employees, setEmployees] = useState<Employee[]>(
+		store.isStaffCompanyStale() ? [] : store.staffCompany,
+	);
+	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	useEffect(() => {
-		fetchEmployees();
-	}, []);
-
-	const fetchEmployees = async () => {
+	const fetchEmployees = useCallback(async () => {
+		if (!store.isStaffCompanyStale()) {
+			setEmployees(store.staffCompany);
+			return;
+		}
 		setLoading(true);
 		setError(null);
 		const { data: res, error } = await handleApi(() => getCompanyEmployees());
@@ -25,15 +29,15 @@ export const useStaff = () => {
 			return;
 		}
 
-		if (res?.data) {
-			setEmployees(res.data);
-		}
-	};
+		const data = res?.data || [];
+		setEmployees(data);
+		store.setStaffCompany(data);
+	}, [store]);
 
 	return {
 		employees,
 		loading,
 		error,
-		refetch: fetchEmployees,
+		fetchEmployees,
 	};
 };
