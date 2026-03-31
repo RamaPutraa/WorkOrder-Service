@@ -39,6 +39,7 @@ import HeroRegis from "@/features/auth/pages/hero-section-regis";
 import ClientRegisterPage from "@/features/auth/pages/client-reg-page";
 import InternalRegisterPage from "@/features/auth/pages/internal-reg-page";
 import ViewMemberCodes from "@/features/owner/membercodes/pages/view-membercode";
+import CreateMembercode from "@/features/owner/membercodes/pages/create-membercode";
 
 const router = createBrowserRouter([
 	{
@@ -132,6 +133,10 @@ const router = createBrowserRouter([
 					{
 						path: "membercodes",
 						element: <ViewMemberCodes />,
+					},
+					{
+						path: "membercodes/create",
+						element: <CreateMembercode />,
 					},
 				],
 			},
