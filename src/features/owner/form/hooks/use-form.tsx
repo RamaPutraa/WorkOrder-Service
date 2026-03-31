@@ -4,15 +4,23 @@ import { useEffect, useState, useMemo } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { getFormByIdApi, getFormsApi } from "../services/formService";
 import { type FilterConfig } from "@/shared/molecules/generic-filter";
+import { useFormStore } from "@/store/formStore";
 
 export const useForm = () => {
+	const store = useFormStore();
 	const { id } = useParams<{ id?: string }>();
-	const [forms, setForms] = useState<Form[]>([]);
 	const [detailForm, setDetailForm] = useState<Form | null>(null);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [forms, setForms] = useState<Form[]>(
+		store.isFormsStale() ? [] : store.forms,
+	);
 
 	const getAllForms = async () => {
+		if (!store.isFormsStale()) {
+			setForms(store.forms);
+			return;
+		}
 		setLoading(true);
 		setError(null);
 
@@ -26,12 +34,23 @@ export const useForm = () => {
 		}
 
 		setForms(res?.data ?? []);
+		store.setForms(res?.data ?? []);
 	};
+
 	const getDetailForm = async () => {
 		if (!id) {
 			setError("ID form tidak ditemukan");
 			notifyError("Gagal memuat data", "ID form tidak ditemukan");
 			return;
+		}
+
+		// Gunakan cache jika masih valid
+		if (!store.isDetailStale(id)) {
+			const cached = store.detailCache[id];
+			if (cached) {
+				setDetailForm(cached.data);
+				return;
+			}
 		}
 
 		setLoading(true);
@@ -47,7 +66,11 @@ export const useForm = () => {
 			notifyError("Gagal memuat data form", error.message);
 			return;
 		}
+		
 		setDetailForm(res?.data || null);
+		if (res?.data) {
+			store.setDetailForm(id, res.data);
+		}
 	};
 
 	useEffect(() => {

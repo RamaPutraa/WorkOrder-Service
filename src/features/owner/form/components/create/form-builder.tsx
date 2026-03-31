@@ -20,6 +20,7 @@ import { handleApi } from "@/lib/handle-api";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
 import { AlertCircle, FileText } from "lucide-react";
 import { ConfirmLeaveDialog } from "@/shared/molecules/confirm-leave-dialog";
+import { useFormStore } from "@/store/formStore";
 
 export type FormBuilderRef = {
 	submitForm: () => void;
@@ -34,6 +35,7 @@ type Props = {
 
 export const FormBuilder = forwardRef<FormBuilderRef, Props>(
 	({ onFieldsChange, onSubmittingChange }, ref) => {
+		const store = useFormStore();
 		const [isSubmitting, setIsSubmitting] = useState(false);
 		const [hasSubmitted, setHasSubmitted] = useState(false);
 		const [isSuccess, setIsSuccess] = useState(false);
@@ -125,7 +127,8 @@ export const FormBuilder = forwardRef<FormBuilderRef, Props>(
 			}
 			notifySuccess("Form berhasil disimpan!");
 			setIsSuccess(true);
-			navigate("/dashboard/internal/forms");
+			store.clearCache();
+			navigate(-1);
 		};
 
 		useImperativeHandle(ref, () => ({
