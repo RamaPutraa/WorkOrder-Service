@@ -109,7 +109,17 @@ const InviteEmployeeDialog = ({
 		setPositionOpen((prev) => ({ ...prev, [index]: val }));
 
 	const onSubmit = (data: InviteEmployeeFormValues) => {
-		invite(data);
+		const payload = {
+			...data,
+			invites: data.invites.map((inv) => {
+				const { positionId, ...rest } = inv;
+				if (inv.role === "staff_company") {
+					return { ...rest, positionId };
+				}
+				return rest;
+			}),
+		};
+		invite(payload as any);
 	};
 
 	const { isDirty, isSubmitSuccessful } = form.formState;
@@ -234,77 +244,80 @@ const InviteEmployeeDialog = ({
 										/>
 
 										{/* Posisi — Combobox */}
-										<FormField
-											control={form.control}
-											name={`invites.${index}.positionId`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel className="text-xs font-medium text-gray-500">
-														Posisi
-													</FormLabel>
-													<Popover
-														open={positionOpen[index]}
-														onOpenChange={(val) =>
-															togglePositionPopover(index, val)
-														}>
-														<PopoverTrigger asChild>
-															<FormControl>
-																<Button
-																	variant="outline"
-																	role="combobox"
-																	className={cn(
-																		"w-full h-9 justify-between rounded-lg border-gray-200 bg-white text-sm font-normal",
-																		!field.value && "text-gray-400",
-																	)}>
-																	{field.value ?
-																		(positions.find(
-																			(p) => p._id === field.value,
-																		)?.name ?? "Pilih posisi...")
-																	:	"Pilih posisi..."}
-																	<ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 text-gray-400" />
-																</Button>
-															</FormControl>
-														</PopoverTrigger>
-														<PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-															<Command>
-																<CommandInput
-																	placeholder="Cari posisi..."
-																	className="text-sm"
-																/>
-																<CommandList>
-																	<CommandEmpty className="py-3 text-center text-sm text-gray-500">
-																		Posisi tidak ditemukan
-																	</CommandEmpty>
-																	<CommandGroup>
-																		{positions.map((pos) => (
-																			<CommandItem
-																				key={pos._id}
-																				value={pos.name}
-																				onSelect={() => {
-																					field.onChange(pos._id);
-																					togglePositionPopover(index, false);
-																				}}
-																				className="text-sm">
-																				<Check
-																					className={cn(
-																						"mr-2 h-3.5 w-3.5",
-																						field.value === pos._id ?
-																							"opacity-100 text-blue-600"
-																						:	"opacity-0",
-																					)}
-																				/>
-																				{pos.name}
-																			</CommandItem>
-																		))}
-																	</CommandGroup>
-																</CommandList>
-															</Command>
-														</PopoverContent>
-													</Popover>
-													<FormMessage className="text-xs" />
-												</FormItem>
-											)}
-										/>
+										{form.watch(`invites.${index}.role`) ===
+											"staff_company" && (
+											<FormField
+												control={form.control}
+												name={`invites.${index}.positionId`}
+												render={({ field }) => (
+													<FormItem>
+														<FormLabel className="text-xs font-medium text-gray-500">
+															Posisi
+														</FormLabel>
+														<Popover
+															open={positionOpen[index]}
+															onOpenChange={(val) =>
+																togglePositionPopover(index, val)
+															}>
+															<PopoverTrigger asChild>
+																<FormControl>
+																	<Button
+																		variant="outline"
+																		role="combobox"
+																		className={cn(
+																			"w-full h-9 justify-between rounded-lg border-gray-200 bg-white text-sm font-normal",
+																			!field.value && "text-gray-400",
+																		)}>
+																		{field.value ?
+																			(positions.find(
+																				(p) => p._id === field.value,
+																			)?.name ?? "Pilih posisi...")
+																		:	"Pilih posisi..."}
+																		<ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 text-gray-400" />
+																	</Button>
+																</FormControl>
+															</PopoverTrigger>
+															<PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+																<Command>
+																	<CommandInput
+																		placeholder="Cari posisi..."
+																		className="text-sm"
+																	/>
+																	<CommandList>
+																		<CommandEmpty className="py-3 text-center text-sm text-gray-500">
+																			Posisi tidak ditemukan
+																		</CommandEmpty>
+																		<CommandGroup>
+																			{positions.map((pos) => (
+																				<CommandItem
+																					key={pos._id}
+																					value={pos.name}
+																					onSelect={() => {
+																						field.onChange(pos._id);
+																						togglePositionPopover(index, false);
+																					}}
+																					className="text-sm">
+																					<Check
+																						className={cn(
+																							"mr-2 h-3.5 w-3.5",
+																							field.value === pos._id ?
+																								"opacity-100 text-blue-600"
+																							:	"opacity-0",
+																						)}
+																					/>
+																					{pos.name}
+																				</CommandItem>
+																			))}
+																		</CommandGroup>
+																	</CommandList>
+																</Command>
+															</PopoverContent>
+														</Popover>
+														<FormMessage className="text-xs" />
+													</FormItem>
+												)}
+											/>
+										)}
 									</div>
 								))}
 

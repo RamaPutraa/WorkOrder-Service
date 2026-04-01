@@ -38,14 +38,14 @@ type InvitationStatus = "pending" | "accepted" | "rejected" | "expired";
 type InvitationsHistory = {
 	_id: string;
 	role: string;
-	positionId: string;
+	positionId?: string;
 	status: InvitationStatus;
 	expiresAt: string;
 	deletedAt: string;
 	createdAt: string;
 	updatedAt: string;
 	__v: number;
-	position: {
+	position?: {
 		_id: string;
 		name: string;
 	};
@@ -68,7 +68,7 @@ type InvitedItem = {
 		email: string;
 	};
 	role_offered: string;
-	position_offered: {
+	position_offered?: {
 		_id: string;
 		name: string;
 	};

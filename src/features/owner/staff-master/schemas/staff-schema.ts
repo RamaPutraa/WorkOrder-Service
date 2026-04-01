@@ -1,10 +1,23 @@
 import { z } from "zod";
 
-export const inviteSingleSchema = z.object({
-	email: z.string().email("Format email tidak valid"),
-	role: z.string().min(1, "Pilih role terlebih dahulu"),
-	positionId: z.string().min(1, "Pilih posisi terlebih dahulu"),
-});
+export const inviteSingleSchema = z
+	.object({
+		email: z.string().email("Format email tidak valid"),
+		role: z.string().min(1, "Pilih role terlebih dahulu"),
+		positionId: z.string().optional(),
+	})
+	.superRefine((val, ctx) => {
+		if (
+			val.role === "staff_company" &&
+			(!val.positionId || val.positionId.trim() === "")
+		) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: "Pilih posisi terlebih dahulu",
+				path: ["positionId"],
+			});
+		}
+	});
 
 export const inviteEmployeeSchema = z.object({
 	invites: z
