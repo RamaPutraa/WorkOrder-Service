@@ -72,7 +72,7 @@ const EditCompanyDialog = ({
 	}, [open, company]);
 
 	const onSubmit = async (values: EditCompanyFormValues) => {
-		await updateCompany(String(company._id), {
+		await updateCompany({
 			name: values.name,
 			address: values.address,
 			description: values.description ?? "",

@@ -12,13 +12,7 @@ export const getCompanyByIdApi = async (id: string) => {
 	return response.data;
 };
 
-export const updateCompanyApi = async (
-	data: UpdateCompanyRequest,
-	id: string,
-) => {
-	const response = await apiClient.put<UpdateCompanyResponse>(
-		`/company/${id}`,
-		data,
-	);
+export const updateCompanyApi = async (data: UpdateCompanyRequest) => {
+	const response = await apiClient.put<UpdateCompanyResponse>(`/company`, data);
 	return response.data;
 };

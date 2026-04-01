@@ -52,7 +52,7 @@ type Form = {
 
 // Companies
 type CompanyMinimal = {
-	_id: number;
+	_id: string;
 	name: string;
 };
 type Company = CompanyMinimal & {

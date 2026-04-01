@@ -76,11 +76,9 @@ export const useCompanyById = (id: string, options?: { lazy?: boolean }) => {
 export const useUpdateCompany = (onSuccess?: () => void) => {
 	const [loading, setLoading] = useState(false);
 
-	const updateCompany = async (id: string, data: UpdateCompanyRequest) => {
+	const updateCompany = async (data: UpdateCompanyRequest) => {
 		setLoading(true);
-		const { data: res, error } = await handleApi(() =>
-			updateCompanyApi(data, id),
-		);
+		const { data: res, error } = await handleApi(() => updateCompanyApi(data));
 		setLoading(false);
 
 		if (error) {
