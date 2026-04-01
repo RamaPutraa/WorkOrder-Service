@@ -130,7 +130,7 @@ const DetailForm = () => {
 									<Calendar className="w-4 h-4" />
 									<span className="text-sm font-medium">Dibuat Pada</span>
 								</div>
-								<span className="text-sm font-medium text-foreground">
+								<span className="flex h-6 items-center justify-center px-2.5 rounded-md border border-border bg-background text-xs font-medium text-foreground">
 									{formatDate(detailForm?.createdAt)}
 								</span>
 							</div>
@@ -140,7 +140,7 @@ const DetailForm = () => {
 									<Clock className="w-4 h-4" />
 									<span className="text-sm font-medium">Diperbarui</span>
 								</div>
-								<span className="text-sm font-medium text-foreground">
+								<span className="flex h-6 items-center justify-center px-2.5 rounded-md border border-border bg-background text-xs font-medium text-foreground">
 									{formatDate(detailForm?.updatedAt)}
 								</span>
 							</div>

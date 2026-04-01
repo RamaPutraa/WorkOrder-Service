@@ -98,9 +98,9 @@ export default function FormFieldViewer({
 
 						{/* Min/max hints using input tags as requested */}
 						{(field.min != null || field.max != null) && (
-							<div className="flex items-center gap-4 w-full">
+							<div className="flex items-center gap-4">
 								{field.min != null && (
-									<div className="flex items-center gap-2">
+									<div className="flex items-center gap-2 w-full">
 										<span className="text-xs font-medium text-muted-foreground">
 											Min
 										</span>
@@ -109,12 +109,12 @@ export default function FormFieldViewer({
 											value={field.min}
 											disabled
 											readOnly
-											className="h-8 w-20 px-2 rounded-md border border-input bg-muted/50 text-xs text-muted-foreground cursor-not-allowed"
+											className="h-8 w-full px-2 rounded-md border border-input bg-muted/50 text-xs text-muted-foreground cursor-not-allowed"
 										/>
 									</div>
 								)}
 								{field.max != null && (
-									<div className="flex items-center gap-2">
+									<div className="flex items-center gap-2 w-full">
 										<span className="text-xs font-medium text-muted-foreground">
 											Maks
 										</span>
@@ -123,7 +123,7 @@ export default function FormFieldViewer({
 											value={field.max}
 											disabled
 											readOnly
-											className="h-8 w-20 px-2 rounded-md border border-input bg-muted/50 text-xs text-muted-foreground cursor-not-allowed"
+											className="h-8 w-full px-2 rounded-md border border-input bg-muted/50 text-xs text-muted-foreground cursor-not-allowed"
 										/>
 									</div>
 								)}
