@@ -1,14 +1,50 @@
 import { Button } from "@/components/ui/button";
 import { useForm } from "../hooks/use-form";
-import { Card } from "@/components/ui/card";
 import FormFieldViewer from "@/shared/molecules/form-field-viewer";
 import { SectionLoading } from "@/shared/atoms";
 import PageHeader from "@/shared/atoms/header-content";
 import { TextLoading } from "@/shared/atoms/loading-state";
-import { Edit, Trash } from "lucide-react";
+import {
+	Calendar,
+	Clock,
+	FileType,
+	ListOrdered,
+	Pencil,
+	ScrollText,
+	Trash,
+} from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { Separator } from "@/components/ui/separator";
 
 const DetailForm = () => {
 	const { detailForm, loading } = useForm();
+	const navigate = useNavigate();
+	const { id } = useParams<{ id: string }>();
+
+	const qtyField = detailForm?.fields?.length || 0;
+
+	const formType = (type: string) => {
+		switch (type) {
+			case "intake":
+				return "Formulir Permintaan";
+			case "report":
+				return "Formulir Laporan";
+			case "work_order":
+				return "Formulir Perintah Kerja";
+
+			default:
+				return type;
+		}
+	};
+
+	const formatDate = (dateString?: string) => {
+		if (!dateString) return "-";
+		return new Date(dateString).toLocaleDateString("id-ID", {
+			day: "numeric",
+			month: "short",
+			year: "numeric",
+		});
+	};
 
 	return (
 		<>
@@ -31,54 +67,107 @@ const DetailForm = () => {
 					:	`Berikut merupakan detail formulir ${detailForm?.title} `
 				}
 				backPath={true}
+				addLabel="Edit Formulir"
+				onAddClick={() => navigate(`../form/edit/${id}`)}
+				addIcon={<Pencil className="w-3.5 h-3.5" />}
 			/>
 
-			{/* Main Content - Form Details */}
 			{loading ?
 				<SectionLoading message="Memuat detail form..." />
-			:	<Card className="shadow-md border rounded-lg overflow-hidden">
-					{/* Card Header with Actions */}
-					<div className="p-5 lg:p-6 border-b bg-gradient-to-br from-background to-muted/20">
-						<div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-							<div className="flex-1">
-								<h2 className="text-xl font-bold mb-2">{detailForm?.title}</h2>
-								<p className="text-sm text-muted-foreground leading-relaxed">
-									{detailForm?.description}
-								</p>
+			:	<div className="grid grid-cols-1 lg:grid-cols-3 gap-0 rounded-xl border border-border/60 shadow-sm h-auto lg:h-[70vh]">
+					<div className="flex flex-col px-6 py-6 bg-muted/10 border-b lg:border-b-0 lg:border-r border-border/60 lg:overflow-y-auto">
+						{/* --- HEADER --- */}
+						<div className="flex justify-between items-start">
+							<div className="shrink-0 p-3 bg-primary/10 text-primary rounded-xl">
+								<ScrollText className="w-6 h-6" />
 							</div>
-
-							<div className="flex gap-2 sm:flex-shrink-0">
-								<Button
-									variant="outline"
-									size="sm"
-									className="flex-1 sm:flex-none h-10 px-4 rounded-lg border-2 hover:bg-muted transition-colors">
-									<Edit className="w-4 h-4 sm:mr-2" />
-									<span className="hidden sm:inline">Edit</span>
-								</Button>
-								<Button
-									variant="destructive"
-									size="sm"
-									className="flex-1 sm:flex-none h-10 px-4 rounded-lg transition-colors">
-									<Trash className="w-4 h-4 sm:mr-2" />
-									<span className="hidden sm:inline">Delete</span>
-								</Button>
-							</div>
+							<Button
+								variant="destructive"
+								size="icon"
+								className="h-9 w-9 shrink-0"
+								title="Hapus Formulir">
+								<Trash className="w-4 h-4" />
+							</Button>
 						</div>
-					</div>
 
-					{/* Form Fields */}
-					<div className="p-5 lg:p-6">
+						{/* --- INFORMASI UTAMA --- */}
+						<div className="mt-6 space-y-2">
+							<h3 className="font-semibold text-lg text-foreground tracking-tight">
+								Informasi Formulir
+							</h3>
+							<p className="text-sm text-muted-foreground leading-relaxed">
+								{detailForm?.description ||
+									"Tidak ada deskripsi untuk formulir ini."}
+							</p>
+						</div>
+
+						<Separator className="my-6" />
+
+						{/* --- METADATA --- */}
 						<div className="space-y-4">
-							{detailForm?.fields?.map((field, i) => (
-								<div
-									key={i}
-									className="p-4 lg:p-5 border rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
-									<FormFieldViewer field={field} answer={null} readOnly />
+							<div className="flex items-center justify-between">
+								<div className="flex items-center gap-2.5 text-muted-foreground">
+									<ListOrdered className="w-4 h-4" />
+									<span className="text-sm font-medium">Jumlah Field</span>
 								</div>
-							))}
+								<div className="flex h-6 items-center justify-center px-2.5 rounded-md bg-primary/10 text-xs font-semibold text-primary">
+									{qtyField}
+								</div>
+							</div>
+
+							<div className="flex items-center justify-between">
+								<div className="flex items-center gap-2.5 text-muted-foreground">
+									<FileType className="w-4 h-4" />
+									<span className="text-sm font-medium">Jenis Formulir</span>
+								</div>
+								<div className="flex h-6 items-center justify-center px-2.5 rounded-md border border-border bg-background text-xs font-medium text-foreground">
+									{formType(detailForm?.formType || "")}
+								</div>
+							</div>
+
+							<div className="flex items-center justify-between">
+								<div className="flex items-center gap-2.5 text-muted-foreground">
+									<Calendar className="w-4 h-4" />
+									<span className="text-sm font-medium">Dibuat Pada</span>
+								</div>
+								<span className="text-sm font-medium text-foreground">
+									{formatDate(detailForm?.createdAt)}
+								</span>
+							</div>
+
+							<div className="flex items-center justify-between">
+								<div className="flex items-center gap-2.5 text-muted-foreground">
+									<Clock className="w-4 h-4" />
+									<span className="text-sm font-medium">Diperbarui</span>
+								</div>
+								<span className="text-sm font-medium text-foreground">
+									{formatDate(detailForm?.updatedAt)}
+								</span>
+							</div>
 						</div>
 					</div>
-				</Card>
+
+					<div className="col-span-1 lg:col-span-2 lg:overflow-y-auto bg-background rounded-r-xl">
+						<div className="p-5 lg:p-8 space-y-6">
+							{detailForm?.fields?.map((field, i) => (
+								<FormFieldViewer
+									key={i}
+									field={field}
+									answer={null}
+									readOnly
+									index={i + 1}
+								/>
+							))}
+
+							{(!detailForm?.fields || detailForm.fields.length === 0) && (
+								<div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
+									<ListOrdered className="w-12 h-12 mb-4 opacity-20" />
+									<p>Belum ada field pertanyaan di formulir ini.</p>
+								</div>
+							)}
+						</div>
+					</div>
+				</div>
 			}
 		</>
 	);

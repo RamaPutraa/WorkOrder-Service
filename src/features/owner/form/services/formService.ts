@@ -16,6 +16,11 @@ export const createFormApi = async (data: CreateFormRequest) => {
 	return response.data;
 };
 
+export const updateFormApi = async (id: string, data: CreateFormRequest) => {
+	const response = await apiCLient.put<GetFormByIdResponse>(`/forms/${id}`, data);
+	return response.data;
+};
+
 export const getPositions = async (): Promise<GetAllPosition> => {
 	const response = await apiCLient.get<GetAllPosition>("/positions");
 	return response.data;

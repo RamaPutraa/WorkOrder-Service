@@ -9,6 +9,7 @@ import GuestRoute from "./GuestRoute";
 import CreateFormPage from "@/features/owner/form/pages/create-form";
 import FormPage from "@/features/owner/form/pages/view-form";
 import DetailFormPage from "@/features/owner/form/pages/detail-form";
+import EditFormPage from "@/features/owner/form/pages/edit-form";
 import PositionPage from "@/features/owner/position/pages/view-position";
 import CreatePositionPage from "@/features/owner/position/pages/create-position";
 import ProfileCompany from "@/features/owner/company/pages/profile-company";
@@ -73,6 +74,10 @@ const router = createBrowserRouter([
 					{
 						path: "form/detail/:id",
 						element: <DetailFormPage />,
+					},
+					{
+						path: "form/edit/:id",
+						element: <EditFormPage />,
 					},
 					{
 						path: "positions",
