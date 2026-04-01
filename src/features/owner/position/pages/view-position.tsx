@@ -6,10 +6,12 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import EditPositionDialog from "../components/edit-position-dialog";
 import PageHeader from "@/shared/atoms/header-content";
+import { useDialogStore } from "@/store/dialogStore";
 import { TextLoading } from "@/shared/atoms/loading-state";
 
 const PositionView = () => {
-	const { fetchPositions, positions, loading, error } = usePosition();
+	const { fetchPositions, positions, loading, error, removePosition } = usePosition();
+	const { showDialog } = useDialogStore();
 	const navigate = useNavigate();
 
 	// ── Edit dialog state ──────────────────────────────────────────────────────
@@ -23,8 +25,16 @@ const PositionView = () => {
 		setEditOpen(true);
 	};
 
-	const handleDelete = (_position: Position) => {
-		// TODO: implement delete logic
+	const handleDelete = (position: Position) => {
+		showDialog({
+			title: "Hapus Departemen",
+			description: `Apakah Anda yakin ingin menghapus departemen ${position.name}?`,
+			confirmText: "Hapus",
+			cancelText: "Batal",
+			onConfirm: async () => {
+				await removePosition(position._id);
+			},
+		});
 	};
 
 	const columns = useMemo(

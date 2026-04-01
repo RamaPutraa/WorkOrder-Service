@@ -1,7 +1,10 @@
 import { useState, useCallback } from "react";
 import { handleApi } from "@/lib/handle-api";
-import { getMembercodesApi } from "../services/membercodeService";
-import { notifyError } from "@/lib/toast-helper";
+import {
+	getMembercodesApi,
+	deleteMembercodeApi,
+} from "../services/membercodeService";
+import { notifyError, notifySuccess } from "@/lib/toast-helper";
 import { useMembercodeStore } from "@/store/membercodeStore";
 
 export const useMembercode = () => {
@@ -37,10 +40,27 @@ export const useMembercode = () => {
 		store.setMembercodes(data); // Simpan ke cache beserta timestamp
 	}, [store]);
 
+	const removeMembercode = async (id: string) => {
+		setLoading(true);
+		const { error } = await handleApi(() => deleteMembercodeApi(id));
+		setLoading(false);
+
+		if (error) {
+			notifyError("Gagal menghapus kode berlangganan", error.message);
+			return false;
+		}
+
+		notifySuccess("Berhasil", "Kode berlangganan berhasil dihapus");
+		store.clearCache();
+		await fetchMembercodes();
+		return true;
+	};
+
 	return {
 		membercodes,
 		loading,
 		error,
 		fetchMembercodes,
+		removeMembercode,
 	};
 };

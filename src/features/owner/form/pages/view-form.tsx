@@ -1,6 +1,6 @@
 import { Card, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ScrollText, CalendarDays } from "lucide-react";
+import { ArrowRight, ScrollText, CalendarDays, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -128,6 +128,23 @@ const ViewForm: React.FC = () => {
 														}>
 														Lihat Detail <ArrowRight className="ml-2 h-4 w-4" />
 													</Button>
+													{/* <Button
+														variant="destructive"
+														size="icon"
+														className="h-8 w-8 rounded-full"
+														onClick={() =>
+															showDialog({
+																title: "Hapus Formulir",
+																description: `Apakah Anda yakin ingin menghapus formulir "${form.title}"?`,
+																confirmText: "Hapus",
+																cancelText: "Batal",
+																onConfirm: async () => {
+																	await removeForm(form._id);
+																},
+															})
+														}>
+														<Trash2 className="h-4 w-4" />
+													</Button> */}
 												</div>
 											</div>
 										</CardFooter>

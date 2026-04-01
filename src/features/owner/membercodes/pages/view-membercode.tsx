@@ -9,13 +9,16 @@ import {
 	Check,
 	Hash,
 	Users,
+	Trash2,
 } from "lucide-react";
 import { useMembercode } from "../hooks/useMembercode";
+import { useDialogStore } from "@/store/dialogStore";
 import { SectionLoading } from "@/shared/atoms/loading-state";
 import { EmptyData } from "@/shared/molecules/empty-data";
 import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
 import { notifySuccess } from "@/lib/toast-helper";
+import { Button } from "@/components/ui/button";
 
 /* ─── Types ─────────────────────────────────────────────────────────── */
 type CopiedMap = Record<string, boolean>;
@@ -72,8 +75,10 @@ const StatCard = ({ icon, label, value, color }: StatCardProps) => {
 
 const ViewMemberCodes = () => {
 	const navigate = useNavigate();
-	const { membercodes, loading, error, fetchMembercodes } = useMembercode();
+	const { membercodes, loading, error, fetchMembercodes, removeMembercode } =
+		useMembercode();
 	const [copied, setCopied] = useState<CopiedMap>({});
+	const { showDialog } = useDialogStore();
 
 	useEffect(() => {
 		void fetchMembercodes();
@@ -238,7 +243,6 @@ const ViewMemberCodes = () => {
 														<div
 															className={`shrink-0 w-2.5 h-2.5 rounded-full ${item.isClaimed ? "bg-emerald-400" : "bg-slate-300"}`}
 														/>
-
 														{/* Code */}
 														<div className="flex-1 min-w-0 flex items-center gap-2">
 															<span className="font-mono text-sm font-semibold text-slate-800 tracking-wider">
@@ -247,7 +251,7 @@ const ViewMemberCodes = () => {
 															<button
 																onClick={() => handleCopy(item._id, item.code)}
 																title="Salin kode"
-																className={`opacity-0 group-hover:opacity-100 transition-all duration-200 rounded-md p-1 ${
+																className={`group-hover:opacity-100 transition-all duration-200 rounded-md p-1 ${
 																	isCopied ?
 																		"text-emerald-500 bg-emerald-50"
 																	:	"text-slate-400 hover:text-blue-600 hover:bg-blue-50"
@@ -257,7 +261,6 @@ const ViewMemberCodes = () => {
 																:	<Copy className="size-3.5" />}
 															</button>
 														</div>
-
 														{/* Claimed by */}
 														<div className="hidden md:flex flex-col items-end min-w-[160px] text-right">
 															{item.isClaimed ?
@@ -274,12 +277,10 @@ const ViewMemberCodes = () => {
 																</span>
 															}
 														</div>
-
 														{/* Date */}
 														<div className="hidden sm:block text-xs text-slate-400 font-medium whitespace-nowrap min-w-[90px] text-right">
 															{formatDate(item.createdAt)}
 														</div>
-
 														{/* Status badge */}
 														<div className="shrink-0">
 															{item.isClaimed ?
@@ -287,11 +288,29 @@ const ViewMemberCodes = () => {
 																	<CheckCircle2 className="size-3" />
 																	Diklaim
 																</Badge>
-															:	<Badge className="bg-violet-50 text-violet-500 border-0 gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full">
+															:	<Badge className="bg-primary/5 text-primary border-0 gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full">
 																	<Ticket className="size-3" />
 																	Tersedia
 																</Badge>
 															}
+														</div>
+														<div className="border-l border-muted-foreground/20 pl-3">
+															<button
+																onClick={() =>
+																	showDialog({
+																		title: "Hapus Kode Berlangganan",
+																		description: `Apakah Anda yakin ingin menghapus kode "${item.code}"?`,
+																		confirmText: "Hapus",
+																		cancelText: "Batal",
+																		onConfirm: async () => {
+																			await removeMembercode(item._id);
+																		},
+																	})
+																}
+																title="Hapus kode"
+																className={`group-hover:opacity-100 transition-all duration-200 rounded-md p-1 bg-red-50 text-red-600 hover:text-red-400 hover:bg-red-50`}>
+																<Trash2 className="size-3.5" />
+															</button>
 														</div>
 													</motion.div>
 												);

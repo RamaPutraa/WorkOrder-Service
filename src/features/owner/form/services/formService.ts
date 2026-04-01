@@ -25,3 +25,8 @@ export const getPositions = async (): Promise<GetAllPosition> => {
 	const response = await apiCLient.get<GetAllPosition>("/positions");
 	return response.data;
 };
+
+export const deleteFormApi = async (id: string) => {
+	const response = await apiCLient.delete(`/forms/${id}`);
+	return response.data;
+};

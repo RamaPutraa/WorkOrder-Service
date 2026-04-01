@@ -13,3 +13,8 @@ export const createMembercodeApi = async (body: CreateMembercodeRequest) => {
 	);
 	return response.data;
 };
+
+export const deleteMembercodeApi = async (id: string) => {
+	const response = await apiClient.delete(`/memberships/codes/${id}`);
+	return response.data;
+};

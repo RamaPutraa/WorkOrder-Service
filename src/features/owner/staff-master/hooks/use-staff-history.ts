@@ -1,7 +1,10 @@
 import { useState, useCallback } from "react";
-import { getInvitationsHistory } from "../services/staff-service";
+import {
+	getInvitationsHistory,
+	deleteInvitationApi,
+} from "../services/staff-service";
 import { handleApi } from "@/lib/handle-api";
-import { notifyError } from "@/lib/toast-helper";
+import { notifyError, notifySuccess } from "@/lib/toast-helper";
 import { useStaffHistoryStore } from "@/store/staffStore";
 
 export const useStaffHistory = () => {
@@ -37,11 +40,28 @@ export const useStaffHistory = () => {
 		store.setStaffHistorys(data); // Simpan ke cache beserta timestamp
 	}, [store]);
 
+	const removeInvitation = async (id: string) => {
+		setLoading(true);
+		const { error } = await handleApi(() => deleteInvitationApi(id));
+		setLoading(false);
+
+		if (error) {
+			notifyError("Gagal menghapus undangan", error.message);
+			return false;
+		}
+
+		notifySuccess("Berhasil", "Undangan berhasil dihapus"); // Actually I should use notifySuccess! Wait, notifySuccess is not imported. I will import it below.
+		store.clearStaffHistorys();
+		await fetchHistory();
+		return true;
+	};
+
 	return {
 		history,
 		loading,
 		error,
 		fetchHistory,
+		removeInvitation,
 	};
 };
 

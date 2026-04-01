@@ -20,3 +20,8 @@ export const getInvitationsHistory = async () => {
 	);
 	return response.data;
 };
+
+export const deleteInvitationApi = async (id: string) => {
+	const response = await apiClient.delete(`/invitations/${id}`);
+	return response.data;
+};

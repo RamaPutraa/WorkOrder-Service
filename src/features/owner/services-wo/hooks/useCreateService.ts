@@ -9,6 +9,7 @@ import {
 	createServiceApi,
 	getServiceByIdApi,
 	getServicesWoApi,
+	deleteServiceApi,
 } from "@/features/owner/services-wo/services/servicesWo";
 import { handleApi } from "@/lib/handle-api";
 import { type FilterConfig } from "@/shared/molecules/generic-filter";
@@ -280,6 +281,22 @@ export const useCreateService = () => {
 		if (detail) serviceStore.setDetailService(id, detail); // simpan ke cache
 	};
 
+	const removeService = async (serviceId: string) => {
+		setLoading(true);
+		const { error } = await handleApi(() => deleteServiceApi(serviceId));
+		setLoading(false);
+
+		if (error) {
+			notifyError("Gagal menghapus layanan", error.message);
+			return false;
+		}
+
+		notifySuccess("Berhasil", "Layanan berhasil dihapus");
+		serviceStore.clearCache(); // invalidate cache
+		await fecthServices();
+		return true;
+	};
+
 	useEffect(() => {
 		if (id) {
 			getDetailService();
@@ -387,6 +404,7 @@ export const useCreateService = () => {
 		removeWorkOrderConfig,
 		updateWorkOrderConfig,
 		createService,
+		removeService,
 		// Cache
 		clearServiceCache: serviceStore.clearCache,
 	};

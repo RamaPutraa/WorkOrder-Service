@@ -5,6 +5,7 @@ import {
 	createPositionApi,
 	getPositionsApi,
 	updatePositionApi,
+	deletePositionApi,
 } from "../services/positionService";
 import { handleApi } from "@/lib/handle-api";
 import { usePositionStore } from "@/store/potisionStore";
@@ -90,6 +91,22 @@ const usePosition = (onSuccess?: () => void) => {
 		return true;
 	};
 
+	const removePosition = async (id: string) => {
+		setLoading(true);
+		const { error } = await handleApi(() => deletePositionApi(id));
+		setLoading(false);
+
+		if (error) {
+			notifyError("Gagal menghapus posisi", error.message);
+			return false;
+		}
+
+		notifySuccess("Berhasil", "Posisi berhasil dihapus");
+		store.clearPositions(); // invalidate cache
+		await fetchPositions();
+		return true;
+	};
+
 	return {
 		createPosition,
 		fetchPositions,
@@ -97,6 +114,7 @@ const usePosition = (onSuccess?: () => void) => {
 		loading,
 		error,
 		updatePosition,
+		removePosition,
 	};
 };
 

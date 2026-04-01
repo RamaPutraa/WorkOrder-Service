@@ -1,5 +1,7 @@
 import { type ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 
 const ROLE_MAP: Record<
 	string,
@@ -33,7 +35,11 @@ const formatDate = (date: string) =>
 		year: "numeric",
 	});
 
-export const invitationColumns: ColumnDef<InvitationsHistory>[] = [
+export const createInvitationColumns = ({
+	onDelete,
+}: {
+	onDelete: (id: string) => void;
+}): ColumnDef<InvitationsHistory>[] => [
 	{
 		id: "email",
 		header: "Pegawai",
@@ -105,6 +111,22 @@ export const invitationColumns: ColumnDef<InvitationsHistory>[] = [
 				<span className="text-sm text-muted-foreground">
 					{formatDate(date)}
 				</span>
+			);
+		},
+	},
+	{
+		id: "actions",
+		header: "Aksi",
+		cell: ({ row }) => {
+			return (
+				<Button
+					variant="ghost"
+					size="icon"
+					className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
+					onClick={() => onDelete(row.original._id)}
+					title="Hapus riwayat undangan">
+					<Trash2 className="h-4 w-4" />
+				</Button>
 			);
 		},
 	},

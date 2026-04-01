@@ -35,3 +35,8 @@ export const toggleServiceActiveApi = async (id: string, request?: any) => {
 	);
 	return response.data;
 };
+
+export const deleteServiceApi = async (id: string) => {
+	const response = await apiClient.delete(`/services/${id}`);
+	return response.data;
+};

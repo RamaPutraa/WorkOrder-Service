@@ -201,7 +201,8 @@ const FormCard = ({
 
 const DetailService = () => {
 	const navigate = useNavigate();
-	const { detailService, loading, getDetailService } = useCreateService();
+	const { detailService, loading, getDetailService, removeService } =
+		useCreateService();
 	const { showDialog } = useDialogStore();
 	const clearServiceCache = useServiceStore((state) => state.clearCache);
 
@@ -290,15 +291,43 @@ const DetailService = () => {
 									</h2>
 								</div>
 								{/* Status badge */}
-								<div className="flex items-center gap-3 shrink-0 bg-muted/20 px-4 py-2 rounded-xl border">
-									<Switch
-										checked={detailService.isActive}
-										onCheckedChange={handleToggleActive}
-									/>
-									<span
-										className={`text-sm font-semibold ${detailService.isActive ? "text-emerald-600" : "text-slate-500"}`}>
-										{detailService.isActive ? "Aktif" : "Nonaktif"}
-									</span>
+								<div className="flex items-center gap-4">
+									<div className="flex items-center gap-3 shrink-0 bg-muted/20 px-4 py-2 rounded-xl border">
+										<Switch
+											checked={detailService.isActive}
+											onCheckedChange={handleToggleActive}
+										/>
+										<span
+											className={`text-sm font-semibold ${detailService.isActive ? "text-emerald-600" : "text-slate-500"}`}>
+											{detailService.isActive ? "Aktif" : "Nonaktif"}
+										</span>
+									</div>
+									<div className="items-center gap-3 shrink-0 bg-muted/20 rounded-md border">
+										<Button
+											variant="destructive"
+											size="icon"
+											className="h-8 w-8 "
+											onClick={() =>
+												showDialog({
+													title: "Hapus Layanan",
+													description: `Apakah Anda yakin ingin menghapus layanan "${detailService.title}"?`,
+													confirmText: "Hapus",
+													cancelText: "Batal",
+													onConfirm: async () => {
+														if (detailService._id) {
+															const success = await removeService(
+																detailService._id,
+															);
+															if (success) {
+																navigate("/dashboard/internal/services");
+															}
+														}
+													},
+												})
+											}>
+											<Trash2 className="h-4 w-4" />
+										</Button>
+									</div>
 								</div>
 							</div>
 

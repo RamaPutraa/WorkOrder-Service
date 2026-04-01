@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { DataTable } from "@/components/ui/data-table";
-import { invitationColumns } from "../components/invitation-columns";
+import { createInvitationColumns } from "../components/invitation-columns";
 import { useStaffHistory } from "../hooks/use-staff-history";
+import { useDialogStore } from "@/store/dialogStore";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import PageHeader from "@/shared/atoms/header-content";
@@ -15,7 +16,22 @@ const STATUS_SUMMARY = [
 ];
 
 const HistoryStaffInvitations = () => {
-	const { history, loading, error, fetchHistory } = useStaffHistory();
+	const { history, loading, error, fetchHistory, removeInvitation } = useStaffHistory();
+	const { showDialog } = useDialogStore();
+
+	const handleDelete = (id: string) => {
+		showDialog({
+			title: "Hapus Riwayat Undangan",
+			description: "Apakah Anda yakin ingin menghapus riwayat undangan ini?",
+			confirmText: "Hapus",
+			cancelText: "Batal",
+			onConfirm: async () => {
+				await removeInvitation(id);
+			},
+		});
+	};
+
+	const columns = createInvitationColumns({ onDelete: handleDelete });
 
 	useEffect(() => {
 		void fetchHistory();
@@ -72,7 +88,7 @@ const HistoryStaffInvitations = () => {
 						</div>
 					)}
 					<DataTable
-						columns={invitationColumns}
+						columns={columns}
 						data={history}
 						searchKey="email"
 						loading={loading}

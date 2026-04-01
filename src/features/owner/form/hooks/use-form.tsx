@@ -1,8 +1,8 @@
 import { handleApi } from "@/lib/handle-api";
-import { notifyError } from "@/lib/toast-helper";
+import { notifyError, notifySuccess } from "@/lib/toast-helper";
 import { useEffect, useState, useMemo } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import { getFormByIdApi, getFormsApi } from "../services/formService";
+import { getFormByIdApi, getFormsApi, deleteFormApi } from "../services/formService";
 import { type FilterConfig } from "@/shared/molecules/generic-filter";
 import { useFormStore } from "@/store/formStore";
 
@@ -144,6 +144,22 @@ export const useForm = () => {
 		[],
 	);
 
+	const removeForm = async (id: string) => {
+		setLoading(true);
+		const { error } = await handleApi(() => deleteFormApi(id));
+		setLoading(false);
+
+		if (error) {
+			notifyError("Gagal menghapus form", error.message);
+			return false;
+		}
+
+		notifySuccess("Berhasil", "Formulir berhasil dihapus");
+		store.clearCache(); // invalidate cache
+		await getAllForms();
+		return true;
+	};
+
 	return {
 		forms,
 		filteredData,
@@ -155,5 +171,6 @@ export const useForm = () => {
 		error,
 		getDetailForm,
 		getAllForms,
+		removeForm,
 	};
 };

@@ -15,9 +15,11 @@ import {
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
+import { useDialogStore } from "@/store/dialogStore";
 
 const DetailForm = () => {
-	const { detailForm, loading } = useForm();
+	const { showDialog } = useDialogStore();
+	const { detailForm, loading, removeForm } = useForm();
 	const navigate = useNavigate();
 	const { id } = useParams<{ id: string }>();
 
@@ -85,7 +87,23 @@ const DetailForm = () => {
 								variant="destructive"
 								size="icon"
 								className="h-9 w-9 shrink-0"
-								title="Hapus Formulir">
+								title="Hapus Formulir"
+								onClick={() =>
+									showDialog({
+										title: "Hapus Formulir",
+										description: `Apakah Anda yakin ingin menghapus formulir "${detailForm?.title}"?`,
+										confirmText: "Hapus",
+										cancelText: "Batal",
+										onConfirm: async () => {
+											if (id) {
+												const success = await removeForm(id);
+												if (success) {
+													navigate("/dashboard/internal/forms");
+												}
+											}
+										},
+									})
+								}>
 								<Trash className="w-4 h-4" />
 							</Button>
 						</div>
