@@ -7,7 +7,7 @@ export const getAllCompanyApi = async () => {
 };
 
 export const getCompanyServiceAPi = async (companyId: string) => {
-	const response = await apiClient.get<GetCompanyServiceResponse>(
+	const response = await apiClient.get<GetCompanyServiceByClientResponse>(
 		`/public/companies/${companyId}/services`,
 	);
 	return response.data;

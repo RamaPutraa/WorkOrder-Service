@@ -2,7 +2,11 @@ import { handleApi } from "@/lib/handle-api";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
 import { useEffect, useState, useMemo } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import { getFormByIdApi, getFormsApi, deleteFormApi } from "../services/formService";
+import {
+	getFormByIdApi,
+	getFormsApi,
+	deleteFormApi,
+} from "../services/formService";
 import { type FilterConfig } from "@/shared/molecules/generic-filter";
 import { useFormStore } from "@/store/formStore";
 
@@ -66,7 +70,7 @@ export const useForm = () => {
 			notifyError("Gagal memuat data form", error.message);
 			return;
 		}
-		
+
 		setDetailForm(res?.data || null);
 		if (res?.data) {
 			store.setDetailForm(id, res.data);
