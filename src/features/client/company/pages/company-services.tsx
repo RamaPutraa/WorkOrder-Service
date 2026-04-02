@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Card, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,11 +17,14 @@ import { GenericFilter } from "@/shared/molecules/generic-filter";
 import { EmptyData } from "@/shared/molecules/empty-data";
 import { SectionLoading } from "@/shared/atoms";
 import PageHeader from "@/shared/atoms/header-content";
+import ClaimMembershipDialog from "@/features/client/memberships/components/claim-membership-dialog";
 
 const ClientCompanyServices = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
+	const [claimDialogOpen, setClaimDialogOpen] = useState(false);
 	const {
+		fetchCompanyServices,
 		filteredServices,
 		filterConfigServices,
 		companies,
@@ -61,6 +65,7 @@ const ClientCompanyServices = () => {
 		);
 
 	return (
+		<>
 		<div className="space-y-6">
 			{/* Page Header */}
 			<PageHeader
@@ -182,6 +187,7 @@ const ClientCompanyServices = () => {
 							:	/* Button Mode Biasa (Blue Background) */
 								<Button
 									size="sm"
+									onClick={() => setClaimDialogOpen(true)}
 									className="w-full bg-white text-primary font-semibold hover:bg-white/90 shadow-md">
 									Mulai Berlangganan
 								</Button>
@@ -323,6 +329,14 @@ const ClientCompanyServices = () => {
 				</AnimatePresence>
 			</div>
 		</div>
+
+		{/* Claim Membership Dialog */}
+		<ClaimMembershipDialog
+			open={claimDialogOpen}
+			onOpenChange={setClaimDialogOpen}
+			onSuccess={fetchCompanyServices}
+		/>
+		</>
 	);
 };
 
