@@ -1,6 +1,18 @@
 import apiClient from "@/lib/api";
+import { dummyInternalWorkOrders } from "../mocks/internal-work-order.mock";
+
+const USE_MOCK = true; // TODO: Ubah ke false jika API backend sudah siap
 
 export const getInternalCompanyWorkOrders = async () => {
+	if (USE_MOCK) {
+		await new Promise((resolve) => setTimeout(resolve, 500));
+		return {
+			data: dummyInternalWorkOrders,
+			message: "Success (Mock)",
+			status: 200,
+		} as InternalWorkOrderResponse;
+	}
+
 	const response =
 		await apiClient.get<InternalWorkOrderResponse>("/workorders");
 	return response.data;

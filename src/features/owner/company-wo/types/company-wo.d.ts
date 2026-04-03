@@ -1,16 +1,21 @@
 type InternalWorkOrder = {
 	_id: string;
-	clientServiceRequestId: string;
-	companyId: string;
-	relateWorkOrderId?: string;
-	assignedStaffs: User[];
-	status: string;
+	serviceRequestId: string | null;
+	service: Service;
+	createdBy: User;
+	approvedBy: User;
+	workOrderApprovalAccessType: "auto" | "staff_pic";
+	minStaff: number;
+	maxStaff: number;
+	assignedStaff: User[];
+	staffPIC: User | null;
+	status: "drafted" | "ready" | "inProgress" | "completed" | "cancelled";
+	workOrderForm: Form;
+	submissions: InternalSubmission[];
 	createdAt: string;
 	updatedAt: string;
-	startedAt?: string;
-	completedAt?: string;
-	createdBy: User;
-	service: Service;
+	startedAt: string | null;
+	completedAt: string | null;
 };
 type InternalWorkOrderResponse = ApiResponse<InternalWorkOrder[]>;
 
