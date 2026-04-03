@@ -1,4 +1,7 @@
 import apiClient from "@/lib/api";
+import { dummyPublicServiceRequests } from "../mocks/public-service-request.mock";
+
+const USE_MOCK = true; // TODO: Ubah ke false jika API backend sudah siap
 
 export const getDetailServiceByIdApi = async (id: string) => {
 	const response = await apiClient.get<PublicDetailService>(
@@ -19,6 +22,15 @@ export const submitIntakeApi = async (
 };
 
 export const getAllClientServiceRequestApi = async () => {
+	if (USE_MOCK) {
+		await new Promise((resolve) => setTimeout(resolve, 500));
+		return {
+			data: dummyPublicServiceRequests,
+			message: "Success (Mock)",
+			status: 200,
+		} as PublicServiceRequestResponse;
+	}
+
 	const response = await apiClient.get<PublicServiceRequestResponse>(
 		"/public/client-service-request",
 	);

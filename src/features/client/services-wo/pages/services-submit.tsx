@@ -16,11 +16,16 @@ import {
 	ChevronLeft,
 	Clock,
 	CheckCircle2,
+	ClipboardPenLine,
+	Calendar,
 } from "lucide-react";
 import { handleApi } from "@/lib/handle-api";
 import { notifyError } from "@/lib/toast-helper";
 import { getAllClientServiceRequestApi } from "../services/public-services";
 import { useNavigate } from "react-router-dom";
+import PageHeader from "@/shared/atoms/header-content";
+import { AnimatePresence, motion } from "framer-motion";
+import { SectionLoading } from "@/shared/atoms";
 
 const ServiceSubmitPage = () => {
 	const [requests, setRequests] = useState<PublicServiceRequest[]>([]);
@@ -53,34 +58,32 @@ const ServiceSubmitPage = () => {
 	}, []);
 
 	const getStatusBadge = (status: string) => {
-		const statusMap: Record<
-			string,
-			{ label: string; variant: "default" | "secondary" | "outline"; icon: any }
-		> = {
-			active: {
-				label: "Aktif",
-				variant: "default",
-				icon: <Clock className="w-3 h-3" />,
-			},
-			completed: {
-				label: "Selesai",
-				variant: "secondary",
-				icon: <CheckCircle2 className="w-3 h-3" />,
-			},
-			pending: {
-				label: "Menunggu",
-				variant: "outline",
-				icon: <Clock className="w-3 h-3" />,
-			},
-		};
-
-		const statusInfo = statusMap[status] || statusMap.pending;
-
+		const s = status.toLowerCase();
+		if (s === "approved")
+			return (
+				<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-emerald-600 ">
+					<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+					<span className="text-[10px] font-bold uppercase tracking-wider">
+						Disetujui
+					</span>
+				</div>
+			);
+		if (s === "rejected")
+			return (
+				<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-red-600 ">
+					<span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+					<span className="text-[10px] font-bold uppercase tracking-wider">
+						Ditolak
+					</span>
+				</div>
+			);
 		return (
-			<Badge variant={statusInfo.variant} className="gap-1">
-				{statusInfo.icon}
-				{statusInfo.label}
-			</Badge>
+			<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-amber-600 ">
+				<span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+				<span className="text-[10px] font-bold uppercase tracking-wider">
+					Menunggu
+				</span>
+			</div>
 		);
 	};
 
@@ -113,82 +116,112 @@ const ServiceSubmitPage = () => {
 	return (
 		<div className="space-y-6">
 			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div className="flex items-center space-x-6">
-					<Button
-						onClick={() => navigate(-1)}
-						className="bg-primary hover:bg-primary/90 h-full">
-						<ChevronLeft className="size-6" />
-					</Button>
-					<div className="flex flex-col space-y-2">
-						<h1 className="text-xl font-bold tracking-tight">
-							Riwayat Permintaan Layanan
-						</h1>
-						<p className="text-muted-foreground">
-							Total {requests.length} permintaan layanan
-						</p>
-					</div>
-				</div>
-				<Button
-					onClick={getAllClientRequests}
-					variant="outline"
-					disabled={loading}>
-					<RefreshCw className="size-4 mr-2" />
-					Muat Ulang
-				</Button>
-			</div>
 
-			{/* Empty State */}
-			{requests.length === 0 ?
-				<Card className="shadow-lg">
-					<CardContent className="py-16">
-						<div className="text-center">
-							<FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-							<p className="text-lg font-medium text-gray-600">
-								Belum ada permintaan layanan
-							</p>
-							<p className="text-sm text-muted-foreground mt-1">
-								Permintaan layanan Anda akan muncul di sini
-							</p>
-						</div>
-					</CardContent>
-				</Card>
-			:	/* Cards Grid */
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-					{requests.map((item) => (
-						<Card
-							key={item?._id}
-							className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 hover:border-blue-500/50">
-							<CardHeader className="space-y-3">
-								<div className="flex items-start justify-between">
-									<div className="p-3 bg-blue-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
-										<FileText className="w-5 h-5 text-white" />
+			<PageHeader
+				title="Riwayat Permintaan Layanan"
+				subtitle="Berikut merupakan riwayat permintaan layanan yang telah Anda ajukan."
+				backPath={true}
+			/>
+
+			<div className="w-full">
+				<div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+					<AnimatePresence mode="wait">
+						{loading ?
+							<motion.div
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								exit={{ opacity: 0 }}
+								className="col-span-full">
+								<SectionLoading message="Memuat data pengajuan layanan..." />
+							</motion.div>
+						: requests.length > 0 ?
+							requests.map((item) => (
+								<motion.div
+									key={item._id}
+									initial={{ opacity: 0, y: 16 }}
+									animate={{ opacity: 2, y: 0 }}
+									transition={{ duration: 0.2, ease: "easeOut" }}>
+									<div
+										onClick={() =>
+											navigate(`/dashboard/client/submissions/${item._id}`)
+										}
+										className="group flex flex-col h-full bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden cursor-pointer">
+										{/* Header */}
+										<div className="border-b border-slate-200/70 p-2">
+											{/* Status Badge */}
+											<div className="shrink-0">
+												{getStatusBadge(item.serviceRequestStatus)}
+											</div>
+										</div>
+										{/* card content 1 */}
+										<div className="px-5 py-3 sm:px-6 pt-5 sm:pt-6 space-y-4">
+											<div className="flex items-center justify-between gap-3 min-w-0">
+												{/* Icon & Title Group */}
+												<div className="flex items-center gap-3 flex-1 min-w-0">
+													<div className="shrink-0 p-2.5 sm:p-3 bg-primary/5 text-primary rounded-xl">
+														<ClipboardPenLine className="w-5 h-5 sm:w-6 sm:h-6" />
+													</div>
+													<div className="flex-1 min-w-0">
+														<h3 className="text-sm sm:text-base font-semibold text-slate-900 leading-snug truncate">
+															{item.service?.title || "Untitled Form"}
+														</h3>
+													</div>
+												</div>
+											</div>
+
+											<p className="text-xs sm:text-sm text-slate-500 leading-relaxed line-clamp-3 md:min-h-[3.75rem]">
+												{item.service?.description ||
+													"Tidak ada deskripsi tersedia untuk layanan ini."}{" "}
+												Lorem ipsum dolor sit amet consectetur adipisicing elit.
+												Velit debitis voluptatem molestiae voluptatibus
+												repellat? Dicta, minima a beatae voluptas nam eum
+												tempora aut enim inventore numquam similique consequatur
+												necessitatibus magnam. Porro labore dignissimos
+												obcaecati cum earum velit iusto qui adipisci aperiam
+												fugiat vel nam molestiae, saepe debitis amet maiores
+												tempore! Molestias omnis enim, eius dignissimos tenetur
+												quae. Accusantium, animi natus? Ipsam quos rerum
+												deleniti quaerat odit temporibus dignissimos quasi
+												deserunt quas totam perspiciatis laudantium veniam
+												quibusdam, nesciunt dolores aut esse eligendi veritatis
+												harum ratione ad minima dicta! Nam, obcaecati
+												consequatur.
+											</p>
+										</div>
+										{/* card content 2 */}
+										<div className="px-6 py-2 border-t border-slate-200/70 flex flex-col justify-end">
+											{/* Info Row (Client & Date) */}
+											<div className="flex flex-wrap items-center gap-x-4 text-xs font-semibold text-muted-foreground py-2">
+												<div className="flex items-center gap-1.5">
+													<Calendar className="w-3.5 h-3.5 shrink-0" />
+													<span>
+														{new Date(item.createdAt).toLocaleDateString(
+															"id-ID",
+															{
+																day: "2-digit",
+																month: "short",
+																year: "numeric",
+															},
+														)}
+													</span>
+												</div>
+											</div>
+											{/* Divider */}
+										</div>
 									</div>
-									{getStatusBadge(item.status)}
-								</div>
-								<div className="space-y-1">
-									<CardTitle className="text-lg group-hover:text-blue-600 transition-colors">
-										{item.service?.title ?? "Tanpa Judul"}
-									</CardTitle>
-									<CardDescription className="line-clamp-2">
-										{item.service?.description ?? "Tidak ada deskripsi"}
-									</CardDescription>
-								</div>
-							</CardHeader>
-							<CardContent>
-								<Button
-									onClick={() =>
-										navigate(`/dashboard/client/submissions/${item._id}`)
-									}
-									className="w-full group/btn bg-blue-600 hover:bg-blue-700 shadow-md">
-									<span>Lihat Detail</span>
-									<ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
-								</Button>
-							</CardContent>
-						</Card>
-					))}
+								</motion.div>
+							))
+						:	<motion.div
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								exit={{ opacity: 0 }}
+								className="col-span-full">
+								<SectionLoading message="Memuat data pengajuan layanan..." />
+							</motion.div>
+						}
+					</AnimatePresence>
 				</div>
-			}
+			</div>
 		</div>
 	);
 };
