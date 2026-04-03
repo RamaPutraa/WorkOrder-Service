@@ -1,12 +1,33 @@
 // internal service request type
+type ServiceSummaryObject = {
+	_id: string;
+	title: string;
+	description: string;
+	accessType: "public" | "member_only" | "internal";
+	isActive: boolean;
+};
+
 type InternalServiceRequest = {
 	_id: string;
-	status: string;
+	servicesRequestStatus:
+		| "received"
+		| "cancelled"
+		| "rejected"
+		| "approved"
+		| "workOrderCreated"
+		| "completed"
+		| "closed";
+	serviceRequestApprovalAccessType: "auto" | "manager";
+	reviewNeed: boolean;
+	service: ServiceSummaryObject;
+	requestedBy: User;
+	approvedBy: User;
+	intakeForm: Form;
+	reviewForm: Form;
+	intakeSubmission: InternalSubmission;
+	reviewSubmission: InternalSubmission;
 	createdAt: string;
 	updatedAt: string;
-	companyId: string;
-	client: User;
-	service: Service;
 };
 type InternalServiceRequestResponse = ApiResponse<InternalServiceRequest[]>;
 
@@ -24,7 +45,7 @@ type InternalSubmission = {
 };
 type InternalServiceDetailRequest = {
 	_id: string;
-	status: string;
+	servicesRequestStatus: string;
 	createdAt: string;
 	updatedAt: string;
 	companyId: string;

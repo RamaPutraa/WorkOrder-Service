@@ -134,7 +134,7 @@ export const useBusiness = () => {
 				csr.service?.description?.toLowerCase().includes(searchQuery);
 
 			const matchesStatus =
-				!statusQuery || csr.status.toLowerCase() === statusQuery;
+				!statusQuery || csr.servicesRequestStatus.toLowerCase() === statusQuery;
 
 			let matchesDate = true;
 			if (dateFromQuery) {

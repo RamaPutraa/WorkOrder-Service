@@ -24,12 +24,24 @@ type PublicSubmitResponse = ApiResponse<{
 // get client service request
 type PublicServiceRequest = {
 	_id: string;
-	status: string;
+	serviceRequestStatus:
+		| received
+		| "cancelled"
+		| "rejected"
+		| "approved"
+		| "workOrderCreated"
+		| "completed"
+		| "closed";
+	company: Company;
+	service: ServiceSummaryObject;
+	requestedBy: User;
+	approvedBy: User;
+	intakeForm: Form;
+	reviewForm: Form;
+	intakeSubmission: PublicSubmission;
+	reviewSubmission: PublicSubmission;
 	createdAt: string;
 	updatedAt: string;
-	companyId: string;
-	client: User;
-	service: Service;
 };
 type PublicServiceRequestResponse = ApiResponse<PublicServiceRequest[]>;
 
