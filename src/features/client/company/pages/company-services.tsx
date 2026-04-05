@@ -72,143 +72,149 @@ const ClientCompanyServices = () => {
 					backPath={true}
 				/>
 
-				{/* Hero Section - Company Info */}
-				{company && (
-					<motion.div
-						initial={{ opacity: 0, y: -12 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.35, ease: "easeOut" }}
-						className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-						{/* Left panel — Company Profile */}
-						<div className="lg:col-span-2 relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm p-6 flex flex-col justify-between gap-6">
-							{/* Decorative circle */}
-							<div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-primary/5 pointer-events-none" />
-							<div className="absolute -bottom-6 -left-6 w-24 h-24 rounded-full bg-blue-50 pointer-events-none" />
+				{loading ? (
+					<div className="py-12">
+						<SectionLoading message="Memuat informasi perusahaan dan layanan..." />
+					</div>
+				) : (
+					<>
+						{/* Hero Section - Company Info */}
+						{company && (
+							<motion.div
+								initial={{ opacity: 0, y: -12 }}
+								animate={{ opacity: 1, y: 0 }}
+								transition={{ duration: 0.35, ease: "easeOut" }}
+								className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+								{/* Left panel — Company Profile */}
+								<div className="lg:col-span-2 relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm p-6 flex flex-col justify-between gap-6">
+									{/* Decorative circle */}
+									<div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-primary/5 pointer-events-none" />
+									<div className="absolute -bottom-6 -left-6 w-24 h-24 rounded-full bg-blue-50 pointer-events-none" />
 
-							<div className="relative flex items-start gap-4">
-								<div className="shrink-0 p-3.5 bg-primary/5 text-primary rounded-xl">
-									<Building2 className="w-7 h-7" />
-								</div>
-								<div className="flex-1 min-w-0">
-									<div className="flex flex-wrap items-center gap-2 mb-1">
-										<h2 className="text-lg font-bold text-slate-900 truncate">
-											{company.name}
-										</h2>
-									</div>
-									{company.address && (
-										<div className="flex items-center gap-1.5 text-sm text-slate-500 mb-2">
-											<MapPin className="w-3.5 h-3.5 shrink-0" />
-											<span className="truncate">{company.address}</span>
+									<div className="relative flex items-start gap-4">
+										<div className="shrink-0 p-3.5 bg-primary/5 text-primary rounded-xl">
+											<Building2 className="w-7 h-7" />
 										</div>
-									)}
-									{company.description && (
-										<p className="text-sm text-slate-500 leading-relaxed line-clamp-2">
-											{company.description}
+										<div className="flex-1 min-w-0">
+											<div className="flex flex-wrap items-center gap-2 mb-1">
+												<h2 className="text-lg font-bold text-slate-900 truncate">
+													{company.name}
+												</h2>
+											</div>
+											{company.address && (
+												<div className="flex items-center gap-1.5 text-sm text-slate-500 mb-2">
+													<MapPin className="w-3.5 h-3.5 shrink-0" />
+													<span className="truncate">{company.address}</span>
+												</div>
+											)}
+											{company.description && (
+												<p className="text-sm text-slate-500 leading-relaxed line-clamp-2">
+													{company.description}
+												</p>
+											)}
+										</div>
+									</div>
+
+									{/* Stats row */}
+									<div className="relative flex items-center gap-6 pt-4 border-t border-slate-100">
+										<div>
+											<p className="text-2xl font-bold text-primary">
+												{filteredServices.length}
+											</p>
+											<p className="text-xs text-slate-500 mt-0.5">
+												Layanan Tersedia
+											</p>
+										</div>
+										<div className="w-px h-10 bg-slate-100" />
+										<div>
+											<p className="text-2xl font-bold text-slate-800">
+												{isSubscribed ? "Aktif" : "—"}
+											</p>
+											<p className="text-xs text-slate-500 mt-0.5">
+												Status Langganan
+											</p>
+										</div>
+									</div>
+								</div>
+
+								{/* Right panel — Subscription CTA */}
+								<div
+									className={`relative overflow-hidden rounded-2xl shadow-sm p-6 flex flex-col justify-between gap-4 transition-all ${
+										isSubscribed ?
+											"bg-gradient-to-br from-[#BF953F] via-[#FCF6BA] via-[55%] to-[#B38728]"
+										:	"bg-gradient-to-br from-primary to-blue-700"
+									}`}>
+									{/* Decorative: Ubah warna lingkaran samar agar sesuai dengan background */}
+									<div
+										className={`absolute -top-8 -right-8 w-32 h-32 rounded-full pointer-events-none ${isSubscribed ? "bg-black/5" : "bg-white/10"}`}
+									/>
+									<div
+										className={`absolute -bottom-4 -left-4 w-20 h-20 rounded-full pointer-events-none ${isSubscribed ? "bg-black/5" : "bg-white/5"}`}
+									/>
+
+									<div className="relative">
+										<div className="flex gap-2 items-center">
+											{/* Ikon */}
+											{isSubscribed ?
+												<CheckCircle2 className="w-8 h-8 text-white/80 drop-shadow-xl" />
+											:	<XCircle className="w-8 h-8 text-white/80" />}
+
+											{/* Judul Teks */}
+											<p
+												className={`font-semibold text-base leading-snug mb-1 ${isSubscribed ? "text-white/80" : "text-white"}`}>
+												{isSubscribed ?
+													"Anda sudah berlangganan"
+												:	"Belum berlangganan?"}
+											</p>
+										</div>
+
+										{/* Paragraf Teks */}
+										<p
+											className={`text-sm leading-relaxed mt-5 ${isSubscribed ? "text-yellow-950/80" : "text-white/75"}`}>
+											{isSubscribed ?
+												"Anda memiliki akses penuh ke semua layanan eksklusif yang tersedia. Silahkan pilih layanan yang Anda butuhkan."
+											:	"Berlangganan untuk mendapatkan akses ke seluruh layanan eksklusif perusahaan."
+											}
 										</p>
-									)}
-								</div>
-							</div>
+									</div>
 
-							{/* Stats row */}
-							<div className="relative flex items-center gap-6 pt-4 border-t border-slate-100">
-								<div>
-									<p className="text-2xl font-bold text-primary">
-										{filteredServices.length}
-									</p>
-									<p className="text-xs text-slate-500 mt-0.5">
-										Layanan Tersedia
-									</p>
-								</div>
-								<div className="w-px h-10 bg-slate-100" />
-								<div>
-									<p className="text-2xl font-bold text-slate-800">
-										{isSubscribed ? "Aktif" : "—"}
-									</p>
-									<p className="text-xs text-slate-500 mt-0.5">
-										Status Langganan
-									</p>
-								</div>
-							</div>
-						</div>
-
-						{/* Right panel — Subscription CTA */}
-						<div
-							className={`relative overflow-hidden rounded-2xl shadow-sm p-6 flex flex-col justify-between gap-4 transition-all ${
-								isSubscribed ?
-									"bg-gradient-to-br from-[#BF953F] via-[#FCF6BA] via-[55%] to-[#B38728]"
-								:	"bg-gradient-to-br from-primary to-blue-700"
-							}`}>
-							{/* Decorative: Ubah warna lingkaran samar agar sesuai dengan background */}
-							<div
-								className={`absolute -top-8 -right-8 w-32 h-32 rounded-full pointer-events-none ${isSubscribed ? "bg-black/5" : "bg-white/10"}`}
-							/>
-							<div
-								className={`absolute -bottom-4 -left-4 w-20 h-20 rounded-full pointer-events-none ${isSubscribed ? "bg-black/5" : "bg-white/5"}`}
-							/>
-
-							<div className="relative">
-								<div className="flex gap-2 items-center">
-									{/* Ikon */}
-									{isSubscribed ?
-										<CheckCircle2 className="w-8 h-8 text-white/80 drop-shadow-xl" />
-									:	<XCircle className="w-8 h-8 text-white/80" />}
-
-									{/* Judul Teks */}
-									<p
-										className={`font-semibold text-base leading-snug mb-1 ${isSubscribed ? "text-white/80" : "text-white"}`}>
+									<div className="relative flex flex-col gap-2">
 										{isSubscribed ?
-											"Anda sudah berlangganan"
-										:	"Belum berlangganan?"}
-									</p>
+											/* Button Mode VIP (Gold Background) */
+											<Button
+												size="sm"
+												disabled
+												className="w-full bg-yellow-950/10 hover:bg-yellow-950/10 text-yellow-950 border border-yellow-950/20 cursor-not-allowed opacity-100 shadow-none">
+												<CheckCircle2 className="w-4 h-4 mr-2" />
+												Sudah Berlangganan
+											</Button>
+										:	/* Button Mode Biasa (Blue Background) */
+											<Button
+												size="sm"
+												onClick={() => setClaimDialogOpen(true)}
+												className="w-full bg-white text-primary font-semibold hover:bg-white/90 shadow-md">
+												Mulai Berlangganan
+											</Button>
+										}
+
+										{!isSubscribed && (
+											<p className="text-white/60 text-xs text-center mt-1">
+												Hubungi perusahaan untuk informasi lebih lanjut
+											</p>
+										)}
+									</div>
 								</div>
+							</motion.div>
+						)}
 
-								{/* Paragraf Teks */}
-								<p
-									className={`text-sm leading-relaxed mt-5 ${isSubscribed ? "text-yellow-950/80" : "text-white/75"}`}>
-									{isSubscribed ?
-										"Anda memiliki akses penuh ke semua layanan eksklusif yang tersedia. Silahkan pilih layanan yang Anda butuhkan."
-									:	"Berlangganan untuk mendapatkan akses ke seluruh layanan eksklusif perusahaan."
-									}
-								</p>
-							</div>
-
-							<div className="relative flex flex-col gap-2">
-								{isSubscribed ?
-									/* Button Mode VIP (Gold Background) */
-									<Button
-										size="sm"
-										disabled
-										className="w-full bg-yellow-950/10 hover:bg-yellow-950/10 text-yellow-950 border border-yellow-950/20 cursor-not-allowed opacity-100 shadow-none">
-										<CheckCircle2 className="w-4 h-4 mr-2" />
-										Sudah Berlangganan
-									</Button>
-								:	/* Button Mode Biasa (Blue Background) */
-									<Button
-										size="sm"
-										onClick={() => setClaimDialogOpen(true)}
-										className="w-full bg-white text-primary font-semibold hover:bg-white/90 shadow-md">
-										Mulai Berlangganan
-									</Button>
-								}
-
-								{!isSubscribed && (
-									<p className="text-white/60 text-xs text-center mt-1">
-										Hubungi perusahaan untuk informasi lebih lanjut
-									</p>
-								)}
-							</div>
+						{/* Filter */}
+						<div>
+							<GenericFilter config={filterConfigServices} />
 						</div>
-					</motion.div>
-				)}
 
-				{/* Filter */}
-				<div>
-					<GenericFilter config={filterConfigServices} />
-				</div>
-
-				{/* Services Grid */}
-				<div className="grid gap-4 sm:gap-5 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-					<AnimatePresence mode="wait">
+						{/* Services Grid */}
+						<div className="grid gap-4 sm:gap-5 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+							<AnimatePresence mode="wait">
 						{loading ?
 							<motion.div
 								key="loading-services"
@@ -318,6 +324,8 @@ const ClientCompanyServices = () => {
 						}
 					</AnimatePresence>
 				</div>
+					</>
+				)}
 			</div>
 
 			{/* Claim Membership Dialog */}

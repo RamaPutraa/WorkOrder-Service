@@ -14,6 +14,7 @@ export const submitIntakeApi = async (
 	id: string,
 	data: PublicSubmitRequest,
 ) => {
+	// TODO:revisi endpoint kalao suda jadi
 	const response = await apiClient.post<PublicSubmitResponse>(
 		`/public/services/${id}/intake-forms`,
 		data,
