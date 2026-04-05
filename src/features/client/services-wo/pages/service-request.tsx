@@ -1,4 +1,4 @@
-import { ChevronLeft, Loader2 } from "lucide-react";
+import { CheckCircle2, ChevronLeft, Loader2, ScrollText } from "lucide-react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import usePublicService from "../hooks/use-client-service";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,10 @@ import { useNavigate } from "react-router-dom";
 import FormFieldViewer, {
 	type AnswerValue,
 } from "@/shared/molecules/form-field-viewer";
+import PageHeader from "@/shared/atoms/header-content";
+import { SectionLoading } from "@/shared/atoms";
+import { EmptyData } from "@/shared/molecules/empty-data";
+import { TextLoading } from "@/shared/atoms/loading-state";
 
 export default function RequestServicePage() {
 	const {
@@ -21,89 +25,76 @@ export default function RequestServicePage() {
 
 	const navigate = useNavigate();
 
-	if (loading)
-		return (
-			<div className="flex items-center justify-center h-40">
-				<Loader2 className="animate-spin" />
-				<span className="ml-2">Memuat data...</span>
-			</div>
-		);
-
 	if (error) return <p className="text-red-500">{error}</p>;
 
 	return (
 		<>
-			<div
+			<PageHeader
+				title="Layanan Perusahaan"
+				subtitle="Berikut merupakan layanan yang dimiliki oleh perusahaan."
+				backPath={true}
+				addIcon={<CheckCircle2 className="size-6" />}
+				addLabel="Pesan Layanan"
+				onAddClick={() => handleSubmit()}
 				className={`sticky top-0 z-30 bg-background transition-shadow duration-300 ${
 					isSticky ? "shadow-xl rounded-md px-6 py-4" : ""
-				}`}>
-				<div className="flex items-center justify-between my-5  relative z-10">
-					<div className="flex items-center space-x-6">
-						<Button
-							onClick={() => navigate(-1)}
-							className="bg-primary hover:bg-primary/90 h-full">
-							<ChevronLeft className="size-6" />
-						</Button>
-						<div className="flex flex-col space-y-2">
-							<h1 className="text-xl font-bold tracking-tight">
-								Layanan Perusahaan
-							</h1>
-							<p className="text-muted-foreground">
-								Berikut merupakan layanan yang dimiliki oleh perusahaan.
-							</p>
-						</div>
+				}`}
+			/>
+			<Card className="p-5 lg:p-6 border-l-4 border-l-primary bg-gradient-to-br from-background to-muted/20 my-2">
+				<div className="flex items-start gap-4">
+					<div className="p-3 rounded-lg bg-primary/10">
+						<ScrollText className="w-6 h-6 text-primary" />
 					</div>
-
-					<Button
-						className="bg-primary hover:bg-primary/90"
-						onClick={() => handleSubmit()}
-						disabled={submitting}>
-						{submitting ?
-							<>
-								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-								Mengirim...
-							</>
-						:	"Pesan Layanan"}
-					</Button>
+					<div className="flex-1">
+						<h3 className="text-lg font-bold mb-1">
+							{loading ?
+								<div className="flex items-center gap-1.5">
+									Formulir{" "}
+									<TextLoading variant="dots" message="" className="w-40" />
+								</div>
+							:	`Formulir ${data?.map((form) => form.title).join(", ")}`}
+						</h3>
+						<p className="text-sm text-muted-foreground">
+							{loading ?
+								<div className="flex items-center gap-1.5">
+									<TextLoading variant="dots" message="" className="w-40" />
+								</div>
+							:	`${data?.map((form) => form.description).join(" ")}`}
+						</p>
+					</div>
 				</div>
-			</div>
+			</Card>
+			{loading ?
+				<SectionLoading message="Memuat formulir..." />
+			: data && data.length > 0 ?
+				<div className="space-y-3">
+					{data.map((form) => (
+						<div key={form._id}>
+							<div className="space-y-3">
+								{form.fields
+									?.sort((a, b) => a.order - b.order)
+									.map((field) => {
+										const currentValue =
+											formValues[form._id]?.[field.order] ?? null;
 
-			<div className="space-y-6">
-				{data.map((form) => (
-					<Card key={form._id} className="shadow-sm">
-						<CardHeader>
-							<h2 className="text-lg font-semibold">{form.title}</h2>
-							<p className="text-sm text-muted-foreground">
-								{form.description}
-							</p>
-						</CardHeader>
-						<CardContent className="space-y-4">
-							{form.fields
-								?.sort((a, b) => a.order - b.order)
-								.map((field) => {
-									// Get current value from formValues state
-									const currentValue =
-										formValues[form._id]?.[field.order] ?? null;
-
-									return (
-										<Card
-											key={field.order}
-											className="shadow-sm border rounded-lg p-4 bg-white">
-											<FormFieldViewer
-												field={field}
-												answer={currentValue as AnswerValue}
-												readOnly={false}
-												onChange={(value) =>
-													handleChange(form._id, field.order, value)
-												}
-											/>
-										</Card>
-									);
-								})}
-						</CardContent>
-					</Card>
-				))}
-			</div>
+										return (
+											<div key={field.order} className="pb-2">
+												<FormFieldViewer
+													field={field}
+													answer={currentValue as AnswerValue}
+													readOnly={false}
+													onChange={(value) =>
+														handleChange(form._id, field.order, value)
+													}
+												/>
+											</div>
+										);
+									})}
+							</div>
+						</div>
+					))}
+				</div>
+			:	<EmptyData />}
 		</>
 	);
 }
