@@ -139,20 +139,3 @@ type PublicServiceSubmited = {
 	createdAt: string;
 	updatedAt: string;
 };
-
-//intake submission
-type IntakeSubmission = {
-	_id: string;
-	ownerId: string;
-	formId: string;
-	submissionType: string;
-	fieldsData: {
-		order: number;
-		value: string | number;
-	}[];
-	status: string;
-	submittedBy: string;
-	createdAt: string;
-	updatedAt: string;
-	submittedAt: string;
-};

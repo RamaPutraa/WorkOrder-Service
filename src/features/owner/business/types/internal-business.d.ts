@@ -1,13 +1,7 @@
-// internal service request type
-type ServiceSummaryObject = {
-	_id: string;
-	title: string;
-	description: string;
-	accessType: "public" | "member_only" | "internal";
-	isActive: boolean;
-};
+// get service-request (inbox)
+type InboxServiceRequestResponse = ApiResponse<InboxServiceRequest[]>;
 
-type InternalServiceRequest = {
+type InboxServiceDetailRequest = {
 	_id: string;
 	servicesRequestStatus:
 		| "received"
@@ -24,37 +18,19 @@ type InternalServiceRequest = {
 	approvedBy: User;
 	intakeForm: Form;
 	reviewForm: Form;
-	intakeSubmission: InternalSubmission;
-	reviewSubmission: InternalSubmission;
+	intakeSubmission: SubmissionObject;
+	reviewSubmission: SubmissionObject;
 	createdAt: string;
 	updatedAt: string;
 };
-type InternalServiceRequestResponse = ApiResponse<InternalServiceRequest[]>;
 
-// get internal service detail request
-type InternalSubmission = {
-	_id: string;
-	ownerId: string;
-	formId: string;
-	submissionType: string;
-	fieldsData: FieldData[]; // from types/public-service.d.ts
-	status: string;
-	submittedBy: string;
-	createdAt: string;
-	updatedAt: string;
-};
-type InternalServiceDetailRequest = {
-	_id: string;
-	servicesRequestStatus: string;
-	createdAt: string;
-	updatedAt: string;
-	companyId: string;
-	client: User;
-	service: Service;
-	clientIntakeForms: ClientIntakeForm[]; // from types/public-service.d.ts
-	submissions: InternalSubmission[];
-};
+// createdAt: string;
+// updatedAt: string;
+// companyId: string;
+// client: User;
+// service: Service;
+// clientIntakeForms: ClientIntakeForm[];
+// submissions: SubmissionObject[];
 
 // get detail internal service request
-type InternalServiceDetailRequestResponse =
-	ApiResponse<InternalServiceDetailRequest>;
+type InboxServiceDetailRequestResponse = ApiResponse<InboxServiceDetailRequest>;

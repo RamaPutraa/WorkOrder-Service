@@ -28,11 +28,11 @@ export const getAllClientServiceRequestApi = async () => {
 			data: dummyPublicServiceRequests,
 			message: "Success (Mock)",
 			status: 200,
-		} as PublicServiceRequestResponse;
+		} as RequesterServiceRequestResponse;
 	}
 
-	const response = await apiClient.get<PublicServiceRequestResponse>(
-		"/public/client-service-request",
+	const response = await apiClient.get<RequesterServiceRequestResponse>(
+		"/service-request/sent",
 	);
 	return response.data;
 };

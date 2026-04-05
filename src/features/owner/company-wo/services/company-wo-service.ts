@@ -43,7 +43,7 @@ export const configStaffWorkOrderApi = async (
 
 export const submitWorkOrderFormApi = async (
 	id: string,
-	submissions: PublicSubmission[],
+	submissions: SubmissionObject[],
 ) => {
 	const response = await apiClient.put(`/workorders/${id}/submissions`, {
 		submissions,

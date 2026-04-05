@@ -1,5 +1,8 @@
 import apiClient from "@/lib/api";
-import { dummyInternalServiceRequests } from "../mock/internal-service-request.mock";
+import {
+	dummyInternalServiceRequests,
+	dummyInternalServiceDetailRequest,
+} from "../mock/internal-service-request.mock";
 
 const USE_MOCK = true; // TODO: Ubah ke false jika API backend sudah siap
 
@@ -11,11 +14,11 @@ export const getAllInternalBusinessServiceRequestApi = async () => {
 			data: dummyInternalServiceRequests,
 			message: "Success (Mock)",
 			status: 200,
-		} as InternalServiceRequestResponse;
+		} as InboxServiceRequestResponse;
 	}
 
-	const response = await apiClient.get<InternalServiceRequestResponse>(
-		"/client-service-request",
+	const response = await apiClient.get<InboxServiceRequestResponse>(
+		"/service-request/inbox",
 	);
 	return response.data;
 };
@@ -23,8 +26,23 @@ export const getAllInternalBusinessServiceRequestApi = async () => {
 export const getDetailInternalBusinessServiceRequestApi = async (
 	id: string,
 ) => {
-	const response = await apiClient.get<InternalServiceDetailRequestResponse>(
-		`/client-service-request/${id}`,
+	if (USE_MOCK) {
+		await new Promise((resolve) => setTimeout(resolve, 500));
+		const mockData =
+			(dummyInternalServiceRequests.find(
+				(req) => req._id === id,
+			) as unknown as InboxServiceDetailRequest) ||
+			dummyInternalServiceDetailRequest;
+
+		return {
+			data: mockData,
+			message: "Success (Mock)",
+			status: 200,
+		} as InboxServiceDetailRequestResponse;
+	}
+
+	const response = await apiClient.get<InboxServiceDetailRequestResponse>(
+		`/service-requests/${id}`,
 	);
 	return response.data;
 };

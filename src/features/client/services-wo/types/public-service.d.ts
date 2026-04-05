@@ -21,44 +21,11 @@ type PublicSubmitResponse = ApiResponse<{
 	data: PublicServiceSubmited;
 }>;
 
-// get client service request
-type PublicServiceRequest = {
-	_id: string;
-	serviceRequestStatus:
-		| received
-		| "cancelled"
-		| "rejected"
-		| "approved"
-		| "workOrderCreated"
-		| "completed"
-		| "closed";
-	company: Company;
-	service: ServiceSummaryObject;
-	requestedBy: User;
-	approvedBy: User;
-	intakeForm: Form;
-	reviewForm: Form;
-	intakeSubmission: PublicSubmission;
-	reviewSubmission: PublicSubmission;
-	createdAt: string;
-	updatedAt: string;
-};
-type PublicServiceRequestResponse = ApiResponse<PublicServiceRequest[]>;
+// get requester service request
+type RequesterServiceRequestResponse = ApiResponse<RequesterServiceRequest[]>;
 
 // detail service submissions from client
 
-// TODO: pindah publicsubmission jadi global type
-type PublicSubmission = {
-	_id: string;
-	ownerId: string;
-	formId: string;
-	submissionType: string;
-	fieldsData: FieldData[];
-	status: string;
-	submittedBy: string;
-	createdAt: string;
-	updatedAt: string;
-};
 type ClientIntakeForm = {
 	order: number;
 	form: Form;
@@ -72,7 +39,7 @@ type PublicDetailSubmissions = {
 	client: User;
 	service: Service;
 	clientIntakeForms: ClientIntakeForm[];
-	submissions: PublicSubmission[];
+	submissions: SubmissionObject[];
 };
 
 type PublicDetailSubmissionResponse = ApiResponse<PublicDetailSubmissions>;

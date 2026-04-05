@@ -1,7 +1,7 @@
 // Sesuaikan import User, Form, dan FieldData sesuai dengan path di project Anda
 // import { User, Form, FieldData } from '@/types/...';
 
-export const dummyInternalServiceRequests: InternalServiceRequest[] = [
+export const dummyInternalServiceRequests: InboxServiceRequest[] = [
 	{
 		_id: "req_001",
 		servicesRequestStatus: "received",
@@ -38,7 +38,32 @@ export const dummyInternalServiceRequests: InternalServiceRequest[] = [
 			_id: "form_01",
 			title: "Laporan Kerusakan IT",
 			description: "Formulir untuk melaporkan masalah IT internal",
-			fields: [],
+			fields: [
+				{
+					order: 1,
+					label: "Lokasi",
+					type: "text",
+					required: true,
+					placeholder: "Masukkan lokasi",
+					min: 0,
+					max: 0,
+					options: [],
+				},
+				{
+					order: 2,
+					label: "Tingkat Keparahan",
+					type: "single_select",
+					required: true,
+					placeholder: "Pilih tingkat keparahan",
+					min: 0,
+					max: 0,
+					options: [
+						{ key: "Rendah", value: "rendah" },
+						{ key: "Sedang", value: "sedang" },
+						{ key: "Tinggi", value: "tinggi" },
+					],
+				},
+			],
 			formType: "intake",
 			createdAt: "2024-04-01T08:30:00Z",
 			updatedAt: "2024-04-01T08:30:00Z",
@@ -47,7 +72,31 @@ export const dummyInternalServiceRequests: InternalServiceRequest[] = [
 			_id: "form_02",
 			title: "Review Perbaikan IT",
 			description: "Formulir hasil pengecekan",
-			fields: [],
+			fields: [
+				{
+					order: 1,
+					label: "Status",
+					type: "single_select",
+					required: true,
+					placeholder: "Pilih status",
+					min: 0,
+					max: 0,
+					options: [
+						{ key: "selesai", value: "Selesai" },
+						{ key: "belum_selesai", value: "Belum Selesai" },
+					],
+				},
+				{
+					order: 2,
+					label: "Catatan",
+					type: "text",
+					required: true,
+					placeholder: "Masukkan catatan",
+					min: 0,
+					max: 0,
+					options: [],
+				},
+			],
 			formType: "intake",
 			createdAt: "2024-04-01T08:30:00Z",
 			updatedAt: "2024-04-01T08:30:00Z",
@@ -66,17 +115,7 @@ export const dummyInternalServiceRequests: InternalServiceRequest[] = [
 			createdAt: "2024-04-01T08:30:00Z",
 			updatedAt: "2024-04-01T08:30:00Z",
 		},
-		reviewSubmission: {
-			_id: "sub_02",
-			ownerId: "usr_099",
-			formId: "form_02",
-			submissionType: "review",
-			fieldsData: [],
-			status: "draft",
-			submittedBy: "usr_099",
-			createdAt: "2024-04-02T10:00:00Z",
-			updatedAt: "2024-04-02T10:00:00Z",
-		},
+		reviewSubmission: null,
 		createdAt: "2024-04-01T08:30:00Z",
 		updatedAt: "2024-04-01T09:00:00Z",
 	},
@@ -116,7 +155,28 @@ export const dummyInternalServiceRequests: InternalServiceRequest[] = [
 			_id: "form_10",
 			title: "Formulir Pengadaan ATK",
 			description: "Formulir untuk melaporkan masalah IT internal",
-			fields: [],
+			fields: [
+				{
+					order: 1,
+					label: "Jenis ATK",
+					type: "text",
+					required: true,
+					placeholder: "Masukkan jenis ATK",
+					min: 0,
+					max: 0,
+					options: [],
+				},
+				{
+					order: 2,
+					label: "Jumlah",
+					type: "number",
+					required: true,
+					placeholder: "Masukkan jumlah",
+					min: 3,
+					max: 10,
+					options: [],
+				},
+			],
 			formType: "intake",
 			createdAt: "2024-04-01T08:30:00Z",
 			updatedAt: "2024-04-01T08:30:00Z",
@@ -125,7 +185,31 @@ export const dummyInternalServiceRequests: InternalServiceRequest[] = [
 			_id: "form_11",
 			title: "Validasi Pengadaan",
 			description: "Formulir untuk melaporkan masalah IT internal",
-			fields: [],
+			fields: [
+				{
+					order: 1,
+					label: "Status",
+					type: "single_select",
+					required: true,
+					placeholder: "Pilih status",
+					min: 0,
+					max: 0,
+					options: [
+						{ key: "selesai", value: "Selesai" },
+						{ key: "belum_selesai", value: "Belum Selesai" },
+					],
+				},
+				{
+					order: 2,
+					label: "Catatan",
+					type: "text",
+					required: true,
+					placeholder: "Masukkan catatan",
+					min: 0,
+					max: 0,
+					options: [],
+				},
+			],
 			formType: "intake",
 			createdAt: "2024-04-01T08:30:00Z",
 			updatedAt: "2024-04-01T08:30:00Z",
@@ -135,7 +219,10 @@ export const dummyInternalServiceRequests: InternalServiceRequest[] = [
 			ownerId: "usr_005",
 			formId: "form_10",
 			submissionType: "intake",
-			fieldsData: [],
+			fieldsData: [
+				{ order: 1, value: "Buku" },
+				{ order: 2, value: "10" },
+			],
 			status: "submitted",
 			submittedBy: "usr_005",
 			createdAt: "2024-04-03T09:15:00Z",
@@ -146,7 +233,14 @@ export const dummyInternalServiceRequests: InternalServiceRequest[] = [
 			ownerId: "usr_auto",
 			formId: "form_11",
 			submissionType: "review",
-			fieldsData: [],
+			fieldsData: [
+				{ order: 1, value: "selesai" },
+				{
+					order: 2,
+					value:
+						"Lain kali mereknya yang lebih bagus, tapi untuk saat ini cukup",
+				},
+			],
 			status: "completed",
 			submittedBy: "usr_auto",
 			createdAt: "2024-04-03T09:20:00Z",
@@ -156,3 +250,6 @@ export const dummyInternalServiceRequests: InternalServiceRequest[] = [
 		updatedAt: "2024-04-03T09:20:00Z",
 	},
 ];
+
+export const dummyInternalServiceDetailRequest: InboxServiceDetailRequest =
+	dummyInternalServiceRequests[0] as unknown as InboxServiceDetailRequest;

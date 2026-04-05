@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { FileText, CheckCircle2, XCircle } from "lucide-react";
+import { FileText, CheckCircle2, XCircle, Timer } from "lucide-react";
 import { useBusiness } from "../hooks/use-business";
 import FormFieldViewer from "@/shared/molecules/form-field-viewer";
 import {
@@ -11,9 +11,28 @@ import {
 import { SectionLoading } from "@/shared/atoms";
 import PageHeader from "@/shared/atoms/header-content";
 import { TextLoading } from "@/shared/atoms/loading-state";
+import { EmptyData } from "@/shared/molecules/empty-data";
 
 const DetailServiceRequest = () => {
 	const { detailData: detail, loading } = useBusiness();
+
+	const formsToRender =
+		detail ?
+			[
+				{
+					id: "intake",
+					label: "Formulir Pengajuan",
+					form: detail.intakeForm,
+					submission: detail.intakeSubmission,
+				},
+				{
+					id: "review",
+					label: "Formulir Ulasan",
+					form: detail.reviewForm,
+					submission: detail.reviewSubmission,
+				},
+			].filter((item) => item.form)
+		:	[];
 
 	return (
 		<>
@@ -50,11 +69,10 @@ const DetailServiceRequest = () => {
 							</div>
 							<div className="flex-1">
 								<h3 className="text-lg font-bold mb-1">
-									Formulir Pengajuan Layanan
+									Formulir Pengajuan & Review Layanan
 								</h3>
 								<p className="text-sm text-muted-foreground">
-									Total {detail.clientIntakeForms.length} formulir telah diisi
-									oleh klien
+									Formulir-formulir terkait laporan dan review dari layanan ini
 								</p>
 							</div>
 						</div>
@@ -63,70 +81,68 @@ const DetailServiceRequest = () => {
 					{/* Accordion for Forms */}
 					<Accordion
 						type="multiple"
-						defaultValue={detail.clientIntakeForms.map((_, i) => `form-${i}`)}
+						defaultValue={["intake", "review"]}
 						className="space-y-4">
-						{detail.clientIntakeForms.map((item, index) => {
-							const form = item.form;
-							const submission = detail.submissions.find(
-								(s) => s.formId === form._id,
-							);
-							const hasSubmission = !!submission;
+						{formsToRender.map((item) => {
+							const { id, label, form, submission } = item;
+							const isSubmitted = submission && submission.status !== "draft";
 
 							return (
 								<AccordionItem
-									key={form._id}
-									value={`form-${index}`}
+									key={id}
+									value={id}
 									className="border rounded-xl shadow-sm overflow-hidden bg-background">
-									<AccordionTrigger className="px-5 lg:px-6 py-4 hover:bg-muted/50 transition-colors [&[data-state=open]]:bg-muted/30">
+									<AccordionTrigger className="px-5 lg:px-6 py-4 hover:no-underline cursor-pointer hover:bg-muted/50 transition-colors [&[data-state=open]]:bg-muted/30">
 										<div className="flex items-center gap-4 flex-1 text-left">
 											{/* Status Icon */}
 											<div
 												className={`p-2 rounded-lg ${
-													hasSubmission ?
-														"bg-green-50 text-green-600"
-													:	"bg-red-50 text-red-600"
+													isSubmitted ?
+														"bg-green-100 text-green-600"
+													:	"bg-yellow-100 text-yellow-700"
 												}`}>
-												{hasSubmission ?
+												{isSubmitted ?
 													<CheckCircle2 className="w-5 h-5" />
-												:	<XCircle className="w-5 h-5" />}
+												:	<Timer className="w-5 h-5" />}
 											</div>
 
 											{/* Form Info */}
 											<div className="flex-1 min-w-0">
 												<h3 className="text-base font-bold mb-1 truncate">
-													{form.title}
+													{form?.title}{" "}
+													<span className="text-sm font-normal text-muted-foreground ml-2">
+														({label})
+													</span>
 												</h3>
 												<p className="text-sm text-muted-foreground line-clamp-1">
-													{form.description}
+													{form?.description || "Tidak ada deskripsi"}
 												</p>
 											</div>
 
 											{/* Badge */}
 											<div
 												className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${
-													hasSubmission ?
+													isSubmitted ?
 														"bg-green-100 text-green-700"
-													:	"bg-red-100 text-red-700"
+													:	"bg-yellow-100 text-yellow-700"
 												}`}>
-												{hasSubmission ? "Terisi" : "Belum Terisi"}
+												{isSubmitted ? "Disubmit" : "Belum Disubmit"}
 											</div>
 										</div>
 									</AccordionTrigger>
 
 									<AccordionContent className="px-5 lg:px-6 pb-5">
-										{hasSubmission && submission ?
+										{form?.fields && form.fields.length > 0 ?
 											<div className="space-y-3 pt-4">
 												{form.fields
-													.sort((a, b) => a.order - b.order)
-													.map((field) => {
-														const answer = submission.fieldsData.find(
-															(fd) => fd.order === field.order,
+													.sort((a: any, b: any) => a.order - b.order)
+													.map((field: any) => {
+														const answer = submission?.fieldsData?.find(
+															(fd: any) => fd.order === field.order,
 														)?.value;
 
 														return (
-															<div
-																key={field.order}
-																className="p-4 border rounded-lg bg-muted/30 hover:bg-muted/40 transition-colors">
+															<div key={field.order} className="pb-4">
 																<FormFieldViewer
 																	field={field}
 																	answer={answer ?? null}
@@ -137,14 +153,7 @@ const DetailServiceRequest = () => {
 													})}
 											</div>
 										:	<div className="pt-4">
-												<Card className="p-6 text-center border-dashed border-2">
-													<div className="flex flex-col items-center gap-2">
-														<XCircle className="w-8 h-8 text-muted-foreground/50" />
-														<p className="text-sm text-muted-foreground font-medium">
-															Belum ada jawaban untuk formulir ini
-														</p>
-													</div>
-												</Card>
+												<EmptyData />
 											</div>
 										}
 									</AccordionContent>
