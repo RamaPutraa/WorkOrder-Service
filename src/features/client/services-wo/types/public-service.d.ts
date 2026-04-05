@@ -22,11 +22,11 @@ type PublicSubmitResponse = ApiResponse<{
 }>;
 
 // get requester service request
-type RequesterServiceRequestResponse = ApiResponse<RequesterServiceRequest[]>;
+type RequesterSRResponse = ApiResponse<RequesterSR[]>;
 
 // TODO:ini harusnya global? karna responsenya bakal dipake sipapaun yang SR (client atau staff)
 // detail requester
-type RequesterServiceDetailRequest = {
+type RequesterSRDetailRequest = {
 	_id: string;
 	serviceRequestStatus:
 		| "received"
@@ -42,11 +42,10 @@ type RequesterServiceDetailRequest = {
 	approvedBy: User;
 	intakeForm: Form;
 	reviewForm: Form;
-	intakeSubmission: SubmissionObject;
+	intakeSubmission: SubmissionObject | null;
 	reviewSubmission: SubmissionObject | null;
 	createdAt: string;
 	updatedAt: string;
 };
 
-type RequesterServiceDetailRequestResponse =
-	ApiResponse<RequesterServiceDetailRequest>;
+type RequesterSRDetailResponse = ApiResponse<RequesterSRDetailRequest>;

@@ -1,7 +1,7 @@
 // Sesuaikan import User, Form, dan FieldData sesuai dengan path di project Anda
 // import { User, Form, FieldData } from '@/types/...';
 
-export const dummyInternalServiceRequests: InboxServiceRequest[] = [
+export const dummyInternalServiceRequests: InboxSR[] = [
 	{
 		_id: "req_001",
 		servicesRequestStatus: "received",
@@ -251,5 +251,5 @@ export const dummyInternalServiceRequests: InboxServiceRequest[] = [
 	},
 ];
 
-export const dummyInternalServiceDetailRequest: InboxServiceDetailRequest =
-	dummyInternalServiceRequests[0] as unknown as InboxServiceDetailRequest;
+export const dummyInternalServiceDetailRequest: InboxSRDetailRequest =
+	dummyInternalServiceRequests[0] as unknown as InboxSRDetailRequest;

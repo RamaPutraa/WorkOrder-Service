@@ -1,7 +1,7 @@
 // get service-request (inbox)
-type InboxServiceRequestResponse = ApiResponse<InboxServiceRequest[]>;
+type InboxSRResponse = ApiResponse<InboxSR[]>;
 
-type InboxServiceDetailRequest = {
+type InboxSRDetailRequest = {
 	_id: string;
 	servicesRequestStatus:
 		| "received"
@@ -24,6 +24,9 @@ type InboxServiceDetailRequest = {
 	updatedAt: string;
 };
 
+// get detail internal service request
+type InboxSRDetailResponse = ApiResponse<InboxSRDetailRequest>;
+
 // createdAt: string;
 // updatedAt: string;
 // companyId: string;
@@ -31,6 +34,3 @@ type InboxServiceDetailRequest = {
 // service: Service;
 // clientIntakeForms: ClientIntakeForm[];
 // submissions: SubmissionObject[];
-
-// get detail internal service request
-type InboxServiceDetailRequestResponse = ApiResponse<InboxServiceDetailRequest>;

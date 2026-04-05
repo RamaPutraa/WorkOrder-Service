@@ -19,7 +19,7 @@ type SubmissionObject = {
 	updatedAt: string;
 };
 
-type InboxServiceRequest = {
+type InboxSR = {
 	_id: string;
 	servicesRequestStatus:
 		| "received"
@@ -43,7 +43,7 @@ type InboxServiceRequest = {
 };
 
 // client service request type
-type RequesterServiceRequest = {
+type RequesterSR = {
 	_id: string;
 	serviceRequestStatus:
 		| "received"

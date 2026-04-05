@@ -1,4 +1,4 @@
-export const dummyPublicServiceRequests: RequesterServiceRequest[] = [
+export const dummyPublicServiceRequests: RequesterSR[] = [
 	{
 		_id: "preq_001",
 		serviceRequestStatus: "received",
@@ -297,5 +297,5 @@ export const dummyPublicServiceRequests: RequesterServiceRequest[] = [
 	},
 ];
 
-export const dummyRequesterServiceDetailRequest: RequesterServiceDetailRequest =
-	dummyPublicServiceRequests[0] as unknown as RequesterServiceDetailRequest;
+export const dummyRequesterServiceDetailRequest: RequesterSRDetailRequest =
+	dummyPublicServiceRequests[0] as unknown as RequesterSRDetailRequest;

@@ -11,7 +11,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { SectionLoading } from "@/shared/atoms";
 
 const ServiceSubmitPage = () => {
-	const [requests, setRequests] = useState<RequesterServiceRequest[]>([]);
+	const [requests, setRequests] = useState<RequesterSR[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 

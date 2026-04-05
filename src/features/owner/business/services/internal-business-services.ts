@@ -14,10 +14,10 @@ export const getAllInternalBusinessServiceRequestApi = async () => {
 			data: dummyInternalServiceRequests,
 			message: "Success (Mock)",
 			status: 200,
-		} as InboxServiceRequestResponse;
+		} as InboxSRResponse;
 	}
 
-	const response = await apiClient.get<InboxServiceRequestResponse>(
+	const response = await apiClient.get<InboxSRResponse>(
 		"/service-request/inbox",
 	);
 	return response.data;
@@ -31,17 +31,17 @@ export const getDetailInternalBusinessServiceRequestApi = async (
 		const mockData =
 			(dummyInternalServiceRequests.find(
 				(req) => req._id === id,
-			) as unknown as InboxServiceDetailRequest) ||
+			) as unknown as InboxSRDetailRequest) ||
 			dummyInternalServiceDetailRequest;
 
 		return {
 			data: mockData,
 			message: "Success (Mock)",
 			status: 200,
-		} as InboxServiceDetailRequestResponse;
+		} as InboxSRDetailResponse;
 	}
 
-	const response = await apiClient.get<InboxServiceDetailRequestResponse>(
+	const response = await apiClient.get<InboxSRDetailResponse>(
 		`/service-requests/${id}`,
 	);
 	return response.data;

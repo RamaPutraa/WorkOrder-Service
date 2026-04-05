@@ -20,9 +20,7 @@ import { EmptyData } from "@/shared/molecules/empty-data";
 const ServiceDetailSubmit = () => {
 	const { id } = useParams<{ id: string }>();
 
-	const [detail, setDetail] = useState<RequesterServiceDetailRequest | null>(
-		null,
-	);
+	const [detail, setDetail] = useState<RequesterSRDetailRequest | null>(null);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 

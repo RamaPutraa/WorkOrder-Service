@@ -1,5 +1,8 @@
 import apiClient from "@/lib/api";
-import { dummyPublicServiceRequests, dummyRequesterServiceDetailRequest } from "../mocks/public-service-request.mock";
+import {
+	dummyPublicServiceRequests,
+	dummyRequesterServiceDetailRequest,
+} from "../mocks/public-service-request.mock";
 
 const USE_MOCK = true; // TODO: Ubah ke false jika API backend sudah siap
 
@@ -30,10 +33,10 @@ export const getAllClientServiceRequestApi = async () => {
 			data: dummyPublicServiceRequests,
 			message: "Success (Mock)",
 			status: 200,
-		} as RequesterServiceRequestResponse;
+		} as RequesterSRResponse;
 	}
 
-	const response = await apiClient.get<RequesterServiceRequestResponse>(
+	const response = await apiClient.get<RequesterSRResponse>(
 		"/service-request/sent",
 	);
 	return response.data;
@@ -46,17 +49,17 @@ export const getDetailClientServiceRequestApi = async (id: string) => {
 		const mockData =
 			(dummyPublicServiceRequests.find(
 				(req) => req._id === id,
-			) as unknown as RequesterServiceDetailRequest) ||
+			) as unknown as RequesterSRDetailRequest) ||
 			dummyRequesterServiceDetailRequest;
 
 		return {
 			data: mockData,
 			message: "Success (Mock)",
 			status: 200,
-		} as RequesterServiceDetailRequestResponse;
+		} as RequesterSRDetailResponse;
 	}
 
-	const response = await apiClient.get<RequesterServiceDetailRequestResponse>(
+	const response = await apiClient.get<RequesterSRDetailResponse>(
 		`/service-requests/${id}`,
 	);
 	return response.data;
