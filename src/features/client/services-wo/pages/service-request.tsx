@@ -1,8 +1,6 @@
-import { CheckCircle2, ChevronLeft, Loader2, ScrollText } from "lucide-react";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { CheckCircle2, ScrollText } from "lucide-react";
+import { Card } from "@/components/ui/card";
 import usePublicService from "../hooks/use-client-service";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
 import FormFieldViewer, {
 	type AnswerValue,
 } from "@/shared/molecules/form-field-viewer";
@@ -17,13 +15,10 @@ export default function RequestServicePage() {
 		loading,
 		error,
 		isSticky,
-		submitting,
 		formValues,
 		handleChange,
 		handleSubmit,
 	} = usePublicService();
-
-	const navigate = useNavigate();
 
 	if (error) return <p className="text-red-500">{error}</p>;
 

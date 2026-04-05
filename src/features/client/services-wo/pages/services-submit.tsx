@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Loader2, RefreshCw, ClipboardPenLine, Calendar } from "lucide-react";
+import { RefreshCw, ClipboardPenLine, Calendar } from "lucide-react";
 import { handleApi } from "@/lib/handle-api";
 import { notifyError } from "@/lib/toast-helper";
 import { getAllClientServiceRequestApi } from "../services/public-services";
