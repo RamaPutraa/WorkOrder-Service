@@ -1,8 +1,9 @@
 import apiClient from "@/lib/api";
-import { dummyPublicServiceRequests } from "../mocks/public-service-request.mock";
+import { dummyPublicServiceRequests, dummyRequesterServiceDetailRequest } from "../mocks/public-service-request.mock";
 
 const USE_MOCK = true; // TODO: Ubah ke false jika API backend sudah siap
 
+// TODO:ubah kalau endpoint udah jadi
 export const getDetailServiceByIdApi = async (id: string) => {
 	const response = await apiClient.get<PublicDetailService>(
 		`/public/services/${id}/intake-forms`,
@@ -38,9 +39,25 @@ export const getAllClientServiceRequestApi = async () => {
 	return response.data;
 };
 
+// TODO:pastiin kalo endpoint udah jadi
 export const getDetailClientServiceRequestApi = async (id: string) => {
-	const response = await apiClient.get<PublicDetailSubmissionResponse>(
-		`/public/client-service-request/${id}`,
+	if (USE_MOCK) {
+		await new Promise((resolve) => setTimeout(resolve, 500));
+		const mockData =
+			(dummyPublicServiceRequests.find(
+				(req) => req._id === id,
+			) as unknown as RequesterServiceDetailRequest) ||
+			dummyRequesterServiceDetailRequest;
+
+		return {
+			data: mockData,
+			message: "Success (Mock)",
+			status: 200,
+		} as RequesterServiceDetailRequestResponse;
+	}
+
+	const response = await apiClient.get<RequesterServiceDetailRequestResponse>(
+		`/service-requests/${id}`,
 	);
 	return response.data;
 };

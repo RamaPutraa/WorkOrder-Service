@@ -1,24 +1,7 @@
 import { useEffect, useState } from "react";
-import {
-	Card,
-	CardHeader,
-	CardTitle,
-	CardDescription,
-	CardContent,
-} from "@/components/ui/card";
+
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-	Loader2,
-	RefreshCw,
-	FileText,
-	ArrowRight,
-	ChevronLeft,
-	Clock,
-	CheckCircle2,
-	ClipboardPenLine,
-	Calendar,
-} from "lucide-react";
+import { Loader2, RefreshCw, ClipboardPenLine, Calendar } from "lucide-react";
 import { handleApi } from "@/lib/handle-api";
 import { notifyError } from "@/lib/toast-helper";
 import { getAllClientServiceRequestApi } from "../services/public-services";
@@ -86,15 +69,6 @@ const ServiceSubmitPage = () => {
 			</div>
 		);
 	};
-
-	if (loading) {
-		return (
-			<div className="flex flex-col items-center justify-center py-16">
-				<Loader2 className="h-12 w-12 animate-spin text-blue-600 mb-4" />
-				<p className="text-muted-foreground">Memuat riwayat permintaan...</p>
-			</div>
-		);
-	}
 
 	if (error) {
 		return (

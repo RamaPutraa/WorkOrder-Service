@@ -24,22 +24,29 @@ type PublicSubmitResponse = ApiResponse<{
 // get requester service request
 type RequesterServiceRequestResponse = ApiResponse<RequesterServiceRequest[]>;
 
-// detail service submissions from client
-
-type ClientIntakeForm = {
-	order: number;
-	form: Form;
-};
-type PublicDetailSubmissions = {
+// TODO:ini harusnya global? karna responsenya bakal dipake sipapaun yang SR (client atau staff)
+// detail requester
+type RequesterServiceDetailRequest = {
 	_id: string;
-	status: string;
+	serviceRequestStatus:
+		| "received"
+		| "cancelled"
+		| "rejected"
+		| "approved"
+		| "workOrderCreated"
+		| "completed"
+		| "closed";
+	company: Company;
+	service: ServiceSummaryObject;
+	requestedBy: User;
+	approvedBy: User;
+	intakeForm: Form;
+	reviewForm: Form;
+	intakeSubmission: SubmissionObject;
+	reviewSubmission: SubmissionObject | null;
 	createdAt: string;
 	updatedAt: string;
-	companyId: string;
-	client: User;
-	service: Service;
-	clientIntakeForms: ClientIntakeForm[];
-	submissions: SubmissionObject[];
 };
 
-type PublicDetailSubmissionResponse = ApiResponse<PublicDetailSubmissions>;
+type RequesterServiceDetailRequestResponse =
+	ApiResponse<RequesterServiceDetailRequest>;

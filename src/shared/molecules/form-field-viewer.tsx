@@ -207,13 +207,38 @@ export default function FormFieldViewer({
 					<div className="flex flex-col gap-1.5">
 						{field.options?.map((opt) => {
 							const val = opt.key ?? opt.value;
-							const arr = Array.isArray(localValue) ? localValue : [];
-							const checked = arr.includes(val);
+							let arr: any[] = [];
+							if (Array.isArray(localValue)) {
+								arr = localValue;
+							} else if (localValue != null && localValue !== "") {
+								if (
+									typeof localValue === "string" &&
+									localValue.startsWith("[") &&
+									localValue.endsWith("]")
+								) {
+									try {
+										arr = JSON.parse(localValue);
+									} catch {
+										arr = [localValue];
+									}
+								} else if (
+									typeof localValue === "string" &&
+									localValue.includes(",")
+								) {
+									arr = localValue.split(",").map((s) => s.trim());
+								} else {
+									arr = [String(localValue)];
+								}
+							}
+
+							const checked = arr.includes(val) || arr.includes(String(val));
 
 							const toggle = () => {
 								if (readOnly) return;
 								handleValueChange(
-									checked ? arr.filter((v) => v !== val) : [...arr, val],
+									checked ?
+										arr.filter((v) => v !== val && String(v) !== String(val))
+									:	[...arr, val],
 								);
 							};
 

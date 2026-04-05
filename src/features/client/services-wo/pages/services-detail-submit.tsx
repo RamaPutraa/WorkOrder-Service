@@ -1,19 +1,28 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { notifyError } from "@/lib/toast-helper";
 import { handleApi } from "@/lib/handle-api";
 import { getDetailClientServiceRequestApi } from "../services/public-services";
-import { Card, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft } from "lucide-react";
-import FormFieldViewer, {
-	type AnswerValue,
-} from "@/shared/molecules/form-field-viewer";
+import { Card } from "@/components/ui/card";
+import { FileText, CheckCircle2, Timer } from "lucide-react";
+import FormFieldViewer from "@/shared/molecules/form-field-viewer";
+import {
+	Accordion,
+	AccordionContent,
+	AccordionItem,
+	AccordionTrigger,
+} from "@/components/ui/accordion";
+import { SectionLoading } from "@/shared/atoms";
+import PageHeader from "@/shared/atoms/header-content";
+import { TextLoading } from "@/shared/atoms/loading-state";
+import { EmptyData } from "@/shared/molecules/empty-data";
 
 const ServiceDetailSubmit = () => {
 	const { id } = useParams<{ id: string }>();
-	const navigate = useNavigate();
-	const [detail, setDetail] = useState<PublicDetailSubmissions | null>(null);
+
+	const [detail, setDetail] = useState<RequesterServiceDetailRequest | null>(
+		null,
+	);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
@@ -48,74 +57,157 @@ const ServiceDetailSubmit = () => {
 		if (id) fetchDetail();
 	}, [id]);
 
-	// --- UI ---
-	if (loading) return <p className="p-4">Loading...</p>;
+	const formsToRender =
+		detail ?
+			[
+				{
+					id: "intake",
+					label: "Formulir Pengajuan",
+					form: detail.intakeForm,
+					submission: detail.intakeSubmission,
+				},
+				{
+					id: "review",
+					label: "Formulir Ulasan",
+					form: detail.reviewForm,
+					submission: detail.reviewSubmission,
+				},
+			].filter((item) => item.form)
+		:	[];
+
 	if (error) return <p className="text-red-500 p-4">{error}</p>;
-	if (!detail) return <p className="p-4">Tidak ada data.</p>;
 
 	return (
-		<div className="space-y-15 p-6">
-			<div className="flex items-center space-x-6 mb-8">
-				<Button
-					onClick={() => navigate(-1)}
-					className="bg-primary hover:bg-primary/90 h-full">
-					<ChevronLeft className="size-6" />
-				</Button>
-				<div className="flex flex-col space-y-2">
-					<h1 className="text-xl font-bold tracking-tight">
-						Detail Service {detail?.service?.title}
-					</h1>
-					<p className="text-muted-foreground">
-						Berikut merupakan detail service {detail?.service?.title} yang
-						dimiliki oleh perusahaan.
-					</p>
-				</div>
-			</div>
-			{detail.clientIntakeForms.map((item) => {
-				const form = item.form;
+		<>
+			{/* Header Section */}
+			<PageHeader
+				title={
+					!detail ?
+						<div className="flex items-center gap-1.5">
+							Detail Service{" "}
+							<TextLoading variant="dots" message="" className="w-40" />
+						</div>
+					:	`Detail Service ${detail?.service?.title}`
+				}
+				subtitle={
+					!detail ?
+						<div className="flex items-center gap-1.5">
+							Berikut merupakan detail service{" "}
+							<TextLoading variant="dots" message="" className="w-60" />
+						</div>
+					:	`Berikut merupakan detail service ${detail?.service?.title} yang dimiliki oleh perusahaan.`
+				}
+				backPath={true}
+			/>
 
-				const submission = detail.submissions.find(
-					(s) => s.formId === form._id,
-				);
-
-				return (
-					<div key={form._id} className="space-y-4">
-						{/* ==== CARD FORM HEADER ==== */}
-						<Card className="shadow-md border-t-4 border-t-blue-600 rounded-xl">
-							<CardHeader>
-								<h2 className="text-xl font-semibold">{form.title}</h2>
+			{/* Content Area */}
+			{loading || !detail ?
+				<SectionLoading message="Memuat detail pengajuan..." />
+			:	<div className="space-y-6">
+					{/* Summary Card */}
+					<Card className="p-5 lg:p-6 border-l-4 border-l-primary bg-gradient-to-br from-background to-muted/20">
+						<div className="flex items-start gap-4">
+							<div className="p-3 rounded-lg bg-primary/10">
+								<FileText className="w-6 h-6 text-primary" />
+							</div>
+							<div className="flex-1">
+								<h3 className="text-lg font-bold mb-1">
+									Formulir Pengajuan & Review Layanan
+								</h3>
 								<p className="text-sm text-muted-foreground">
-									{form.description}
+									Formulir-formulir terkait detail dan laporan dari pengajuan
+									layanan Anda
 								</p>
-							</CardHeader>
-						</Card>
+							</div>
+						</div>
+					</Card>
 
-						{/* ==== CARD FIELDS using FormFieldViewer ==== */}
-						{submission ?
-							form.fields
-								.sort((a, b) => a.order - b.order)
-								.map((field) => {
-									const answer = submission.fieldsData.find(
-										(fd) => fd.order === field.order,
-									)?.value;
+					{/* Accordion for Forms */}
+					<Accordion
+						type="multiple"
+						defaultValue={["intake", "review"]}
+						className="space-y-4">
+						{formsToRender.map((item) => {
+							const { id, label, form, submission } = item;
+							const isSubmitted = submission && submission.status !== "draft";
 
-									return (
-										<Card
-											key={field.order}
-											className="shadow-sm border rounded-lg p-4 bg-white">
-											<FormFieldViewer
-												field={field}
-												answer={(answer ?? null) as AnswerValue}
-												readOnly={true}
-											/>
-										</Card>
-									);
-								})
-						:	<p className="text-red-500">Belum ada jawaban</p>}
-					</div>
-				);
-			})}
-		</div>
+							return (
+								<AccordionItem
+									key={id}
+									value={id}
+									className="border rounded-xl shadow-sm overflow-hidden bg-background">
+									<AccordionTrigger className="px-5 lg:px-6 py-4 hover:no-underline cursor-pointer hover:bg-muted/50 transition-colors [&[data-state=open]]:bg-muted/30">
+										<div className="flex items-center gap-4 flex-1 text-left">
+											{/* Status Icon */}
+											<div
+												className={`p-2 rounded-lg ${
+													isSubmitted ?
+														"bg-green-100 text-green-600"
+													:	"bg-yellow-100 text-yellow-700"
+												}`}>
+												{isSubmitted ?
+													<CheckCircle2 className="w-5 h-5" />
+												:	<Timer className="w-5 h-5" />}
+											</div>
+
+											{/* Form Info */}
+											<div className="flex-1 min-w-0">
+												<h3 className="text-base font-bold mb-1 truncate">
+													{form?.title}{" "}
+													<span className="text-sm font-normal text-muted-foreground ml-2">
+														({label})
+													</span>
+												</h3>
+												<p className="text-sm text-muted-foreground line-clamp-1">
+													{form?.description || "Tidak ada deskripsi"}
+												</p>
+											</div>
+
+											{/* Badge */}
+											<div
+												className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${
+													isSubmitted ?
+														"bg-green-100 text-green-700"
+													:	"bg-yellow-100 text-yellow-700"
+												}`}>
+												{isSubmitted ? "Disubmit" : "Belum Disubmit"}
+											</div>
+										</div>
+									</AccordionTrigger>
+
+									<AccordionContent className="px-5 lg:px-6 pb-5">
+										{form?.fields && form.fields.length > 0 ?
+											<div className="space-y-3 pt-4">
+												{form.fields
+													.sort((a: any, b: any) => a.order - b.order)
+													.map((field: any) => {
+														const answer = submission?.fieldsData?.find(
+															(fd: any) => fd.order === field.order,
+														)?.value;
+
+														return (
+															<div key={field.order} className="pb-4">
+																<FormFieldViewer
+																	field={field}
+																	answer={(answer ?? null) as any}
+																	readOnly
+																/>
+															</div>
+														);
+													})}
+											</div>
+										:	<div className="pt-4">
+												<EmptyData />
+											</div>
+										}
+									</AccordionContent>
+								</AccordionItem>
+							);
+						})}
+					</Accordion>
+				</div>
+			}
+		</>
 	);
 };
 
