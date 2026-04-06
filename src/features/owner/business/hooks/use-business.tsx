@@ -13,9 +13,10 @@ import { type FilterConfig } from "@/shared/molecules/generic-filter";
 
 export const useBusiness = () => {
 	const { id } = useParams<{ id: string }>();
-	const [data, setData] = useState<InternalServiceRequest[]>([]);
-	const [detailData, setDetailData] =
-		useState<InternalServiceDetailRequest | null>(null);
+	const [data, setData] = useState<InboxSR[]>([]);
+	const [detailData, setDetailData] = useState<InboxSRDetailRequest | null>(
+		null,
+	);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 

@@ -17,14 +17,15 @@ type FieldData = {
 	order: number;
 	value: string | number | string[] | File | null;
 };
-type PublicSubmitRequest = {
+// TODO:bisa jadi global
+type RequesterSubmitRequest = {
 	submissions: {
 		formId: string;
 		fieldsData: FieldData[];
 	}[];
 };
-type PublicSubmitResponse = ApiResponse<{
-	data: PublicServiceSubmited;
+type RequesterSubmitResponse = ApiResponse<{
+	data: RequesterSR;
 }>;
 
 // get requester service request

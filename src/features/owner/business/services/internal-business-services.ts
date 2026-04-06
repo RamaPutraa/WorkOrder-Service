@@ -4,7 +4,7 @@ import {
 	dummyInternalServiceDetailRequest,
 } from "../mock/internal-service-request.mock";
 
-const USE_MOCK = true; // TODO: Ubah ke false jika API backend sudah siap
+const USE_MOCK = false; // TODO: Ubah ke false jika API backend sudah siap
 
 export const getAllInternalBusinessServiceRequestApi = async () => {
 	if (USE_MOCK) {
@@ -18,7 +18,7 @@ export const getAllInternalBusinessServiceRequestApi = async () => {
 	}
 
 	const response = await apiClient.get<InboxSRResponse>(
-		"/service-request/inbox",
+		"/service-requests/inbox",
 	);
 	return response.data;
 };

@@ -18,6 +18,7 @@ export default function RequestServicePage() {
 		formValues,
 		handleChange,
 		handleSubmit,
+		submitting,
 	} = usePublicService();
 
 	if (error) return <p className="text-red-500">{error}</p>;
@@ -31,6 +32,7 @@ export default function RequestServicePage() {
 				addIcon={<CheckCircle2 className="size-6" />}
 				addLabel="Pesan Layanan"
 				onAddClick={() => handleSubmit()}
+				loading={submitting}
 				className={`sticky top-0 z-30 bg-background transition-shadow duration-300 ${
 					isSticky ? "shadow-xl rounded-md px-6 py-4" : ""
 				}`}

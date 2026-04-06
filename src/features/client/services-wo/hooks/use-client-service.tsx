@@ -126,7 +126,7 @@ export const usePublicServices = () => {
 		}));
 
 		// Wrap in the required format
-		const payload: PublicSubmitRequest = {
+		const payload: RequesterSubmitRequest = {
 			submissions,
 		};
 
