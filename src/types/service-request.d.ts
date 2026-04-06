@@ -19,6 +19,7 @@ type SubmissionObject = {
 	updatedAt: string;
 };
 
+// internal get service request
 type InboxSR = {
 	_id: string;
 	servicesRequestStatus:
@@ -41,6 +42,32 @@ type InboxSR = {
 	createdAt: string;
 	updatedAt: string;
 };
+type InboxSRResponse = ApiResponse<InboxSR[]>;
+
+// get detail internal service request
+type InboxSRDetailRequest = {
+	_id: string;
+	servicesRequestStatus:
+		| "received"
+		| "cancelled"
+		| "rejected"
+		| "approved"
+		| "workOrderCreated"
+		| "completed"
+		| "closed";
+	serviceRequestApprovalAccessType: "auto" | "manager";
+	reviewNeed: boolean;
+	service: ServiceSummaryObject;
+	requestedBy: User;
+	approvedBy: User;
+	intakeForm: Form;
+	reviewForm: Form;
+	intakeSubmission: SubmissionObject;
+	reviewSubmission: SubmissionObject;
+	createdAt: string;
+	updatedAt: string;
+};
+type InboxSRDetailResponse = ApiResponse<InboxSRDetailRequest>;
 
 // client service request type
 type RequesterSR = {
@@ -64,3 +91,28 @@ type RequesterSR = {
 	createdAt: string;
 	updatedAt: string;
 };
+type RequesterSRResponse = ApiResponse<RequesterSR[]>;
+
+// detail requester
+type RequesterSRDetailRequest = {
+	_id: string;
+	serviceRequestStatus:
+		| "received"
+		| "cancelled"
+		| "rejected"
+		| "approved"
+		| "workOrderCreated"
+		| "completed"
+		| "closed";
+	company: Company;
+	service: ServiceSummaryObject;
+	requestedBy: User;
+	approvedBy: User;
+	intakeForm: Form;
+	reviewForm: Form;
+	intakeSubmission: SubmissionObject | null;
+	reviewSubmission: SubmissionObject | null;
+	createdAt: string;
+	updatedAt: string;
+};
+type RequesterSRDetailResponse = ApiResponse<RequesterSRDetailRequest>;

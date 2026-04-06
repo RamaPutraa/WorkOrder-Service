@@ -74,9 +74,9 @@ type Company = CompanyMinimal & {
 
 // Services
 enum serviceAccessType {
-	public,
-	member_only,
-	internal,
+	public = "public",
+	member_only = "member_only",
+	internal = "internal",
 }
 
 enum serviceRequestApprovalAccessType {
