@@ -164,13 +164,13 @@ export function TextLoading({
 }: TextLoadingProps) {
 	if (variant === "blink") {
 		return (
-			<p
+			<span
 				className={cn(
 					"text-sm text-muted-foreground font-medium animate-pulse",
 					className,
 				)}>
 				{message}
-			</p>
+			</span>
 		);
 	}
 
@@ -200,10 +200,10 @@ function DotsLoading({
 	}, []);
 
 	return (
-		<p className={cn("text-sm text-muted-foreground font-medium", className)}>
+		<span className={cn("text-sm text-muted-foreground font-medium", className)}>
 			{message}
 			<span className="inline-block w-6 text-left">{dots}</span>
-		</p>
+		</span>
 	);
 }
 

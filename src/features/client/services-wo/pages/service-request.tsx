@@ -43,17 +43,17 @@ export default function RequestServicePage() {
 					<div className="flex-1">
 						<h3 className="text-lg font-bold mb-1">
 							{loading ?
-								<div className="flex items-center gap-1.5">
+								<span className="flex items-center gap-1.5">
 									Formulir{" "}
 									<TextLoading variant="dots" message="" className="w-40" />
-								</div>
+								</span>
 							:	`Formulir ${data?.map((form) => form.title).join(", ")}`}
 						</h3>
 						<p className="text-sm text-muted-foreground">
 							{loading ?
-								<div className="flex items-center gap-1.5">
+								<span className="flex items-center gap-1.5">
 									<TextLoading variant="dots" message="" className="w-40" />
-								</div>
+								</span>
 							:	`${data?.map((form) => form.description).join(" ")}`}
 						</p>
 					</div>
