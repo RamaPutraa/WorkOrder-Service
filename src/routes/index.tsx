@@ -41,6 +41,11 @@ import ClientRegisterPage from "@/features/auth/pages/client-reg-page";
 import InternalRegisterPage from "@/features/auth/pages/internal-reg-page";
 import ViewMemberCodes from "@/features/owner/membercodes/pages/view-membercode";
 import CreateMembercode from "@/features/owner/membercodes/pages/create-membercode";
+import SrHistory from "@/features/staff/service-request/pages/sr-history";
+import SrDetailHistory from "@/features/staff/service-request/pages/sr-detail-history";
+import ListServices from "@/features/staff/service-request/pages/list-services";
+import ServiceForm from "@/features/staff/service-request/pages/services-form";
+import SrConfirmation from "@/features/staff/service-request-confirmation/pages/sr-confirmation";
 
 const router = createBrowserRouter([
 	{
@@ -167,7 +172,9 @@ const router = createBrowserRouter([
 		],
 	},
 	{
+		path: "/dashboard/staff",
 		element: <ProtectedRoute allowedRoles={["staff_company"]} />,
+		errorElement: <ErrorPage />,
 		children: [
 			{
 				element: (
@@ -175,7 +182,32 @@ const router = createBrowserRouter([
 						<AppLayout />
 					</RootLayout>
 				),
-				children: [{ path: "/dashboard/staff", element: <DashboardStaff /> }],
+				children: [
+					{
+						path: "",
+						element: <DashboardStaff />,
+					},
+					{
+						path: "services-request/confirmation",
+						element: <SrConfirmation />,
+					},
+					{
+						path: "services",
+						element: <ListServices />,
+					},
+					{
+						path: "services/:id/request",
+						element: <ServiceForm />,
+					},
+					{
+						path: "services-request/history",
+						element: <SrHistory />,
+					},
+					{
+						path: "services-request/history/:id",
+						element: <SrDetailHistory />,
+					},
+				],
 			},
 		],
 	},

@@ -49,7 +49,9 @@ export function NavStaffBusiness({
 				{items.map((item) => {
 					const isLocked =
 						isUnassigned &&
-						(item.title === "Rekan Kerja" || item.title === "Perintah Kerja");
+						(item.title === "Layanan Perusahaan" ||
+							item.title === "Perintah Kerja" ||
+							item.title === "Konfirmasi Penugasan");
 
 					if (isLocked) {
 						return (

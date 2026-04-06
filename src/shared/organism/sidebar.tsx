@@ -3,12 +3,20 @@
 import * as React from "react";
 import {
 	BookOpen,
-	Bot,
 	Briefcase,
-	Frame,
+	ClipboardList,
+	ClipboardPenLine,
+	FileCheck,
+	FolderKanban,
 	GalleryVerticalEnd,
-	PieChart,
-	SquareTerminal,
+	Home,
+	IdCard,
+	Inbox,
+	LayoutDashboard,
+	MessageCircleQuestion,
+	MonitorCog,
+	Send,
+	Settings,
 	Ticket,
 } from "lucide-react";
 import {
@@ -48,12 +56,12 @@ const data = {
 		{
 			title: "Kelola FAQ",
 			url: "",
-			icon: BookOpen,
+			icon: FolderKanban,
 		},
 		{
 			title: "Tugas Kerja",
 			url: "#",
-			icon: SquareTerminal,
+			icon: MonitorCog,
 			items: [
 				{
 					title: "Template",
@@ -72,7 +80,7 @@ const data = {
 		{
 			title: "Kepegawaian",
 			url: "#",
-			icon: Bot,
+			icon: IdCard,
 			items: [
 				{
 					title: "Departemen",
@@ -108,7 +116,7 @@ const data = {
 		{
 			title: "Permintaan Layanan",
 			url: "#",
-			icon: BookOpen,
+			icon: Send,
 			items: [
 				{
 					title: "Riwayat Permintaan",
@@ -125,31 +133,31 @@ const data = {
 		{
 			name: "Home",
 			url: "/",
-			icon: Frame,
+			icon: Home,
 		},
 		{
 			name: "Dashboard",
 			url: "/dashboard/client",
-			icon: PieChart,
+			icon: LayoutDashboard,
 		},
 	],
 	navHelp: [
 		{
 			name: "Bantuan",
 			url: "/",
-			icon: BookOpen,
+			icon: MessageCircleQuestion,
 		},
 		{
 			name: "Pengaturan",
 			url: "#",
-			icon: PieChart,
+			icon: Settings,
 		},
 	],
 	navInternalBusiness: [
 		{
 			title: "Permintaan Layanan",
 			url: "#",
-			icon: BookOpen,
+			icon: Send,
 			items: [
 				{
 					title: "Daftar Layanan",
@@ -162,9 +170,9 @@ const data = {
 			],
 		},
 		{
-			title: "Tugas Kerja",
+			title: "Perintah Kerja",
 			url: "#",
-			icon: Bot,
+			icon: ClipboardPenLine,
 			items: [
 				{
 					title: "Daftar Tugas Kerja",
@@ -181,17 +189,32 @@ const data = {
 		{
 			title: "Undangan Perusahaan",
 			url: "/dashboard/unassigned/invitations-history",
-			icon: PieChart,
+			icon: Inbox,
 		},
 		{
-			title: "Rekan Kerja",
-			url: "/dashboard/client/companies",
-			icon: BookOpen,
+			title: "Konfirmasi Penugasan",
+			url: "/dashboard/staff/services-request/confirmation",
+			icon: FileCheck,
+		},
+		{
+			title: "Layanan Perusahaan",
+			url: "#",
+			icon: ClipboardList,
+			items: [
+				{
+					title: "Daftar Layanan",
+					url: "/dashboard/staff/services",
+				},
+				{
+					title: "Riwayat Permintaan",
+					url: "/dashboard/staff/services-request/history",
+				},
+			],
 		},
 		{
 			title: "Perintah Kerja",
 			url: "#",
-			icon: BookOpen,
+			icon: ClipboardPenLine,
 			items: [
 				{
 					title: "Tugas Kerja",
@@ -256,6 +279,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 					<NavStaffBusiness items={data.navStaffBusiness} />
 				)}
 				{user && ["staff_unassigned"].includes(user.role) && (
+					// set lock menu at nav-menu-staff.tsx
 					<NavStaffBusiness items={data.navStaffBusiness} isUnassigned />
 				)}
 				{user && ["client"].includes(user.role) && (
