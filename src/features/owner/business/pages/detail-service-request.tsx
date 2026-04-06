@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { FileText, CheckCircle2, XCircle, Timer } from "lucide-react";
+import { FileText, CheckCircle2, Timer } from "lucide-react";
 import { useBusiness } from "../hooks/use-business";
 import FormFieldViewer from "@/shared/molecules/form-field-viewer";
 import {

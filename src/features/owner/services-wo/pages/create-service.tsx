@@ -1,7 +1,4 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { useCreateService } from "../hooks/useCreateService";
@@ -11,7 +8,6 @@ import { CardWorkOrdersConfig } from "../components/create/work-orders-config";
 import PageHeader from "@/shared/atoms/header-content";
 
 const CreateService: React.FC = () => {
-	const navigate = useNavigate();
 	const {
 		// UI states
 		creating,
@@ -161,6 +157,7 @@ const CreateService: React.FC = () => {
 				backPath={true}
 				addLabel="Simpan Layanan"
 				onAddClick={createService}
+				loading={creating}
 			/>
 
 			{/* Main Layout - Split View */}

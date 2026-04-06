@@ -1,7 +1,4 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, Loader2, Pencil, Save } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { useEditService } from "../hooks/useEditService";
@@ -9,9 +6,9 @@ import { CardServiceInfo } from "../components/create/service-info";
 import { CardServiceRequestConfig } from "../components/create/service-request-config";
 import { CardWorkOrdersConfig } from "../components/create/work-orders-config";
 import PageHeader from "@/shared/atoms/header-content";
+import { Save } from "lucide-react";
 
 const EditService: React.FC = () => {
-	const navigate = useNavigate();
 	const {
 		// UI states
 		updating: creating,
@@ -153,7 +150,6 @@ const EditService: React.FC = () => {
 				return null;
 		}
 	};
-	// TODO:unkown bug, feeling: ga bisa edit yang dari liangga
 	return (
 		<div className="h-full flex flex-col">
 			<PageHeader

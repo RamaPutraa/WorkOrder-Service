@@ -52,9 +52,9 @@ export const useCreateService = () => {
 		serviceStore.isServicesStale() ? [] : serviceStore.services,
 	);
 	const [detailService, setDetailService] = useState<Service | null>(
-		id && !serviceStore.isDetailStale(id)
-			? (serviceStore.detailCache[id]?.data ?? null)
-			: null,
+		id && !serviceStore.isDetailStale(id) ?
+			(serviceStore.detailCache[id]?.data ?? null)
+		:	null,
 	);
 
 	// === Base form fields ===
@@ -222,7 +222,8 @@ export const useCreateService = () => {
 		}
 
 		notifySuccess("Layanan berhasil disimpan");
-		navigate("/dashboard/internal/services");
+		serviceStore.clearCache();
+		navigate(-1);
 	};
 
 	// === Fetch List Services (dengan cache 5 menit) ===
