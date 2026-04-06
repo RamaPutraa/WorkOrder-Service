@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import PageHeader from "@/shared/atoms/header-content";
 import { AnimatePresence, motion } from "framer-motion";
 import { SectionLoading } from "@/shared/atoms";
+import { EmptyData } from "@/shared/molecules/empty-data";
 
 const ServiceSubmitPage = () => {
 	const [requests, setRequests] = useState<RequesterSR[]>([]);
@@ -190,7 +191,7 @@ const ServiceSubmitPage = () => {
 								animate={{ opacity: 1 }}
 								exit={{ opacity: 0 }}
 								className="col-span-full">
-								<SectionLoading message="Memuat data pengajuan layanan..." />
+								<EmptyData />
 							</motion.div>
 						}
 					</AnimatePresence>

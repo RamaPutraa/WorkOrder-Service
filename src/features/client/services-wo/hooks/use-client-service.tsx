@@ -12,7 +12,7 @@ type FieldValue = string | number | File | string[] | null;
 type FormValues = Record<string, Record<number, FieldValue>>;
 export const usePublicServices = () => {
 	const { id } = useParams<{ id: string }>();
-	const [data, setData] = useState<Form[]>([]);
+	const [data, setData] = useState<Form[]>();
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [isSticky, setIsSticky] = useState(false);
@@ -20,7 +20,7 @@ export const usePublicServices = () => {
 	const [submitting, setSubmitting] = useState(false);
 	const navigate = useNavigate();
 
-	const fetchPublicServiceDetail = async () => {
+	const fetchRequesterSRIntakeForm = async () => {
 		if (!id) {
 			setError("ID layanan tidak ditemukan");
 			notifyError("Gagal memuat data", "ID layanan tidak ditemukan");
@@ -43,11 +43,11 @@ export const usePublicServices = () => {
 			return;
 		}
 
-		setData(res?.data?.map((item) => item.form) ?? []);
+		if (res?.data?.form) setData([res.data.form]);
 	};
 
 	useEffect(() => {
-		if (id) fetchPublicServiceDetail();
+		if (id) fetchRequesterSRIntakeForm();
 	}, [id]);
 
 	// useeffect stiky
@@ -105,7 +105,7 @@ export const usePublicServices = () => {
 
 	// submit data
 	const handleSubmit = async () => {
-		if (!data.length) {
+		if (!data) {
 			setError("Tidak ada form yang bisa dikirim.");
 			notifyError("Tidak ada form yang bisa dikirim.");
 			return;
@@ -162,7 +162,7 @@ export const usePublicServices = () => {
 		formValues,
 		handleChange,
 		handleSubmit,
-		fetchPublicServiceDetail,
+		fetchRequesterSRIntakeForm,
 	};
 };
 

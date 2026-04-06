@@ -18,6 +18,8 @@ const formTypeLabel = (type: string) => {
 			return "Pengajuan";
 		case "work_order":
 			return "Perintah Kerja";
+		case "review":
+			return "Ulasan";
 		default:
 			return type;
 	}

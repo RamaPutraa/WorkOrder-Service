@@ -4,12 +4,12 @@ import {
 	dummyRequesterServiceDetailRequest,
 } from "../mocks/public-service-request.mock";
 
-const USE_MOCK = true; // TODO: Ubah ke false jika API backend sudah siap
+const USE_MOCK = false; // TODO: Ubah ke false jika API backend sudah siap
 
 // TODO:ubah kalau endpoint udah jadi
 export const getDetailServiceByIdApi = async (id: string) => {
-	const response = await apiClient.get<PublicDetailService>(
-		`/public/services/${id}/intake-forms`,
+	const response = await apiClient.get<RequesterSRIntakeFormResponse>(
+		`/public/services/${id}/intake-form`,
 	);
 	return response.data;
 };
@@ -20,7 +20,7 @@ export const submitIntakeApi = async (
 ) => {
 	// TODO:revisi endpoint kalao suda jadi
 	const response = await apiClient.post<PublicSubmitResponse>(
-		`/public/services/${id}/intake-forms`,
+		`/public/services/${id}/intake-form`,
 		data,
 	);
 	return response.data;
@@ -37,7 +37,7 @@ export const getAllClientServiceRequestApi = async () => {
 	}
 
 	const response = await apiClient.get<RequesterSRResponse>(
-		"/service-request/sent",
+		"/service-requests/sent",
 	);
 	return response.data;
 };

@@ -142,6 +142,7 @@ export const useForm = () => {
 					{ label: "Pengajuan Layanan", value: "intake" },
 					{ label: "Perintah Kerja", value: "work_order" },
 					{ label: "Laporan", value: "report" },
+					{ label: "Ulasan", value: "review" },
 				],
 			},
 		],

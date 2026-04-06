@@ -44,7 +44,7 @@ type Form = {
 	_id: string;
 	title: string;
 	description: string;
-	formType: string;
+	formType: "work_order" | "intake" | "review" | "report";
 	fields: Field[];
 	createdAt: string;
 	updatedAt: string;

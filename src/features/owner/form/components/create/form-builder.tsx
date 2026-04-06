@@ -45,7 +45,7 @@ export const FormBuilder = forwardRef<FormBuilderRef, Props>(
 				{
 					title: "",
 					description: "",
-					formType: "",
+					formType: "" as CreateFormRequest["formType"],
 					fields: [],
 				},
 				{
@@ -141,7 +141,7 @@ export const FormBuilder = forwardRef<FormBuilderRef, Props>(
 			!isSuccess &&
 			(formData.title !== "" ||
 				formData.description !== "" ||
-				formData.formType !== "" ||
+				!!formData.formType ||
 				formData.fields.length > 0);
 
 		return (
@@ -244,6 +244,7 @@ export const FormBuilder = forwardRef<FormBuilderRef, Props>(
 									<SelectItem value="work_order">Perintah Kerja</SelectItem>
 									<SelectItem value="intake">Pelanggan</SelectItem>
 									<SelectItem value="report">Laporan</SelectItem>
+									<SelectItem value="review">Ulasan</SelectItem>
 								</SelectContent>
 							</Select>
 							{errors.formType && (

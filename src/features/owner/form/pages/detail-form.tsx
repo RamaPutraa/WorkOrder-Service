@@ -34,8 +34,10 @@ const DetailForm = () => {
 			case "work_order":
 				return "Formulir Perintah Kerja";
 
-			default:
-				return type;
+		case "review":
+			return "Formulir Ulasan";
+		default:
+			return type;
 		}
 	};
 

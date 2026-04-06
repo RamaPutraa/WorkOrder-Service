@@ -1,7 +1,5 @@
 type FieldType =
 	| "text"
-	| "email"
-	| "password"
 	| "number"
 	| "textarea"
 	| "single_select"

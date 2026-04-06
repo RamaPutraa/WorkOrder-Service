@@ -234,6 +234,7 @@ export const FormBuilderEdit = forwardRef<FormBuilderEditRef, Props>(
 									<SelectItem value="work_order">Perintah Kerja</SelectItem>
 									<SelectItem value="intake">Pelanggan</SelectItem>
 									<SelectItem value="report">Laporan</SelectItem>
+									<SelectItem value="review">Ulasan</SelectItem>
 								</SelectContent>
 							</Select>
 							{errors.formType && (

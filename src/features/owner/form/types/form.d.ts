@@ -17,7 +17,7 @@ type Field = {
 type CreateFormRequest = {
 	title: string;
 	description: string;
-	formType: string;
+	formType: "work_order" | "intake" | "review" | "report";
 	fields: Field[];
 };
 

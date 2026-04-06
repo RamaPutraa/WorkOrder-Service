@@ -1,14 +1,16 @@
 // TODO:nanti pake ini kalo endpoint get intake udah jadi
 // get intake form
-type RequesterSRIntakeRequest = ApiResponse<RequesterSR>; //TODO:versi ini belum ada fiturnya di internal (staff yang request)
+type RequesterSRIntakeFormResponse = ApiResponse<{
+	form: Form;
+}>; //TODO:versi ini belum ada fiturnya di internal (staff yang request)
 
 // get detail service company form client
-type PublicDetailService = ApiResponse<
-	{
-		order: number;
-		form: Form;
-	}[]
->;
+// type PublicDetailService = ApiResponse<
+// 	{
+// 		order: number;
+// 		form: Form;
+// 	}[]
+// >;
 
 // client submit intake form
 type FieldData = {
