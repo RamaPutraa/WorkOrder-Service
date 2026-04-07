@@ -71,7 +71,7 @@ type CreateServiceRequest = {
 		workOrderFormId: string;
 		workReportFormId: string;
 		workOrderApprovalAccessType: workOrderRequestApprovalAccessType;
-		workReportApprovalAcessType: workReportRequestApprovalAccessType;
+		workReportApprovalAccessType: workReportRequestApprovalAccessType;
 		minStaff: number;
 		maxStaff: number;
 	}[];

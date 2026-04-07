@@ -13,3 +13,8 @@ type FieldConfig = {
 	placeholder?: string;
 	type: FieldType;
 };
+
+type FieldData = {
+	order: number;
+	value: string | number | string[] | File | null;
+};

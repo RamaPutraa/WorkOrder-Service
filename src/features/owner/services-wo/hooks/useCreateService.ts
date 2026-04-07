@@ -196,7 +196,7 @@ export const useCreateService = () => {
 				workReportFormId: c.workReportFormId,
 				workOrderApprovalAccessType:
 					c.workOrderApprovalType as unknown as workOrderRequestApprovalAccessType,
-				workReportApprovalAcessType:
+				workReportApprovalAccessType:
 					c.workReportApprovalType as unknown as workReportRequestApprovalAccessType,
 				minStaff: c.minStaff,
 				maxStaff: c.maxStaff,

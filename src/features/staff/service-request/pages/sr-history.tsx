@@ -5,6 +5,7 @@ import { SectionLoading } from "@/shared/atoms";
 import { useNavigate } from "react-router-dom";
 import { Calendar, ClipboardPenLine, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { EmptyData } from "@/shared/molecules/empty-data";
 
 const SrHistory = () => {
 	const { data, loading, error, fetchSrHistory } = useServicesRequest();
@@ -157,7 +158,7 @@ const SrHistory = () => {
 								animate={{ opacity: 1 }}
 								exit={{ opacity: 0 }}
 								className="col-span-full">
-								<SectionLoading message="Memuat data pengajuan layanan..." />
+								<EmptyData />
 							</motion.div>
 						}
 					</AnimatePresence>

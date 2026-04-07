@@ -196,7 +196,7 @@ const router = createBrowserRouter([
 						element: <ListServices />,
 					},
 					{
-						path: "services/:id/request",
+						path: "services/:id/form-intake",
 						element: <ServiceForm />,
 					},
 					{

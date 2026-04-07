@@ -43,7 +43,7 @@ export const usePublicServices = () => {
 			return;
 		}
 
-		if (res?.data?.form) setData([res.data.form]);
+		if (res?.data) setData([res.data]);
 	};
 
 	useEffect(() => {
@@ -127,7 +127,7 @@ export const usePublicServices = () => {
 
 		// Wrap in the required format
 		const payload: RequesterSubmitRequest = {
-			submissions,
+			submission: submissions[0],
 		};
 
 		const { data: res, error } = await handleApi(() =>

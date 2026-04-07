@@ -22,6 +22,7 @@ type SubmissionObject = {
 // internal get service request
 type InboxSR = {
 	_id: string;
+	code: string;
 	servicesRequestStatus:
 		| "received"
 		| "cancelled"
@@ -47,6 +48,7 @@ type InboxSRResponse = ApiResponse<InboxSR[]>;
 // get detail internal service request
 type InboxSRDetailRequest = {
 	_id: string;
+	code: string;
 	servicesRequestStatus:
 		| "received"
 		| "cancelled"
@@ -72,6 +74,7 @@ type InboxSRDetailResponse = ApiResponse<InboxSRDetailRequest>;
 // client service request type
 type RequesterSR = {
 	_id: string;
+	code: string;
 	serviceRequestStatus:
 		| "received"
 		| "cancelled"
@@ -96,6 +99,7 @@ type RequesterSRResponse = ApiResponse<RequesterSR[]>;
 // detail requester
 type RequesterSRDetailRequest = {
 	_id: string;
+	code: string;
 	serviceRequestStatus:
 		| "received"
 		| "cancelled"
@@ -116,3 +120,19 @@ type RequesterSRDetailRequest = {
 	updatedAt: string;
 };
 type RequesterSRDetailResponse = ApiResponse<RequesterSRDetailRequest>;
+
+// requestr get sr intake
+type RequesterSRIntakeFormResponse = ApiResponse<Form>;
+
+// requsetr submit sr intake
+type RequesterSubmitRequest = {
+	submission: {
+		formId: string;
+		fieldsData: FieldData[];
+	};
+};
+
+// requester submit sr intake response
+type RequesterSubmitResponse = ApiResponse<{
+	data: RequesterSR;
+}>;

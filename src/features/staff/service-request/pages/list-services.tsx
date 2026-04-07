@@ -57,7 +57,7 @@ const ListServices = () => {
 									<div
 										onClick={() =>
 											navigate(
-												`/dashboard/client/company/services/${service._id}/intake-forms`,
+												`/dashboard/staff/services/${service._id}/form-intake`,
 											)
 										}
 										className="group gap-2 flex flex-col h-full bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden cursor-pointer">

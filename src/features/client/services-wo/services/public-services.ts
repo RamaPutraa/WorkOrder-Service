@@ -12,7 +12,7 @@ export const submitIntakeApi = async (
 	data: RequesterSubmitRequest,
 ) => {
 	const response = await apiClient.post<RequesterSubmitResponse>(
-		`/service-request/service/${id}`,
+		`/service-requests/service/${id}`,
 		data,
 	);
 	return response.data;
