@@ -38,8 +38,8 @@ const ViewServiceRequest = () => {
 		);
 	}
 
-	const getStatusBadge = (status: string) => {
-		const s = status.toLowerCase();
+	const getStatusBadge = (status?: string) => {
+		const s = status?.toLowerCase() || "";
 		if (s === "approved")
 			return (
 				<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-emerald-600 ">
