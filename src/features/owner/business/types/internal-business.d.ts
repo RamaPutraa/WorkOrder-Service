@@ -1,7 +1,10 @@
-// createdAt: string;
-// updatedAt: string;
-// companyId: string;
-// client: User;
-// service: Service;
-// clientIntakeForms: ClientIntakeForm[];
-// submissions: SubmissionObject[];
+// approved response
+type SRapproved = {
+	serviceRequest: InboxSR;
+	workOrder: InternalWorkOrder;
+};
+
+type SRapprovedResponse = ApiResponse<SRapproved>;
+
+// reject response
+type SRrejectResponse = ApiResponse<InboxSR>;

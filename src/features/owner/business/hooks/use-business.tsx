@@ -1,5 +1,5 @@
 import { handleApi } from "@/lib/handle-api";
-import { notifyError } from "@/lib/toast-helper";
+import { notifyError, notifySuccess } from "@/lib/toast-helper";
 import { useEffect, useState } from "react";
 import {
 	approveInternalBusinessServiceRequestApi,
@@ -83,6 +83,7 @@ export const useBusiness = () => {
 			rejectInternalBusinessServiceRequestApi(id),
 		);
 		setLoading(false);
+		notifySuccess("Layanan berhasil ditolak");
 
 		if (error) {
 			setError(error.message);
@@ -105,6 +106,8 @@ export const useBusiness = () => {
 			approveInternalBusinessServiceRequestApi(id),
 		);
 		setLoading(false);
+		notifySuccess("Layanan berhasil disetujui");
+
 		if (error) {
 			setError(error.message);
 			notifyError("Gagal menyetujui layanan", error.message);
@@ -135,7 +138,7 @@ export const useBusiness = () => {
 				csr.service?.description?.toLowerCase().includes(searchQuery);
 
 			const matchesStatus =
-				!statusQuery || csr.servicesRequestStatus.toLowerCase() === statusQuery;
+				!statusQuery || csr.serviceRequestStatus.toLowerCase() === statusQuery;
 
 			let matchesDate = true;
 			if (dateFromQuery) {

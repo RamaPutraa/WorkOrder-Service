@@ -7,6 +7,7 @@ import {
 	Check,
 	X,
 	Wrench,
+	XCircle,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDialogStore } from "@/store/dialogStore";
@@ -39,8 +40,8 @@ const ViewServiceRequest = () => {
 	}
 
 	const getStatusBadge = (status?: string) => {
-		const s = status?.toLowerCase() || "";
-		if (s === "approved")
+		const s = status;
+		if (s === "workOrderCreated")
 			return (
 				<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-emerald-600 ">
 					<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -118,7 +119,7 @@ const ViewServiceRequest = () => {
 										<div className="border-b border-slate-200/70 p-2">
 											{/* Status Badge */}
 											<div className="shrink-0">
-												{getStatusBadge(item.servicesRequestStatus)}
+												{getStatusBadge(item.serviceRequestStatus)}
 											</div>
 										</div>
 										{/* card content 1 */}
@@ -182,12 +183,13 @@ const ViewServiceRequest = () => {
 											</div>
 											{/* Divider */}
 										</div>
-										{item.servicesRequestStatus === "approved" && (
+										{/* TODO: nanti bsisa berubah ke approved */}
+										{item.serviceRequestStatus === "workOrderCreated" && (
 											<div className="px-6 py-4 mt-auto flex flex-col justify-end border-t border-slate-200/70">
 												{/* Info Row (Client & Date) */}
 												<div className="flex flex-wrap items-center gap-x-4 text-xs text-muted-foreground">
 													<div className="flex items-center gap-1.5">
-														<Wrench className="w-6 h-6 shrink-0 bg-primary/5 text-primary rounded-full p-1" />
+														Catatan :
 														<span className="truncate max-w-[120px] italic sm:max-w-none">
 															Layanan sudah bisa diproses ke tahap selanjutnya.
 														</span>
@@ -196,14 +198,32 @@ const ViewServiceRequest = () => {
 											</div>
 										)}
 										{/* card footer */}
-										{item.servicesRequestStatus === "received" && (
+										{item.serviceRequestStatus === "received" && (
 											<div className="px-5 sm:px-6 py-4 mt-auto border-t border-slate-200/70">
 												<div className="w-full flex flex-col lg:flex-row items-stretch lg:items-center gap-2">
 													{/* Tombol Terima & Tolak */}
 													<div className="flex gap-2 flex-1">
 														<Button
+															variant="outline"
 															size="sm"
-															className="flex-1 gap-1.5 font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl px-3 h-9 shadow-sm shadow-blue-200 transition-all flex items-center justify-center active:scale-95"
+															className="flex-1 gap-1.5 font-semibold text-red-600 hover:bg-red-700 cursor-pointer hover:text-white rounded-xl px-3 h-9  transition-all flex items-center justify-center active:scale-95"
+															onClick={(e) => {
+																e.stopPropagation();
+																showDialog({
+																	title: "Konfirmasi Penolakan",
+																	description:
+																		"Apakah kamu yakin ingin menolak layanan ini?",
+																	confirmText: "Tolak",
+																	cancelText: "Batal",
+																	onConfirm: () => handleReject(item._id),
+																});
+															}}>
+															<XCircle className="w-4 h-4 shrink-0" />
+															<span>Tolak</span>
+														</Button>
+														<Button
+															size="sm"
+															className="flex-1 gap-1.5 font-semibold text-white bg-blue-600 hover:cursor-pointer hover:bg-blue-700 rounded-xl px-3 h-9 shadow-sm shadow-blue-200 transition-all flex items-center justify-center active:scale-95"
 															onClick={(e) => {
 																e.stopPropagation();
 																showDialog({
@@ -217,24 +237,6 @@ const ViewServiceRequest = () => {
 															}}>
 															<Check className="w-4 h-4 shrink-0" />
 															<span>Terima</span>
-														</Button>
-
-														<Button
-															size="sm"
-															className="flex-1 gap-1.5 font-semibold text-white bg-red-600 hover:bg-red-700 rounded-xl px-3 h-9 shadow-sm shadow-red-200 transition-all flex items-center justify-center active:scale-95"
-															onClick={(e) => {
-																e.stopPropagation();
-																showDialog({
-																	title: "Konfirmasi Penolakan",
-																	description:
-																		"Apakah kamu yakin ingin menolak layanan ini?",
-																	confirmText: "Tolak",
-																	cancelText: "Batal",
-																	onConfirm: () => handleReject(item._id),
-																});
-															}}>
-															<X className="w-4 h-4 shrink-0" />
-															<span>Tolak</span>
 														</Button>
 													</div>
 												</div>
