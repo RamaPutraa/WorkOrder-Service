@@ -4,6 +4,7 @@ import * as React from "react";
 import {
 	BookOpen,
 	Briefcase,
+	Building2,
 	ClipboardList,
 	ClipboardPenLine,
 	FileCheck,
@@ -106,13 +107,9 @@ const data = {
 		{
 			title: "Daftar Perusahaan",
 			url: "/dashboard/client/companies",
-			icon: BookOpen,
+			icon: Building2,
 		},
-		{
-			title: "Daftar Layanan",
-			url: "/dashboard/client/services",
-			icon: BookOpen,
-		},
+
 		{
 			title: "Permintaan Layanan",
 			url: "#",

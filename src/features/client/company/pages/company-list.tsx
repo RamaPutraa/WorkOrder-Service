@@ -107,10 +107,10 @@ const CompanyList = () => {
 													{/* Status Dot */}
 													<div className="flex items-center gap-2">
 														<div className="flex items-center">
-															<div className="shrink-0 p-3 text-primary rounded-xl">
-																<MapPinHouse className="w-5 h-5" />
+															<div className="shrink-0 p-3  rounded-xl flex items-center gap-2">
+																<MapPinHouse className="w-5 h-5 text-primary" />{" "}
+																Alamat :
 															</div>
-															<p>Alamat : </p>
 														</div>
 														<p className="text-sm text-slate-500 leading-relaxed line-clamp-1">
 															{company.address || "No description available."}

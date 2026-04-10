@@ -1,11 +1,4 @@
-import {
-	Card,
-	CardHeader,
-	CardContent,
-	CardTitle,
-	CardFooter,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
 	Building2,
@@ -13,7 +6,7 @@ import {
 	Clock,
 	CheckCircle2,
 	Search,
-	ArrowRight,
+	MapPin,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getAllCompanyApi } from "./company/services/companyClientService";
@@ -22,6 +15,7 @@ import { handleApi } from "@/lib/handle-api";
 import { notifyError } from "@/lib/toast-helper";
 import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
+import { SectionLoading } from "@/shared/atoms";
 
 const metrics = [
 	{
@@ -187,12 +181,7 @@ const DashboardClient = () => {
 									exit={{ opacity: 0 }}
 									transition={{ duration: 0.3 }}
 									className="col-span-full flex items-center justify-center py-12">
-									<div className="text-center space-y-3">
-										<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto" />
-										<p className="text-sm text-muted-foreground">
-											Memuat data perusahaan...
-										</p>
-									</div>
+									<SectionLoading message="Memuat data perusahaan..." />
 								</motion.div>
 							: filteredCompanies.length === 0 ?
 								<motion.div
@@ -216,10 +205,16 @@ const DashboardClient = () => {
 										initial={{ opacity: 0, y: 16 }}
 										animate={{ opacity: 1, y: 0 }}
 										transition={{ duration: 0.2, ease: "easeOut" }}>
-										<Card className="group gap-2 flex flex-col h-full bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
-											<CardHeader className="space-y-4">
+										<div
+											onClick={() =>
+												navigate(
+													`/dashboard/client/company/${company._id}/services`,
+												)
+											}
+											className="group gap-2 flex flex-col h-full bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md hover:cursor-pointer transition-all duration-300 overflow-hidden">
+											<div className="space-y-4">
 												{/* Baris Atas: Icon, Judul, dan Status */}
-												<div className="flex items-start justify-between gap-4">
+												<div className="flex items-start justify-between gap-4 px-4 pt-4">
 													<div className="p-3 bg-primary/5 text-primary rounded-xl">
 														<Building2 className="w-6 h-6 " />
 													</div>
@@ -234,39 +229,23 @@ const DashboardClient = () => {
 												</div>
 
 												{/* Deskripsi - Masuk dalam CardContent atau tetap di Header dengan padding yang pas */}
-												<div className="text-sm text-slate-500 leading-relaxed line-clamp-3 min-h-[3.75rem] text-justify">
+												<div className="px-4 text-sm text-slate-500 leading-relaxed line-clamp-3 min-h-[3.75rem] text-justify">
 													{company.description ||
 														"Tidak ada deskripsi tersedia untuk layanan ini."}
 												</div>
-											</CardHeader>
+											</div>
 
-											<CardFooter className="grid grid-cols-1 text-xs border-t border-slate-200/70">
-												<div className="mx-6">
-													<Button
-														onClick={() =>
-															navigate(
-																`/dashboard/client/company/${company._id}/services`,
-															)
-														}
-														className="w-full group/btn bg-blue-600 hover:bg-blue-700 shadow-md">
-														<span>Lihat Layanan</span>
-														<ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
-													</Button>
+											<div className="flex items-center justify-between gap-4 p-4 border-t border-slate-200/70">
+												<div className="p-3 bg-primary/5 text-primary rounded-xl">
+													<MapPin className="w-3 h-3 " />
 												</div>
-											</CardFooter>
-											{/* <CardContent className="mt-auto">
-												<Button
-													onClick={() =>
-														navigate(
-															`/dashboard/client/company/${company._id}/services`,
-														)
-													}
-													className="w-full group/btn bg-blue-600 hover:bg-blue-700 shadow-md">
-													<span>Lihat Layanan</span>
-													<ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
-												</Button>
-											</CardContent> */}
-										</Card>
+												<div className="flex-1 min-w-0">
+													<p className="text-xs text-muted-foreground line-clamp-1">
+														{company.address || "Tidak ada alamat"}
+													</p>
+												</div>
+											</div>
+										</div>
 									</motion.div>
 								))
 							}
