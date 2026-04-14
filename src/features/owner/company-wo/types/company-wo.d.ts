@@ -1,63 +1,38 @@
-type InternalWorkOrder = {
-	_id: string;
-	code: string;
-	serviceRequestId: string | null;
-	companyId: CompanyMinimal;
-	service: ServiceSummaryObject;
-	createdBy: User;
-	approvedBy: User;
-	workOrderApprovalAccessType: "auto" | "staff_pic";
-	minStaff: number;
-	maxStaff: number;
-	assignedStaff: User[];
-	staffPIC: User | null;
-	status: "drafted" | "ready" | "inProgress" | "completed" | "cancelled";
-	readyAt: string;
-	startedAt: string | null;
-	completedAt: string | null;
-	cancelledAt: string | null;
-	createdAt: string;
-	updatedAt: string | null;
-	deletedAt: string | null;
-	workOrderForm: Form;
-	submissions: SubmissionObject[];
-};
-type InternalWorkOrderResponse = ApiResponse<InternalWorkOrder[]>;
+// create work order
+// request id from sr id
+type CreateWorkOrderResponse = ApiResponse<WorkOrder>;
 
-type WorkOrderFormItem = {
-	order: number;
-	form: Form;
-	fieldsData?: FieldData[];
-};
+// create rejected work order
+// request id from sr id
+type CreateRejectedWorkOrderResponse = ApiResponse<WorkOrder>;
 
-type DetailInternalWorkOrder = InternalWorkOrder & {
-	workorderForms: WorkOrderFormItem[];
-	submissions: PublicSubmission[];
-};
-type DetailInternalWorkOrderResponse = ApiResponse<DetailInternalWorkOrder>;
-
-// wo submit
+// assigned staff
+// get employee
 type AssignStaffToWorkOrder = ApiResponse<StaffItem[]> & {
 	meta: {
 		count: number;
 	};
 };
-
-// wo report
-type WorkOrderReport = {
-	_id: string;
-	workOrderId: string;
-	companyId: string;
-	status: string;
-	createdAt: string;
-	updatedAt: string;
-	startedAt: string | null;
-	completedAt: string | null;
-	reportForms: {
-		order: number;
-		form: Form;
-	}[];
-	submissions: PublicSubmission[];
+// assign staff to wo
+type AssignStaffToWorkOrderRequest = {
+	staff_pic: string;
+	assign_staffs: string[];
 };
+type AssignStaffToWorkOrderResponse = ApiResponse<WorkOrder>;
 
-type WorkOrderReportResponse = ApiResponse<WorkOrderReport>;
+// submit wo
+type SubmitWorkOrderResponse = ApiResponse<WorkOrder>;
+
+// completed wo
+type CompleteWorkOrderRequest = {
+	issue: string;
+};
+type CompleteWorkOrderResponse = ApiResponse<WorkOrder>;
+
+// fail wo
+type FailWorkOrderRequest = {
+	issue: string;
+};
+type FailWorkOrderResponse = ApiResponse<WorkOrder>;
+
+// get wo report

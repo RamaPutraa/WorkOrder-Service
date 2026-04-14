@@ -181,7 +181,7 @@ export const useCreateService = () => {
 		const payload: CreateServiceRequest = {
 			title,
 			description,
-			accessType: accessType as unknown as accessTypeService,
+			accessType: accessType as unknown as serviceAccessType,
 			isActive: selectedStatus?.value === "true",
 			serviceRequestConfig: {
 				intakeFormId,
@@ -195,9 +195,9 @@ export const useCreateService = () => {
 				workOrderFormId: c.workOrderFormId,
 				workReportFormId: c.workReportFormId,
 				workOrderApprovalAccessType:
-					c.workOrderApprovalType as unknown as workOrderRequestApprovalAccessType,
+					c.workOrderApprovalType as unknown as workOrderApprovalAccessType,
 				workReportApprovalAccessType:
-					c.workReportApprovalType as unknown as workReportRequestApprovalAccessType,
+					c.workReportApprovalType as unknown as workReportApprovalAccessType,
 				minStaff: c.minStaff,
 				maxStaff: c.maxStaff,
 			})),

@@ -1,14 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useCompanyWo } from "../hooks/use-company-wo";
 import { Button } from "@/components/ui/button";
-import {
-	Calendar,
-	User,
-	Eye,
-	FileCheck,
-	Ticket,
-	ScrollText,
-} from "lucide-react";
+import { Calendar, User, FileCheck, Ticket, ScrollText } from "lucide-react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "framer-motion";
@@ -31,35 +24,45 @@ const CompanyViewWo = () => {
 
 	// Status badge configuration
 	const getStatusConfig = (status: string) => {
-		switch (status.toLowerCase()) {
-			case "drafted":
+		switch (status) {
+			case "draft":
 				return {
-					className: "bg-gray-100 text-gray-700 border border-gray-200",
+					className: " text-gray-600",
 					label: "Dirancang",
 				};
-			case "ready":
+			case "sent":
 				return {
-					className: "bg-yellow-100 text-yellow-700 border border-yellow-200",
-					label: "Siap Dikerjakan",
+					className: " text-blue-600",
+					label: "Dikirim",
 				};
-			case "in_progress":
+			case "approved":
 				return {
-					className: "bg-blue-100 text-blue-700 border border-blue-200",
-					label: "Sedang Dikerjakan",
+					className: " text-green-600",
+					label: "Disetujui",
+				};
+			case "unprocessable":
+				return {
+					className: " text-yellow-600",
+					label: "Belum dapat dikerjakan",
+				};
+			case "onProgress":
+				return {
+					className: " text-blue-600",
+					label: "Sedang dikerjakan",
 				};
 			case "completed":
 				return {
-					className: "bg-green-100 text-green-700 border border-green-200",
+					className: " text-green-600",
 					label: "Selesai",
 				};
 			case "cancelled":
 				return {
-					className: "bg-red-100 text-red-700 border border-red-200",
+					className: " text-red-600",
 					label: "Dibatalkan",
 				};
 			default:
 				return {
-					className: "bg-gray-100 text-gray-700 border border-gray-200",
+					className: " text-gray-600",
 					label: status,
 				};
 		}
@@ -101,7 +104,13 @@ const CompanyViewWo = () => {
 									animate={{ opacity: 1, y: 0 }}
 									whileHover={{ scale: 1.02, y: -4 }}
 									transition={{ duration: 0.2, ease: "easeOut" }}>
-									<Card className="flex flex-col h-full border shadow-md hover:shadow-lg rounded-lg transition-all duration-200 bg-gradient-to-br from-background to-muted/10 overflow-hidden">
+									<Card
+										onClick={() =>
+											navigate(
+												`/dashboard/internal/workorders/detail/${wo._id}`,
+											)
+										}
+										className="flex flex-col h-full border shadow-md hover:shadow-lg rounded-lg transition-all duration-200 bg-gradient-to-br from-background to-muted/10 overflow-hidden hover:cursor-pointer">
 										{/* Header */}
 										<CardHeader className="pb-3">
 											<div className="flex items-center justify-between gap-3">
@@ -128,15 +137,19 @@ const CompanyViewWo = () => {
 											{/* Info Grid */}
 											<div className="space-y-3">
 												{/* status */}
-												<div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+												<div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
 													<div className="p-2 rounded-md bg-background">
 														<Ticket className="w-4 h-4 text-primary" />
 													</div>
-													<div className="flex-1 min-w-0">
-														<p className="text-xs font-medium text-muted-foreground mb-0.5">
+													<div
+														className={`flex-1 min-w-0 px-3 py-2 rounded-lg ${statusConfig.className}`}>
+														{/* Label Header */}
+														<p className="text-xs font-medium opacity-80 mb-0.5">
 															Status Tugas Kerja
 														</p>
-														<p className="text-sm font-medium truncate">
+
+														{/* Value Status */}
+														<p className="text-sm font-bold truncate">
 															{statusConfig.label}
 														</p>
 													</div>
@@ -149,10 +162,10 @@ const CompanyViewWo = () => {
 													</div>
 													<div className="flex-1 min-w-0">
 														<p className="text-xs font-medium text-muted-foreground mb-0.5">
-															Manager
+															Disetujui Oleh
 														</p>
 														<p className="text-sm font-medium truncate">
-															{wo.createdBy?.name || "-"}
+															{wo.approvedBy?.name || "-"}
 														</p>
 													</div>
 												</div>
@@ -183,27 +196,16 @@ const CompanyViewWo = () => {
 											</div>
 
 											{/* Action Buttons */}
-											<div className="grid grid-cols-2 gap-2 mt-auto">
+											<div className="grid grid-cols-1  mt-auto">
 												<Button
-													variant="outline"
-													className="h-10 rounded-lg border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all duration-200 font-medium"
-													onClick={() =>
-														navigate(
-															`/dashboard/internal/workorders/detail/${wo._id}`,
-														)
-													}>
-													<Eye className="w-4 h-4 mr-1" />
-													Detail
-												</Button>
-												<Button
-													className="h-10 rounded-lg bg-primary text-white hover:bg-primary/90 transition-all duration-200 font-medium"
+													className="h-10 rounded-lg bg-primary text-white hover:bg-primary/90 transition-all duration-200 font-medium hover:cursor-pointer"
 													onClick={() =>
 														navigate(
 															`/dashboard/internal/workorders/${wo._id}/report`,
 														)
 													}>
 													<FileCheck className="w-4 h-4 mr-1" />
-													Laporan
+													Laporan Pengerjaan
 												</Button>
 											</div>
 										</CardContent>

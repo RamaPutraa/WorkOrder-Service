@@ -1,391 +1,309 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { Users, Settings, Save, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
 	Dialog,
-	DialogClose,
 	DialogContent,
 	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import {
-	Command,
-	CommandInput,
-	CommandList,
-	CommandEmpty,
-	CommandGroup,
-	CommandItem,
-} from "@/components/ui/command";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertTriangle, Plus, User, Users } from "lucide-react";
-import { useDialogStore } from "@/store/dialogStore";
-import { configStaffWorkOrderApi } from "../services/company-wo-service";
+import { SectionLoading } from "@/shared/atoms";
 import { handleApi } from "@/lib/handle-api";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
+import { assignStaffToWorkOrderApi } from "../services/company-wo-service";
 
-interface StaffAssignedProps {
-	detailData: DetailInternalWorkOrder;
+export interface StaffAssignedProps {
+	wo: WorkOrderDetail & { meta?: WorkOrderMeta };
 	employees: StaffItem[];
-	assignedStaffsUI: StaffItem[];
-	setAssignedStaffsUI: React.Dispatch<React.SetStateAction<StaffItem[]>>;
-	isReadOnly?: boolean;
-	fetchEmployeeList: () => Promise<void>;
+	fetchEmployeeList: () => void;
+	isReadOnly: boolean;
+	currentStatus?: string;
+	onAssignSuccess: () => void;
 }
 
-const StaffAssigned = ({
-	detailData,
+const StaffRow = ({
+	staff,
+	isPIC,
+	highlight = false,
+}: {
+	staff: User | StaffItem;
+	isPIC: boolean;
+	highlight?: boolean;
+}) => (
+	<div
+		className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+			highlight ?
+				"bg-amber-50 border-amber-200"
+			:	"bg-muted/20 border-border/50 hover:bg-muted/40"
+		}`}>
+		<div
+			className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
+				highlight ? "bg-amber-100 text-amber-700" : "bg-primary/10 text-primary"
+			}`}>
+			{staff.name?.charAt(0)?.toUpperCase() ?? "?"}
+		</div>
+		<div className="flex-1 min-w-0">
+			<p className="text-sm font-semibold leading-tight truncate">
+				{staff.name}
+			</p>
+			<p className="text-xs text-muted-foreground truncate">{staff.email}</p>
+		</div>
+		{isPIC && (
+			<span className="shrink-0 inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-bold border border-amber-200">
+				<Star className="w-2.5 h-2.5" />
+				PIC
+			</span>
+		)}
+	</div>
+);
+
+export const StaffAssigned = ({
+	wo,
 	employees,
-	assignedStaffsUI,
-	setAssignedStaffsUI,
-	isReadOnly = false,
 	fetchEmployeeList,
+	isReadOnly,
+	currentStatus,
+	onAssignSuccess,
 }: StaffAssignedProps) => {
-	const [open, setOpen] = useState(false);
-	const [showMaxAlert, setShowMaxAlert] = useState(false);
-	const [selectedStaff, setSelectedStaff] = useState<StaffItem | null>(null);
-	const [isSaving, setIsSaving] = useState(false);
-	const [originalStaffs, setOriginalStaffs] = useState<StaffItem[]>([]);
-	const { showDialog } = useDialogStore();
+	const [isStaffDialogOpen, setIsStaffDialogOpen] = useState(false);
+	const [selectedStaffEmails, setSelectedStaffEmails] = useState<string[]>([]);
+	const [picEmail, setPicEmail] = useState<string>("");
+	const [isAssigningState, setIsAssigningState] = useState(false);
 
-	// Fetch employees when dialog opens
-	useEffect(() => {
-		if (open && !isReadOnly) {
-			void fetchEmployeeList();
+	const handleOpenStaffDialog = () => {
+		if (employees.length === 0) fetchEmployeeList();
+		// Mapping initial values based on current WO using emails
+		setSelectedStaffEmails(wo?.assignedStaff?.map((s) => s.email) || []);
+		setPicEmail(wo?.staffPIC?.email || "");
+		setIsStaffDialogOpen(true);
+	};
+
+	const handleAssignStaffSubmit = async () => {
+		if (!wo) return;
+		if (!picEmail) {
+			notifyError("Validasi Gagal", "PIC harus dipilih.");
+			return;
 		}
-	}, [open, isReadOnly]);
+		if (selectedStaffEmails.length < wo.minStaff) {
+			notifyError("Validasi Gagal", `Minimal ${wo.minStaff} pegawai.`);
+			return;
+		}
+		if (selectedStaffEmails.length > wo.maxStaff) {
+			notifyError("Validasi Gagal", `Maksimal ${wo.maxStaff} pegawai.`);
+			return;
+		}
+		if (!selectedStaffEmails.includes(picEmail)) {
+			notifyError(
+				"Validasi Gagal",
+				"PIC harus termasuk dalam pegawai yang dipilih.",
+			);
+			return;
+		}
 
-	// Track original staff when component mounts or detailData changes
-	useEffect(() => {
-		setOriginalStaffs(detailData.assignedStaffs ?? []);
-	}, [detailData.assignedStaffs]);
-
-	// Check if there are changes
-	const hasChanges = () => {
-		if (assignedStaffsUI.length !== originalStaffs.length) return true;
-		return !assignedStaffsUI.every((staff) =>
-			originalStaffs.some((original) => original._id === staff._id),
+		setIsAssigningState(true);
+		const { error } = await handleApi(() =>
+			assignStaffToWorkOrderApi(wo._id, {
+				assign_staffs: selectedStaffEmails,
+				staff_pic: picEmail,
+			}),
 		);
+		setIsAssigningState(false);
+
+		if (error) {
+			notifyError("Gagal menyimpan", error.message);
+			return;
+		}
+		notifySuccess("Berhasil", "Konfigurasi pegawai bertugas diperbarui");
+		setIsStaffDialogOpen(false);
+		onAssignSuccess();
 	};
-
-	// Handle save with confirmation
-	const handleSave = () => {
-		showDialog({
-			title: "Konfirmasi Simpan",
-			description:
-				"Apakah Anda yakin ingin menyimpan perubahan staff yang ditugaskan?",
-			confirmText: "Simpan",
-			cancelText: "Batal",
-			onConfirm: async () => {
-				setIsSaving(true);
-				const staffEmails = assignedStaffsUI.map((staff) => staff.email);
-
-				const { error } = await handleApi(() =>
-					configStaffWorkOrderApi(detailData._id, staffEmails),
-				);
-
-				setIsSaving(false);
-
-				if (error) {
-					notifyError("Gagal menyimpan", error.message);
-					return;
-				}
-
-				notifySuccess(
-					"Berhasil disimpan",
-					"Perubahan staff yang ditugaskan telah disimpan",
-				);
-				setOriginalStaffs(assignedStaffsUI);
-			},
-		});
-	};
-
-	// Handle cancel with confirmation
-	const handleCancel = () => {
-		showDialog({
-			title: "Konfirmasi Batal",
-			description:
-				"Apakah Anda yakin ingin membatalkan perubahan? Semua perubahan yang belum disimpan akan hilang.",
-			confirmText: "Ya, Batalkan",
-			cancelText: "Tidak",
-			onConfirm: () => {
-				setAssignedStaffsUI(originalStaffs);
-			},
-		});
-	};
-	// Handle remove staff with confirmation
-	const handleRemoveStaff = (staff: StaffItem) => {
-		showDialog({
-			title: "Konfirmasi Hapus Staff",
-			description: `Apakah Anda yakin ingin menghapus ${staff.name} (${staff.position?.name || "No Position"}) dari daftar staff yang ditugaskan?`,
-			confirmText: "Ya, Hapus",
-			cancelText: "Batal",
-			onConfirm: async () => {
-				setIsSaving(true);
-
-				// Remove staff from UI first
-				const updatedStaffs = assignedStaffsUI.filter(
-					(s) => s._id !== staff._id,
-				);
-				setAssignedStaffsUI(updatedStaffs);
-
-				// Get email array and save to database
-				const staffEmails = updatedStaffs.map((s) => s.email);
-				const { error } = await handleApi(() =>
-					configStaffWorkOrderApi(detailData._id, staffEmails),
-				);
-
-				setIsSaving(false);
-
-				if (error) {
-					// Rollback if error
-					setAssignedStaffsUI(assignedStaffsUI);
-					notifyError("Gagal menghapus staff", error.message);
-					return;
-				}
-
-				notifySuccess(
-					"Staff berhasil dihapus",
-					`${staff.name} telah dihapus dari daftar staff yang ditugaskan`,
-				);
-
-				// Update original staffs to reflect saved state
-				setOriginalStaffs(updatedStaffs);
-			},
-		});
-	};
-
-	const requiredPositions = detailData.service.requiredStaffs.map(
-		(rs) => rs.position.name,
-	);
-
-	const filteredEmployees = employees
-		.filter(
-			(emp) => emp.position && requiredPositions.includes(emp.position.name),
-		)
-		.filter(
-			(emp) => !assignedStaffsUI.some((assigned) => assigned._id === emp._id),
-		);
-
-	console.log("Required Positions:", requiredPositions);
-	console.log("All Employees:", employees);
-	console.log("Filtered Employees:", filteredEmployees);
-
-	const countByPosition = (positionId: string) =>
-		assignedStaffsUI.filter((s) => s.position?._id === positionId).length;
-
-	const required = detailData.service.requiredStaffs.find(
-		(r) => r.position._id === selectedStaff?.position._id,
-	);
-
-	const maxStaff = required?.maximumStaff ?? 0;
 
 	return (
-		<Card className="border rounded-xl shadow-sm">
-			<CardHeader>
-				<div className="flex justify-between items-center">
-					<div>
-						<h2 className="text-lg font-semibold">Pegawai Bertugas</h2>
-						<p className="text-sm text-muted-foreground">
-							Daftar staff yang ditugaskan.
+		<div className="border shadow-sm rounded-xl">
+			<div className="p-5">
+				<h3 className="text-base font-semibold flex items-center gap-2">
+					<Users className="w-4 h-4 text-primary" />
+					Daftar Pegawai Bertugas
+				</h3>
+			</div>
+			<div className="space-y-4 px-5">
+				{/* Min/Max visual */}
+				<div className="grid grid-cols-2 gap-3">
+					<div className="p-4 rounded-xl bg-blue-50 border border-blue-100 text-center">
+						<p className="text-2xl font-bold text-blue-600">{wo.minStaff}</p>
+						<p className="text-xs text-blue-500 font-medium mt-0.5">Minimum</p>
+					</div>
+					<div className="p-4 rounded-xl bg-indigo-50 border border-indigo-100 text-center">
+						<p className="text-2xl font-bold text-indigo-600">{wo.maxStaff}</p>
+						<p className="text-xs text-indigo-500 font-medium mt-0.5">
+							Maksimum
 						</p>
 					</div>
+				</div>
 
-					<div className="flex items-center gap-2 bg-secondary/50 px-3 py-1 rounded-md">
-						<Users className="w-4 h-4 text-muted-foreground" />
-						<span className="text-sm font-medium">
-							{assignedStaffsUI.length} Staff
+				{/* Assigned Staff */}
+				<div className="border rounded-xl p-3 flex flex-col gap-3">
+					<div className="overflow-y-auto max-h-[320px] pr-1">
+						{wo.assignedStaff.length === 0 ?
+							<div className="flex flex-col items-center justify-center py-8 text-center text-muted-foreground">
+								<Users className="w-10 h-10 mb-2 opacity-30" />
+								<p className="text-sm">Belum ada staff yang ditetapkan</p>
+							</div>
+						:	<div className="space-y-2">
+								{wo.assignedStaff.map((staff) => (
+									<StaffRow
+										key={staff._id}
+										staff={staff}
+										isPIC={staff.email === wo.staffPIC?.email}
+									/>
+								))}
+							</div>
+						}
+					</div>
+				</div>
+				<div>
+					<Button
+						onClick={handleOpenStaffDialog}
+						disabled={isReadOnly || currentStatus !== "draft"}
+						className="bg-blue-600 hover:cursor-pointer hover:bg-blue-700 w-full md:w-auto text-white rounded-xl px-5 h-11 shadow-sm shadow-blue-200 transition-all flex items-center gap-2 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed">
+						<Settings className="w-4 h-4" />
+						<span className="font-semibold text-xs">
+							Konfigurasi Pegawai Bertugas
+						</span>
+					</Button>
+				</div>
+
+				<div className="border-b border-border/50" />
+
+				{/* Assigned count */}
+				<div className="flex items-center justify-between ">
+					<span className="text-xs font-medium text-muted-foreground">
+						Staff Ditetapkan
+					</span>
+					<div className="flex items-center gap-1.5">
+						<span
+							className={`text-sm font-bold ${
+								wo.assignedStaff.length >= wo.minStaff ?
+									"text-green-600"
+								:	"text-amber-600"
+							}`}>
+							{wo.assignedStaff.length}
+						</span>
+						<span className="text-xs text-muted-foreground">
+							/ {wo.maxStaff} orang
 						</span>
 					</div>
 				</div>
-			</CardHeader>
 
-			<CardContent>
-				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-					{/* ========== LIST STAFF ========== */}
-					{assignedStaffsUI.map((staff) => (
-						<Card
-							key={staff._id}
-							className="relative overflow-hidden border shadow-sm hover:shadow-md transition">
-							{/* Tombol Hapus - hanya untuk owner/manager */}
-							{!isReadOnly && (
-								<button
-									onClick={() => handleRemoveStaff(staff)}
-									className="absolute top-2 right-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-full p-1 transition">
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										className="h-5 w-5"
-										fill="none"
-										viewBox="0 0 24 24"
-										stroke="currentColor"
-										strokeWidth={2}>
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m2 0h-1m-8 0H7m10 0l-1-3H8L7 7"
-										/>
-									</svg>
-								</button>
-							)}
+				{/* Progress bar */}
+				<div className="w-full h-2 bg-muted rounded-full overflow-hidden mb-5">
+					<div
+						className={`h-full rounded-full transition-all duration-500 ${
+							wo.assignedStaff.length >= wo.minStaff ?
+								"bg-green-500"
+							:	"bg-amber-400"
+						}`}
+						style={{
+							width: `${Math.min(
+								(wo.assignedStaff.length / wo.maxStaff) * 100,
+								100,
+							)}%`,
+						}}
+					/>
+				</div>
+			</div>
 
-							<CardContent className="flex flex-col items-center text-center space-y-3 p-4">
-								<div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary transition">
-									<User className="w-6 h-6" />
-								</div>
+			<Dialog open={isStaffDialogOpen} onOpenChange={setIsStaffDialogOpen}>
+				<DialogContent className="max-w-xl max-h-[85vh] flex flex-col p-0 rounded-2xl">
+					<DialogHeader className="bg-primary rounded-t-2xl p-4">
+						<DialogTitle className="text-white">
+							Konfigurasi Pegawai Bertugas
+						</DialogTitle>
+						<DialogDescription className="text-white/80">
+							Pilih pegawai yang akan ditugaskan.
+						</DialogDescription>
+					</DialogHeader>
 
-								<div className="space-y-1 w-full">
-									<p className="font-medium text-sm truncate px-2">
-										{staff.name}
-									</p>
-									<p className="text-xs text-muted-foreground px-2 py-1 rounded-full truncate">
-										{staff.position?.name || "No Position"}
-									</p>
-								</div>
-							</CardContent>
-						</Card>
-					))}
-
-					{/* ========== BUTTON ADD STAFF - hanya untuk owner/manager ========== */}
-					{!isReadOnly && (
-						<Dialog open={open} onOpenChange={setOpen}>
-							<DialogTrigger asChild>
-								<button className="group flex flex-col items-center justify-center p-4 border-2 border-dashed border-muted-foreground/25 rounded-xl bg-muted/30 hover:bg-muted/50 hover:border-primary/50 cursor-pointer transition min-h-[160px]">
-									<div className="h-10 w-10 rounded-full bg-background border border-muted-foreground/20 flex items-center justify-center mb-2 group-hover:border-primary group-hover:text-primary transition">
-										<Plus className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
-									</div>
-									<p className="text-sm font-medium text-muted-foreground group-hover:text-primary transition">
-										Tambah Staff
-									</p>
-								</button>
-							</DialogTrigger>
-
-							{/* === Dialog Content === */}
-							<DialogContent className="sm:max-w-[500px]">
-								<form
-									onSubmit={(e) => {
-										e.preventDefault();
-										if (!selectedStaff) return;
-
-										const requiredForSelected =
-											detailData.service.requiredStaffs.find(
-												(r) => r.position._id === selectedStaff.position._id,
-											);
-										const maxForSelected =
-											requiredForSelected?.maximumStaff ?? 0;
-
-										const currentCount = countByPosition(
-											selectedStaff.position._id,
-										);
-
-										if (currentCount >= maxForSelected) {
-											setShowMaxAlert(true);
-											return;
-										}
-
-										setAssignedStaffsUI((prev) => [...prev, selectedStaff]);
-										setSelectedStaff(null);
-										setShowMaxAlert(false);
-										setOpen(false);
-									}}>
-									<DialogHeader>
-										<DialogTitle>Pegawai Bertugas</DialogTitle>
-										<DialogDescription>
-											Pilih staff yang ingin ditugaskan.
-										</DialogDescription>
-									</DialogHeader>
-
-									{showMaxAlert && (
-										<Alert className="bg-yellow-50 text-yellow-800 border-yellow-300 shadow-sm mt-2">
-											<AlertTitle className="flex items-center gap-2">
-												<AlertTriangle className="h-4 w-4" />
-												Kuota Staff Penuh
-											</AlertTitle>
-											<AlertDescription>
-												Posisi <b>{selectedStaff?.position.name}</b> hanya boleh
-												maksimal {maxStaff} staff.
-											</AlertDescription>
-										</Alert>
-									)}
-
-									{/* ComboBox */}
-									<div className="grid gap-4 py-4">
-										<div className="grid gap-2">
-											<Label>Pilih Staff</Label>
-
-											<Command className="rounded-lg border shadow">
-												<CommandInput placeholder="Cari nama staff..." />
-
-												<CommandList>
-													<CommandEmpty>
-														<Badge variant="secondary" className="p-1">
-															Semua staff sudah dipilih!
-														</Badge>
-													</CommandEmpty>
-
-													<CommandGroup>
-														{filteredEmployees.map((s) => (
-															<CommandItem
-																key={s._id}
-																value={s.name}
-																onSelect={() => setSelectedStaff(s)}
-																className="cursor-pointer">
-																{s.name} —
-																<span className="text-muted-foreground ml-1">
-																	{s.position?.name}
-																</span>
-															</CommandItem>
-														))}
-													</CommandGroup>
-												</CommandList>
-											</Command>
-
-											{selectedStaff && (
-												<div className="mt-2 text-sm p-2 border rounded-lg bg-muted/30">
-													<p className="font-medium">{selectedStaff.name}</p>
+					<div className="border border-border/50 mx-3 rounded-2xl">
+						<div className="flex-1 overflow-y-auto p-3 space-y-3">
+							{employees.length === 0 ?
+								<SectionLoading message="Memuat data pegawai..." />
+							:	employees.map((emp) => {
+									const isSelected = selectedStaffEmails.includes(emp.email);
+									const isPic = picEmail === emp.email;
+									return (
+										<div
+											key={emp._id}
+											className={`flex items-center justify-between p-3 border rounded-lg transition-colors ${isSelected ? "border-primary/50 bg-primary/5" : "border-border/50 bg-muted/10 hover:bg-muted/30"}`}>
+											<div className="flex items-center gap-3">
+												<Checkbox
+													id={`chk-${emp._id}`}
+													checked={isSelected}
+													onCheckedChange={(checked) => {
+														if (checked) {
+															setSelectedStaffEmails([
+																...selectedStaffEmails,
+																emp.email,
+															]);
+														} else {
+															setSelectedStaffEmails(
+																selectedStaffEmails.filter(
+																	(email) => email !== emp.email,
+																),
+															);
+															if (isPic) setPicEmail("");
+														}
+													}}
+												/>
+												<div className="grid gap-0.5">
+													<label
+														htmlFor={`chk-${emp._id}`}
+														className="text-sm font-semibold leading-none cursor-pointer">
+														{emp.name}
+													</label>
 													<p className="text-xs text-muted-foreground">
-														{selectedStaff.position?.name}
+														{emp.email}
 													</p>
 												</div>
+											</div>
+
+											{isSelected && (
+												<button
+													type="button"
+													onClick={() => setPicEmail(emp.email)}
+													className={`hover:cursor-pointer shrink-0 inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-full font-bold border transition-colors ${isPic ? "bg-amber-100 text-amber-700 border-amber-300" : "bg-muted text-muted-foreground hover:bg-muted/80 border-transparent"}`}>
+													{isPic && <Star className="w-3.5 h-3.5" />}
+													{isPic ? "PIC Terpilih" : "Jadikan PIC"}
+												</button>
 											)}
 										</div>
-									</div>
+									);
+								})
+							}
+						</div>
+					</div>
 
-									<DialogFooter>
-										<DialogClose asChild>
-											<Button variant="outline" type="button">
-												Batal
-											</Button>
-										</DialogClose>
-
-										<Button type="submit">Simpan</Button>
-									</DialogFooter>
-								</form>
-							</DialogContent>
-						</Dialog>
-					)}
-				</div>
-			</CardContent>
-			{/* Tombol Simpan dan Batal - hanya untuk owner/manager */}
-			{!isReadOnly && hasChanges() && (
-				<div className="flex items-center justify-end border-t-2 mx-5">
-					<div className="flex items-center gap-2 pt-5 pb-3">
+					<DialogFooter className="mt-2 p-3 border-t border-border/50">
 						<Button
+							className="hover:cursor-pointer"
 							variant="outline"
-							onClick={handleCancel}
-							disabled={isSaving}>
+							onClick={() => setIsStaffDialogOpen(false)}>
 							Batal
 						</Button>
-						<Button onClick={handleSave} disabled={isSaving}>
-							{isSaving ? "Menyimpan..." : "Simpan"}
+						<Button
+							className="bg-primary text-white hover:cursor-pointer"
+							onClick={handleAssignStaffSubmit}
+							disabled={isAssigningState}>
+							<Save className="w-4 h-4 mr-2" />
+							{isAssigningState ? "Menyimpan..." : "Simpan Konfigurasi"}
 						</Button>
-					</div>
-				</div>
-			)}
-		</Card>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+		</div>
 	);
 };
 

@@ -32,7 +32,7 @@ import CompanyList from "@/features/client/company/pages/company-list";
 import ServicesList from "@/features/client/services-wo/pages/services-list";
 import DashboardStaff from "@/features/staff/dahsboard-staff";
 import DashboardManager from "@/features/manager/dashboard-manager";
-import CompanyReportWo from "@/features/owner/company-wo/pages/company-report-wo";
+// import CompanyReportWo from "@/features/owner/company-wo/pages/company-report-wo";
 import HistoryStaffInvitations from "@/features/owner/staff-master/pages/history-staff-invitations";
 import InvitationsHistory from "@/features/staff/invitations/pages/invitations-history";
 import ProfilePage from "@/features/auth/pages/profile";
@@ -136,10 +136,10 @@ const router = createBrowserRouter([
 						path: "workorders/detail/:id",
 						element: <CompanyDetailWo />,
 					},
-					{
-						path: "workorders/:id/report",
-						element: <CompanyReportWo />,
-					},
+					// {
+					// 	path: "workorders/:id/report",
+					// 	element: <CompanyReportWo />,
+					// },
 					{
 						path: "membercodes",
 						element: <ViewMemberCodes />,

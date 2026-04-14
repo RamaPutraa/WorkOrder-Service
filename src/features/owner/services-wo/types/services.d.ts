@@ -34,31 +34,11 @@ type IntakeForms = {
 // ==========================
 // === REQUEST & RESPONSE ===
 // ==========================
-enum accessTypeService {
-	public,
-	member_only,
-	internal,
-}
-
-enum serviceRequestApprovalAccessType {
-	auto,
-	manager,
-}
-
-enum workOrderRequestApprovalAccessType {
-	auto,
-	staff_pic,
-}
-
-enum workReportRequestApprovalAccessType {
-	auto,
-	manager,
-}
 // request service (payload ke backend)
 type CreateServiceRequest = {
 	title: string;
 	description: string;
-	accessType: accessTypeService;
+	accessType: serviceAccessType;
 	isActive: boolean;
 	serviceRequestConfig: {
 		intakeFormId: string;
@@ -70,8 +50,8 @@ type CreateServiceRequest = {
 		positionId: string;
 		workOrderFormId: string;
 		workReportFormId: string;
-		workOrderApprovalAccessType: workOrderRequestApprovalAccessType;
-		workReportApprovalAccessType: workReportRequestApprovalAccessType;
+		workOrderApprovalAccessType: workOrderApprovalAccessType;
+		workReportApprovalAccessType: workReportApprovalAccessType;
 		minStaff: number;
 		maxStaff: number;
 	}[];

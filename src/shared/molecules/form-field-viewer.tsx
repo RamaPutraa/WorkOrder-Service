@@ -57,8 +57,6 @@ export default function FormFieldViewer({
 	const renderField = () => {
 		switch (field.type) {
 			case "text":
-			case "email":
-			case "password":
 				if (readOnly && !localValue && !field.placeholder) return null;
 				return (
 					<input

@@ -73,26 +73,13 @@ type Company = CompanyMinimal & {
 };
 
 // Services
-enum serviceAccessType {
-	public = "public",
-	member_only = "member_only",
-	internal = "internal",
-}
+type serviceAccessType = "public" | "member_only" | "internal";
 
-enum serviceRequestApprovalAccessType {
-	auto,
-	manager,
-}
+type serviceRequestApprovalAccessType = "auto" | "manager";
 
-enum workOrderApprovalAccessType {
-	auto,
-	staff_pic,
-}
+type workOrderApprovalAccessType = "auto" | "staff_pic";
 
-enum workReportApprovalAccessType {
-	auto,
-	manager,
-}
+type workReportApprovalAccessType = "auto" | "manager";
 
 type Service = {
 	_id: string;
@@ -109,17 +96,15 @@ type Service = {
 		reviewNeed: boolean;
 	};
 
-	workOrdersConfig: [
-		{
-			workOrderForm: Form;
-			workReportForm: Form;
-			positionsOnDuty: Position;
-			workOrderApprovalAccessType: workOrderApprovalAccessType;
-			workReportApprovalAccessType: workReportApprovalAccessType;
-			minStaff: number;
-			maxStaff: number;
-		},
-	];
+	workOrdersConfig: {
+		workOrderForm: Form;
+		workReportForm: Form;
+		positionsOnDuty: Position;
+		workOrderApprovalAccessType: workOrderApprovalAccessType;
+		workReportApprovalAccessType: workReportApprovalAccessType;
+		minStaff: number;
+		maxStaff: number;
+	}[];
 	createdAt: string;
 	updatedAt: string;
 };

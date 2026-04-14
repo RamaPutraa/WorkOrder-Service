@@ -139,7 +139,9 @@ export const useEditService = () => {
 		setTitle(service.title);
 		setDescription(service.description);
 		setAccessType(service.accessType as unknown as string);
-		setIsActive(service.isActive === true || service.isActive === "true" as any);
+		setIsActive(
+			service.isActive === true || service.isActive === ("true" as any),
+		);
 
 		if (service.serviceRequestConfig) {
 			setIntakeFormId(service.serviceRequestConfig.intakeForm?._id || "");
@@ -255,7 +257,7 @@ export const useEditService = () => {
 		const payload: CreateServiceRequest = {
 			title,
 			description,
-			accessType: accessType as unknown as accessTypeService,
+			accessType: accessType as unknown as serviceAccessType,
 			isActive: Boolean(isActive), // Ensure strict boolean type
 			serviceRequestConfig: {
 				intakeFormId,
@@ -269,9 +271,9 @@ export const useEditService = () => {
 				workOrderFormId: c.workOrderFormId,
 				workReportFormId: c.workReportFormId,
 				workOrderApprovalAccessType:
-					c.workOrderApprovalType as unknown as workOrderRequestApprovalAccessType,
-				workReportApprovalAcessType:
-					c.workReportApprovalType as unknown as workReportRequestApprovalAccessType,
+					c.workOrderApprovalType as unknown as workOrderApprovalAccessType,
+				workReportApprovalAccessType:
+					c.workReportApprovalType as unknown as workReportApprovalAccessType,
 				minStaff: c.minStaff,
 				maxStaff: c.maxStaff,
 			})),

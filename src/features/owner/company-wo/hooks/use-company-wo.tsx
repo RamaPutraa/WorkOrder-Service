@@ -1,8 +1,9 @@
 import { handleApi } from "@/lib/handle-api";
 import {
-	assignStaffToWorkOrder,
+	assignStaffToWorkOrderApi,
 	getInternalCompanyWorkOrderDetail,
 	getInternalCompanyWorkOrders,
+	getStaffListForAssign,
 } from "../services/company-wo-service";
 import { notifyError } from "@/lib/toast-helper";
 import { useEffect, useState, useMemo } from "react";
@@ -13,10 +14,8 @@ export const useCompanyWo = () => {
 	const { id } = useParams<{ id: string }>();
 	const [employees, setEmployees] = useState<StaffItem[]>([]);
 
-	const [data, setData] = useState<InternalWorkOrder[]>([]);
-	const [detailData, setDetailData] = useState<DetailInternalWorkOrder | null>(
-		null,
-	);
+	const [data, setData] = useState<WorkOrder[]>([]);
+	const [detailData, setDetailData] = useState<WorkOrderDetail | null>(null);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
@@ -25,9 +24,7 @@ export const useCompanyWo = () => {
 		setLoading(true);
 		setError(null);
 
-		const { data: res, error } = await handleApi(() =>
-			assignStaffToWorkOrder(),
-		);
+		const { data: res, error } = await handleApi(() => getStaffListForAssign());
 
 		setLoading(false);
 
