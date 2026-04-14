@@ -5,7 +5,7 @@ import StaffAssigned from "../components/staff-assigned";
 import { StatusBadge } from "../components/wo-status-badge";
 import { InfoRow } from "../components/wo-info-row";
 import { SiblingCard } from "../components/wo-sibling-card";
-import { WoFormInfo } from "../components/wo-form-info";
+import WorkOrderForms from "../components/work-order-forms";
 import {
 	Calendar,
 	User,
@@ -21,9 +21,9 @@ import {
 	Info,
 	Ban,
 	Timer,
-	PlusIcon,
 	Eye,
 	CircleCheckBig,
+	Send,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -32,6 +32,7 @@ import {
 	cancelWorkOrderApi,
 	completeWorkOrderApi,
 	failWorkOrderApi,
+	recreateRejectedWorkOrderApi,
 	rejectWorkOrderApi,
 	sendWorkOrderApi,
 	startWorkOrderApi,
@@ -263,6 +264,34 @@ const CompanyDetailWo = () => {
 		}
 	};
 
+	const handleRecreateWorkOrder = () => {
+		showDialog({
+			title: "Konfirmasi Pembuatan Ulang",
+			description:
+				"Apakah Anda yakin ingin membuat ulang perintah kerja ini? Status akan berubah menjadi 'Dibuat'.",
+			confirmText: "Ya, Buat Ulang",
+			cancelText: "Batal",
+			onConfirm: async () => {
+				setIsStarting(true);
+				const { error } = await handleApi(() =>
+					recreateRejectedWorkOrderApi(wo?._id ?? ""),
+				);
+				setIsStarting(false);
+				if (error) {
+					notifyError("Gagal membuat ulang perintah kerja", error.message);
+					return;
+				}
+				notifySuccess(
+					"Berhasil Dibuat Ulang",
+					"Perintah kerja telah dibuat ulang",
+				);
+				if (wo?._id) {
+					fecthDetailInternalCompanyWorkOrder(wo._id);
+				}
+			},
+		});
+	};
+
 	// WorkOrderDetailResponse = ApiResponse<WorkOrderDetail & { meta: WorkOrderMeta }>
 	// so detailData.data is WorkOrderDetail & { meta: WorkOrderMeta }
 	const wo = detailData as
@@ -382,8 +411,8 @@ const CompanyDetailWo = () => {
 							{currentStatus === "rejected" && (
 								<Button
 									className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
-									onClick={handleStartWorkOrder}>
-									<PlusIcon className="h-4 w-4" /> Buat Baru
+									onClick={handleRecreateWorkOrder}>
+									<Send className="h-4 w-4" /> Ajukan Ulang
 								</Button>
 							)}
 
@@ -407,7 +436,11 @@ const CompanyDetailWo = () => {
 									</Button>
 
 									<Button
-										onClick={() => navigate(-1)}
+										onClick={() =>
+											navigate(
+												`/dashboard/internal/workorders/${wo?._id}/report`,
+											)
+										}
 										className="bg-white hover:bg-muted/20 w-full md:w-auto text-black rounded-xl  h-11 shadow-sm shadow-white-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer">
 										<Eye className="h-4 w-4" /> Laporan Pengerjaan
 									</Button>
@@ -663,10 +696,14 @@ const CompanyDetailWo = () => {
 						/>
 					</div>
 
-					{/* ── Row 3: WO Siblings ── */}
-
 					{/* ── Row 5: Work Order Form Info ── */}
-					<WoFormInfo wo={wo} />
+					<WorkOrderForms
+						workOrderForm={wo.workOrderForm}
+						workOrderId={wo._id}
+						submissions={wo.submissions || []}
+						isReadOnly={isReadOnly}
+						onSaveSuccess={() => fecthDetailInternalCompanyWorkOrder(wo._id)}
+					/>
 				</motion.div>
 			)}
 

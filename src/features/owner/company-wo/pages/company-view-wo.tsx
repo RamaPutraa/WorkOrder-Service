@@ -112,7 +112,7 @@ const CompanyViewWo = () => {
 										}
 										className="flex flex-col h-full border shadow-md hover:shadow-lg rounded-lg transition-all duration-200 bg-gradient-to-br from-background to-muted/10 overflow-hidden hover:cursor-pointer">
 										{/* Header */}
-										<CardHeader className="pb-3">
+										<CardHeader className="pb-0 ">
 											<div className="flex items-center justify-between gap-3">
 												<div className="shrink-0 p-3 bg-primary/5 text-primary rounded-xl">
 													<ScrollText className="w-6 h-6" />
@@ -125,15 +125,11 @@ const CompanyViewWo = () => {
 														{wo.service?.description || "-"}
 													</p>
 												</div>
-												{/* <div
-													className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap ${statusConfig.className}`}>
-													{statusConfig.label}
-												</div> */}
 											</div>
 										</CardHeader>
-
+										<div className="border-b border-boder/10 mx-6"></div>
 										{/* Content */}
-										<CardContent className="flex-1 flex flex-col gap-4 pt-0">
+										<CardContent className="flex-1 flex flex-col gap-4 pt-0 ">
 											{/* Info Grid */}
 											<div className="space-y-3">
 												{/* status */}
@@ -191,22 +187,6 @@ const CompanyViewWo = () => {
 														</p>
 													</div>
 												</div>
-
-												<Separator />
-											</div>
-
-											{/* Action Buttons */}
-											<div className="grid grid-cols-1  mt-auto">
-												<Button
-													className="h-10 rounded-lg bg-primary text-white hover:bg-primary/90 transition-all duration-200 font-medium hover:cursor-pointer"
-													onClick={() =>
-														navigate(
-															`/dashboard/internal/workorders/${wo._id}/report`,
-														)
-													}>
-													<FileCheck className="w-4 h-4 mr-1" />
-													Laporan Pengerjaan
-												</Button>
 											</div>
 										</CardContent>
 									</Card>

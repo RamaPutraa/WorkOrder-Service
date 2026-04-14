@@ -84,17 +84,11 @@ type WorkOrderDetailResponse = ApiResponse<
 type WorkReport = {
 	_id: string;
 	workOrderId: string;
-	reportForm: string;
+	// TODO: nanti ini ubah, harusnya form id. ini karnea mock saja
+	reportForm: Form;
 	workReportApprovalAccessType: "auto" | "manager";
-	status:
-		| "draft"
-		| "sent"
-		| "approved"
-		| "unprocessable"
-		| "onProgress"
-		| "failed"
-		| "completed";
-	approvedBy: User;
+	status: "OnProgress" | "submitted" | "rejected" | "approved";
+	approvedBy: User | null;
 	submissions: SubmissionObject[];
 	createdAt: string;
 	updatedAt: string | null;

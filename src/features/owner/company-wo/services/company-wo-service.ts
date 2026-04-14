@@ -3,6 +3,8 @@ import {
 	dummyInternalWorkOrder,
 	dummyInternalWorkOrders,
 } from "../mocks/internal-work-order.mock";
+import { dummyWorkReportData } from "../mocks/internal-work-report.mock";
+
 
 const USE_MOCK = true; // TODO: Ubah ke false jika API backend sudah siap
 
@@ -148,6 +150,14 @@ export const failWorkOrderApi = async (
 
 // get work order report
 export const getWorkOrderReport = async (id: string) => {
+	if (USE_MOCK) {
+		await new Promise((resolve) => setTimeout(resolve, 500));
+		return {
+			data: dummyWorkReportData,
+			message: "Success (Mock)",
+			status: 200,
+		} as WorkReportResponse;
+	}
 	const response = await apiClient.get<WorkReportResponse>(
 		`/workorders/${id}/report`,
 	);

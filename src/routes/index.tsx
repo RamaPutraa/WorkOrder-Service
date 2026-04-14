@@ -46,6 +46,7 @@ import SrDetailHistory from "@/features/staff/service-request/pages/sr-detail-hi
 import ListServices from "@/features/staff/service-request/pages/list-services";
 import ServiceForm from "@/features/staff/service-request/pages/services-form";
 import SrConfirmation from "@/features/staff/service-request-confirmation/pages/sr-confirmation";
+import CompanyReportWo from "@/features/owner/company-wo/pages/company-report-wo";
 
 const router = createBrowserRouter([
 	{
@@ -136,10 +137,10 @@ const router = createBrowserRouter([
 						path: "workorders/detail/:id",
 						element: <CompanyDetailWo />,
 					},
-					// {
-					// 	path: "workorders/:id/report",
-					// 	element: <CompanyReportWo />,
-					// },
+					{
+						path: "workorders/:id/report",
+						element: <CompanyReportWo />,
+					},
 					{
 						path: "membercodes",
 						element: <ViewMemberCodes />,

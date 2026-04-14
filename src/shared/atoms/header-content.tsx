@@ -39,7 +39,7 @@ const PageHeader = ({
 						variant="outline"
 						size="icon"
 						onClick={() => navigate(-1)}
-						className="h-10 w-10 shrink-0 rounded-xl border-slate-200 hover:bg-slate-50 hover:text-blue-600 transition-all shadow-none">
+						className="h-10 w-10 shrink-0 rounded-xl border-slate-200 hover:bg-slate-50 hover:text-blue-600 transition-all shadow-none hover:cursor-pointer">
 						<ChevronLeft className="w-5 h-5" />
 					</Button>
 				)}

@@ -87,7 +87,7 @@ export const dummyInternalWorkOrders: WorkOrder[] = [
 			updatedAt: "2023-06-01T00:00:00Z",
 			__v: 0,
 		},
-		status: "onprogress",
+		status: "completed",
 		workOrderForm: {
 			_id: "form_wo_01",
 			title: "Form Work Order IT",
