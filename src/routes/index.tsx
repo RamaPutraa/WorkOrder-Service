@@ -47,6 +47,8 @@ import ListServices from "@/features/staff/service-request/pages/list-services";
 import ServiceForm from "@/features/staff/service-request/pages/services-form";
 import SrConfirmation from "@/features/staff/service-request-confirmation/pages/sr-confirmation";
 import CompanyReportWo from "@/features/owner/company-wo/pages/company-report-wo";
+import WoServicesList from "@/features/owner/wo-create/pages/services-list";
+import WoServicesDetail from "@/features/owner/wo-create/pages/services-detail";
 
 const router = createBrowserRouter([
 	{
@@ -148,6 +150,14 @@ const router = createBrowserRouter([
 					{
 						path: "membercodes/create",
 						element: <CreateMembercode />,
+					},
+					{
+						path: "wo-create/services",
+						element: <WoServicesList />,
+					},
+					{
+						path: "wo-create/services/detail/:id",
+						element: <WoServicesDetail />,
 					},
 				],
 			},

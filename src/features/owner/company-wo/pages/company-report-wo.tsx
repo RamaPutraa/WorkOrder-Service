@@ -73,26 +73,27 @@ const CompanyReportWo = () => {
 				notifyError("Gagal memuat laporan", error.message);
 				return;
 			}
-			
+
 			const newReportData = res?.data ?? null;
 			setReportData(newReportData);
 
 			if (newReportData?.reportForm) {
-				const formIdToFetch = typeof newReportData.reportForm === 'string' 
-					? newReportData.reportForm 
-					: (newReportData.reportForm as any)._id;
+				const formIdToFetch =
+					typeof newReportData.reportForm === "string" ?
+						newReportData.reportForm
+					:	(newReportData.reportForm as any)._id;
 
 				const { data: formRes, error: formError } = await handleApi(() =>
-					getFormByIdApi(formIdToFetch)
+					getFormByIdApi(formIdToFetch),
 				);
-				
+
 				if (formError) {
 					notifyError("Gagal memuat formulir", formError.message);
 				} else {
 					setFormObject(formRes?.data ?? null);
 				}
 			}
-			
+
 			setLoading(false);
 		};
 		void fetchReportData();
@@ -172,9 +173,10 @@ const CompanyReportWo = () => {
 			onConfirm: async () => {
 				setIsSaving(true);
 
-				const formIdToSave = typeof reportData.reportForm === 'string'
-					? reportData.reportForm
-					: (reportData.reportForm as any)._id;
+				const formIdToSave =
+					typeof reportData.reportForm === "string" ?
+						reportData.reportForm
+					:	(reportData.reportForm as any)._id;
 
 				// Cari the latest object to decide if we append or create new.
 				const latestSubmission = reportData.submissions?.find(
@@ -202,8 +204,8 @@ const CompanyReportWo = () => {
 					updatedAt: new Date().toISOString(),
 				};
 
-				const { error } = await handleApi(
-					() => submitWorkOrderReportApi(reportData._id, submissionToSend),
+				const { error } = await handleApi(() =>
+					submitWorkOrderReportApi(reportData._id, submissionToSend),
 				);
 
 				setIsSaving(false);
@@ -245,17 +247,31 @@ const CompanyReportWo = () => {
 		switch (status.toLowerCase()) {
 			case "onprogress":
 				return {
-					bg: "bg-primary/5",
-					text: "text-primary",
+					bg: "bg-gray-100",
+					text: "text-gray-700",
 					label: "Sedang Dikerjakan",
 					icon: Clock,
 				};
 			case "submitted":
 				return {
-					bg: "bg-green-100",
-					text: "text-green-700",
+					bg: "bg-primary/5",
+					text: "text-primary",
 					label: "Terkirim",
 					icon: Clock,
+				};
+			case "approved":
+				return {
+					bg: "bg-green-100",
+					text: "text-green-700",
+					label: "Disetujui",
+					icon: CheckCircle2,
+				};
+			case "rejected":
+				return {
+					bg: "bg-red-100",
+					text: "text-red-700",
+					label: "Ditolak",
+					icon: XCircle,
 				};
 		}
 	};
@@ -263,9 +279,10 @@ const CompanyReportWo = () => {
 	const handleSendWorkReport = () => {
 		if (!reportData || !id) return;
 
-		const formIdToSend = typeof reportData.reportForm === 'string'
-			? reportData.reportForm
-			: (reportData.reportForm as any)._id;
+		const formIdToSend =
+			typeof reportData.reportForm === "string" ?
+				reportData.reportForm
+			:	(reportData.reportForm as any)._id;
 
 		// Cari the latest object to send
 		const latestSubmission = reportData.submissions?.find(
@@ -340,9 +357,7 @@ const CompanyReportWo = () => {
 				);
 				// Re-fetch
 				if (id) {
-					const { data: res } = await handleApi(() =>
-						getWorkOrderReport(id),
-					);
+					const { data: res } = await handleApi(() => getWorkOrderReport(id));
 					if (res?.data) setReportData(res.data);
 				}
 			},
@@ -368,15 +383,10 @@ const CompanyReportWo = () => {
 					notifyError("Gagal menolak laporan", error.message);
 					return;
 				}
-				notifySuccess(
-					"Laporan Ditolak",
-					"Laporan tugas kerja telah ditolak.",
-				);
+				notifySuccess("Laporan Ditolak", "Laporan tugas kerja telah ditolak.");
 				// Re-fetch
 				if (id) {
-					const { data: res } = await handleApi(() =>
-						getWorkOrderReport(id),
-					);
+					const { data: res } = await handleApi(() => getWorkOrderReport(id));
 					if (res?.data) setReportData(res.data);
 				}
 			},
@@ -436,10 +446,13 @@ const CompanyReportWo = () => {
 								</p>
 								<div className="flex items-center gap-2">
 									<User className="w-4 h-4 text-gray-400" />
+
 									<span
 										className={`text-sm font-bold ${reportData.approvedBy ? "text-gray-900" : "text-gray-400"}`}>
 										{reportData.approvedBy ?
 											reportData.approvedBy.name
+										: reportData.workReportApprovalAccessType === "auto" ?
+											"Disetujui Otomatis"
 										:	"Belum disetujui"}
 									</span>
 								</div>

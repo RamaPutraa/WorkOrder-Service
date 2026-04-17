@@ -152,16 +152,21 @@ const data = {
 	],
 	navInternalBusiness: [
 		{
+			title: "Daftar Layanan",
+			url: "/dashboard/internal/wo-create/services",
+			icon: ClipboardList,
+		},
+		{
 			title: "Permintaan Layanan",
 			url: "#",
 			icon: Send,
 			items: [
 				{
-					title: "Daftar Layanan",
+					title: "Daftar Permintaan ",
 					url: "/dashboard/internal/business/services/request",
 				},
 				{
-					title: "Riwayat Layanan",
+					title: "Riwayat Permintaan ",
 					url: "#",
 				},
 			],

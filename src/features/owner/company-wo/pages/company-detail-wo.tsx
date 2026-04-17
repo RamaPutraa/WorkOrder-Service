@@ -304,7 +304,13 @@ const CompanyDetailWo = () => {
 	const canComplete = meta?.workOrderCapabilities.can_complete;
 	const canFail = meta?.workOrderCapabilities.can_fail;
 	const userPic = wo?.staffPIC?.email == user?.email;
-	const userCreated = wo?.createdBy?.email == user?.email;
+	// true  → user adalah pembuatnya
+	// false → user bukan pembuatnya
+	// null  → data createdBy tidak tersedia (belum diisi)
+	const userCreated: boolean | null =
+		wo?.createdBy == null ? null
+		: wo.createdBy.email === user?.email ? true
+		: false;
 	const userAssigned = wo?.assignedStaff?.some((s) => s.email == user?.email);
 	const isDrafted = currentStatus === "drafted";
 
@@ -347,7 +353,8 @@ const CompanyDetailWo = () => {
 								currentStatus === "sent") && (
 								<>
 									{(user?.role === "owner_company" ||
-										user?.role === "manager_company") && (
+										userCreated === true ||
+										userCreated === null) && (
 										<Button
 											className=" bg-red-600 hover:bg-red-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-red-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
 											onClick={handleCancelWorkOrder}>
@@ -545,13 +552,40 @@ const CompanyDetailWo = () => {
 
 														{!meta.workOrderCapabilities.can_start &&
 															!meta.workOrderCapabilities.can_complete &&
-															!meta.workOrderCapabilities.can_fail && (
+															!meta.workOrderCapabilities.can_fail &&
+															wo.status === "drafted" && (
 																<Alert className="max-w-full bg-yellow-50 text-yellow-800 border-yellow-200 [&>svg]:text-yellow-800">
 																	<Ban className="h-4 w-4" />
-																	<AlertTitle>Menunggu</AlertTitle>
+																	<AlertTitle>Dirancang</AlertTitle>
 																	<AlertDescription>
-																		Menunggu konfirmasi/konfigurasi perintah
-																		kerja terkait
+																		Perintah kerja ini masih dalam tahap
+																		desain/konfigurasi
+																	</AlertDescription>
+																</Alert>
+															)}
+
+														{!meta.workOrderCapabilities.can_start &&
+															!meta.workOrderCapabilities.can_complete &&
+															!meta.workOrderCapabilities.can_fail &&
+															wo.status === "sent" && (
+																<Alert className="max-w-full bg-yellow-50 text-yellow-800 border-yellow-200 [&>svg]:text-yellow-800">
+																	<Ban className="h-4 w-4" />
+																	<AlertTitle>Menunggu Persetujuan</AlertTitle>
+																	<AlertDescription>
+																		Menunggu konfirmasi departemen terkait.
+																	</AlertDescription>
+																</Alert>
+															)}
+
+														{!meta.workOrderCapabilities.can_start &&
+															!meta.workOrderCapabilities.can_complete &&
+															!meta.workOrderCapabilities.can_fail &&
+															wo.status === "approved" && (
+																<Alert className="max-w-full bg-green-50 text-green-800 border-green-200 [&>svg]:text-green-800">
+																	<CheckCircle2Icon className="h-4 w-4" />
+																	<AlertTitle>Disetujui</AlertTitle>
+																	<AlertDescription>
+																		Menunggu konfirmasi perintah kerja terkait.
 																	</AlertDescription>
 																</Alert>
 															)}
@@ -638,9 +672,9 @@ const CompanyDetailWo = () => {
 															</p>
 														</div>
 													</div>
-												:	<span className="text-muted-foreground text-sm italic">
-														Belum ada
-													</span>
+												: wo.workOrderApprovalAccessType === "auto" ?
+													"Otomatis disetujui"
+												:	"Belum disetujui"
 											}
 										/>
 										<div className="border-b border-border/50" />

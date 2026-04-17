@@ -25,7 +25,7 @@ const CompanyViewWo = () => {
 	// Status badge configuration
 	const getStatusConfig = (status: string) => {
 		switch (status) {
-			case "draft":
+			case "drafted":
 				return {
 					className: " text-gray-600",
 					label: "Dirancang",
@@ -45,7 +45,7 @@ const CompanyViewWo = () => {
 					className: " text-yellow-600",
 					label: "Belum dapat dikerjakan",
 				};
-			case "onProgress":
+			case "onprogress":
 				return {
 					className: " text-blue-600",
 					label: "Sedang dikerjakan",
@@ -160,9 +160,18 @@ const CompanyViewWo = () => {
 														<p className="text-xs font-medium text-muted-foreground mb-0.5">
 															Disetujui Oleh
 														</p>
-														<p className="text-sm font-medium truncate">
-															{wo.approvedBy?.name || "-"}
-														</p>
+														{wo.approvedBy ?
+															<p className="text-sm font-medium truncate">
+																{wo.approvedBy?.name || "-"}
+															</p>
+														: wo.workOrderApprovalAccessType === "auto" ?
+															<p className="text-sm font-medium truncate">
+																Otomatis disetujui
+															</p>
+														:	<p className="text-sm font-medium truncate">
+																Belum disetujui
+															</p>
+														}
 													</div>
 												</div>
 

@@ -1,23 +1,7 @@
 import apiClient from "@/lib/api";
-import {
-	dummyInternalWorkOrder,
-	dummyInternalWorkOrders,
-} from "../mocks/internal-work-order.mock";
-import { dummyWorkReportData } from "../mocks/internal-work-report.mock";
-
-const USE_MOCK = false;
 
 // get all wo
 export const getInternalCompanyWorkOrders = async () => {
-	if (USE_MOCK) {
-		await new Promise((resolve) => setTimeout(resolve, 500));
-		return {
-			data: dummyInternalWorkOrders,
-			message: "Success (Mock)",
-			status: 200,
-		} as GetAllWorkOrderResponse;
-	}
-
 	const response = await apiClient.get<GetAllWorkOrderResponse>("/workorders");
 	return response.data;
 };
@@ -26,14 +10,6 @@ export const getInternalCompanyWorkOrders = async () => {
 export const getInternalCompanyWorkOrderDetail = async (id: string) => {
 	const response = await apiClient.get<WorkOrderDetailResponse>(
 		`/workorders/${id}`,
-	);
-	return response.data;
-};
-
-// create wo
-export const createWorkOrderApi = async (id: string) => {
-	const response = await apiClient.post<CreateWorkOrderResponse>(
-		`/services/${id}/create-work-order`,
 	);
 	return response.data;
 };

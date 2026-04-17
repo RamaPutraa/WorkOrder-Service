@@ -66,7 +66,7 @@ const PageHeader = ({
 						<Button
 							onClick={onAddClick}
 							disabled={loading}
-							className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl px-5 h-11 shadow-sm shadow-blue-200 transition-all flex items-center gap-2 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed">
+							className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl px-5 h-11 shadow-sm shadow-blue-200 transition-all flex items-center gap-2 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer">
 							{loading ?
 								<ButtonLoading />
 							:	addIcon}

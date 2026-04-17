@@ -1,10 +1,6 @@
 // get all work order
 type GetAllWorkOrderResponse = ApiResponse<WorkOrder[]>;
 
-// create work order
-// request id from sr id
-type CreateWorkOrderResponse = ApiResponse<WorkOrder>;
-
 // create rejected work order
 // request id from sr id
 type CreateRejectedWorkOrderResponse = ApiResponse<WorkOrder>;
