@@ -61,6 +61,33 @@ const ServiceSubmitPage = () => {
 					</span>
 				</div>
 			);
+		if (s === "onprogress")
+			return (
+				<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-blue-600 ">
+					<span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+					<span className="text-[10px] font-bold uppercase tracking-wider">
+						Sedang Dikerjakan
+					</span>
+				</div>
+			);
+		if (s === "completed")
+			return (
+				<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-emerald-600 ">
+					<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+					<span className="text-[10px] font-bold uppercase tracking-wider">
+						Selesai
+					</span>
+				</div>
+			);
+		if (s === "unprocessable")
+			return (
+				<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-red-600 ">
+					<span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+					<span className="text-[10px] font-bold uppercase tracking-wider">
+						Tidak Dapat Diproses
+					</span>
+				</div>
+			);
 		return (
 			<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-amber-600 ">
 				<span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />

@@ -34,7 +34,7 @@ export const SiblingCard = ({
 				<span className="text-sm font-medium">{sibling.code}</span>
 				{isCurrent && (
 					<span className="text-[10px] px-1.5 py-0.5 rounded bg-primary text-primary-foreground font-semibold">
-						Ini
+						Sedang diakses
 					</span>
 				)}
 			</div>

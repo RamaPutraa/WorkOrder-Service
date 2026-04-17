@@ -10,7 +10,7 @@ import {
 
 export const getStatusConfig = (status: string) => {
 	switch (status) {
-		case "draft":
+		case "drafted":
 			return {
 				label: "Dirancang",
 				colorClass: "text-gray-600 bg-gray-100 border-gray-200",

@@ -303,11 +303,15 @@ const CompanyDetailWo = () => {
 	const canStart = meta?.workOrderCapabilities.can_start;
 	const canComplete = meta?.workOrderCapabilities.can_complete;
 	const canFail = meta?.workOrderCapabilities.can_fail;
+	const userPic = wo?.staffPIC?.email == user?.email;
+	const userCreated = wo?.createdBy?.email == user?.email;
+	const userAssigned = wo?.assignedStaff?.some((s) => s.email == user?.email);
+	const isDrafted = currentStatus === "drafted";
 
 	const getHeaderSubtitle = () => {
 		if (!wo) return <TextLoading variant="skeleton" />;
 		switch (currentStatus) {
-			case "draft":
+			case "drafted":
 				return "Lakukan konfigurasi sebelum memulai perintah kerja.";
 			case "sent":
 				return "Menunggu persetujuan perintah kerja.";
@@ -335,26 +339,26 @@ const CompanyDetailWo = () => {
 				backPath={true}
 				className={`sticky top-0 z-30 transition-shadow duration-300 ${isSticky ? "shadow-md rounded-b-md px-4 sm:px-6 bg-background" : ""}`}
 				actionButtons={
-					!isReadOnly && (
+					(!isReadOnly || userPic || userAssigned) && (
 						<>
-							{(currentStatus === "draft" ||
+							{(currentStatus === "drafted" ||
 								currentStatus === "approved" ||
 								currentStatus === "rejected" ||
 								currentStatus === "sent") && (
 								<>
-									{/* {(user?.role === "owner_company" ||
-										user?.role === "manager_company") && ( */}
-									<Button
-										className=" bg-red-600 hover:bg-red-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-red-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
-										onClick={handleCancelWorkOrder}>
-										<XCircle className="h-4 w-4" />
-										{isSubmittingReady ? "Memproses..." : "Batalkan"}
-									</Button>
-									{/* )} */}
+									{(user?.role === "owner_company" ||
+										user?.role === "manager_company") && (
+										<Button
+											className=" bg-red-600 hover:bg-red-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-red-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
+											onClick={handleCancelWorkOrder}>
+											<XCircle className="h-4 w-4" />
+											{isSubmittingReady ? "Memproses..." : "Batalkan"}
+										</Button>
+									)}
 								</>
 							)}
 
-							{currentStatus === "draft" && (
+							{currentStatus === "drafted" && (
 								<Button
 									className=" bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
 									onClick={handleSendWorkOrder}
@@ -377,18 +381,18 @@ const CompanyDetailWo = () => {
 									{user?.role === "staff_company" && (
 										<>
 											<Button
-												className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
-												onClick={handleApproveWorkOrder}
-												disabled={isStarting}>
-												<CheckCircle2 className="h-4 w-4" />
-												{isStarting ? "Memproses" : "Setujui"}
-											</Button>
-											<Button
 												className="bg-red-600 hover:bg-red-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-red-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
 												onClick={handleRejectWorkOrder}
 												disabled={isStarting}>
 												<XCircle className="h-4 w-4" />
 												{isStarting ? "Memproses" : "Tolak"}
+											</Button>
+											<Button
+												className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
+												onClick={handleApproveWorkOrder}
+												disabled={isStarting}>
+												<CheckCircle2 className="h-4 w-4" />
+												{isStarting ? "Memproses" : "Setujui"}
 											</Button>
 										</>
 									)}
@@ -701,7 +705,7 @@ const CompanyDetailWo = () => {
 						workOrderForm={wo.workOrderForm}
 						workOrderId={wo._id}
 						submissions={wo.submissions || []}
-						isReadOnly={isReadOnly}
+						isReadOnly={isReadOnly || !isDrafted}
 						onSaveSuccess={() => fecthDetailInternalCompanyWorkOrder(wo._id)}
 					/>
 				</motion.div>

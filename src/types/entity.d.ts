@@ -97,6 +97,7 @@ type Service = {
 	};
 
 	workOrdersConfig: {
+		_id: string;
 		workOrderForm: Form;
 		workReportForm: Form;
 		positionsOnDuty: Position;

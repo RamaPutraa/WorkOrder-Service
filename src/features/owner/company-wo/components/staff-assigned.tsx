@@ -1,7 +1,17 @@
 import { useState } from "react";
-import { Users, Settings, Save, Star } from "lucide-react";
+import { Users, Settings, Save, Star, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
 	Dialog,
 	DialogContent,
@@ -28,17 +38,23 @@ const StaffRow = ({
 	staff,
 	isPIC,
 	highlight = false,
+	onClick,
 }: {
 	staff: User | StaffItem;
 	isPIC: boolean;
 	highlight?: boolean;
+	onClick?: () => void;
 }) => (
 	<div
-		className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+		onClick={onClick}
+		className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${onClick ? "cursor-pointer" : ""} ${
 			highlight ?
 				"bg-amber-50 border-amber-200"
 			:	"bg-muted/20 border-border/50 hover:bg-muted/40"
 		}`}>
+		{onClick && (
+			<Checkbox checked={highlight} className="pointer-events-none" />
+		)}
 		<div
 			className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
 				highlight ? "bg-amber-100 text-amber-700" : "bg-primary/10 text-primary"
@@ -72,6 +88,10 @@ export const StaffAssigned = ({
 	const [selectedStaffEmails, setSelectedStaffEmails] = useState<string[]>([]);
 	const [picEmail, setPicEmail] = useState<string>("");
 	const [isAssigningState, setIsAssigningState] = useState(false);
+	const [selectedStaffsToRemove, setSelectedStaffsToRemove] = useState<
+		string[]
+	>([]);
+	const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
 	const handleOpenStaffDialog = () => {
 		if (employees.length === 0) fetchEmployeeList();
@@ -83,23 +103,13 @@ export const StaffAssigned = ({
 
 	const handleAssignStaffSubmit = async () => {
 		if (!wo) return;
-		if (!picEmail) {
-			notifyError("Validasi Gagal", "PIC harus dipilih.");
-			return;
-		}
+
 		if (selectedStaffEmails.length < wo.minStaff) {
 			notifyError("Validasi Gagal", `Minimal ${wo.minStaff} pegawai.`);
 			return;
 		}
 		if (selectedStaffEmails.length > wo.maxStaff) {
 			notifyError("Validasi Gagal", `Maksimal ${wo.maxStaff} pegawai.`);
-			return;
-		}
-		if (!selectedStaffEmails.includes(picEmail)) {
-			notifyError(
-				"Validasi Gagal",
-				"PIC harus termasuk dalam pegawai yang dipilih.",
-			);
 			return;
 		}
 
@@ -118,6 +128,61 @@ export const StaffAssigned = ({
 		}
 		notifySuccess("Berhasil", "Konfigurasi pegawai bertugas diperbarui");
 		setIsStaffDialogOpen(false);
+		onAssignSuccess();
+	};
+
+	const handleOpenConfirm = () => {
+		if (selectedStaffsToRemove.length === 0 || !wo) return;
+
+		const updatedAssignStaffs = wo.assignedStaff
+			.filter((s) => !selectedStaffsToRemove.includes(s.email))
+			.map((s) => s.email);
+
+		if (updatedAssignStaffs.length < wo.minStaff) {
+			notifyError(
+				"Validasi Gagal",
+				`Tidak bisa menghapus. Minimal ${wo.minStaff} pegawai harus bertugas.`,
+			);
+			return;
+		}
+
+		let updatedPicEmail = wo.staffPIC?.email || "";
+		if (selectedStaffsToRemove.includes(updatedPicEmail)) {
+			notifyError(
+				"Validasi Gagal",
+				"Tidak bisa menghapus Staff PIC secara langsung. Silakan ubah PIC melalui konfigurasi terlebih dahulu.",
+			);
+			return;
+		}
+
+		setIsConfirmOpen(true);
+	};
+
+	const handleRemoveStaffSubmit = async () => {
+		if (!wo || selectedStaffsToRemove.length === 0) return;
+
+		const updatedAssignStaffs = wo.assignedStaff
+			.filter((s) => !selectedStaffsToRemove.includes(s.email))
+			.map((s) => s.email);
+
+		let updatedPicEmail = wo.staffPIC?.email || "";
+
+		setIsAssigningState(true);
+		const { error } = await handleApi(() =>
+			assignStaffToWorkOrderApi(wo._id, {
+				assign_staffs: updatedAssignStaffs,
+				staff_pic: updatedPicEmail,
+			}),
+		);
+		setIsAssigningState(false);
+
+		if (error) {
+			notifyError("Gagal menghapus", error.message);
+			return;
+		}
+		notifySuccess("Berhasil", "Pegawai berhasil dihapus dari tugas");
+		setSelectedStaffsToRemove([]);
+		setIsConfirmOpen(false);
 		onAssignSuccess();
 	};
 
@@ -158,21 +223,44 @@ export const StaffAssigned = ({
 										key={staff._id}
 										staff={staff}
 										isPIC={staff.email === wo.staffPIC?.email}
+										highlight={selectedStaffsToRemove.includes(staff.email)}
+										onClick={
+											isReadOnly || currentStatus !== "drafted" ?
+												undefined
+											:	() =>
+													setSelectedStaffsToRemove((prev) =>
+														prev.includes(staff.email) ?
+															prev.filter((e) => e !== staff.email)
+														:	[...prev, staff.email],
+													)
+										}
 									/>
 								))}
 							</div>
 						}
 					</div>
 				</div>
-				<div>
+				<div className="flex gap-2">
 					<Button
 						onClick={handleOpenStaffDialog}
-						disabled={isReadOnly || currentStatus !== "draft"}
-						className="bg-blue-600 hover:cursor-pointer hover:bg-blue-700 w-full md:w-auto text-white rounded-xl px-5 h-11 shadow-sm shadow-blue-200 transition-all flex items-center gap-2 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed">
+						disabled={isReadOnly || currentStatus !== "drafted"}
+						className="bg-blue-600 hover:cursor-pointer hover:bg-blue-700 flex-1 md:flex-none text-white rounded-xl px-5 h-11 shadow-sm shadow-blue-200 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed">
 						<Settings className="w-4 h-4" />
 						<span className="font-semibold text-xs">
 							Konfigurasi Pegawai Bertugas
 						</span>
+					</Button>
+					<Button
+						onClick={handleOpenConfirm}
+						disabled={
+							isReadOnly ||
+							currentStatus !== "drafted" ||
+							selectedStaffsToRemove.length === 0 ||
+							isAssigningState
+						}
+						variant="destructive"
+						className="rounded-xl hover:cursor-pointer px-6 h-11 transition-all active:scale-95 flex items-center justify-center disabled:opacity-50">
+						<Trash2 className="w-4 h-4" />
 					</Button>
 				</div>
 
@@ -303,6 +391,34 @@ export const StaffAssigned = ({
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
+
+			<AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+				<AlertDialogContent className="rounded-2xl max-w-md">
+					<AlertDialogHeader>
+						<AlertDialogTitle>Hapus Pegawai Bertugas?</AlertDialogTitle>
+						<AlertDialogDescription>
+							Anda yakin ingin menghapus {selectedStaffsToRemove.length} pegawai
+							dari tugas ini? Tindakan ini akan segera memperbarui data tugas.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel
+							disabled={isAssigningState}
+							className="hover:cursor-pointer rounded-xl">
+							Batal
+						</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={(e) => {
+								e.preventDefault();
+								handleRemoveStaffSubmit();
+							}}
+							disabled={isAssigningState}
+							className="bg-red-600 text-white hover:bg-red-700 hover:cursor-pointer rounded-xl">
+							{isAssigningState ? "Menghapus..." : "Ya, Hapus"}
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</div>
 	);
 };

@@ -63,7 +63,14 @@ export const useCompanyWo = () => {
 			notifyError("Gagal memuat detail tugas kerja", error.message);
 			return;
 		}
-		setDetailData(res?.data ?? null);
+		if (res?.data) {
+			setDetailData({
+				...res.data,
+				...(res.meta ? { meta: res.meta } : {}),
+			});
+		} else {
+			setDetailData(null);
+		}
 		console.log(res);
 	};
 

@@ -1,3 +1,6 @@
+// get all work order
+type GetAllWorkOrderResponse = ApiResponse<WorkOrder[]>;
+
 // create work order
 // request id from sr id
 type CreateWorkOrderResponse = ApiResponse<WorkOrder>;
@@ -15,7 +18,7 @@ type AssignStaffToWorkOrder = ApiResponse<StaffItem[]> & {
 };
 // assign staff to wo
 type AssignStaffToWorkOrderRequest = {
-	staff_pic: string;
+	staff_pic: string | null;
 	assign_staffs: string[];
 };
 type AssignStaffToWorkOrderResponse = ApiResponse<WorkOrder>;

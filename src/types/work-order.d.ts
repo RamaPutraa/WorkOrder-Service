@@ -26,7 +26,7 @@ type WorkOrder = {
 	assignedStaff: User[];
 	staffPIC: User | null;
 	status:
-		| "draft"
+		| "drafted"
 		| "sent"
 		| "approved"
 		| "rejected"
@@ -60,7 +60,7 @@ type WorkOrderDetail = {
 	assignedStaff: User[];
 	staffPIC: User | null;
 	status:
-		| "draft"
+		| "drafted"
 		| "sent"
 		| "approved"
 		| "rejected"
@@ -76,16 +76,14 @@ type WorkOrderDetail = {
 	createdAt: string;
 	updatedAt: string | null;
 	deletedAt: string | null;
+	meta?: WorkOrderMeta;
 };
-type WorkOrderDetailResponse = ApiResponse<
-	WorkOrderDetail & { meta: WorkOrderMeta }
->;
+type WorkOrderDetailResponse = ApiResponse<WorkOrderDetail>;
 
 type WorkReport = {
 	_id: string;
 	workOrderId: string;
-	// TODO: nanti ini ubah, harusnya form id. ini karnea mock saja
-	reportForm: Form;
+	reportForm: string;
 	workReportApprovalAccessType: "auto" | "manager";
 	status: "OnProgress" | "submitted" | "rejected" | "approved";
 	approvedBy: User | null;

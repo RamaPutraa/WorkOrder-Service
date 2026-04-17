@@ -82,8 +82,11 @@ type RequesterSR = {
 		| "rejected"
 		| "approved"
 		| "workOrderCreated"
+		| "onprogress"
 		| "completed"
-		| "closed";
+		| "closed"
+		| "failed"
+		| "unprocessable";
 	company: Company;
 	service: ServiceSummaryObject;
 	requestedBy: User;
@@ -107,8 +110,11 @@ type RequesterSRDetailRequest = {
 		| "rejected"
 		| "approved"
 		| "workOrderCreated"
+		| "onprogress"
 		| "completed"
-		| "closed";
+		| "closed"
+		| "failed"
+		| "unprocessable";
 	company: Company;
 	service: ServiceSummaryObject;
 	requestedBy: User;

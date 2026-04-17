@@ -135,7 +135,7 @@ const WorkOrderForms = ({
 				};
 
 				const { error } = await handleApi(() =>
-					submitWorkOrderFormApi(workOrderId, [submissionToSend]),
+					submitWorkOrderFormApi(workOrderId, submissionToSend),
 				);
 
 				setIsSaving(false);

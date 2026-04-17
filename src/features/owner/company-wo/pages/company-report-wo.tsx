@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { SectionLoading } from "@/shared/atoms";
 import PageHeader from "@/shared/atoms/header-content";
 import { EmptyData } from "@/shared/molecules/empty-data";
@@ -10,17 +9,22 @@ import FormFieldViewer, {
 	type AnswerValue,
 } from "@/shared/molecules/form-field-viewer";
 import { useDialogStore } from "@/store/dialogStore";
+import { useAuthStore } from "@/store/authStore";
 import { handleApi } from "@/lib/handle-api";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
 import {
 	getWorkOrderReport,
 	sentWorkOrderReportApi,
 	submitWorkOrderReportApi,
+	approvedWorkOrderReportApi,
+	rejectWorkOrderReportApi,
 } from "../services/company-wo-service";
+import { getFormByIdApi } from "@/features/owner/form/services/formService";
 import {
 	Calendar,
 	Clock,
 	XCircle,
+	CheckCircle2,
 	Pencil,
 	Save,
 	X,
@@ -33,11 +37,19 @@ const CompanyReportWo = () => {
 	const navigate = useNavigate();
 	const { id } = useParams<{ id: string }>();
 	const { showDialog } = useDialogStore();
+	const { user } = useAuthStore();
 	const [reportData, setReportData] = useState<WorkReport | null>(null);
+	const [formObject, setFormObject] = useState<Form | null>(null);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [isSaving, setIsSaving] = useState(false);
+	const [isProcessing, setIsProcessing] = useState(false);
 	const [isEditMode, setIsEditMode] = useState(false);
+
+	// Role-based permissions
+	const isReviewer =
+		user?.role === "owner_company" || user?.role === "manager_company";
+	const canEdit = !isReviewer; // only staff can edit/submit report
 
 	// State for form data tracking
 	const [formData, setFormData] = useState<Map<number, AnswerValue>>(new Map());
@@ -54,33 +66,47 @@ const CompanyReportWo = () => {
 			const { data: res, error } = await handleApi(() =>
 				getWorkOrderReport(id),
 			);
-			setLoading(false);
 
 			if (error) {
+				setLoading(false);
 				setError(error.message);
 				notifyError("Gagal memuat laporan", error.message);
 				return;
 			}
-			setReportData(res?.data ?? null);
+			
+			const newReportData = res?.data ?? null;
+			setReportData(newReportData);
+
+			if (newReportData?.reportForm) {
+				const formIdToFetch = typeof newReportData.reportForm === 'string' 
+					? newReportData.reportForm 
+					: (newReportData.reportForm as any)._id;
+
+				const { data: formRes, error: formError } = await handleApi(() =>
+					getFormByIdApi(formIdToFetch)
+				);
+				
+				if (formError) {
+					notifyError("Gagal memuat formulir", formError.message);
+				} else {
+					setFormObject(formRes?.data ?? null);
+				}
+			}
+			
+			setLoading(false);
 		};
 		void fetchReportData();
 	}, [id]);
 
-	// Initialize form data when reportData is loaded
+	// Initialize form data when reportData and formObject are loaded
 	useEffect(() => {
-		if (!reportData) return;
-
-		// TODO: Ketika endpoint API asli sudah jadi, reportForm mungkin berbentuk string (berisi ID form)
-		// bukan object utuh. Jika itu terjadi, Anda perlu melakukan GET fetch tambahan memakai ID form
-		// untuk mendapatkan object form (berisi title, description, dan fields) sebelum menjabarkan logic di bawah ini.
-		const formObj = reportData.reportForm;
+		if (!reportData || !formObject) return;
 
 		const fieldMap = new Map<number, AnswerValue>();
 
 		const getLatestSubmission = (submissions: SubmissionObject[]) => {
 			if (!submissions || submissions.length === 0) return null;
-			// Di backend terbaru, formId akan merujuk ke ID dari form. Jika reportForm berbentuk ID, ganti akses ini.
-			const relevant = submissions.filter((s) => s.formId === formObj?._id);
+			const relevant = submissions.filter((s) => s.formId === formObject._id);
 			if (relevant.length === 0) return null;
 			return relevant.reduce((latest, current) =>
 				new Date(current.updatedAt) > new Date(latest.updatedAt) ?
@@ -91,8 +117,8 @@ const CompanyReportWo = () => {
 
 		const latestSubmission = getLatestSubmission(reportData.submissions || []);
 
-		if (formObj && formObj.fields) {
-			formObj.fields.forEach((field) => {
+		if (formObject && formObject.fields) {
+			formObject.fields.forEach((field) => {
 				let answer: AnswerValue = null;
 				if (latestSubmission) {
 					const submittedData = latestSubmission.fieldsData.find(
@@ -111,7 +137,7 @@ const CompanyReportWo = () => {
 		if (!latestSubmission) {
 			setIsEditMode(true);
 		}
-	}, [reportData]);
+	}, [reportData, formObject]);
 
 	// Listen to field changes
 	const handleFieldChange = (order: number, value: AnswerValue) => {
@@ -146,9 +172,13 @@ const CompanyReportWo = () => {
 			onConfirm: async () => {
 				setIsSaving(true);
 
+				const formIdToSave = typeof reportData.reportForm === 'string'
+					? reportData.reportForm
+					: (reportData.reportForm as any)._id;
+
 				// Cari the latest object to decide if we append or create new.
 				const latestSubmission = reportData.submissions?.find(
-					(s) => s.formId === reportData.reportForm?._id,
+					(s) => s.formId === formIdToSave,
 				);
 
 				const fieldsData = Array.from(formData.entries()).map(
@@ -163,7 +193,7 @@ const CompanyReportWo = () => {
 						latestSubmission?._id ??
 						`sub_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
 					ownerId: latestSubmission?.ownerId ?? "",
-					formId: reportData.reportForm._id,
+					formId: formIdToSave,
 					submissionType: "work_report",
 					fieldsData,
 					status: "submitted",
@@ -173,7 +203,7 @@ const CompanyReportWo = () => {
 				};
 
 				const { error } = await handleApi(
-					() => submitWorkOrderReportApi(id, [submissionToSend]), // API assumes param is (id, submissions array)
+					() => submitWorkOrderReportApi(reportData._id, submissionToSend),
 				);
 
 				setIsSaving(false);
@@ -233,9 +263,13 @@ const CompanyReportWo = () => {
 	const handleSendWorkReport = () => {
 		if (!reportData || !id) return;
 
+		const formIdToSend = typeof reportData.reportForm === 'string'
+			? reportData.reportForm
+			: (reportData.reportForm as any)._id;
+
 		// Cari the latest object to send
 		const latestSubmission = reportData.submissions?.find(
-			(s) => s.formId === reportData.reportForm?._id,
+			(s) => s.formId === formIdToSend,
 		);
 
 		if (!latestSubmission) {
@@ -255,7 +289,7 @@ const CompanyReportWo = () => {
 			onConfirm: async () => {
 				setIsSaving(true);
 				const { error } = await handleApi(() =>
-					sentWorkOrderReportApi(id, latestSubmission),
+					sentWorkOrderReportApi(reportData._id, latestSubmission),
 				);
 
 				setIsSaving(false);
@@ -276,6 +310,74 @@ const CompanyReportWo = () => {
 				const { data: res } = await handleApi(() => getWorkOrderReport(id));
 				if (res?.data) {
 					setReportData(res.data);
+				}
+			},
+		});
+	};
+
+	// Approve report handler
+	const handleApproveReport = () => {
+		if (!reportData) return;
+		showDialog({
+			title: "Konfirmasi Persetujuan Laporan",
+			description:
+				"Apakah Anda yakin ingin menyetujui laporan kerja ini? Tindakan ini tidak dapat dibatalkan.",
+			confirmText: "Ya, Setujui",
+			cancelText: "Batal",
+			onConfirm: async () => {
+				setIsProcessing(true);
+				const { error } = await handleApi(() =>
+					approvedWorkOrderReportApi(reportData._id),
+				);
+				setIsProcessing(false);
+				if (error) {
+					notifyError("Gagal menyetujui laporan", error.message);
+					return;
+				}
+				notifySuccess(
+					"Laporan Disetujui",
+					"Laporan tugas kerja telah berhasil disetujui.",
+				);
+				// Re-fetch
+				if (id) {
+					const { data: res } = await handleApi(() =>
+						getWorkOrderReport(id),
+					);
+					if (res?.data) setReportData(res.data);
+				}
+			},
+		});
+	};
+
+	// Reject report handler
+	const handleRejectReport = () => {
+		if (!reportData) return;
+		showDialog({
+			title: "Konfirmasi Penolakan Laporan",
+			description:
+				"Apakah Anda yakin ingin menolak laporan kerja ini? Tindakan ini tidak dapat dibatalkan.",
+			confirmText: "Ya, Tolak",
+			cancelText: "Batal",
+			onConfirm: async () => {
+				setIsProcessing(true);
+				const { error } = await handleApi(() =>
+					rejectWorkOrderReportApi(reportData._id),
+				);
+				setIsProcessing(false);
+				if (error) {
+					notifyError("Gagal menolak laporan", error.message);
+					return;
+				}
+				notifySuccess(
+					"Laporan Ditolak",
+					"Laporan tugas kerja telah ditolak.",
+				);
+				// Re-fetch
+				if (id) {
+					const { data: res } = await handleApi(() =>
+						getWorkOrderReport(id),
+					);
+					if (res?.data) setReportData(res.data);
 				}
 			},
 		});
@@ -356,6 +458,29 @@ const CompanyReportWo = () => {
 									})}
 								</div>
 							</div>
+
+							{/* Approve / Reject buttons — hanya untuk reviewer & laporan sudah terkirim */}
+							{isReviewer && reportData.status === "submitted" && (
+								<>
+									<div className="w-px h-8 bg-gray-200 hidden sm:block" />
+									<div className="flex items-center gap-2">
+										<Button
+											onClick={handleRejectReport}
+											disabled={isProcessing}
+											className="bg-red-600 hover:bg-red-700 text-white rounded-xl h-9 px-4 shadow-sm shadow-red-200 transition-all flex items-center gap-1.5 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer text-sm">
+											<XCircle className="w-4 h-4" />
+											{isProcessing ? "Memproses..." : "Tolak"}
+										</Button>
+										<Button
+											onClick={handleApproveReport}
+											disabled={isProcessing}
+											className="bg-green-600 hover:bg-green-700 text-white rounded-xl h-9 px-4 shadow-sm shadow-green-200 transition-all flex items-center gap-1.5 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer text-sm">
+											<CheckCircle2 className="w-4 h-4" />
+											{isProcessing ? "Memproses..." : "Setujui"}
+										</Button>
+									</div>
+								</>
+							)}
 						</div>
 					</div>
 
@@ -369,38 +494,41 @@ const CompanyReportWo = () => {
 									</div>
 									<div>
 										<h2 className="text-md font-bold text-foreground leading-tight">
-											{reportData.reportForm?.title || "Formulir Laporan"}
+											{formObject?.title || "Formulir Laporan"}
 										</h2>
 										<p className="text-sm text-muted-foreground mt-0.5">
-											{reportData.reportForm?.description ||
+											{formObject?.description ||
 												"Isi rincian hasil pekerjaan di lapangan."}
 										</p>
 									</div>
 								</div>
-								<div className="flex items-center gap-2">
-									{!isEditMode && (
+								{/* Edit & Kirim hanya untuk staff (bukan manager/owner) */}
+								{canEdit && (
+									<div className="flex items-center gap-2">
+										{!isEditMode && (
+											<Button
+												onClick={() => setIsEditMode(true)}
+												className="bg-yellow-400 hover:bg-yellow-500 w-full md:w-auto text-white rounded-xl h-11 shadow-sm shadow-yellow-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer">
+												<Pencil className="w-4 h-4 mr-2" />
+												Edit Laporan
+											</Button>
+										)}
 										<Button
-											onClick={() => setIsEditMode(true)}
-											className="bg-yellow-400 hover:bg-yellow-500 w-full md:w-auto text-white rounded-xl h-11 shadow-sm shadow-yellow-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer">
-											<Pencil className="w-4 h-4 mr-2" />
-											Edit Laporan
+											onClick={handleSendWorkReport}
+											className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer">
+											<Send className="w-4 h-4 mr-2" />
+											Kirim Laporan
 										</Button>
-									)}
-									<Button
-										onClick={handleSendWorkReport}
-										className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer">
-										<Send className="w-4 h-4 mr-2" />
-										Kirim Laporan
-									</Button>
-								</div>
+									</div>
+								)}
 							</div>
 						</CardHeader>
 						<CardContent className="space-y-4 pt-6">
-							{!reportData.reportForm ?
+							{!formObject ?
 								<EmptyData />
 							:	<div className="space-y-4">
-									{reportData.reportForm.fields?.length > 0 ?
-										reportData.reportForm.fields
+									{formObject.fields && formObject.fields.length > 0 ?
+										[...formObject.fields]
 											.sort((a, b) => a.order - b.order)
 											.map((field, idx) => {
 												const answer = formData.get(field.order) ?? null;
@@ -410,7 +538,7 @@ const CompanyReportWo = () => {
 															field={field}
 															answer={answer}
 															index={idx + 1}
-															readOnly={!isEditMode}
+															readOnly={!isEditMode || isReviewer}
 															onChange={(value) =>
 																handleFieldChange(field.order, value)
 															}

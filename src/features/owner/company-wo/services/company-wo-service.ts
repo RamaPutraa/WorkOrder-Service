@@ -5,8 +5,7 @@ import {
 } from "../mocks/internal-work-order.mock";
 import { dummyWorkReportData } from "../mocks/internal-work-report.mock";
 
-
-const USE_MOCK = true; // TODO: Ubah ke false jika API backend sudah siap
+const USE_MOCK = false;
 
 // get all wo
 export const getInternalCompanyWorkOrders = async () => {
@@ -16,24 +15,18 @@ export const getInternalCompanyWorkOrders = async () => {
 			data: dummyInternalWorkOrders,
 			message: "Success (Mock)",
 			status: 200,
-		} as ApiResponse<WorkOrder[]>;
+		} as GetAllWorkOrderResponse;
 	}
 
-	const response = await apiClient.get<WorkOrderResponse>("/workorders");
+	const response = await apiClient.get<GetAllWorkOrderResponse>("/workorders");
 	return response.data;
 };
 
 // get detail wo
 export const getInternalCompanyWorkOrderDetail = async (id: string) => {
-	if (USE_MOCK) {
-		await new Promise((resolve) => setTimeout(resolve, 500));
-		return {
-			data: dummyInternalWorkOrder,
-			message: "Success (Mock)",
-			status: 200,
-		} as WorkOrderResponse;
-	}
-	const response = await apiClient.get<WorkOrderResponse>(`/workorders/${id}`);
+	const response = await apiClient.get<WorkOrderDetailResponse>(
+		`/workorders/${id}`,
+	);
 	return response.data;
 };
 
@@ -56,9 +49,9 @@ export const recreateRejectedWorkOrderApi = async (id: string) => {
 // submit form
 export const submitWorkOrderFormApi = async (
 	id: string,
-	submissions: SubmissionObject[],
+	submissions: SubmissionObject,
 ) => {
-	const response = await apiClient.post<SubmitWorkOrderResponse>(
+	const response = await apiClient.put<SubmitWorkOrderResponse>(
 		`/workorders/${id}/submissions`,
 		submissions,
 	);
@@ -77,8 +70,8 @@ export const assignStaffToWorkOrderApi = async (
 	id: string,
 	data: AssignStaffToWorkOrderRequest,
 ) => {
-	const response = await apiClient.patch<AssignStaffToWorkOrderResponse>(
-		`/workorders/${id}/assign-staff`,
+	const response = await apiClient.put<AssignStaffToWorkOrderResponse>(
+		`/workorders/${id}/assign-staffs`,
 		data,
 	);
 	return response.data;
@@ -150,14 +143,6 @@ export const failWorkOrderApi = async (
 
 // get work order report
 export const getWorkOrderReport = async (id: string) => {
-	if (USE_MOCK) {
-		await new Promise((resolve) => setTimeout(resolve, 500));
-		return {
-			data: dummyWorkReportData,
-			message: "Success (Mock)",
-			status: 200,
-		} as WorkReportResponse;
-	}
 	const response = await apiClient.get<WorkReportResponse>(
 		`/workorders/${id}/report`,
 	);
@@ -167,13 +152,11 @@ export const getWorkOrderReport = async (id: string) => {
 // submit wo report
 export const submitWorkOrderReportApi = async (
 	id: string,
-	submissions: SubmissionObject[],
+	submission: SubmissionObject,
 ) => {
 	const response = await apiClient.post<WorkReportResponse>(
-		`/workreport/${id}`,
-		{
-			submissions,
-		},
+		`/workreports/${id}/submit`,
+		submission,
 	);
 	return response.data;
 };
@@ -184,7 +167,7 @@ export const sentWorkOrderReportApi = async (
 	submissions: SubmissionObject,
 ) => {
 	const response = await apiClient.patch<WorkReportResponse>(
-		`/workreport/${id}/sent`,
+		`/workreports/${id}/sent`,
 		submissions,
 	);
 	return response.data;
@@ -193,7 +176,7 @@ export const sentWorkOrderReportApi = async (
 // approved
 export const approvedWorkOrderReportApi = async (id: string) => {
 	const response = await apiClient.patch<WorkReportResponse>(
-		`/workreport/${id}/approve`,
+		`/workreports/${id}/approve`,
 	);
 	return response.data;
 };
@@ -201,7 +184,7 @@ export const approvedWorkOrderReportApi = async (id: string) => {
 // reject report
 export const rejectWorkOrderReportApi = async (id: string) => {
 	const response = await apiClient.patch<WorkReportResponse>(
-		`/workreport/${id}/reject`,
+		`/workreports/${id}/reject`,
 	);
 	return response.data;
 };
