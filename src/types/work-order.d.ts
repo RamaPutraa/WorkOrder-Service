@@ -3,6 +3,7 @@ type WorkOrderMeta = {
 		can_start: boolean;
 		can_complete: boolean;
 		can_fail: boolean;
+		can_recreate: boolean;
 	};
 	workOrderSiblings: {
 		_id: string;
@@ -32,7 +33,7 @@ type WorkOrder = {
 		| "rejected"
 		| "cancelled"
 		| "unprocessable"
-		| "onprogress"
+		| "on_progress"
 		| "completed"
 		| "failed";
 	workOrderForm: Form;
@@ -66,7 +67,7 @@ type WorkOrderDetail = {
 		| "rejected"
 		| "cancelled"
 		| "unprocessable"
-		| "onprogress"
+		| "on_progress"
 		| "completed"
 		| "failed";
 	workOrderForm: Form;
@@ -85,7 +86,7 @@ type WorkReport = {
 	workOrderId: string;
 	reportForm: string;
 	workReportApprovalAccessType: "auto" | "manager";
-	status: "OnProgress" | "submitted" | "rejected" | "approved";
+	status: "on_progress" | "submitted" | "rejected" | "approved";
 	approvedBy: User | null;
 	submissions: SubmissionObject[];
 	createdAt: string;

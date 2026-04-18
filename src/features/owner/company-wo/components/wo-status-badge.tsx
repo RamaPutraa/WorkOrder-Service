@@ -39,7 +39,7 @@ export const getStatusConfig = (status: string) => {
 				dotClass: "bg-amber-400",
 				icon: Hourglass,
 			};
-		case "onprogress":
+		case "on_progress":
 			return {
 				label: "Sedang Dikerjakan",
 				colorClass: "text-indigo-600 bg-indigo-50 border-indigo-200",
@@ -63,6 +63,13 @@ export const getStatusConfig = (status: string) => {
 		case "rejected":
 			return {
 				label: "Ditolak",
+				colorClass: "text-red-600 bg-red-50 border-red-200",
+				dotClass: "bg-red-400",
+				icon: XCircle,
+			};
+		case "cancelled":
+			return {
+				label: "Dibatalkan",
 				colorClass: "text-red-600 bg-red-50 border-red-200",
 				dotClass: "bg-red-400",
 				icon: XCircle,

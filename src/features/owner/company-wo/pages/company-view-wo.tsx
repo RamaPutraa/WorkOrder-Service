@@ -1,18 +1,47 @@
 import { useNavigate } from "react-router-dom";
 import { useCompanyWo } from "../hooks/use-company-wo";
-import { Button } from "@/components/ui/button";
-import { Calendar, User, FileCheck, Ticket, ScrollText } from "lucide-react";
+import { Calendar, User, Ticket, ScrollText, CheckCircle2, Timer } from "lucide-react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "framer-motion";
 import { SectionLoading } from "@/shared/atoms";
 import PageHeader from "@/shared/atoms/header-content";
 import { GenericFilter } from "@/shared/molecules/generic-filter";
 import { EmptyData } from "@/shared/molecules/empty-data";
+import { useEffect, useState } from "react";
+import { getWorkOrderReport } from "../services/company-wo-service";
+import { handleApi } from "@/lib/handle-api";
 
 const CompanyViewWo = () => {
 	const { filteredData, filterConfig, loading, error } = useCompanyWo();
 	const navigate = useNavigate();
+	// workReportMap: woId -> WorkReport (hanya untuk WO on_progress/completed/failed)
+	const [workReportMap, setWorkReportMap] = useState<Record<string, WorkReport>>({});
+
+	// Fetch work reports secara paralel untuk WO yang relevan
+	useEffect(() => {
+		if (!filteredData || filteredData.length === 0) return;
+		const relevantWos = filteredData.filter((wo) =>
+			["on_progress", "completed", "failed"].includes(wo.status),
+		);
+		if (relevantWos.length === 0) return;
+
+		const fetchAll = async () => {
+			const results = await Promise.all(
+				relevantWos.map(async (wo) => {
+					const { data: res } = await handleApi(() => getWorkOrderReport(wo._id));
+					if (res?.data) return { id: wo._id, report: res.data as WorkReport };
+					return null;
+				}),
+			);
+			const map: Record<string, WorkReport> = {};
+			results.forEach((r) => {
+				if (r) map[r.id] = r.report;
+			});
+			setWorkReportMap(map);
+		};
+		void fetchAll();
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [filteredData]);
 
 	if (error) {
 		return (
@@ -30,6 +59,11 @@ const CompanyViewWo = () => {
 					className: " text-gray-600",
 					label: "Dirancang",
 				};
+			case "rejected":
+				return {
+					className: " text-red-600",
+					label: "Ditolak",
+				};
 			case "sent":
 				return {
 					className: " text-blue-600",
@@ -45,7 +79,7 @@ const CompanyViewWo = () => {
 					className: " text-yellow-600",
 					label: "Belum dapat dikerjakan",
 				};
-			case "onprogress":
+			case "on_progress":
 				return {
 					className: " text-blue-600",
 					label: "Sedang dikerjakan",
@@ -59,6 +93,11 @@ const CompanyViewWo = () => {
 				return {
 					className: " text-red-600",
 					label: "Dibatalkan",
+				};
+			case "failed":
+				return {
+					className: " text-red-600",
+					label: "Gagal",
 				};
 			default:
 				return {
@@ -96,6 +135,14 @@ const CompanyViewWo = () => {
 					: filteredData.length > 0 ?
 						filteredData.map((wo) => {
 							const statusConfig = getStatusConfig(wo.status);
+							const report = workReportMap[wo._id] ?? null;
+							// Kondisi alert work report
+							const showNeedComplete =
+								report?.workReportApprovalAccessType === "auto" &&
+								report?.status === "approved";
+							const showNeedApproval =
+								report?.workReportApprovalAccessType === "manager" &&
+								report?.status === "submitted";
 
 							return (
 								<motion.div
@@ -111,6 +158,23 @@ const CompanyViewWo = () => {
 											)
 										}
 										className="flex flex-col h-full border shadow-md hover:shadow-lg rounded-lg transition-all duration-200 bg-gradient-to-br from-background to-muted/10 overflow-hidden hover:cursor-pointer">
+										{/* Report Action Banner */}
+										{showNeedComplete && (
+											<div className="flex items-center gap-2 px-4 py-2 bg-green-50 border-b border-green-200">
+												<CheckCircle2 className="w-3.5 h-3.5 text-green-600 shrink-0" />
+												<p className="text-xs font-semibold text-green-700">
+													Tugas kerja perlu diselesaikan
+												</p>
+											</div>
+										)}
+										{showNeedApproval && (
+											<div className="flex items-center gap-2 px-4 py-2 bg-amber-50 border-b border-amber-200">
+												<Timer className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+												<p className="text-xs font-semibold text-amber-700">
+													Tugas kerja perlu disetujui
+												</p>
+											</div>
+										)}
 										{/* Header */}
 										<CardHeader className="pb-0 ">
 											<div className="flex items-center justify-between gap-3">

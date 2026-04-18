@@ -43,12 +43,21 @@ const ServiceSubmitPage = () => {
 
 	const getStatusBadge = (status: string) => {
 		const s = status.toLowerCase();
-		if (s === "approved")
+		if (s === "received")
 			return (
-				<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-emerald-600 ">
-					<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+				<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-blue-600 ">
+					<span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
 					<span className="text-[10px] font-bold uppercase tracking-wider">
-						Disetujui
+						Menunggu
+					</span>
+				</div>
+			);
+		if (s === "cancelled")
+			return (
+				<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-red-600 ">
+					<span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+					<span className="text-[10px] font-bold uppercase tracking-wider">
+						Dibatalkan
 					</span>
 				</div>
 			);
@@ -61,7 +70,16 @@ const ServiceSubmitPage = () => {
 					</span>
 				</div>
 			);
-		if (s === "onprogress")
+		if (s === "approved")
+			return (
+				<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-emerald-600 ">
+					<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+					<span className="text-[10px] font-bold uppercase tracking-wider">
+						Disetujui
+					</span>
+				</div>
+			);
+		if (s === "on_progress")
 			return (
 				<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-blue-600 ">
 					<span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
@@ -70,12 +88,21 @@ const ServiceSubmitPage = () => {
 					</span>
 				</div>
 			);
-		if (s === "completed")
+		if (s === "completed" || s === "closed")
 			return (
 				<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-emerald-600 ">
 					<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
 					<span className="text-[10px] font-bold uppercase tracking-wider">
 						Selesai
+					</span>
+				</div>
+			);
+		if (s === "partial_completed")
+			return (
+				<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-amber-600 ">
+					<span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+					<span className="text-[10px] font-bold uppercase tracking-wider">
+						Sebagian Selesai
 					</span>
 				</div>
 			);
@@ -88,14 +115,6 @@ const ServiceSubmitPage = () => {
 					</span>
 				</div>
 			);
-		return (
-			<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-amber-600 ">
-				<span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-				<span className="text-[10px] font-bold uppercase tracking-wider">
-					Menunggu
-				</span>
-			</div>
-		);
 	};
 
 	if (error) {

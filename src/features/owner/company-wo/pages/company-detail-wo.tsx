@@ -24,6 +24,7 @@ import {
 	Eye,
 	CircleCheckBig,
 	Send,
+	RefreshCw,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -36,6 +37,7 @@ import {
 	rejectWorkOrderApi,
 	sendWorkOrderApi,
 	startWorkOrderApi,
+	getWorkOrderReport,
 } from "../services/company-wo-service";
 import { handleApi } from "@/lib/handle-api";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
@@ -56,7 +58,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+//  Helpers
 
 const formatDate = (dateStr: string | null | undefined) => {
 	if (!dateStr) return "-";
@@ -67,7 +69,7 @@ const formatDate = (dateStr: string | null | undefined) => {
 	});
 };
 
-// ─── Main Component ────────────────────────────────────────────────────────────
+//  Main Component
 
 const CompanyDetailWo = () => {
 	const navigate = useNavigate();
@@ -90,6 +92,7 @@ const CompanyDetailWo = () => {
 	const [failIssue, setFailIssue] = useState("");
 	const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
 	const [completeIssue, setCompleteIssue] = useState("");
+	const [workReport, setWorkReport] = useState<WorkReport | null>(null);
 
 	// Detect scroll for sticky header
 	useEffect(() => {
@@ -98,7 +101,27 @@ const CompanyDetailWo = () => {
 		return () => window.removeEventListener("scroll", handleScroll);
 	}, []);
 
-	// ── Handlers ────────────────────────────────────────────────────
+	// Fetch work report when WO is in relevant status
+	useEffect(() => {
+		const fetchReport = async () => {
+			const d = detailData as
+				| (WorkOrderDetail & { meta?: WorkOrderMeta })
+				| undefined;
+			const id = d?._id;
+			if (!id) return;
+			const reportableStatuses = ["on_progress", "completed", "failed"];
+			if (!reportableStatuses.includes(d?.status ?? "")) return;
+			const { data: res } = await handleApi(() => getWorkOrderReport(id));
+			if (res?.data) setWorkReport(res.data);
+		};
+		void fetchReport();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [
+		(detailData as WorkOrderDetail | undefined)?.status,
+		(detailData as WorkOrderDetail | undefined)?._id,
+	]);
+
+	//  Handlers
 	const handleSendWorkOrder = () => {
 		showDialog({
 			title: "Konfirmasi Konfigurasi Selesai",
@@ -285,6 +308,7 @@ const CompanyDetailWo = () => {
 					"Berhasil Dibuat Ulang",
 					"Perintah kerja telah dibuat ulang",
 				);
+				navigate(-1);
 				if (wo?._id) {
 					fecthDetailInternalCompanyWorkOrder(wo._id);
 				}
@@ -304,15 +328,23 @@ const CompanyDetailWo = () => {
 	const canComplete = meta?.workOrderCapabilities.can_complete;
 	const canFail = meta?.workOrderCapabilities.can_fail;
 	const userPic = wo?.staffPIC?.email == user?.email;
-	// true  → user adalah pembuatnya
-	// false → user bukan pembuatnya
-	// null  → data createdBy tidak tersedia (belum diisi)
+	// true  â†’ user adalah pembuatnya
+	// false â†’ user bukan pembuatnya
+	// null  â†’ data createdBy tidak tersedia (belum diisi)
 	const userCreated: boolean | null =
 		wo?.createdBy == null ? null
 		: wo.createdBy.email === user?.email ? true
 		: false;
 	const userAssigned = wo?.assignedStaff?.some((s) => s.email == user?.email);
 	const isDrafted = currentStatus === "drafted";
+
+	// can_recreate: owner selalu, manager hanya jika dia pembuat atau createdBy null
+	const isOwnerOrAllowedManager =
+		user?.role === "owner_company" ||
+		(user?.role === "manager_company" &&
+			(userCreated === true || userCreated === null));
+	const canRecreateEdit =
+		!!meta?.workOrderCapabilities?.can_recreate && isOwnerOrAllowedManager;
 
 	const getHeaderSubtitle = () => {
 		if (!wo) return <TextLoading variant="skeleton" />;
@@ -325,7 +357,7 @@ const CompanyDetailWo = () => {
 				return "Perintah kerja telah disetujui dan siap dimulai.";
 			case "unprocessable":
 				return "Perintah kerja belum dapat dikerjakan saat ini.";
-			case "onprogress":
+			case "on_progress":
 				return "Perintah kerja sedang dikerjakan.";
 			case "failed":
 				return "Perintah kerja mengalami kegagalan.";
@@ -338,7 +370,7 @@ const CompanyDetailWo = () => {
 
 	return (
 		<div className="space-y-6">
-			{/* ── Sticky Header ── */}
+			{/*  Sticky Header  */}
 			<PageHeader
 				title="Detail Perintah Kerja"
 				subtitle={getHeaderSubtitle()}
@@ -353,8 +385,8 @@ const CompanyDetailWo = () => {
 								currentStatus === "sent") && (
 								<>
 									{(user?.role === "owner_company" ||
-										userCreated === true ||
-										userCreated === null) && (
+										(user?.role === "manager_company" &&
+											(userCreated === true || userCreated === null))) && (
 										<Button
 											className=" bg-red-600 hover:bg-red-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-red-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
 											onClick={handleCancelWorkOrder}>
@@ -411,7 +443,7 @@ const CompanyDetailWo = () => {
 									<Button
 										className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
 										onClick={handleStartWorkOrder}
-										disabled={isStarting || !canStart}>
+										disabled={isStarting || !canStart || !userAssigned}>
 										<Play className="h-4 w-4" />
 										{isStarting ? "Memulai..." : "Mulai Perintah Kerja"}
 									</Button>
@@ -419,15 +451,18 @@ const CompanyDetailWo = () => {
 							)}
 
 							{/* TODO:Kalau reject auto cancel ato ga  */}
-							{currentStatus === "rejected" && (
-								<Button
-									className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
-									onClick={handleRecreateWorkOrder}>
-									<Send className="h-4 w-4" /> Ajukan Ulang
-								</Button>
-							)}
+							{meta?.workOrderCapabilities.can_recreate &&
+								(user?.role === "owner_company" ||
+									(user?.role === "manager_company" &&
+										(userCreated === true || userCreated === null))) && (
+									<Button
+										className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
+										onClick={handleRecreateWorkOrder}>
+										<Send className="h-4 w-4" /> Ajukan Ulang
+									</Button>
+								)}
 
-							{(currentStatus === "onprogress" ||
+							{(currentStatus === "on_progress" ||
 								currentStatus === "completed" ||
 								currentStatus === "failed") && (
 								<>
@@ -462,24 +497,24 @@ const CompanyDetailWo = () => {
 				}
 			/>
 
-			{/* ── Loading ── */}
+			{/*  Loading  */}
 			{loading && !wo && (
 				<SectionLoading message="Memuat data perintah kerja..." />
 			)}
 
-			{/* ── Content ── */}
+			{/*  Content  */}
 			{wo && (
 				<motion.div
 					initial={{ opacity: 0, y: 12 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.3 }}
 					className="space-y-6">
-					{/* ── Row 2: 3-column grid ── */}
+					{/*  Row 2: 3-column grid  */}
 					<div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 						{/* Card 1: Info Umum */}
 						<div className="border shadow-sm rounded-xl md:col-span-2">
 							<div className="space-y-4 p-5">
-								{/* ── Row 1: Status Hero Banner ── */}
+								{/*  Row 1: Status Hero Banner  */}
 								<div className="overflow-hidden border-0 ">
 									<div className="relative">
 										<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4  border-b border-border/50 pb-4">
@@ -489,16 +524,16 @@ const CompanyDetailWo = () => {
 												</div>
 												<div>
 													<h2 className="text-lg font-bold text-foreground leading-tight">
-														{wo.service?.title || "—"}
+														{wo.service?.title || "-"}
 													</h2>
 													<p className="text-sm text-muted-foreground mt-0.5">
-														{wo.service?.description || "—"}
+														{wo.service?.description || "-"}
 													</p>
 												</div>
 											</div>
 											<div className="flex flex-wrap items-center gap-2">
 												<StatusBadge status={wo.status} />
-												{wo.has_issue && (
+												{wo.has_issue && wo.status == "failed" && (
 													<span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border text-orange-600 bg-orange-50 border-orange-200">
 														<AlertTriangle className="w-3.5 h-3.5" />
 														Ada Kendala
@@ -539,13 +574,33 @@ const CompanyDetailWo = () => {
 															</Alert>
 														)}
 
-														{meta.workOrderCapabilities.can_fail && (
+														{wo.status === "cancelled" && (
+															<Alert className="max-w-full bg-red-50 text-red-800 border-red-200 [&>svg]:text-red-800">
+																<XCircle className="h-4 w-4" />
+																<AlertTitle>Dibatalkan</AlertTitle>
+																<AlertDescription>
+																	Tugas kerja ini telah dibatalkan.
+																</AlertDescription>
+															</Alert>
+														)}
+
+														{wo.status === "failed" && (
 															<Alert className="max-w-full bg-red-50 text-red-800 border-red-200 [&>svg]:text-red-800">
 																<XCircle className="h-4 w-4" />
 																<AlertTitle>Terdapat Masalah</AlertTitle>
 																<AlertDescription>
-																	Tugas kerja ini dapat digagalkan atau
-																	dibatalkan karena suatu kondisi.
+																	Tugas kerja ini terselesaikan dengan kendala.
+																</AlertDescription>
+															</Alert>
+														)}
+
+														{meta.workOrderCapabilities.can_recreate && (
+															<Alert className="max-w-full bg-red-50 text-red-800 border-red-200 [&>svg]:text-red-800">
+																<RefreshCw className="h-4 w-4" />
+																<AlertTitle>Ditolak</AlertTitle>
+																<AlertDescription>
+																	Tugas kerja ini dapat dibuat ulang atau
+																	dibatalkan.
 																</AlertDescription>
 															</Alert>
 														)}
@@ -560,6 +615,19 @@ const CompanyDetailWo = () => {
 																	<AlertDescription>
 																		Perintah kerja ini masih dalam tahap
 																		desain/konfigurasi
+																	</AlertDescription>
+																</Alert>
+															)}
+
+														{!meta.workOrderCapabilities.can_start &&
+															!meta.workOrderCapabilities.can_complete &&
+															!meta.workOrderCapabilities.can_fail &&
+															wo.status === "completed" && (
+																<Alert className="max-w-full bg-green-50 text-green-800 border-green-200 [&>svg]:text-green-800">
+																	<CircleCheckBig className="h-4 w-4" />
+																	<AlertTitle>Selesai</AlertTitle>
+																	<AlertDescription>
+																		Perintah kerja ini telah selesai.
 																	</AlertDescription>
 																</Alert>
 															)}
@@ -589,6 +657,59 @@ const CompanyDetailWo = () => {
 																	</AlertDescription>
 																</Alert>
 															)}
+
+														{!meta.workOrderCapabilities.can_start &&
+															!meta.workOrderCapabilities.can_complete &&
+															!meta.workOrderCapabilities.can_fail &&
+															wo.status === "on_progress" &&
+															(!workReport ||
+																workReport.status === "on_progress") && (
+																<Alert className="max-w-full bg-blue-50 text-blue-800 border-blue-200 [&>svg]:text-blue-800">
+																	<CheckCircle2Icon className="h-4 w-4" />
+																	<AlertTitle>Sedang Dikerjakan</AlertTitle>
+																	<AlertDescription>
+																		Perintah kerja sedang dikerjakan.
+																	</AlertDescription>
+																</Alert>
+															)}
+														{/* Alert: work report perlu diselesaikan (auto + approved) */}
+														{wo.status === "on_progress" && (
+															<>
+																{workReport &&
+																	workReport.workReportApprovalAccessType ===
+																		"auto" &&
+																	workReport.status === "approved" && (
+																		<Alert className="max-w-full bg-green-50 text-green-800 border-green-200 [&>svg]:text-green-800">
+																			<CircleCheckBig className="h-4 w-4" />
+																			<AlertTitle>
+																				Laporan Disetujui Otomatis
+																			</AlertTitle>
+																			<AlertDescription>
+																				Laporan kerja telah disetujui secara
+																				otomatis. Tugas kerja perlu
+																				diselesaikan.
+																			</AlertDescription>
+																		</Alert>
+																	)}
+															</>
+														)}
+
+														{/* Alert: work report perlu disetujui (manager + submitted) */}
+														{workReport &&
+															workReport.workReportApprovalAccessType ===
+																"manager" &&
+															workReport.status === "submitted" && (
+																<Alert className="max-w-full bg-amber-50 text-amber-800 border-amber-200 [&>svg]:text-amber-800">
+																	<Shield className="h-4 w-4" />
+																	<AlertTitle>
+																		Menunggu Persetujuan Manager
+																	</AlertTitle>
+																	<AlertDescription>
+																		Laporan kerja telah dikirim dan menunggu
+																		persetujuan. Tugas kerja perlu disetujui.
+																	</AlertDescription>
+																</Alert>
+															)}
 													</div>
 												</div>
 											)}
@@ -599,11 +720,23 @@ const CompanyDetailWo = () => {
 													Keterangan Kendala :
 												</span>
 												<div className="flex flex-col gap-2">
-													{/* ── Issue note ── */}
-													{wo.has_issue && wo.issue_note && (
-														<Alert className="max-w-full bg-orange-50 text-orange-800 border-orange-200 [&>svg]:text-orange-800">
+													{/*  Issue note  */}
+													{wo.has_issue &&
+														wo.issue_note &&
+														wo.status == "failed" && (
+															<Alert className="max-w-full bg-orange-50 text-orange-800 border-orange-200 [&>svg]:text-orange-800">
+																<Info className="h-4 w-4" />
+																<AlertTitle>Catatan Masalah</AlertTitle>
+																<AlertDescription>
+																	{wo.issue_note}
+																</AlertDescription>
+															</Alert>
+														)}
+
+													{wo.has_issue && wo.status === "completed" && (
+														<Alert className="max-w-full bg-blue-50 text-blue-800 border-blue-200 [&>svg]:text-blue-800">
 															<Info className="h-4 w-4" />
-															<AlertTitle>Catatan Kendala</AlertTitle>
+															<AlertTitle>Catatan</AlertTitle>
 															<AlertDescription>
 																{wo.issue_note}
 															</AlertDescription>
@@ -613,9 +746,9 @@ const CompanyDetailWo = () => {
 													{!wo.has_issue && (
 														<Alert className="max-w-full bg-gray-50 text-gray-800 border-gray-200 [&>svg]:text-gray-800">
 															<Info className="h-4 w-4" />
-															<AlertTitle>Catatan Kendala</AlertTitle>
+															<AlertTitle>Catatan</AlertTitle>
 															<AlertDescription>
-																Tidak ada kendala pada perintah kerja ini
+																Tidak ada catatan pada perintah kerja ini
 															</AlertDescription>
 														</Alert>
 													)}
@@ -646,7 +779,7 @@ const CompanyDetailWo = () => {
 												<div className="flex items-center gap-2">
 													<div>
 														<p className="text-sm font-medium leading-tight">
-															{wo.createdBy?.name || "—"}
+															{wo.createdBy?.name || "-"}
 														</p>
 														<p className="text-xs text-muted-foreground">
 															{wo.createdBy?.email || ""}
@@ -728,18 +861,19 @@ const CompanyDetailWo = () => {
 							fetchEmployeeList={fetchEmployeeList}
 							isReadOnly={isReadOnly}
 							currentStatus={currentStatus}
+							canRecreateEdit={canRecreateEdit}
 							onAssignSuccess={() =>
 								fecthDetailInternalCompanyWorkOrder(wo._id)
 							}
 						/>
 					</div>
 
-					{/* ── Row 5: Work Order Form Info ── */}
+					{/*  Row 5: Work Order Form Info  */}
 					<WorkOrderForms
 						workOrderForm={wo.workOrderForm}
 						workOrderId={wo._id}
 						submissions={wo.submissions || []}
-						isReadOnly={isReadOnly || !isDrafted}
+						isReadOnly={isReadOnly || (!isDrafted && !canRecreateEdit)}
 						onSaveSuccess={() => fecthDetailInternalCompanyWorkOrder(wo._id)}
 					/>
 				</motion.div>
@@ -835,6 +969,6 @@ const CompanyDetailWo = () => {
 	);
 };
 
-// ─── Small helpers ─────────────────────────────────────────────────────────────
+//  Small helpers
 
 export default CompanyDetailWo;

@@ -29,8 +29,10 @@ type InboxSR = {
 		| "cancelled"
 		| "rejected"
 		| "approved"
-		| "workOrderCreated"
+		| "on_progress"
 		| "completed"
+		| "partial_completed"
+		| "unprocessable"
 		| "closed";
 	serviceRequestApprovalAccessType: "auto" | "manager";
 	reviewNeed: boolean;
@@ -55,8 +57,10 @@ type InboxSRDetailRequest = {
 		| "cancelled"
 		| "rejected"
 		| "approved"
-		| "workOrderCreated"
+		| "on_progress"
 		| "completed"
+		| "partial_completed"
+		| "unprocessable"
 		| "closed";
 	serviceRequestApprovalAccessType: "auto" | "manager";
 	reviewNeed: boolean;
@@ -81,12 +85,11 @@ type RequesterSR = {
 		| "cancelled"
 		| "rejected"
 		| "approved"
-		| "workOrderCreated"
-		| "onprogress"
+		| "on_progress"
 		| "completed"
-		| "closed"
-		| "failed"
-		| "unprocessable";
+		| "partial_completed"
+		| "unprocessable"
+		| "closed";
 	company: Company;
 	service: ServiceSummaryObject;
 	requestedBy: User;
@@ -109,12 +112,11 @@ type RequesterSRDetailRequest = {
 		| "cancelled"
 		| "rejected"
 		| "approved"
-		| "workOrderCreated"
-		| "onprogress"
+		| "on_progress"
 		| "completed"
-		| "closed"
-		| "failed"
-		| "unprocessable";
+		| "partial_completed"
+		| "unprocessable"
+		| "closed";
 	company: Company;
 	service: ServiceSummaryObject;
 	requestedBy: User;

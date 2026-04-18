@@ -245,7 +245,7 @@ const CompanyReportWo = () => {
 
 	const getStatusConfig = (status: string) => {
 		switch (status.toLowerCase()) {
-			case "onprogress":
+			case "on_progress":
 				return {
 					bg: "bg-gray-100",
 					text: "text-gray-700",
@@ -395,6 +395,7 @@ const CompanyReportWo = () => {
 
 	const statusConfig = reportData ? getStatusConfig(reportData.status) : null;
 	const StatusIcon = statusConfig?.icon ?? Clock;
+	const workReportStatus = reportData?.status === "on_progress";
 
 	return (
 		<div className="space-y-6 pb-12">

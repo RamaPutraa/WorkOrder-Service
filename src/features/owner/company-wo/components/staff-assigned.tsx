@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Users, Settings, Save, Star, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -31,6 +31,7 @@ export interface StaffAssignedProps {
 	fetchEmployeeList: () => void;
 	isReadOnly: boolean;
 	currentStatus?: string;
+	canRecreateEdit?: boolean;
 	onAssignSuccess: () => void;
 }
 
@@ -82,6 +83,7 @@ export const StaffAssigned = ({
 	fetchEmployeeList,
 	isReadOnly,
 	currentStatus,
+	canRecreateEdit = false,
 	onAssignSuccess,
 }: StaffAssignedProps) => {
 	const [isStaffDialogOpen, setIsStaffDialogOpen] = useState(false);
@@ -117,7 +119,7 @@ export const StaffAssigned = ({
 		const { error } = await handleApi(() =>
 			assignStaffToWorkOrderApi(wo._id, {
 				assign_staffs: selectedStaffEmails,
-				staff_pic: picEmail,
+				...(picEmail ? { staff_pic: picEmail } : {}),
 			}),
 		);
 		setIsAssigningState(false);
@@ -171,7 +173,7 @@ export const StaffAssigned = ({
 		const { error } = await handleApi(() =>
 			assignStaffToWorkOrderApi(wo._id, {
 				assign_staffs: updatedAssignStaffs,
-				staff_pic: updatedPicEmail,
+				...(updatedPicEmail ? { staff_pic: updatedPicEmail } : {}),
 			}),
 		);
 		setIsAssigningState(false);
@@ -225,7 +227,7 @@ export const StaffAssigned = ({
 										isPIC={staff.email === wo.staffPIC?.email}
 										highlight={selectedStaffsToRemove.includes(staff.email)}
 										onClick={
-											isReadOnly || currentStatus !== "drafted" ?
+											isReadOnly || (currentStatus !== "drafted" && !canRecreateEdit) ?
 												undefined
 											:	() =>
 													setSelectedStaffsToRemove((prev) =>
@@ -243,7 +245,7 @@ export const StaffAssigned = ({
 				<div className="flex gap-2">
 					<Button
 						onClick={handleOpenStaffDialog}
-						disabled={isReadOnly || currentStatus !== "drafted"}
+						disabled={isReadOnly || (currentStatus !== "drafted" && !canRecreateEdit)}
 						className="bg-blue-600 hover:cursor-pointer hover:bg-blue-700 flex-1 md:flex-none text-white rounded-xl px-5 h-11 shadow-sm shadow-blue-200 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed">
 						<Settings className="w-4 h-4" />
 						<span className="font-semibold text-xs">
@@ -254,7 +256,7 @@ export const StaffAssigned = ({
 						onClick={handleOpenConfirm}
 						disabled={
 							isReadOnly ||
-							currentStatus !== "drafted" ||
+							(currentStatus !== "drafted" && !canRecreateEdit) ||
 							selectedStaffsToRemove.length === 0 ||
 							isAssigningState
 						}

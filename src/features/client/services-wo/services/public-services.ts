@@ -31,3 +31,14 @@ export const getDetailClientServiceRequestApi = async (id: string) => {
 	);
 	return response.data;
 };
+
+export const submitReviewApi = async (
+	id: string,
+	data: RequesterSubmitRequest,
+) => {
+	const response = await apiClient.post<RequesterSubmitResponse>(
+		`/service-requests/${id}/review`,
+		data,
+	);
+	return response.data;
+};

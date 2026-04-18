@@ -1,14 +1,6 @@
 import { useBusiness } from "../hooks/use-business";
 import { Button } from "@/components/ui/button";
-import {
-	Calendar,
-	User,
-	ClipboardPenLine,
-	Check,
-	X,
-	Wrench,
-	XCircle,
-} from "lucide-react";
+import { Calendar, User, ClipboardPenLine, Check, XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDialogStore } from "@/store/dialogStore";
 import { motion, AnimatePresence } from "framer-motion";
@@ -41,7 +33,7 @@ const ViewServiceRequest = () => {
 
 	const getStatusBadge = (status?: string) => {
 		const s = status;
-		if (s === "workOrderCreated")
+		if (s === "work_order_created")
 			return (
 				<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-emerald-600 ">
 					<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -59,14 +51,42 @@ const ViewServiceRequest = () => {
 					</span>
 				</div>
 			);
-		return (
-			<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-amber-600 ">
-				<span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-				<span className="text-[10px] font-bold uppercase tracking-wider">
-					Menunggu
-				</span>
-			</div>
-		);
+		if (s === "partial_completed")
+			return (
+				<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-amber-600 ">
+					<span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+					<span className="text-[10px] font-bold uppercase tracking-wider">
+						Sebagian Selesai
+					</span>
+				</div>
+			);
+		if (s === "completed" || s === "closed")
+			return (
+				<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-emerald-600 ">
+					<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+					<span className="text-[10px] font-bold uppercase tracking-wider">
+						Selesai
+					</span>
+				</div>
+			);
+		if (s === "on_progress")
+			return (
+				<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-amber-600 ">
+					<span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+					<span className="text-[10px] font-bold uppercase tracking-wider">
+						Dalam Pengerjaan
+					</span>
+				</div>
+			);
+		if (s === "received")
+			return (
+				<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-amber-600 ">
+					<span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+					<span className="text-[10px] font-bold uppercase tracking-wider">
+						Permintaan Masuk
+					</span>
+				</div>
+			);
 	};
 
 	return (
@@ -184,7 +204,7 @@ const ViewServiceRequest = () => {
 											{/* Divider */}
 										</div>
 										{/* TODO: nanti bsisa berubah ke approved */}
-										{item.serviceRequestStatus === "workOrderCreated" && (
+										{item.serviceRequestStatus === "approved" && (
 											<div className="px-6 py-4 mt-auto flex flex-col justify-end border-t border-slate-200/70">
 												{/* Info Row (Client & Date) */}
 												<div className="flex flex-wrap items-center gap-x-4 text-xs text-muted-foreground">
