@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import { logoutApi } from "@/features/auth/services/authService";
+import { unregisterFcmTokenApi } from "@/features/notifications/services/notification-service";
+import { useNotificationStore } from "./notificationStore";
 
 type AuthState = {
 	token: string | null;
@@ -50,6 +52,15 @@ export const useAuthStore = create<AuthState>((set) => ({
 
 	logout: async () => {
 		try {
+			// Unregister FCM token first if exists
+			const fcmToken = useNotificationStore.getState().fcmToken;
+			if (fcmToken) {
+				await unregisterFcmTokenApi(fcmToken).catch((err) =>
+					console.error("Failed to unregister FCM token", err),
+				);
+				useNotificationStore.getState().setFcmToken(null);
+			}
+
 			// Call logout API endpoint
 			await logoutApi();
 		} catch (error) {

@@ -17,6 +17,7 @@ import {
 	SidebarProvider,
 	SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { NavActions } from "../molecules/nav-actions";
 
 const isIdSegment = (segment: string) => {
 	// MongoDB ObjectId (24 hex characters)
@@ -92,6 +93,9 @@ const AppLayout = () => {
 								}
 							</BreadcrumbList>
 						</Breadcrumb>
+					</div>
+					<div className="ml-auto px-3">
+						<NavActions />
 					</div>
 				</header>
 				<div className="flex flex-1 flex-col gap-4 p-10">
