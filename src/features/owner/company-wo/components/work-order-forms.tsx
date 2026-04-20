@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import FormFieldViewer, {
 	type AnswerValue,
 } from "@/shared/molecules/form-field-viewer";
@@ -17,6 +16,7 @@ interface WorkOrderFormsProps {
 	submissions: SubmissionObject[];
 	isReadOnly?: boolean;
 	onSaveSuccess?: () => void;
+	isRefreshing?: boolean;
 }
 
 const WorkOrderForms = ({
@@ -25,6 +25,7 @@ const WorkOrderForms = ({
 	submissions = [],
 	isReadOnly = false,
 	onSaveSuccess,
+	isRefreshing = false,
 }: WorkOrderFormsProps) => {
 	const { showDialog } = useDialogStore();
 	const [isSaving, setIsSaving] = useState(false);
@@ -173,8 +174,14 @@ const WorkOrderForms = ({
 	};
 
 	return (
-		<Card className="border shadow-sm rounded-xl">
-			<CardHeader className="pb-2 border-b border-border/50">
+		<div className="border shadow-sm rounded-xl relative overflow-hidden">
+			{isRefreshing && (
+				<div className="absolute inset-0 z-50 bg-background/60 backdrop-blur-[1px] flex flex-col items-center justify-center">
+					<div className="w-8 h-8 animate-spin rounded-full border-[3px] border-primary border-t-transparent mb-2" />
+					<p className="text-sm font-semibold text-primary">Memperbarui...</p>
+				</div>
+			)}
+			<div className="p-6 pb-4 border-b border-border/50">
 				<div className="flex items-center gap-4">
 					<div className="shrink-0 p-3 rounded-xl bg-primary/10 text-primary">
 						<FileText className="w-5 h-5" />
@@ -188,8 +195,8 @@ const WorkOrderForms = ({
 						</p>
 					</div>
 				</div>
-			</CardHeader>
-			<CardContent className="space-y-4 pt-6">
+			</div>
+			<div className="space-y-4 p-6 pt-4">
 				{!workOrderForm ?
 					<EmptyData />
 				:	<div className="space-y-4">
@@ -234,8 +241,8 @@ const WorkOrderForms = ({
 						</Button>
 					</div>
 				)}
-			</CardContent>
-		</Card>
+			</div>
+		</div>
 	);
 };
 

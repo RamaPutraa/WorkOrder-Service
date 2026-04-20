@@ -57,6 +57,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { WoStatusStepper } from "../components/wo-status-stepper";
 
 //  Helpers
 
@@ -86,13 +87,15 @@ const CompanyDetailWo = () => {
 	const isReadOnly = user?.role === "staff_company";
 
 	const [isSticky, setIsSticky] = useState(false);
-	const [isSubmittingReady, setIsSubmittingReady] = useState(false);
-	const [isStarting, setIsStarting] = useState(false);
+	const [activeAction, setActiveAction] = useState<string | null>(null);
+	const [isHeaderRefreshing, setIsHeaderRefreshing] = useState(false);
+	const [isCardRefreshing, setIsCardRefreshing] = useState(false);
 	const [isFailDialogOpen, setIsFailDialogOpen] = useState(false);
 	const [failIssue, setFailIssue] = useState("");
 	const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
 	const [completeIssue, setCompleteIssue] = useState("");
 	const [workReport, setWorkReport] = useState<WorkReport | null>(null);
+	const [isReportFetching, setIsReportFetching] = useState(true);
 
 	// Detect scroll for sticky header
 	useEffect(() => {
@@ -103,23 +106,38 @@ const CompanyDetailWo = () => {
 
 	// Fetch work report when WO is in relevant status
 	useEffect(() => {
+		if ((loading && !detailData) || isHeaderRefreshing) {
+			setIsReportFetching(true);
+			return;
+		}
+
 		const fetchReport = async () => {
 			const d = detailData as
 				| (WorkOrderDetail & { meta?: WorkOrderMeta })
 				| undefined;
 			const id = d?._id;
-			if (!id) return;
+			if (!id) {
+				setIsReportFetching(false);
+				return;
+			}
 			const reportableStatuses = ["on_progress", "completed", "failed"];
-			if (!reportableStatuses.includes(d?.status ?? "")) return;
+			if (!reportableStatuses.includes(d?.status ?? "")) {
+				setWorkReport(null);
+				setIsReportFetching(false);
+				return;
+			}
+
+			setIsReportFetching(true);
 			const { data: res } = await handleApi(() => getWorkOrderReport(id));
-			if (res?.data) setWorkReport(res.data);
+			if (res?.data) {
+				setWorkReport(res.data);
+			} else {
+				setWorkReport(null);
+			}
+			setIsReportFetching(false);
 		};
 		void fetchReport();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [
-		(detailData as WorkOrderDetail | undefined)?.status,
-		(detailData as WorkOrderDetail | undefined)?._id,
-	]);
+	}, [detailData, loading, isHeaderRefreshing]);
 
 	//  Handlers
 	const handleSendWorkOrder = () => {
@@ -130,19 +148,22 @@ const CompanyDetailWo = () => {
 			confirmText: "Ya, Selesai",
 			cancelText: "Batal",
 			onConfirm: async () => {
-				setIsSubmittingReady(true);
+				setActiveAction("send");
 				const { error } = await handleApi(() =>
 					sendWorkOrderApi(wo?._id ?? ""),
 				);
-				setIsSubmittingReady(false);
 				if (error) {
 					notifyError("Gagal menandai konfigurasi selesai", error.message);
+					setActiveAction(null);
 					return;
 				}
 				notifySuccess("Konfigurasi Selesai", "Work order siap untuk dimulai");
 				if (wo?._id) {
-					fecthDetailInternalCompanyWorkOrder(wo._id);
+					setIsHeaderRefreshing(true);
+					await fecthDetailInternalCompanyWorkOrder(wo._id);
+					setIsHeaderRefreshing(false);
 				}
+				setActiveAction(null);
 			},
 		});
 	};
@@ -155,19 +176,22 @@ const CompanyDetailWo = () => {
 			confirmText: "Ya, Mulai",
 			cancelText: "Batal",
 			onConfirm: async () => {
-				setIsStarting(true);
+				setActiveAction("start");
 				const { error } = await handleApi(() =>
 					startWorkOrderApi(wo?._id ?? ""),
 				);
-				setIsStarting(false);
 				if (error) {
 					notifyError("Gagal memulai perintah kerja", error.message);
+					setActiveAction(null);
 					return;
 				}
 				notifySuccess("Berhasil Dimulai", "Perintah kerja telah dimulai");
 				if (wo?._id) {
-					fecthDetailInternalCompanyWorkOrder(wo._id);
+					setIsHeaderRefreshing(true);
+					await fecthDetailInternalCompanyWorkOrder(wo._id);
+					setIsHeaderRefreshing(false);
 				}
+				setActiveAction(null);
 			},
 		});
 	};
@@ -180,19 +204,22 @@ const CompanyDetailWo = () => {
 			confirmText: "Ya, Setujui",
 			cancelText: "Batal",
 			onConfirm: async () => {
-				setIsStarting(true);
+				setActiveAction("approve");
 				const { error } = await handleApi(() =>
 					approveWorkOrderApi(wo?._id ?? ""),
 				);
-				setIsStarting(false);
 				if (error) {
 					notifyError("Gagal menyetujui perintah kerja", error.message);
+					setActiveAction(null);
 					return;
 				}
 				notifySuccess("Berhasil Disetujui", "Perintah kerja telah disetujui");
 				if (wo?._id) {
-					fecthDetailInternalCompanyWorkOrder(wo._id);
+					setIsHeaderRefreshing(true);
+					await fecthDetailInternalCompanyWorkOrder(wo._id);
+					setIsHeaderRefreshing(false);
 				}
+				setActiveAction(null);
 			},
 		});
 	};
@@ -205,39 +232,45 @@ const CompanyDetailWo = () => {
 			confirmText: "Ya, Tolak",
 			cancelText: "Batal",
 			onConfirm: async () => {
-				setIsStarting(true);
+				setActiveAction("reject");
 				const { error } = await handleApi(() =>
 					rejectWorkOrderApi(wo?._id ?? ""),
 				);
-				setIsStarting(false);
 				if (error) {
 					notifyError("Gagal menolak perintah kerja", error.message);
+					setActiveAction(null);
 					return;
 				}
 				notifySuccess("Berhasil Ditolak", "Perintah kerja telah ditolak");
 				if (wo?._id) {
-					fecthDetailInternalCompanyWorkOrder(wo._id);
+					setIsHeaderRefreshing(true);
+					await fecthDetailInternalCompanyWorkOrder(wo._id);
+					setIsHeaderRefreshing(false);
 				}
+				setActiveAction(null);
 			},
 		});
 	};
 
 	const handleCompleteWorkOrder = async () => {
-		setIsStarting(true);
+		setActiveAction("complete");
 		const { error } = await handleApi(() =>
 			completeWorkOrderApi(wo?._id ?? "", { issue: completeIssue }),
 		);
-		setIsStarting(false);
 		if (error) {
 			notifyError("Gagal menyelesaikan perintah kerja", error.message);
+			setActiveAction(null);
 			return;
 		}
 		notifySuccess("Berhasil Selesai", "Perintah kerja telah selesai");
 		setIsCompleteDialogOpen(false);
 		setCompleteIssue("");
 		if (wo?._id) {
-			fecthDetailInternalCompanyWorkOrder(wo._id);
+			setIsHeaderRefreshing(true);
+			await fecthDetailInternalCompanyWorkOrder(wo._id);
+			setIsHeaderRefreshing(false);
 		}
+		setActiveAction(null);
 	};
 
 	const handleCancelWorkOrder = () => {
@@ -248,19 +281,22 @@ const CompanyDetailWo = () => {
 			confirmText: "Ya, Batalkan",
 			cancelText: "Batal",
 			onConfirm: async () => {
-				setIsStarting(true);
+				setActiveAction("cancel");
 				const { error } = await handleApi(() =>
 					cancelWorkOrderApi(wo?._id ?? ""),
 				);
-				setIsStarting(false);
 				if (error) {
 					notifyError("Gagal membatalkan perintah kerja", error.message);
+					setActiveAction(null);
 					return;
 				}
 				notifySuccess("Berhasil Dibatalkan", "Perintah kerja telah dibatalkan");
 				if (wo?._id) {
-					fecthDetailInternalCompanyWorkOrder(wo._id);
+					setIsHeaderRefreshing(true);
+					await fecthDetailInternalCompanyWorkOrder(wo._id);
+					setIsHeaderRefreshing(false);
 				}
+				setActiveAction(null);
 			},
 		});
 	};
@@ -270,21 +306,24 @@ const CompanyDetailWo = () => {
 			notifyError("Catatan Kendala", "Harap isi alasan kendala");
 			return;
 		}
-		setIsStarting(true);
+		setActiveAction("fail");
 		const { error } = await handleApi(() =>
 			failWorkOrderApi(wo?._id ?? "", { issue: failIssue }),
 		);
-		setIsStarting(false);
 		if (error) {
 			notifyError("Gagal", error.message);
+			setActiveAction(null);
 			return;
 		}
 		notifySuccess("Berhasil Digagalkan", "Perintah kerja telah digagalkan");
 		setIsFailDialogOpen(false);
 		setFailIssue("");
 		if (wo?._id) {
-			fecthDetailInternalCompanyWorkOrder(wo._id);
+			setIsHeaderRefreshing(true);
+			await fecthDetailInternalCompanyWorkOrder(wo._id);
+			setIsHeaderRefreshing(false);
 		}
+		setActiveAction(null);
 	};
 
 	const handleRecreateWorkOrder = () => {
@@ -295,13 +334,13 @@ const CompanyDetailWo = () => {
 			confirmText: "Ya, Buat Ulang",
 			cancelText: "Batal",
 			onConfirm: async () => {
-				setIsStarting(true);
+				setActiveAction("recreate");
 				const { error } = await handleApi(() =>
 					recreateRejectedWorkOrderApi(wo?._id ?? ""),
 				);
-				setIsStarting(false);
 				if (error) {
 					notifyError("Gagal membuat ulang perintah kerja", error.message);
+					setActiveAction(null);
 					return;
 				}
 				notifySuccess(
@@ -310,8 +349,11 @@ const CompanyDetailWo = () => {
 				);
 				navigate(-1);
 				if (wo?._id) {
-					fecthDetailInternalCompanyWorkOrder(wo._id);
+					setIsHeaderRefreshing(true);
+					await fecthDetailInternalCompanyWorkOrder(wo._id);
+					setIsHeaderRefreshing(false);
 				}
+				setActiveAction(null);
 			},
 		});
 	};
@@ -368,6 +410,9 @@ const CompanyDetailWo = () => {
 		}
 	};
 
+	const isPageLoading =
+		(loading && !wo) || isHeaderRefreshing || isReportFetching;
+
 	return (
 		<div className="space-y-6">
 			{/*  Sticky Header  */}
@@ -389,9 +434,10 @@ const CompanyDetailWo = () => {
 											(userCreated === true || userCreated === null))) && (
 										<Button
 											className=" bg-red-600 hover:bg-red-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-red-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
-											onClick={handleCancelWorkOrder}>
+											onClick={handleCancelWorkOrder}
+											disabled={activeAction !== null}>
 											<XCircle className="h-4 w-4" />
-											{isSubmittingReady ? "Memproses..." : "Batalkan"}
+											{activeAction === "cancel" ? "Memproses..." : "Batalkan"}
 										</Button>
 									)}
 								</>
@@ -401,9 +447,9 @@ const CompanyDetailWo = () => {
 								<Button
 									className=" bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
 									onClick={handleSendWorkOrder}
-									disabled={isSubmittingReady}>
+									disabled={activeAction !== null}>
 									<CheckCircle2 className="h-4 w-4" />
-									{isSubmittingReady ? "Memproses..." : "Kirim"}
+									{activeAction === "send" ? "Memproses..." : "Kirim"}
 								</Button>
 							)}
 
@@ -422,16 +468,18 @@ const CompanyDetailWo = () => {
 											<Button
 												className="bg-red-600 hover:bg-red-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-red-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
 												onClick={handleRejectWorkOrder}
-												disabled={isStarting}>
+												disabled={activeAction !== null}>
 												<XCircle className="h-4 w-4" />
-												{isStarting ? "Memproses" : "Tolak"}
+												{activeAction === "reject" ? "Memproses..." : "Tolak"}
 											</Button>
 											<Button
 												className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
 												onClick={handleApproveWorkOrder}
-												disabled={isStarting}>
+												disabled={activeAction !== null}>
 												<CheckCircle2 className="h-4 w-4" />
-												{isStarting ? "Memproses" : "Setujui"}
+												{activeAction === "approve" ?
+													"Memproses..."
+												:	"Setujui"}
 											</Button>
 										</>
 									)}
@@ -443,9 +491,13 @@ const CompanyDetailWo = () => {
 									<Button
 										className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
 										onClick={handleStartWorkOrder}
-										disabled={isStarting || !canStart || !userAssigned}>
+										disabled={
+											activeAction !== null || !canStart || !userAssigned
+										}>
 										<Play className="h-4 w-4" />
-										{isStarting ? "Memulai..." : "Mulai Perintah Kerja"}
+										{activeAction === "start" ?
+											"Memproses..."
+										:	"Mulai Perintah Kerja"}
 									</Button>
 								</>
 							)}
@@ -457,8 +509,12 @@ const CompanyDetailWo = () => {
 										(userCreated === true || userCreated === null))) && (
 									<Button
 										className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
-										onClick={handleRecreateWorkOrder}>
-										<Send className="h-4 w-4" /> Ajukan Ulang
+										onClick={handleRecreateWorkOrder}
+										disabled={activeAction !== null}>
+										<Send className="h-4 w-4" />{" "}
+										{activeAction === "recreate" ?
+											"Memproses..."
+										:	"Ajukan Ulang"}
 									</Button>
 								)}
 
@@ -469,16 +525,16 @@ const CompanyDetailWo = () => {
 									<Button
 										className="bg-red-600 hover:bg-red-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-red-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
 										onClick={() => setIsFailDialogOpen(true)}
-										disabled={isStarting || !canFail}>
+										disabled={activeAction !== null || !canFail}>
 										<XCircle className="h-4 w-4" />
-										{isStarting ? "Memproses..." : "Gagal"}
+										Gagal
 									</Button>
 									<Button
 										className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
 										onClick={() => setIsCompleteDialogOpen(true)}
-										disabled={isStarting || !canComplete}>
+										disabled={activeAction !== null || !canComplete}>
 										<CircleCheckBig className="h-4 w-4" />
-										{isStarting ? "Memproses..." : "Selesaikan"}
+										Selesaikan
 									</Button>
 
 									<Button
@@ -498,26 +554,28 @@ const CompanyDetailWo = () => {
 			/>
 
 			{/*  Loading  */}
-			{loading && !wo && (
+			{isPageLoading ?
 				<SectionLoading message="Memuat data perintah kerja..." />
-			)}
+			:	null}
 
 			{/*  Content  */}
-			{wo && (
+			{wo && !isPageLoading && (
 				<motion.div
 					initial={{ opacity: 0, y: 12 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.3 }}
 					className="space-y-6">
 					{/*  Row 2: 3-column grid  */}
-					<div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+					<div className="grid grid-cols-1 md:grid-cols-1 xl:grid-cols-3 gap-5">
 						{/* Card 1: Info Umum */}
 						<div className="border shadow-sm rounded-xl md:col-span-2">
-							<div className="space-y-4 p-5">
+							<div className="space-y-2">
 								{/*  Row 1: Status Hero Banner  */}
 								<div className="overflow-hidden border-0 ">
-									<div className="relative">
-										<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4  border-b border-border/50 pb-4">
+									{/* status wo */}
+
+									<div className="relative px-5 md:px-12">
+										<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-7">
 											<div className="flex items-center gap-4">
 												<div className="shrink-0 p-3 rounded-xl bg-primary/10 text-primary">
 													<FileText className="w-6 h-6" />
@@ -531,21 +589,35 @@ const CompanyDetailWo = () => {
 													</p>
 												</div>
 											</div>
-											<div className="flex flex-wrap items-center gap-2">
-												<StatusBadge status={wo.status} />
-												{wo.has_issue && wo.status == "failed" && (
-													<span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border text-orange-600 bg-orange-50 border-orange-200">
-														<AlertTriangle className="w-3.5 h-3.5" />
-														Ada Kendala
-													</span>
-												)}
+											{/* Mobile Badge Fallback */}
+											<div className="flex md:hidden flex-col sm:items-end gap-1.5 mt-3 sm:mt-0">
+												<div className="flex flex-wrap items-center gap-2">
+													<StatusBadge status={wo.status} />
+													{wo.has_issue && wo.status == "failed" && (
+														<span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border text-orange-600 bg-orange-50 border-orange-200">
+															<AlertTriangle className="w-3.5 h-3.5" />
+															Ada Kendala
+														</span>
+													)}
+												</div>
+												<span className="text-[11px] sm:text-xs text-muted-foreground flex items-center gap-1 font-medium">
+													<Calendar className="w-3 h-3" />
+													{formatDate(wo.updatedAt)}
+												</span>
 											</div>
 										</div>
-
+										{/* <div className="border-t border-border/50 p-0 hidden md:block"></div> */}
+										<div className="py-5  w-full hidden md:block">
+											{/* <span className="mb-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center">
+												<Settings2 className="w-3.5 h-3.5 mr-1" />
+												Status Perintah Kerja:
+											</span> */}
+											<WoStatusStepper wo={wo} />
+										</div>
 										<div className="grid gird-cols-1 gap-4 lg:grid-cols-2">
 											{/* Capabilities Bar */}
 											{meta?.workOrderCapabilities && (
-												<div className="mt-5 flex flex-col gap-3 pt-4 ">
+												<div className="mt-5 flex flex-col gap-3">
 													<span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center">
 														<Settings2 className="w-3.5 h-3.5 mr-1" />
 														Keterangan perintah kerja:
@@ -673,7 +745,7 @@ const CompanyDetailWo = () => {
 																</Alert>
 															)}
 														{/* Alert: work report perlu diselesaikan (auto + approved) */}
-														{wo.status === "on_progress" && (
+														{/* {wo.status === "on_progress" && (
 															<>
 																{workReport &&
 																	workReport.workReportApprovalAccessType ===
@@ -692,7 +764,7 @@ const CompanyDetailWo = () => {
 																		</Alert>
 																	)}
 															</>
-														)}
+														)} */}
 
 														{/* Alert: work report perlu disetujui (manager + submitted) */}
 														{workReport &&
@@ -714,7 +786,7 @@ const CompanyDetailWo = () => {
 												</div>
 											)}
 
-											<div className="mt-5 flex flex-col gap-3 pt-4">
+											<div className="mt-5 flex flex-col gap-3">
 												<span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center">
 													<Settings2 className="w-3.5 h-3.5 mr-1" />
 													Keterangan Kendala :
@@ -747,9 +819,7 @@ const CompanyDetailWo = () => {
 														<Alert className="max-w-full bg-gray-50 text-gray-800 border-gray-200 [&>svg]:text-gray-800">
 															<Info className="h-4 w-4" />
 															<AlertTitle>Catatan</AlertTitle>
-															<AlertDescription>
-																Tidak ada catatan pada perintah kerja ini
-															</AlertDescription>
+															<AlertDescription>-</AlertDescription>
 														</Alert>
 													)}
 												</div>
@@ -760,7 +830,7 @@ const CompanyDetailWo = () => {
 
 								{/* informasi lainnya */}
 								<div className="grid grid-cols-1 xl:grid-cols-2 ">
-									<div className="p-2 space-y-3">
+									<div className="px-12 space-y-3">
 										<InfoRow
 											icon={ArrowLeftRight}
 											label="Tipe Persetujuan WO"
@@ -812,7 +882,7 @@ const CompanyDetailWo = () => {
 										/>
 										<div className="border-b border-border/50" />
 									</div>
-									<div className="p-2 space-y-3">
+									<div className="px-12 space-y-3">
 										<InfoRow
 											icon={Calendar}
 											label="Tanggal Dibuat"
@@ -828,7 +898,7 @@ const CompanyDetailWo = () => {
 									</div>
 								</div>
 								{/* siblings wo */}
-								<div className="mt-5 flex flex-col gap-3 pt-4">
+								<div className=" flex flex-col gap-3 px-12 my-7">
 									<span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center">
 										<Settings2 className="w-3.5 h-3.5 mr-1" />
 										Perintah Kerja Terkait :
@@ -862,9 +932,12 @@ const CompanyDetailWo = () => {
 							isReadOnly={isReadOnly}
 							currentStatus={currentStatus}
 							canRecreateEdit={canRecreateEdit}
-							onAssignSuccess={() =>
-								fecthDetailInternalCompanyWorkOrder(wo._id)
-							}
+							onAssignSuccess={async () => {
+								setIsCardRefreshing(true);
+								await fecthDetailInternalCompanyWorkOrder(wo._id);
+								setIsCardRefreshing(false);
+							}}
+							isRefreshing={isCardRefreshing}
 						/>
 					</div>
 
@@ -874,7 +947,12 @@ const CompanyDetailWo = () => {
 						workOrderId={wo._id}
 						submissions={wo.submissions || []}
 						isReadOnly={isReadOnly || (!isDrafted && !canRecreateEdit)}
-						onSaveSuccess={() => fecthDetailInternalCompanyWorkOrder(wo._id)}
+						onSaveSuccess={async () => {
+							setIsCardRefreshing(true);
+							await fecthDetailInternalCompanyWorkOrder(wo._id);
+							setIsCardRefreshing(false);
+						}}
+						isRefreshing={isCardRefreshing}
 					/>
 				</motion.div>
 			)}
@@ -907,14 +985,14 @@ const CompanyDetailWo = () => {
 						<Button
 							variant="outline"
 							onClick={() => setIsFailDialogOpen(false)}
-							disabled={isStarting}>
+							disabled={activeAction !== null}>
 							Batal
 						</Button>
 						<Button
 							variant="destructive"
 							onClick={handleFailWorkOrder}
-							disabled={isStarting}>
-							{isStarting ? "Memproses..." : "Konfirmasi Gagal"}
+							disabled={activeAction !== null}>
+							{activeAction === "fail" ? "Memproses..." : "Konfirmasi Gagal"}
 						</Button>
 					</DialogFooter>
 				</DialogContent>
@@ -953,14 +1031,14 @@ const CompanyDetailWo = () => {
 						<Button
 							variant="outline"
 							onClick={() => setIsCompleteDialogOpen(false)}
-							disabled={isStarting}>
+							disabled={activeAction !== null}>
 							Batal
 						</Button>
 						<Button
 							className="bg-blue-600 hover:bg-blue-700 text-white"
 							onClick={handleCompleteWorkOrder}
-							disabled={isStarting}>
-							{isStarting ? "Memproses..." : "Selesaikan"}
+							disabled={activeAction !== null}>
+							{activeAction === "complete" ? "Memproses..." : "Selesaikan"}
 						</Button>
 					</DialogFooter>
 				</DialogContent>

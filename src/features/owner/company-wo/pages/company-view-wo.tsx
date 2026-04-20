@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useCompanyWo } from "../hooks/use-company-wo";
-import { Calendar, User, Ticket, ScrollText, CheckCircle2, Timer } from "lucide-react";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Calendar, User, Ticket, ScrollText, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SectionLoading } from "@/shared/atoms";
 import PageHeader from "@/shared/atoms/header-content";
@@ -15,20 +14,40 @@ const CompanyViewWo = () => {
 	const { filteredData, filterConfig, loading, error } = useCompanyWo();
 	const navigate = useNavigate();
 	// workReportMap: woId -> WorkReport (hanya untuk WO on_progress/completed/failed)
-	const [workReportMap, setWorkReportMap] = useState<Record<string, WorkReport>>({});
+	const [workReportMap, setWorkReportMap] = useState<
+		Record<string, WorkReport>
+	>({});
+	const [isReportFetching, setIsReportFetching] = useState(true);
 
 	// Fetch work reports secara paralel untuk WO yang relevan
 	useEffect(() => {
-		if (!filteredData || filteredData.length === 0) return;
+		if (loading) {
+			setIsReportFetching(true);
+			return;
+		}
+
+		if (!filteredData || filteredData.length === 0) {
+			setIsReportFetching(false);
+			return;
+		}
+
 		const relevantWos = filteredData.filter((wo) =>
 			["on_progress", "completed", "failed"].includes(wo.status),
 		);
-		if (relevantWos.length === 0) return;
+
+		if (relevantWos.length === 0) {
+			setIsReportFetching(false);
+			return;
+		}
+
+		setIsReportFetching(true);
 
 		const fetchAll = async () => {
 			const results = await Promise.all(
 				relevantWos.map(async (wo) => {
-					const { data: res } = await handleApi(() => getWorkOrderReport(wo._id));
+					const { data: res } = await handleApi(() =>
+						getWorkOrderReport(wo._id),
+					);
 					if (res?.data) return { id: wo._id, report: res.data as WorkReport };
 					return null;
 				}),
@@ -38,10 +57,10 @@ const CompanyViewWo = () => {
 				if (r) map[r.id] = r.report;
 			});
 			setWorkReportMap(map);
+			setIsReportFetching(false);
 		};
 		void fetchAll();
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [filteredData]);
+	}, [filteredData, loading]);
 
 	if (error) {
 		return (
@@ -67,17 +86,17 @@ const CompanyViewWo = () => {
 			case "sent":
 				return {
 					className: " text-blue-600",
-					label: "Dikirim",
+					label: "Dikirim (Perlu persetujuan staff)",
 				};
 			case "approved":
 				return {
 					className: " text-green-600",
-					label: "Disetujui",
+					label: "Disetujui (Perlu dimulai)",
 				};
 			case "unprocessable":
 				return {
 					className: " text-yellow-600",
-					label: "Belum dapat dikerjakan",
+					label: "Tidak dapat dikerjakan",
 				};
 			case "on_progress":
 				return {
@@ -97,7 +116,7 @@ const CompanyViewWo = () => {
 			case "failed":
 				return {
 					className: " text-red-600",
-					label: "Gagal",
+					label: "Gagal (Perintah kerja diselesaikan)",
 				};
 			default:
 				return {
@@ -121,9 +140,9 @@ const CompanyViewWo = () => {
 			</div>
 
 			{/* Work Orders Grid */}
-			<div className="grid gap-4 sm:gap-5 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+			<div className="grid gap-4 sm:gap-5 grid-cols-1 xl:grid-cols-3">
 				<AnimatePresence mode="wait">
-					{loading ?
+					{loading || isReportFetching ?
 						<motion.div
 							initial={{ opacity: 0 }}
 							animate={{ opacity: 1 }}
@@ -139,10 +158,12 @@ const CompanyViewWo = () => {
 							// Kondisi alert work report
 							const showNeedComplete =
 								report?.workReportApprovalAccessType === "auto" &&
-								report?.status === "approved";
+								report?.status === "approved" &&
+								wo.status === "on_progress";
 							const showNeedApproval =
 								report?.workReportApprovalAccessType === "manager" &&
-								report?.status === "submitted";
+								report?.status === "submitted" &&
+								wo.status === "on_progress";
 
 							return (
 								<motion.div
@@ -151,32 +172,15 @@ const CompanyViewWo = () => {
 									animate={{ opacity: 1, y: 0 }}
 									whileHover={{ scale: 1.02, y: -4 }}
 									transition={{ duration: 0.2, ease: "easeOut" }}>
-									<Card
+									<div
 										onClick={() =>
 											navigate(
 												`/dashboard/internal/workorders/detail/${wo._id}`,
 											)
 										}
 										className="flex flex-col h-full border shadow-md hover:shadow-lg rounded-lg transition-all duration-200 bg-gradient-to-br from-background to-muted/10 overflow-hidden hover:cursor-pointer">
-										{/* Report Action Banner */}
-										{showNeedComplete && (
-											<div className="flex items-center gap-2 px-4 py-2 bg-green-50 border-b border-green-200">
-												<CheckCircle2 className="w-3.5 h-3.5 text-green-600 shrink-0" />
-												<p className="text-xs font-semibold text-green-700">
-													Tugas kerja perlu diselesaikan
-												</p>
-											</div>
-										)}
-										{showNeedApproval && (
-											<div className="flex items-center gap-2 px-4 py-2 bg-amber-50 border-b border-amber-200">
-												<Timer className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-												<p className="text-xs font-semibold text-amber-700">
-													Tugas kerja perlu disetujui
-												</p>
-											</div>
-										)}
 										{/* Header */}
-										<CardHeader className="pb-0 ">
+										<div className="p-5 ">
 											<div className="flex items-center justify-between gap-3">
 												<div className="shrink-0 p-3 bg-primary/5 text-primary rounded-xl">
 													<ScrollText className="w-6 h-6" />
@@ -190,26 +194,47 @@ const CompanyViewWo = () => {
 													</p>
 												</div>
 											</div>
-										</CardHeader>
-										<div className="border-b border-boder/10 mx-6"></div>
+										</div>
+										<div className="border-b border-boder/50"></div>
 										{/* Content */}
-										<CardContent className="flex-1 flex flex-col gap-4 pt-0 ">
+										<div className="flex-1 flex flex-col gap-4 p-5 ">
 											{/* Info Grid */}
 											<div className="space-y-3">
+												{/* Report Action Banner */}
+												{showNeedComplete && (
+													<div className="px-5 py-1 bg-green-500/5 rounded-lg">
+														<div className="flex items-center gap-3">
+															<AlertCircle className="w-4 h-4 text-green-600" />
+															<p className="text-xs font-semibold   text-green-600 ">
+																Tugas kerja perlu diselesaikan
+															</p>
+														</div>
+													</div>
+												)}
+												{showNeedApproval && (
+													<div className="px-5 py-1 border-t border-border/50">
+														<div className="flex items-center gap-3 ">
+															<AlertCircle className="w-4 h-4 text-amber-600" />
+															<p className="text-xs font-semibold   text-amber-600 ">
+																Laporan tugas kerja perlu disetujui
+															</p>
+														</div>
+													</div>
+												)}
 												{/* status */}
 												<div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
 													<div className="p-2 rounded-md bg-background">
 														<Ticket className="w-4 h-4 text-primary" />
 													</div>
 													<div
-														className={`flex-1 min-w-0 px-3 py-2 rounded-lg ${statusConfig.className}`}>
+														className={`flex-1 min-w-0  py-2 rounded-lg ${statusConfig.className}`}>
 														{/* Label Header */}
 														<p className="text-xs font-medium opacity-80 mb-0.5">
 															Status Tugas Kerja
 														</p>
 
 														{/* Value Status */}
-														<p className="text-sm font-bold truncate">
+														<p className="text-sm font-semibold truncate">
 															{statusConfig.label}
 														</p>
 													</div>
@@ -261,8 +286,8 @@ const CompanyViewWo = () => {
 													</div>
 												</div>
 											</div>
-										</CardContent>
-									</Card>
+										</div>
+									</div>
 								</motion.div>
 							);
 						})

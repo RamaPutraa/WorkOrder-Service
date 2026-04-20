@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { RefreshCw, ClipboardPenLine, Calendar } from "lucide-react";
+import { RefreshCw, ClipboardPenLine, Calendar, Star } from "lucide-react";
 import { handleApi } from "@/lib/handle-api";
 import { notifyError } from "@/lib/toast-helper";
 import { getAllClientServiceRequestApi } from "../services/public-services";
@@ -208,6 +208,18 @@ const ServiceSubmitPage = () => {
 												harum ratione ad minima dicta! Nam, obcaecati
 												consequatur.
 											</p>
+
+											{item.serviceRequestStatus === "closed" &&
+												!item.reviewForm === null && (
+													<div className="flex ">
+														<div className="bg-yellow-500/5 p-1 rounded-full flex items-center gap-2 border border-yellow-500">
+															<Star className="w-4 h-4 text-yellow-500" />
+															<p className="text-xs font-semibold text-yellow-500">
+																Berikan kami ulasan
+															</p>
+														</div>
+													</div>
+												)}
 										</div>
 										{/* card content 2 */}
 										<div className="px-6 py-2 border-t border-slate-200/70 flex flex-col justify-end">

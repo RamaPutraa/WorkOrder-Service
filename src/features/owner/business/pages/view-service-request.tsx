@@ -33,7 +33,7 @@ const ViewServiceRequest = () => {
 
 	const getStatusBadge = (status?: string) => {
 		const s = status;
-		if (s === "work_order_created")
+		if (s === "approved")
 			return (
 				<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-emerald-600 ">
 					<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -84,6 +84,15 @@ const ViewServiceRequest = () => {
 					<span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
 					<span className="text-[10px] font-bold uppercase tracking-wider">
 						Permintaan Masuk
+					</span>
+				</div>
+			);
+		if (s === "unprocessable")
+			return (
+				<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-red-600 ">
+					<span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+					<span className="text-[10px] font-bold uppercase tracking-wider">
+						Tidak Dapat Dikerjakan
 					</span>
 				</div>
 			);

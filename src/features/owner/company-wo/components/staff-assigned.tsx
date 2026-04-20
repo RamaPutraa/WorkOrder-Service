@@ -20,7 +20,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import { SectionLoading } from "@/shared/atoms";
+import { ButtonLoading, SectionLoading } from "@/shared/atoms";
 import { handleApi } from "@/lib/handle-api";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
 import { assignStaffToWorkOrderApi } from "../services/company-wo-service";
@@ -33,6 +33,7 @@ export interface StaffAssignedProps {
 	currentStatus?: string;
 	canRecreateEdit?: boolean;
 	onAssignSuccess: () => void;
+	isRefreshing?: boolean;
 }
 
 const StaffRow = ({
@@ -85,6 +86,7 @@ export const StaffAssigned = ({
 	currentStatus,
 	canRecreateEdit = false,
 	onAssignSuccess,
+	isRefreshing = false,
 }: StaffAssignedProps) => {
 	const [isStaffDialogOpen, setIsStaffDialogOpen] = useState(false);
 	const [selectedStaffEmails, setSelectedStaffEmails] = useState<string[]>([]);
@@ -189,7 +191,13 @@ export const StaffAssigned = ({
 	};
 
 	return (
-		<div className="border shadow-sm rounded-xl">
+		<div className="border shadow-sm rounded-xl relative overflow-hidden">
+			{isRefreshing && (
+				<div className="absolute inset-0 z-50 bg-background/60 backdrop-blur-[1px] flex flex-col items-center justify-center">
+					<div className="w-8 h-8 animate-spin rounded-full border-[3px] border-primary border-t-transparent mb-2" />
+					<p className="text-sm font-semibold text-primary">Memperbarui...</p>
+				</div>
+			)}
 			<div className="p-5">
 				<h3 className="text-base font-semibold flex items-center gap-2">
 					<Users className="w-4 h-4 text-primary" />
@@ -212,7 +220,7 @@ export const StaffAssigned = ({
 				</div>
 
 				{/* Assigned Staff */}
-				<div className="border rounded-xl p-3 flex flex-col gap-3">
+				<div className="border rounded-xl p-3 flex flex-col gap-3 relative overflow-hidden">
 					<div className="overflow-y-auto max-h-[320px] pr-1">
 						{wo.assignedStaff.length === 0 ?
 							<div className="flex flex-col items-center justify-center py-8 text-center text-muted-foreground">
@@ -227,7 +235,10 @@ export const StaffAssigned = ({
 										isPIC={staff.email === wo.staffPIC?.email}
 										highlight={selectedStaffsToRemove.includes(staff.email)}
 										onClick={
-											isReadOnly || (currentStatus !== "drafted" && !canRecreateEdit) ?
+											(
+												isReadOnly ||
+												(currentStatus !== "drafted" && !canRecreateEdit)
+											) ?
 												undefined
 											:	() =>
 													setSelectedStaffsToRemove((prev) =>
@@ -245,7 +256,9 @@ export const StaffAssigned = ({
 				<div className="flex gap-2">
 					<Button
 						onClick={handleOpenStaffDialog}
-						disabled={isReadOnly || (currentStatus !== "drafted" && !canRecreateEdit)}
+						disabled={
+							isReadOnly || (currentStatus !== "drafted" && !canRecreateEdit)
+						}
 						className="bg-blue-600 hover:cursor-pointer hover:bg-blue-700 flex-1 md:flex-none text-white rounded-xl px-5 h-11 shadow-sm shadow-blue-200 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed">
 						<Settings className="w-4 h-4" />
 						<span className="font-semibold text-xs">
@@ -387,8 +400,13 @@ export const StaffAssigned = ({
 							className="bg-primary text-white hover:cursor-pointer"
 							onClick={handleAssignStaffSubmit}
 							disabled={isAssigningState}>
-							<Save className="w-4 h-4 mr-2" />
-							{isAssigningState ? "Menyimpan..." : "Simpan Konfigurasi"}
+							{isAssigningState ?
+								<ButtonLoading message="Menyimpan..." />
+							:	<>
+									<Save className="w-4 h-4 mr-2" />
+									Simpan Konfigurasi
+								</>
+							}
 						</Button>
 					</DialogFooter>
 				</DialogContent>

@@ -245,6 +245,39 @@ const ServiceDetailSubmit = () => {
 						</div>
 					)}
 
+					{srStatus === "partial_completed" && (
+						<div className="flex items-start gap-3 p-4 rounded-xl bg-yellow-50 border border-yellow-100 text-yellow-700 text-sm">
+							<Info className="size-4 shrink-0 mt-0.5" />
+							<p>
+								Layanan Anda telah selesai dikerjakan. Namun layanan anda
+								<span className="font-semibold"> tidak maksimal</span>{" "}
+								terselesaikan.
+							</p>
+						</div>
+					)}
+
+					{srStatus === "unprocessable" && (
+						<div className="flex items-start gap-3 p-4 rounded-xl bg-red-50 border border-red-100 text-red-700 text-sm">
+							<Info className="size-4 shrink-0 mt-0.5" />
+							<p>
+								Layanan Anda{" "}
+								<span className="font-semibold"> tidak dapat diproses.</span>{" "}
+								Silahkan ajukan layanan ulang
+							</p>
+						</div>
+					)}
+
+					{srStatus === "on_progress" && (
+						<div className="flex items-start gap-3 p-4 rounded-xl bg-blue-50 border border-blue-100 text-blue-700 text-sm">
+							<Info className="size-4 shrink-0 mt-0.5" />
+							<p>
+								Layanan Anda{" "}
+								<span className="font-semibold"> sedang dikerjakan.</span>{" "}
+								Silahkan menunggu
+							</p>
+						</div>
+					)}
+
 					{/* Accordion */}
 					<Accordion
 						type="multiple"

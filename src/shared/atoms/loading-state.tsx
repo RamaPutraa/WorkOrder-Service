@@ -117,8 +117,13 @@ export function SectionLoading({ message }: { message?: string }) {
 /**
  * Button loading state (small spinner)
  */
-export function ButtonLoading() {
-	return <Loader2 className="h-4 w-4 animate-spin" />;
+export function ButtonLoading({ message }: { message?: string }) {
+	return (
+		<div className="flex items-center gap-2">
+			<Loader2 className="h-4 w-4 animate-spin" />
+			{message && <span className="text-sm">{message}</span>}
+		</div>
+	);
 }
 
 /**
@@ -200,7 +205,8 @@ function DotsLoading({
 	}, []);
 
 	return (
-		<span className={cn("text-sm text-muted-foreground font-medium", className)}>
+		<span
+			className={cn("text-sm text-muted-foreground font-medium", className)}>
 			{message}
 			<span className="inline-block w-6 text-left">{dots}</span>
 		</span>

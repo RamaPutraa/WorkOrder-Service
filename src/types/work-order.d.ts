@@ -43,6 +43,16 @@ type WorkOrder = {
 	createdAt: string;
 	updatedAt: string | null;
 	deletedAt: string | null;
+	approvedAt: string | null;
+	cancelledAt: string | null;
+	rejectedAt: string | null;
+	unprocessableAt: string | null;
+
+	completedAt: string | null;
+	failedAt: string | null;
+	draftedAt: string | null;
+	sentAt: string | null;
+	startedAt: string | null;
 };
 type WorkOrderResponse = ApiResponse<WorkOrder>;
 
@@ -77,6 +87,16 @@ type WorkOrderDetail = {
 	createdAt: string;
 	updatedAt: string | null;
 	deletedAt: string | null;
+	approvedAt: string | null;
+	cancelledAt: string | null;
+	rejectedAt: string | null;
+	unprocessableAt: string | null;
+
+	completedAt: string | null;
+	failedAt: string | null;
+	draftedAt: string | null;
+	sentAt: string | null;
+	startedAt: string | null;
 	meta?: WorkOrderMeta;
 };
 type WorkOrderDetailResponse = ApiResponse<WorkOrderDetail>;

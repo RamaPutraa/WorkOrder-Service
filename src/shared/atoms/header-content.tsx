@@ -57,7 +57,7 @@ const PageHeader = ({
 			</div>
 
 			{/* Area Tombol Aksi Kanan */}
-			<div className="flex items-center gap-2 sm:gap-3 w-full md:w-auto">
+			<div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto">
 				{/* Jika ada custom buttons, render custom buttons */}
 				{actionButtons ?
 					actionButtons

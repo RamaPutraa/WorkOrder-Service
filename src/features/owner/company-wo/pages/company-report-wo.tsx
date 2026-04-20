@@ -10,6 +10,7 @@ import FormFieldViewer, {
 } from "@/shared/molecules/form-field-viewer";
 import { useDialogStore } from "@/store/dialogStore";
 import { useAuthStore } from "@/store/authStore";
+import { useCompanyWo } from "../hooks/use-company-wo";
 import { handleApi } from "@/lib/handle-api";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
 import {
@@ -38,6 +39,7 @@ const CompanyReportWo = () => {
 	const { id } = useParams<{ id: string }>();
 	const { showDialog } = useDialogStore();
 	const { user } = useAuthStore();
+	const { detailData } = useCompanyWo();
 	const [reportData, setReportData] = useState<WorkReport | null>(null);
 	const [formObject, setFormObject] = useState<Form | null>(null);
 	const [loading, setLoading] = useState(false);
@@ -50,6 +52,11 @@ const CompanyReportWo = () => {
 	const isReviewer =
 		user?.role === "owner_company" || user?.role === "manager_company";
 	const canEdit = !isReviewer; // only staff can edit/submit report
+
+	const isAssignedStaff =
+		detailData?.assignedStaff?.some((s) => s.email === user?.email) || false;
+	const isPic = detailData?.staffPIC?.email === user?.email || false;
+	const canSendReport = isAssignedStaff || isPic;
 
 	// State for form data tracking
 	const [formData, setFormData] = useState<Map<number, AnswerValue>>(new Map());
@@ -395,7 +402,7 @@ const CompanyReportWo = () => {
 
 	const statusConfig = reportData ? getStatusConfig(reportData.status) : null;
 	const StatusIcon = statusConfig?.icon ?? Clock;
-	const workReportStatus = reportData?.status === "on_progress";
+	// const workReportStatus = reportData?.status === "on_progress";
 
 	return (
 		<div className="space-y-6 pb-12">
@@ -403,6 +410,19 @@ const CompanyReportWo = () => {
 				title="Laporan Tugas Kerja"
 				subtitle="Tinjau dan kelola rincian penyelesaian tugas kerja"
 				backPath={true}
+				addIcon={<Send className="h-4 w-4" />}
+				// addLabel="Kirim Laporan"
+				// onAddClick={handleSendWorkReport}
+				loading={isSaving}
+				actionButtons={
+					<Button
+						className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
+						onClick={handleSendWorkReport}
+						disabled={isSaving || !canSendReport}>
+						<Send className="h-4 w-4" />
+						{isSaving ? "Memproses..." : "Kirim laporan"}
+					</Button>
+				}
 			/>
 
 			{loading && <SectionLoading message="Memuat laporan..." />}
@@ -430,46 +450,62 @@ const CompanyReportWo = () => {
 					<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 bg-white rounded-xl border border-gray-100 shadow-sm">
 						<div className="flex items-center gap-6 sm:gap-10 flex-wrap w-full">
 							<div className="space-y-1.5 flex-1 sm:flex-none">
-								<p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
-									Status Laporan
-								</p>
-								<div className="flex items-center gap-2">
-									<StatusIcon className={`w-4 h-4 ${statusConfig?.text}`} />
-									<span className={`text-sm font-bold ${statusConfig?.text}`}>
-										{statusConfig?.label}
-									</span>
+								<div className="flex items-center gap-3">
+									<div className="p-2 rounded-lg bg-primary/5 text-primary">
+										<StatusIcon className="w-4 h-4" />
+									</div>
+									<div>
+										<p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
+											Status Laporan
+										</p>
+										<span className={`text-sm font-bold ${statusConfig?.text}`}>
+											{statusConfig?.label}
+										</span>
+									</div>
 								</div>
 							</div>
 							<div className="w-px h-8 bg-gray-200 hidden sm:block"></div>
 							<div className="space-y-1.5 flex-1 sm:flex-none">
-								<p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
-									Disetujui Oleh
-								</p>
-								<div className="flex items-center gap-2">
-									<User className="w-4 h-4 text-gray-400" />
-
-									<span
-										className={`text-sm font-bold ${reportData.approvedBy ? "text-gray-900" : "text-gray-400"}`}>
-										{reportData.approvedBy ?
-											reportData.approvedBy.name
-										: reportData.workReportApprovalAccessType === "auto" ?
-											"Disetujui Otomatis"
-										:	"Belum disetujui"}
-									</span>
+								<div className="flex items-center gap-3">
+									<div className="p-2 rounded-lg bg-primary/5 text-primary">
+										<User className="w-4 h-4" />
+									</div>
+									<div>
+										<p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
+											Disetujui Oleh
+										</p>
+										<span
+											className={`text-sm font-bold ${reportData.approvedBy ? "text-gray-900" : "text-gray-400"}`}>
+											{reportData.approvedBy ?
+												reportData.approvedBy.name
+											: reportData.workReportApprovalAccessType === "auto" ?
+												"Disetujui Otomatis"
+											:	"Belum disetujui"}
+										</span>
+									</div>
 								</div>
 							</div>
 							<div className="w-px h-8 bg-gray-200 hidden sm:block"></div>
 							<div className="space-y-1.5 flex-1 sm:flex-none">
-								<p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
-									Dibuat Pada
-								</p>
-								<div className="flex items-center gap-2 text-sm font-bold text-gray-900">
-									<Calendar className="w-4 h-4 text-gray-400" />
-									{new Date(reportData.createdAt).toLocaleDateString("id-ID", {
-										day: "2-digit",
-										month: "long",
-										year: "numeric",
-									})}
+								<div className="flex items-center gap-3">
+									<div className="p-2 rounded-lg bg-primary/5 text-primary">
+										<Calendar className="w-4 h-4" />
+									</div>
+									<div>
+										<p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
+											Dibuat Pada
+										</p>
+										<div className="flex items-center gap-2 text-sm font-bold text-gray-900">
+											{new Date(reportData.createdAt).toLocaleDateString(
+												"id-ID",
+												{
+													day: "2-digit",
+													month: "long",
+													year: "numeric",
+												},
+											)}
+										</div>
+									</div>
 								</div>
 							</div>
 
@@ -519,20 +555,30 @@ const CompanyReportWo = () => {
 								{/* Edit & Kirim hanya untuk staff (bukan manager/owner) */}
 								{canEdit && (
 									<div className="flex items-center gap-2">
-										{!isEditMode && (
-											<Button
-												onClick={() => setIsEditMode(true)}
-												className="bg-yellow-400 hover:bg-yellow-500 w-full md:w-auto text-white rounded-xl h-11 shadow-sm shadow-yellow-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer">
-												<Pencil className="w-4 h-4 mr-2" />
-												Edit Laporan
-											</Button>
-										)}
 										<Button
-											onClick={handleSendWorkReport}
-											className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer">
-											<Send className="w-4 h-4 mr-2" />
-											Kirim Laporan
+											onClick={() => setIsEditMode(true)}
+											disabled={isEditMode}
+											className="bg-yellow-400 hover:bg-yellow-500 w-full md:w-auto text-white rounded-xl h-9 px-3 text-sm shadow-sm transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer">
+											<Pencil className="w-4 h-4 mr-1.5" />
+											Edit Laporan
 										</Button>
+
+										<div className="flex items-center gap-2">
+											<Button
+												onClick={handleCancel}
+												disabled={isSaving || !isEditMode}
+												className="bg-white border focus:ring-0 focus:outline-none hover:bg-muted/20 w-full md:w-auto text-black rounded-xl h-9 px-3 text-sm shadow-sm transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer">
+												<X className="w-4 h-4 mr-1.5" />
+												Batal
+											</Button>
+											<Button
+												onClick={handleSave}
+												disabled={isSaving || !isEditMode || !hasChanges()}
+												className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl h-9 px-3 text-sm shadow-sm transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer">
+												<Save className="w-4 h-4 mr-1.5" />
+												{isSaving ? "Menyimpan..." : "Simpan Laporan"}
+											</Button>
+										</div>
 									</div>
 								)}
 							</div>
@@ -563,25 +609,6 @@ const CompanyReportWo = () => {
 									:	<EmptyData />}
 								</div>
 							}
-
-							{isEditMode && hasChanges() && (
-								<div className="flex items-center justify-end border-t mt-6 pt-5 gap-3">
-									<Button
-										className="bg-white border hover:bg-muted/20 w-full md:w-auto text-black rounded-xl h-11 shadow-sm transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
-										onClick={handleCancel}
-										disabled={isSaving}>
-										<X className="w-4 h-4 mr-2" />
-										Batal
-									</Button>
-									<Button
-										className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
-										onClick={handleSave}
-										disabled={isSaving}>
-										<Save className="w-4 h-4 mr-2" />
-										{isSaving ? "Menyimpan..." : "Simpan Laporan"}
-									</Button>
-								</div>
-							)}
 						</CardContent>
 					</Card>
 				</div>
