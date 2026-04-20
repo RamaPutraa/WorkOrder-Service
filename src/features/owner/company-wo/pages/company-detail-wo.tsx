@@ -607,11 +607,11 @@ const CompanyDetailWo = () => {
 											</div>
 										</div>
 										{/* <div className="border-t border-border/50 p-0 hidden md:block"></div> */}
-										<div className="py-5  w-full hidden md:block">
-											{/* <span className="mb-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center">
+										<div className="pb-4  w-full hidden md:block">
+											<span className="mb-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center">
 												<Settings2 className="w-3.5 h-3.5 mr-1" />
 												Status Perintah Kerja:
-											</span> */}
+											</span>
 											<WoStatusStepper wo={wo} />
 										</div>
 										<div className="grid gird-cols-1 gap-4 lg:grid-cols-2">
@@ -882,7 +882,7 @@ const CompanyDetailWo = () => {
 										/>
 										<div className="border-b border-border/50" />
 									</div>
-									<div className="px-12 space-y-3">
+									<div className="space-y-3">
 										<InfoRow
 											icon={Calendar}
 											label="Tanggal Dibuat"

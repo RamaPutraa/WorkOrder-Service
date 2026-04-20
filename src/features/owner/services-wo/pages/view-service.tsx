@@ -1,9 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, ClipboardList } from "lucide-react";
+import { ClipboardList } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardFooter, CardHeader } from "@/components/ui/card";
 import { SectionLoading } from "@/shared/atoms";
 import { useCreateService } from "../hooks/useCreateService";
 import PageHeader from "@/shared/atoms/header-content";
@@ -80,10 +78,34 @@ const ViewService: React.FC = () => {
 								initial={{ opacity: 0, y: 16 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ duration: 0.2, ease: "easeOut" }}>
-								<Card className="group gap-2 flex flex-col h-full bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
-									<CardHeader className=" space-y-4">
+								<div
+									onClick={() =>
+										navigate(
+											`/dashboard/internal/services/detail/${service._id}`,
+										)
+									}
+									className=" group gap-2 flex flex-col h-full bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden hover:cursor-pointer">
+									<div className=" space-y-4">
+										{/* Header */}
+										<div className="border-b border-slate-200/70 ">
+											{/* Status Badge */}
+											{service.isActive ?
+												<div className="flex items-center gap-1.5 px-5 py-2  text-emerald-600 ">
+													<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+													<span className="text-[10px] font-bold uppercase tracking-wider">
+														Aktif
+													</span>
+												</div>
+											:	<div className="flex items-center gap-1.5 px-5 py-2  text-slate-500 ">
+													<span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+													<span className="text-[10px] font-bold uppercase tracking-wider">
+														Nonaktif
+													</span>
+												</div>
+											}
+										</div>
 										{/* Baris Atas: Icon, Judul, dan Status */}
-										<div className="flex items-start justify-between gap-4">
+										<div className="flex items-start justify-between gap-4 px-5 py-2">
 											<div className="flex items-center gap-3 min-w-0">
 												{/* Icon */}
 												<div className="shrink-0 p-2.5 rounded-xl bg-primary/5 text-primary  transition-colors">
@@ -95,59 +117,38 @@ const ViewService: React.FC = () => {
 													{service.title || "Untitled Form"}
 												</h3>
 											</div>
-
-											{/* Status Badge di pojok kanan atas */}
-											<div className="shrink-0 mt-1">
-												{service.isActive ?
-													<div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
-														<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-														<span className="text-[10px] font-bold uppercase tracking-wider">
-															Aktif
-														</span>
-													</div>
-												:	<div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 text-slate-400 border border-slate-100">
-														<span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-														<span className="text-[10px] font-bold uppercase tracking-wider">
-															Nonaktif
-														</span>
-													</div>
-												}
-											</div>
 										</div>
 
 										{/* Deskripsi - Masuk dalam CardContent atau tetap di Header dengan padding yang pas */}
-										<div className="text-sm text-slate-500 leading-relaxed line-clamp-3 min-h-[3.75rem] text-justify">
+										<div className="px-5 text-sm text-slate-500 leading-relaxed line-clamp-3 min-h-[3.75rem] text-justify">
 											{service.description ||
-												"Tidak ada deskripsi tersedia untuk layanan ini."}
+												"Tidak ada deskripsi tersedia untuk layanan ini."}{" "}
+											Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+											Voluptatum a quod quos consectetur minus sunt, id
+											voluptate voluptas, provident deserunt earum hic,
+											laboriosam sequi eum assumenda est! Dolore, eius amet!
+											Similique mollitia exercitationem consequuntur cupiditate
+											necessitatibus atque voluptate rem, autem voluptatem!
+											Ipsum, quibusdam asperiores, inventore in architecto nobis
+											provident modi, dolorum officia rerum deserunt repellendus
+											quo optio sequi iure aliquam. Magnam mollitia vel nihil
+											distinctio quas cumque quisquam ea. Quisquam consectetur,
+											expedita magni assumenda quae vel, sequi blanditiis sed
+											quia similique ducimus nostrum molestiae dolore
+											reprehenderit dicta corporis beatae rerum.
 										</div>
-									</CardHeader>
+									</div>
 
-									<CardFooter className="grid grid-cols-1 text-xs mx-6 border-t border-slate-200/70 p-0">
+									<div className="grid grid-cols-1 text-xs py-3 px-5 border-t border-slate-200/70 p-0">
 										<div className=" flex items-center justify-between text-xs text-slate-400 ">
 											<span className="tracking-wide uppercase">
 												<Badge variant="outline">
 													{serviceTypeLabel(service.accessType)}
 												</Badge>
 											</span>
-
-											{/* Status Dot */}
-											<div className="flex items-center gap-2">
-												{/* Action */}
-												<Button
-													variant="outline"
-													size="sm"
-													className="text-xs rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
-													onClick={() =>
-														navigate(
-															`/dashboard/internal/services/detail/${service._id}`,
-														)
-													}>
-													Lihat Detail <ArrowRight className="ml-2 h-4 w-4" />
-												</Button>
-											</div>
 										</div>
-									</CardFooter>
-								</Card>
+									</div>
+								</div>
 							</motion.div>
 						))
 					:	<motion.div
