@@ -6,6 +6,8 @@ type NotificationState = {
   permission: NotificationPermission | 'idle';
   setFcmToken: (token: string | null) => void;
   setPermission: (p: NotificationPermission) => void;
+  hasNewNotification: boolean;
+  setHasNewNotification: (val: boolean) => void;
 };
 
 export const useNotificationStore = create<NotificationState>()(
@@ -13,8 +15,10 @@ export const useNotificationStore = create<NotificationState>()(
     (set) => ({
       fcmToken: null,
       permission: 'idle',
+      hasNewNotification: false,
       setFcmToken: (token) => set({ fcmToken: token }),
       setPermission: (permission) => set({ permission }),
+      setHasNewNotification: (val) => set({ hasNewNotification: val }),
     }),
     {
       name: 'notification-storage',

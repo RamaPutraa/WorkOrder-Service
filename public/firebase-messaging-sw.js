@@ -18,21 +18,21 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
+// Create a broadcast channel to communicate with the main thread
+const bc = new BroadcastChannel("fcm-notifications");
+
 messaging.onBackgroundMessage((payload) => {
 	console.log(
 		"[firebase-messaging-sw.js] Received background message ",
 		payload,
 	);
+	
+	// Notify all open tabs that a new notification arrived
+	bc.postMessage({ type: "NEW_NOTIFICATION", payload });
 
-	const notificationTitle =
-		payload.notification?.title || payload.data?.title || "New Notification";
-	const notificationOptions = {
-		body: payload.notification?.body || payload.data?.body,
-		icon: "/vite.svg",
-		data: payload.data,
-	};
-
-	self.registration.showNotification(notificationTitle, notificationOptions);
+	// We no longer manually call showNotification here because Firebase
+	// handles it automatically for background messages with a 'notification' payload.
+	// Calling it manually causes duplicate notifications.
 });
 
 self.addEventListener("notificationclick", (event) => {

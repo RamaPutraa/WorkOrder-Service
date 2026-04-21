@@ -1,9 +1,13 @@
-import apiClient from '@/lib/api';
+import apiClient from "@/lib/api";
 
 export const registerFcmTokenApi = (token: string) => {
-	return apiClient.post('/notifications/fcm-token', { token });
+	return apiClient.post("/notifications/fcm-token", { token });
 };
 
 export const unregisterFcmTokenApi = (token: string) => {
-	return apiClient.delete('/notifications/fcm-token', { data: { token } });
+	return apiClient.delete("/notifications/fcm-token", { data: { token } });
+};
+
+export const getNotificationsApi = () => {
+	return apiClient.get<NotificationResponse>("/notifications");
 };
