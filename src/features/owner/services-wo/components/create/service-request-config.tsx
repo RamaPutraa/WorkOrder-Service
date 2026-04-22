@@ -44,14 +44,34 @@ export const CardServiceRequestConfig: React.FC<
 }) => {
 	const [intakeSearch, setIntakeSearch] = useState("");
 	const [reviewSearch, setReviewSearch] = useState("");
+	const [intakeTypeFilter, setIntakeTypeFilter] = useState("intake");
+	const [reviewTypeFilter, setReviewTypeFilter] = useState("review");
 
-	const filteredIntakeForms = forms.filter((f) =>
-		f.title.toLowerCase().includes(intakeSearch.toLowerCase()),
-	);
+	const formTypeOptions = [
+		{ label: "Semua", value: "all" },
+		{ label: "Pengajuan", value: "intake" },
+		{ label: "Ulasan", value: "review" },
+		{ label: "Perintah Kerja", value: "work_order" },
+		{ label: "Laporan", value: "report" },
+	];
 
-	const filteredReviewForms = forms.filter((f) =>
-		f.title.toLowerCase().includes(reviewSearch.toLowerCase()),
-	);
+	const filteredIntakeForms = forms.filter((f) => {
+		const matchesSearch = f.title
+			.toLowerCase()
+			.includes(intakeSearch.toLowerCase());
+		const matchesType =
+			intakeTypeFilter === "all" || f.formType === intakeTypeFilter;
+		return matchesSearch && matchesType;
+	});
+
+	const filteredReviewForms = forms.filter((f) => {
+		const matchesSearch = f.title
+			.toLowerCase()
+			.includes(reviewSearch.toLowerCase());
+		const matchesType =
+			reviewTypeFilter === "all" || f.formType === reviewTypeFilter;
+		return matchesSearch && matchesType;
+	});
 
 	return (
 		<div className="h-full overflow-y-auto">
@@ -90,6 +110,21 @@ export const CardServiceRequestConfig: React.FC<
 							</div>
 
 							<div className="max-h-[320px] overflow-y-auto p-5 space-y-3 border border-slate-200 rounded-md">
+								<div className="flex flex-wrap gap-1.5 pb-1">
+									{formTypeOptions.map((opt) => (
+										<button
+											key={opt.value}
+											type="button"
+											onClick={() => setIntakeTypeFilter(opt.value)}
+											className={`px-3 py-1 text-[10px] font-semibold rounded-full border transition-all duration-200 ${
+												intakeTypeFilter === opt.value ?
+													"bg-primary border-primary text-white"
+												:	"bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50"
+											}`}>
+											{opt.label}
+										</button>
+									))}
+								</div>
 								<div className="relative">
 									<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
 									<Input
@@ -138,12 +173,6 @@ export const CardServiceRequestConfig: React.FC<
 																	</p>
 																</div>
 															</div>
-
-															{f.fields && (
-																<span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">
-																	{f.fields.length} Pertanyaan
-																</span>
-															)}
 														</div>
 													</button>
 												</>
@@ -167,6 +196,21 @@ export const CardServiceRequestConfig: React.FC<
 							</div>
 
 							<div className="max-h-[320px] overflow-y-auto p-5 space-y-3 border border-slate-200 rounded-xl">
+								<div className="flex flex-wrap gap-1.5 pb-1">
+									{formTypeOptions.map((opt) => (
+										<button
+											key={opt.value}
+											type="button"
+											onClick={() => setReviewTypeFilter(opt.value)}
+											className={`px-3 py-1 text-[10px] font-semibold rounded-full border transition-all duration-200 ${
+												reviewTypeFilter === opt.value ?
+													"bg-primary border-primary text-white"
+												:	"bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50"
+											}`}>
+											{opt.label}
+										</button>
+									))}
+								</div>
 								<div className="relative">
 									<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
 									<Input
@@ -215,12 +259,6 @@ export const CardServiceRequestConfig: React.FC<
 																	</p>
 																</div>
 															</div>
-
-															{f.fields && (
-																<span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">
-																	{f.fields.length} Pertanyaan
-																</span>
-															)}
 														</div>
 													</button>
 												</>

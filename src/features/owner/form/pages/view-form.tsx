@@ -1,6 +1,4 @@
-import { Card, CardFooter, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, ScrollText, CalendarDays, Trash2 } from "lucide-react";
+import { ScrollText, CalendarDays } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -69,11 +67,16 @@ const ViewForm: React.FC = () => {
 							return (
 								<motion.div
 									key={form._id}
-									initial={{ opacity: 0, y: 16 }}
+									initial={{ opacity: 0, y: 20 }}
 									animate={{ opacity: 1, y: 0 }}
+									whileHover={{ scale: 1.02, y: -4 }}
 									transition={{ duration: 0.2, ease: "easeOut" }}>
-									<Card className="group gap-2 flex flex-col h-full bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
-										<CardHeader className="px-6  ">
+									<div
+										onClick={() =>
+											navigate(`/dashboard/internal/form/detail/${form._id}`)
+										}
+										className="hover:cursor-pointer p-5 group gap-2 flex flex-col h-full bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+										<div className="py-3">
 											<div className="flex items-start gap-4">
 												{/* Icon */}
 												<div className="shrink-0 p-3 bg-primary/5 text-primary rounded-xl">
@@ -96,9 +99,9 @@ const ViewForm: React.FC = () => {
 													</Badge>
 												</span>
 											</div>
-										</CardHeader>
+										</div>
 
-										<CardFooter className="px-6 py-2">
+										<div className="footer">
 											<div className="w-full pt-4 border-t border-slate-200/70 flex items-center justify-between text-xs text-slate-400">
 												{form.createdAt && (
 													<div className="flex items-center gap-1.5 text-xs text-slate-400 mt-1">
@@ -115,42 +118,9 @@ const ViewForm: React.FC = () => {
 														</span>
 													</div>
 												)}
-
-												{/* Status Dot */}
-												<div className="flex items-center gap-2">
-													{/* Action */}
-													<Button
-														variant="outline"
-														size="sm"
-														className="text-xs rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
-														onClick={() =>
-															navigate(
-																`/dashboard/internal/form/detail/${form._id}`,
-															)
-														}>
-														Lihat Detail <ArrowRight className="ml-2 h-4 w-4" />
-													</Button>
-													{/* <Button
-														variant="destructive"
-														size="icon"
-														className="h-8 w-8 rounded-full"
-														onClick={() =>
-															showDialog({
-																title: "Hapus Formulir",
-																description: `Apakah Anda yakin ingin menghapus formulir "${form.title}"?`,
-																confirmText: "Hapus",
-																cancelText: "Batal",
-																onConfirm: async () => {
-																	await removeForm(form._id);
-																},
-															})
-														}>
-														<Trash2 className="h-4 w-4" />
-													</Button> */}
-												</div>
 											</div>
-										</CardFooter>
-									</Card>
+										</div>
+									</div>
 								</motion.div>
 							);
 						})

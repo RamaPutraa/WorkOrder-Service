@@ -370,15 +370,14 @@ const CompanyDetailWo = () => {
 	const canComplete = meta?.workOrderCapabilities.can_complete;
 	const canFail = meta?.workOrderCapabilities.can_fail;
 	const userPic = wo?.staffPIC?.email == user?.email;
-	// true  â†’ user adalah pembuatnya
-	// false â†’ user bukan pembuatnya
-	// null  â†’ data createdBy tidak tersedia (belum diisi)
+
 	const userCreated: boolean | null =
 		wo?.createdBy == null ? null
 		: wo.createdBy.email === user?.email ? true
 		: false;
 	const userAssigned = wo?.assignedStaff?.some((s) => s.email == user?.email);
 	const isDrafted = currentStatus === "drafted";
+	const canCancel = meta?.workOrderCapabilities.can_cancel;
 
 	// can_recreate: owner selalu, manager hanya jika dia pembuat atau createdBy null
 	const isOwnerOrAllowedManager =
@@ -429,13 +428,14 @@ const CompanyDetailWo = () => {
 								currentStatus === "rejected" ||
 								currentStatus === "sent") && (
 								<>
+									{}
 									{(user?.role === "owner_company" ||
 										(user?.role === "manager_company" &&
 											(userCreated === true || userCreated === null))) && (
 										<Button
 											className=" bg-red-600 hover:bg-red-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-red-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
 											onClick={handleCancelWorkOrder}
-											disabled={activeAction !== null}>
+											disabled={activeAction !== null || !canCancel}>
 											<XCircle className="h-4 w-4" />
 											{activeAction === "cancel" ? "Memproses..." : "Batalkan"}
 										</Button>
@@ -568,13 +568,13 @@ const CompanyDetailWo = () => {
 					{/*  Row 2: 3-column grid  */}
 					<div className="grid grid-cols-1 md:grid-cols-1 xl:grid-cols-3 gap-5">
 						{/* Card 1: Info Umum */}
-						<div className="border shadow-sm rounded-xl md:col-span-2">
+						<div className="border shadow-sm rounded-xl md:col-span-2 px-7 py-3">
 							<div className="space-y-2">
 								{/*  Row 1: Status Hero Banner  */}
 								<div className="overflow-hidden border-0 ">
 									{/* status wo */}
 
-									<div className="relative px-5 md:px-12">
+									<div className="relative">
 										<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-7">
 											<div className="flex items-center gap-4">
 												<div className="shrink-0 p-3 rounded-xl bg-primary/10 text-primary">
@@ -661,7 +661,8 @@ const CompanyDetailWo = () => {
 																<XCircle className="h-4 w-4" />
 																<AlertTitle>Terdapat Masalah</AlertTitle>
 																<AlertDescription>
-																	Tugas kerja ini terselesaikan dengan kendala.
+																	Tugas kerja memiliki kendala, tugas kerja
+																	tidak terselesaikan.
 																</AlertDescription>
 															</Alert>
 														)}
@@ -830,7 +831,7 @@ const CompanyDetailWo = () => {
 
 								{/* informasi lainnya */}
 								<div className="grid grid-cols-1 xl:grid-cols-2 ">
-									<div className="px-12 space-y-3">
+									<div className="px-3 py-3 space-y-3">
 										<InfoRow
 											icon={ArrowLeftRight}
 											label="Tipe Persetujuan WO"
@@ -882,7 +883,7 @@ const CompanyDetailWo = () => {
 										/>
 										<div className="border-b border-border/50" />
 									</div>
-									<div className="space-y-3">
+									<div className="px-3 py-3 space-y-3">
 										<InfoRow
 											icon={Calendar}
 											label="Tanggal Dibuat"
@@ -898,7 +899,7 @@ const CompanyDetailWo = () => {
 									</div>
 								</div>
 								{/* siblings wo */}
-								<div className=" flex flex-col gap-3 px-12 my-7">
+								<div className=" flex flex-col gap-3 my-7">
 									<span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center">
 										<Settings2 className="w-3.5 h-3.5 mr-1" />
 										Perintah Kerja Terkait :

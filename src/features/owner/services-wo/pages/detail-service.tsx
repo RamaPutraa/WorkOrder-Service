@@ -7,12 +7,9 @@ import { useDialogStore } from "@/store/dialogStore";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
 import { Switch } from "@/components/ui/switch";
 import {
-	ArrowLeft,
 	CalendarDays,
 	CheckCircle2,
-	Circle,
 	ClipboardCheck,
-	Eye,
 	FileText,
 	Globe,
 	Lock,
@@ -67,14 +64,16 @@ const SectionHeader = ({
 	subtitle: string;
 }) => (
 	<div className="flex items-center gap-2 mb-4">
-		<div className="flex items-center justify-center size-10 rounded-lg bg-primary/10 text-primary shrink-0">
+		<div className="flex items-center justify-center size-10 rounded-lg bg-primary/5 text-primary shrink-0 shadow-sm">
 			{icon}
 		</div>
 		<div className="space-y-1">
-			<h3 className="font-semibold text-muted-foreground text-sm tracking-wide uppercase ">
+			<h3 className="font-semibold text-muted-foreground text-sm tracking-wide uppercase line-clamp-1 lg:text-wrap">
 				{title}
 			</h3>
-			<p className="text-sm text-muted-foreground">{subtitle}</p>
+			<p className="text-sm text-muted-foreground line-clamp-1 lg:text-wrap">
+				{subtitle}
+			</p>
 		</div>
 	</div>
 );
@@ -111,7 +110,9 @@ const FormCard = ({
 
 	return (
 		<>
-			<div className="group rounded-xl border bg-card p-4 hover:border-primary/40 transition-colors h-full flex flex-col gap-3">
+			<div
+				onClick={() => setOpen(true)}
+				className="hover:cursor-pointer group rounded-xl border bg-card p-4 hover:border-primary/40 transition-colors h-full flex flex-col gap-3">
 				{/* Form type label */}
 				<p className="text-xs font-medium uppercase text-muted-foreground tracking-wide">
 					{formTypeLabel(formType)}
@@ -143,16 +144,6 @@ const FormCard = ({
 							`${fields.length} field tersedia`
 						:	"Tidak ada field"}
 					</span>
-					{fields && fields.length > 0 && (
-						<Button
-							size="sm"
-							variant="outline"
-							className="h-7 gap-1.5 text-xs"
-							onClick={() => setOpen(true)}>
-							<Eye className="size-3" />
-							Lihat Detail
-						</Button>
-					)}
 				</div>
 			</div>
 
@@ -496,59 +487,75 @@ const DetailService = () => {
 											key={i}
 											className="rounded-2xl border bg-card p-5 lg:p-6 shadow-sm">
 											{/* Grid 3 Kolom */}
-											<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+											<div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
 												{/* ── Kolom 1: Posisi & Persetujuan ── */}
 												<div className="flex flex-col space-y-6 lg:border-r lg:pr-8 border-border/50">
 													{/* Card Informasi Penugasan */}
-													<div className="space-y-3">
-														<p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
-															<Users2 className="size-3.5" />
+													<div className="space-y-4">
+														<p className="text-xs font-bold uppercase tracking-widest text-muted-foreground/80 flex items-center gap-2">
+															<Users2 className="size-3.5 text-primary" />
 															Informasi Penugasan
 														</p>
-														<div className="flex items-start gap-4 p-4 rounded-xl border bg-primary/5 hover:bg-primary/10 transition-colors">
-															<div className="size-10 rounded-lg bg-primary/15 text-primary flex items-center justify-center shrink-0">
-																<Users2 className="size-5" />
-															</div>
-															<div className="flex-1 min-w-0 space-y-2">
-																<div>
-																	<p className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground">
+														<div className="flex flex-col gap-3">
+															{/* Main Position Card */}
+															<div className="flex items-center gap-4 p-4 rounded-2xl border bg-muted/20 hover:bg-muted/30 transition-all duration-200">
+																<div className="size-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 shadow-sm">
+																	<Users2 className="size-5" />
+																</div>
+																<div className="flex-1 min-w-0">
+																	<p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground/70">
 																		Posisi Penanggung Jawab
 																	</p>
-																	<p className="font-semibold text-base truncate mt-0.5 text-foreground">
+																	<p className="font-bold text-base truncate text-foreground">
 																		{wo.positionsOnDuty?.name ?? "—"}
 																	</p>
 																</div>
-																<Badge
-																	variant="secondary"
-																	className="text-xs bg-background/80 hover:bg-background border-muted">
-																	{wo.minStaff} – {wo.maxStaff} Orang
-																</Badge>
+															</div>
+
+															{/* Staff Limits Grid */}
+															<div className="grid grid-cols-2 gap-3">
+																<div className="bg-muted/10 border border-border/50 rounded-2xl p-4 flex flex-col items-center justify-center hover:bg-muted/20 transition-all duration-200 group">
+																	<p className="text-2xl font-bold text-primary leading-none group-hover:scale-110 transition-transform">
+																		{wo.minStaff}
+																	</p>
+																	<p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 mt-2">
+																		Min. Staff
+																	</p>
+																</div>
+																<div className="bg-muted/10 border border-border/50 rounded-2xl p-4 flex flex-col items-center justify-center hover:bg-muted/20 transition-all duration-200 group">
+																	<p className="text-2xl font-bold text-primary leading-none group-hover:scale-110 transition-transform">
+																		{wo.maxStaff}
+																	</p>
+																	<p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 mt-2">
+																		Max. Staff
+																	</p>
+																</div>
 															</div>
 														</div>
 													</div>
 
 													{/* Card Approval / Persetujuan */}
-													<div className="space-y-3 mt-auto">
-														<p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
-															<CheckCircle2 className="size-3.5" />
+													<div className="space-y-4 mt-auto">
+														<p className="text-xs font-bold uppercase tracking-widest text-muted-foreground/80 flex items-center gap-2">
+															<CheckCircle2 className="size-3.5 text-primary" />
 															Hak Akses Persetujuan
 														</p>
 														<div className="grid grid-cols-2 gap-3">
-															<div className="rounded-xl border bg-muted/20 p-3 flex flex-col justify-center gap-1 hover:border-primary/30 transition-colors">
-																<p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
+															<div className="rounded-2xl border bg-muted/20 p-4 flex flex-col justify-center gap-1.5 hover:bg-muted/30 transition-all duration-200">
+																<p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground/70">
 																	Tugas Kerja
 																</p>
-																<p className="text-xs font-semibold">
+																<p className="text-xs font-bold text-foreground">
 																	{approvalLabel[
 																		wo.workOrderApprovalAccessType as unknown as string
 																	] ?? String(wo.workOrderApprovalAccessType)}
 																</p>
 															</div>
-															<div className="rounded-xl border bg-muted/20 p-3 flex flex-col justify-center gap-1 hover:border-primary/30 transition-colors">
-																<p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
+															<div className="rounded-2xl border bg-muted/20 p-4 flex flex-col justify-center gap-1.5 hover:bg-muted/30 transition-all duration-200">
+																<p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground/70">
 																	Pelaporan
 																</p>
-																<p className="text-xs font-semibold">
+																<p className="text-xs font-bold text-foreground">
 																	{approvalLabel[
 																		wo.workReportApprovalAccessType as unknown as string
 																	] ?? String(wo.workReportApprovalAccessType)}
@@ -562,7 +569,7 @@ const DetailService = () => {
 												<div className="flex flex-col space-y-3">
 													<p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
 														<FileText className="size-3.5" />
-														Work Order Form
+														Formulir Perintah Kerja
 													</p>
 													<div className="flex-1">
 														{wo.workOrderForm ?
@@ -583,7 +590,7 @@ const DetailService = () => {
 												<div className="flex flex-col space-y-3">
 													<p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
 														<ClipboardCheck className="size-3.5" />
-														Work Report Form
+														Formulir Laporan Kerja
 													</p>
 													<div className="flex-1">
 														{wo.workReportForm ?

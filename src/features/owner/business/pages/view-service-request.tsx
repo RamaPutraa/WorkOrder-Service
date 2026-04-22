@@ -134,8 +134,9 @@ const ViewServiceRequest = () => {
 							filteredData.map((item) => (
 								<motion.div
 									key={item._id}
-									initial={{ opacity: 0, y: 16 }}
-									animate={{ opacity: 2, y: 0 }}
+									initial={{ opacity: 0, y: 20 }}
+									animate={{ opacity: 1, y: 0 }}
+									whileHover={{ scale: 1.02, y: -4 }}
 									transition={{ duration: 0.2, ease: "easeOut" }}>
 									<div
 										onClick={() =>

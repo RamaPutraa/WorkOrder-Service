@@ -4,6 +4,7 @@ type WorkOrderMeta = {
 		can_complete: boolean;
 		can_fail: boolean;
 		can_recreate: boolean;
+		can_cancel: boolean;
 	};
 	workOrderSiblings: {
 		_id: string;

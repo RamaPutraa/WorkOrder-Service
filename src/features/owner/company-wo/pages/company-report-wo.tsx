@@ -420,7 +420,7 @@ const CompanyReportWo = () => {
 						onClick={handleSendWorkReport}
 						disabled={isSaving || !canSendReport}>
 						<Send className="h-4 w-4" />
-						{isSaving ? "Memproses..." : "Kirim laporan"}
+						{isSaving ? "Memproses..." : "Finalisasi Laporan"}
 					</Button>
 				}
 			/>
@@ -446,90 +446,84 @@ const CompanyReportWo = () => {
 
 			{!loading && !error && reportData && (
 				<div className="space-y-6">
-					{/* ── [OPSI A] Flat horizontal bar dengan divider vertikal ── */}
-					<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 bg-white rounded-xl border border-gray-100 shadow-sm">
-						<div className="flex items-center gap-6 sm:gap-10 flex-wrap w-full">
-							<div className="space-y-1.5 flex-1 sm:flex-none">
-								<div className="flex items-center gap-3">
-									<div className="p-2 rounded-lg bg-primary/5 text-primary">
-										<StatusIcon className="w-4 h-4" />
-									</div>
-									<div>
-										<p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
-											Status Laporan
-										</p>
-										<span className={`text-sm font-bold ${statusConfig?.text}`}>
-											{statusConfig?.label}
-										</span>
-									</div>
+					{/* ── Status Bar ── */}
+					<div className="p-5 bg-white rounded-xl border border-gray-100 shadow-sm">
+						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-center">
+							{/* Status Laporan */}
+							<div className="flex items-center gap-3">
+								<div className="p-2 rounded-lg bg-primary/5 text-primary shrink-0">
+									<StatusIcon className="w-4 h-4" />
+								</div>
+								<div className="min-w-0">
+									<p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest truncate">
+										Status Laporan
+									</p>
+									<span className={`text-sm font-bold ${statusConfig?.text}`}>
+										{statusConfig?.label}
+									</span>
 								</div>
 							</div>
-							<div className="w-px h-8 bg-gray-200 hidden sm:block"></div>
-							<div className="space-y-1.5 flex-1 sm:flex-none">
-								<div className="flex items-center gap-3">
-									<div className="p-2 rounded-lg bg-primary/5 text-primary">
-										<User className="w-4 h-4" />
-									</div>
-									<div>
-										<p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
-											Disetujui Oleh
-										</p>
-										<span
-											className={`text-sm font-bold ${reportData.approvedBy ? "text-gray-900" : "text-gray-400"}`}>
-											{reportData.approvedBy ?
-												reportData.approvedBy.name
-											: reportData.workReportApprovalAccessType === "auto" ?
-												"Disetujui Otomatis"
-											:	"Belum disetujui"}
-										</span>
-									</div>
+
+							{/* Disetujui Oleh */}
+							<div className="flex items-center gap-3 sm:border-l sm:pl-6 lg:border-l-0 lg:pl-0 xl:border-l xl:pl-6 border-gray-100">
+								<div className="p-2 rounded-lg bg-primary/5 text-primary shrink-0">
+									<User className="w-4 h-4" />
+								</div>
+								<div className="min-w-0">
+									<p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest truncate">
+										Disetujui Oleh
+									</p>
+									<span
+										className={`text-sm font-bold truncate block ${reportData.approvedBy ? "text-gray-900" : "text-gray-400"}`}>
+										{reportData.approvedBy ?
+											reportData.approvedBy.name
+										: reportData.workReportApprovalAccessType === "auto" ?
+											"Disetujui Otomatis"
+										:	"Belum disetujui"}
+									</span>
 								</div>
 							</div>
-							<div className="w-px h-8 bg-gray-200 hidden sm:block"></div>
-							<div className="space-y-1.5 flex-1 sm:flex-none">
-								<div className="flex items-center gap-3">
-									<div className="p-2 rounded-lg bg-primary/5 text-primary">
-										<Calendar className="w-4 h-4" />
-									</div>
-									<div>
-										<p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
-											Dibuat Pada
-										</p>
-										<div className="flex items-center gap-2 text-sm font-bold text-gray-900">
-											{new Date(reportData.createdAt).toLocaleDateString(
-												"id-ID",
-												{
-													day: "2-digit",
-													month: "long",
-													year: "numeric",
-												},
-											)}
-										</div>
+
+							{/* Dibuat Pada */}
+							<div className="flex items-center gap-3 lg:border-l lg:pl-6 xl:border-l xl:pl-6 border-gray-100">
+								<div className="p-2 rounded-lg bg-primary/5 text-primary shrink-0">
+									<Calendar className="w-4 h-4" />
+								</div>
+								<div className="min-w-0">
+									<p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest truncate">
+										Dibuat Pada
+									</p>
+									<div className="text-sm font-bold text-gray-900">
+										{new Date(reportData.createdAt).toLocaleDateString(
+											"id-ID",
+											{
+												day: "2-digit",
+												month: "long",
+												year: "numeric",
+											},
+										)}
 									</div>
 								</div>
 							</div>
 
 							{/* Approve / Reject buttons — hanya untuk reviewer & laporan sudah terkirim */}
 							{isReviewer && reportData.status === "submitted" && (
-								<>
-									<div className="w-px h-8 bg-gray-200 hidden sm:block" />
-									<div className="flex items-center gap-2">
-										<Button
-											onClick={handleRejectReport}
-											disabled={isProcessing}
-											className="bg-red-600 hover:bg-red-700 text-white rounded-xl h-9 px-4 shadow-sm shadow-red-200 transition-all flex items-center gap-1.5 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer text-sm">
-											<XCircle className="w-4 h-4" />
-											{isProcessing ? "Memproses..." : "Tolak"}
-										</Button>
-										<Button
-											onClick={handleApproveReport}
-											disabled={isProcessing}
-											className="bg-green-600 hover:bg-green-700 text-white rounded-xl h-9 px-4 shadow-sm shadow-green-200 transition-all flex items-center gap-1.5 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer text-sm">
-											<CheckCircle2 className="w-4 h-4" />
-											{isProcessing ? "Memproses..." : "Setujui"}
-										</Button>
-									</div>
-								</>
+								<div className="flex items-center gap-2 xl:border-l xl:pl-6 border-gray-100 sm:col-span-2 lg:col-span-3 xl:col-span-1">
+									<Button
+										onClick={handleRejectReport}
+										disabled={isProcessing}
+										className="flex-1 sm:flex-none bg-red-600 hover:bg-red-700 text-white rounded-xl h-10 px-4 shadow-sm shadow-red-200 transition-all flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer text-sm">
+										<XCircle className="w-4 h-4" />
+										{isProcessing ? "..." : "Tolak"}
+									</Button>
+									<Button
+										onClick={handleApproveReport}
+										disabled={isProcessing}
+										className="flex-1 sm:flex-none bg-green-600 hover:bg-green-700 text-white rounded-xl h-10 px-4 shadow-sm shadow-green-200 transition-all flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer text-sm">
+										<CheckCircle2 className="w-4 h-4" />
+										{isProcessing ? "..." : "Setujui"}
+									</Button>
+								</div>
 							)}
 						</div>
 					</div>
@@ -537,7 +531,7 @@ const CompanyReportWo = () => {
 					{/* Form Editor Card */}
 					<Card className="border shadow-sm rounded-xl">
 						<CardHeader className="pb-4 border-b border-border/50">
-							<div className="flex items-center justify-between">
+							<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 								<div className="flex items-center gap-4">
 									<div className="shrink-0 p-3 rounded-xl bg-primary/10 text-primary">
 										<Settings2 className="w-5 h-5" />
@@ -552,31 +546,39 @@ const CompanyReportWo = () => {
 										</p>
 									</div>
 								</div>
+
 								{/* Edit & Kirim hanya untuk staff (bukan manager/owner) */}
 								{canEdit && (
-									<div className="flex items-center gap-2">
-										<Button
-											onClick={() => setIsEditMode(true)}
-											disabled={isEditMode}
-											className="bg-yellow-400 hover:bg-yellow-500 w-full md:w-auto text-white rounded-xl h-9 px-3 text-sm shadow-sm transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer">
-											<Pencil className="w-4 h-4 mr-1.5" />
-											Edit Laporan
-										</Button>
+									<div className="flex items-center gap-2 self-end sm:self-auto">
+										<div className="border-r border-slate-200 pr-2">
+											<Button
+												onClick={() => setIsEditMode(true)}
+												disabled={isEditMode}
+												className="bg-yellow-400 hover:bg-yellow-500 text-white rounded-xl h-9 px-3 text-sm shadow-sm transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
+												title="Edit Laporan">
+												<Pencil className="w-4 h-4" />
+											</Button>
+										</div>
 
 										<div className="flex items-center gap-2">
 											<Button
 												onClick={handleCancel}
 												disabled={isSaving || !isEditMode}
-												className="bg-white border focus:ring-0 focus:outline-none hover:bg-muted/20 w-full md:w-auto text-black rounded-xl h-9 px-3 text-sm shadow-sm transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer">
-												<X className="w-4 h-4 mr-1.5" />
-												Batal
+												className="bg-white border hover:bg-muted/20 text-black rounded-xl h-9 px-3 text-sm shadow-sm transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer">
+												<X className="w-4 h-4 sm:mr-1.5" />
+												<span className="hidden sm:inline">Batal</span>
 											</Button>
 											<Button
 												onClick={handleSave}
 												disabled={isSaving || !isEditMode || !hasChanges()}
-												className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl h-9 px-3 text-sm shadow-sm transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer">
-												<Save className="w-4 h-4 mr-1.5" />
-												{isSaving ? "Menyimpan..." : "Simpan Laporan"}
+												className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl h-9 px-3 text-sm shadow-sm transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer">
+												<Save className="w-4 h-4 sm:mr-1.5" />
+												<span className="hidden sm:inline">
+													{isSaving ? "Simpan..." : "Simpan Laporan"}
+												</span>
+												<span className="sm:hidden">
+													{isSaving ? "..." : "Simpan"}
+												</span>
 											</Button>
 										</div>
 									</div>

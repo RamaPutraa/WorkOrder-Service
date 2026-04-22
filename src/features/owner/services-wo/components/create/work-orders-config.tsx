@@ -2,13 +2,21 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
 import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+	Command,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
+} from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 import { type WorkOrderConfigItem } from "../../hooks/useCreateService";
 import { EmptyData } from "@/shared/molecules/empty-data";
 import {
@@ -18,6 +26,8 @@ import {
 	Loader2,
 	Search,
 	ScrollText,
+	ChevronsUpDown,
+	Check,
 } from "lucide-react";
 
 const WorkOrderRowCard = ({
@@ -41,14 +51,33 @@ const WorkOrderRowCard = ({
 }) => {
 	const [woFormSearch, setWoFormSearch] = useState("");
 	const [wrFormSearch, setWrFormSearch] = useState("");
+	const [woTypeFilter, setWoTypeFilter] = useState("work_order");
+	const [wrTypeFilter, setWrTypeFilter] = useState("report");
+	const [posOpen, setPosOpen] = useState(false);
 
-	const filteredWoForms = forms.filter((f) =>
-		f.title.toLowerCase().includes(woFormSearch.toLowerCase()),
-	);
+	const formTypeOptions = [
+		{ label: "Semua", value: "all" },
+		{ label: "Pengajuan", value: "intake" },
+		{ label: "Ulasan", value: "review" },
+		{ label: "Perintah Kerja", value: "work_order" },
+		{ label: "Laporan", value: "report" },
+	];
 
-	const filteredWrForms = forms.filter((f) =>
-		f.title.toLowerCase().includes(wrFormSearch.toLowerCase()),
-	);
+	const filteredWoForms = forms.filter((f) => {
+		const matchesSearch = f.title
+			.toLowerCase()
+			.includes(woFormSearch.toLowerCase());
+		const matchesType = woTypeFilter === "all" || f.formType === woTypeFilter;
+		return matchesSearch && matchesType;
+	});
+
+	const filteredWrForms = forms.filter((f) => {
+		const matchesSearch = f.title
+			.toLowerCase()
+			.includes(wrFormSearch.toLowerCase());
+		const matchesType = wrTypeFilter === "all" || f.formType === wrTypeFilter;
+		return matchesSearch && matchesType;
+	});
 
 	return (
 		<div className="relative rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm transition-all hover:shadow-md">
@@ -79,22 +108,57 @@ const WorkOrderRowCard = ({
 						<Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
 							Posisi Bertugas <span className="text-red-500">*</span>
 						</Label>
-						<Select
-							value={item.positionId}
-							onValueChange={(v) =>
-								updateWorkOrderConfig(index, "positionId", v)
-							}>
-							<SelectTrigger className="h-10 bg-white w-full">
-								<SelectValue placeholder="Pilih posisi…" />
-							</SelectTrigger>
-							<SelectContent>
-								{positions.map((p) => (
-									<SelectItem key={p._id} value={p._id}>
-										{p.name}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
+						<Popover open={posOpen} onOpenChange={setPosOpen}>
+							<PopoverTrigger asChild>
+								<Button
+									variant="outline"
+									role="combobox"
+									aria-expanded={posOpen}
+									className="w-full h-10 justify-between bg-white font-normal hover:bg-white text-slate-700 border-slate-200">
+									<span className="truncate">
+										{item.positionId ?
+											(positions.find((p) => p._id === item.positionId)?.name ??
+											"Pilih posisi…")
+										:	"Pilih posisi…"}
+									</span>
+									<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+								</Button>
+							</PopoverTrigger>
+							<PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+								<Command>
+									<CommandInput
+										placeholder="Cari posisi berdasarkan nama..."
+										className="h-9"
+									/>
+									<CommandList>
+										<CommandEmpty className="py-3 text-center text-sm text-slate-500">
+											Posisi tidak ditemukan.
+										</CommandEmpty>
+										<CommandGroup>
+											{positions.map((p) => (
+												<CommandItem
+													key={p._id}
+													value={p.name}
+													onSelect={() => {
+														updateWorkOrderConfig(index, "positionId", p._id);
+														setPosOpen(false);
+													}}>
+													<Check
+														className={cn(
+															"mr-2 h-4 w-4",
+															item.positionId === p._id ?
+																"opacity-100"
+															:	"opacity-0",
+														)}
+													/>
+													{p.name}
+												</CommandItem>
+											))}
+										</CommandGroup>
+									</CommandList>
+								</Command>
+							</PopoverContent>
+						</Popover>
 					</div>
 
 					<div className="space-y-2">
@@ -152,6 +216,21 @@ const WorkOrderRowCard = ({
 								Formulir Work Order <span className="text-red-500">*</span>
 							</Label>
 						</div>
+						<div className="flex flex-wrap gap-1.5 pb-1">
+							{formTypeOptions.map((opt) => (
+								<button
+									key={opt.value}
+									type="button"
+									onClick={() => setWoTypeFilter(opt.value)}
+									className={`px-3 py-1 text-[10px] font-semibold rounded-full border transition-all duration-200 ${
+										woTypeFilter === opt.value ?
+											"bg-primary border-primary text-white"
+										:	"bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50"
+									}`}>
+									{opt.label}
+								</button>
+							))}
+						</div>
 						<div className="relative">
 							<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
 							<Input
@@ -199,11 +278,6 @@ const WorkOrderRowCard = ({
 															</p>
 														</div>
 													</div>
-													{f.fields && (
-														<span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">
-															{f.fields.length} Pertanyaan
-														</span>
-													)}
 												</div>
 											</button>
 										);
@@ -273,6 +347,21 @@ const WorkOrderRowCard = ({
 								Formulir Work Report <span className="text-red-500">*</span>
 							</Label>
 						</div>
+						<div className="flex flex-wrap gap-1.5 pb-1">
+							{formTypeOptions.map((opt) => (
+								<button
+									key={opt.value}
+									type="button"
+									onClick={() => setWrTypeFilter(opt.value)}
+									className={`px-3 py-1 text-[10px] font-semibold rounded-full border transition-all duration-200 ${
+										wrTypeFilter === opt.value ?
+											"bg-primary border-primary text-white"
+										:	"bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50"
+									}`}>
+									{opt.label}
+								</button>
+							))}
+						</div>
 						<div className="relative">
 							<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
 							<Input
@@ -320,11 +409,6 @@ const WorkOrderRowCard = ({
 															</p>
 														</div>
 													</div>
-													{f.fields && (
-														<span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">
-															{f.fields.length} Pertanyaan
-														</span>
-													)}
 												</div>
 											</button>
 										);
