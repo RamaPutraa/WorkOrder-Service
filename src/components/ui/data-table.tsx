@@ -19,8 +19,7 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 import { SectionLoading } from "@/shared/atoms";
@@ -30,6 +29,7 @@ interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
 	data: TData[];
 	searchKey?: string;
+	searchValue?: string;
 	loading?: boolean;
 	loadingMessage?: string;
 }
@@ -38,6 +38,7 @@ export function DataTable<TData, TValue>({
 	columns,
 	data,
 	searchKey = "name",
+	searchValue,
 	loading = false,
 	loadingMessage = "Memuat data...",
 }: DataTableProps<TData, TValue>) {
@@ -59,22 +60,16 @@ export function DataTable<TData, TValue>({
 		},
 	});
 
-	return (
-		<div className="space-y-4">
-			{/* Search Input */}
-			<div className="flex items-center">
-				<Input
-					placeholder={`Cari ${searchKey}...`}
-					value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
-					onChange={(event) =>
-						table.getColumn(searchKey)?.setFilterValue(event.target.value)
-					}
-					className="max-w-sm"
-				/>
-			</div>
+	useEffect(() => {
+		if (searchValue !== undefined && searchKey) {
+			table.getColumn(searchKey)?.setFilterValue(searchValue);
+		}
+	}, [searchValue, searchKey, table]);
 
+	return (
+		<div className=" bg-white rounded-xl border border-border/60 shadow-sm">
 			{/* Table */}
-			<div className="rounded-md border">
+			<div className="border-b">
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -127,9 +122,8 @@ export function DataTable<TData, TValue>({
 					</TableBody>
 				</Table>
 			</div>
-
 			{/* Pagination */}
-			<div className="flex items-center justify-end space-x-2">
+			<div className="flex items-center justify-end px-5 py-2">
 				<div className="flex-1 text-sm text-muted-foreground">
 					{table.getFilteredRowModel().rows.length} dari {data.length} baris
 				</div>

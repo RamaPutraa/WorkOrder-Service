@@ -1,12 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { DataTable } from "@/components/ui/data-table";
 import { createInvitationColumns } from "../components/invitation-columns";
 import { useStaffHistory } from "../hooks/use-staff-history";
 import { useDialogStore } from "@/store/dialogStore";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import PageHeader from "@/shared/atoms/header-content";
 import { TextLoading } from "@/shared/atoms/loading-state";
+import { Input } from "@/components/ui/input";
 
 const STATUS_SUMMARY = [
 	{ label: "Menunggu", key: "pending", variant: "outline" as const },
@@ -16,8 +16,12 @@ const STATUS_SUMMARY = [
 ];
 
 const HistoryStaffInvitations = () => {
-	const { history, loading, error, fetchHistory, removeInvitation } = useStaffHistory();
+	const { history, loading, error, fetchHistory, removeInvitation } =
+		useStaffHistory();
 	const { showDialog } = useDialogStore();
+
+	// ── Filter state ───────────────────────────────────────────────────────────
+	const [searchValue, setSearchValue] = useState("");
 
 	const handleDelete = (id: string) => {
 		showDialog({
@@ -63,15 +67,11 @@ const HistoryStaffInvitations = () => {
 				backPath={true}
 			/>
 
-			{/* Table */}
-			<Card>
-				<CardHeader>
-					<h2 className="text-lg font-semibold">Daftar Riwayat Undangan</h2>
-				</CardHeader>
-				<CardContent>
-					{/* Status summary chips */}
-					{!loading && history.length > 0 && (
-						<div className="flex flex-wrap gap-2 mb-5">
+			<div className="">
+				{/* Status summary chips */}
+				{!loading && history.length > 0 && (
+					<div className="flex items-center justify-between ">
+						<div className="flex flex-wrap gap-2 ">
 							{STATUS_SUMMARY.map(({ label, key, variant }) => {
 								const count = history.filter((h) => h.status === key).length;
 								return (
@@ -86,16 +86,42 @@ const HistoryStaffInvitations = () => {
 								);
 							})}
 						</div>
-					)}
+					</div>
+				)}
+			</div>
+
+			{/* Table */}
+			<div className="bg-muted/50 rounded-xl border">
+				<div className="px-5 py-4">
+					<div className="flex items-center justify-between">
+						<div>
+							<h2 className="text-lg font-semibold">Daftar Riwayat Undangan</h2>
+							<p className="text-sm text-muted-foreground">
+								Total {history.length} undangan
+							</p>
+						</div>
+						<div>
+							<Input
+								placeholder="Cari email"
+								className="w-[300px] bg-white rounded-lg"
+								value={searchValue}
+								onChange={(e) => setSearchValue(e.target.value)}
+							/>
+						</div>
+					</div>
+				</div>
+
+				<div className="px-2 pb-2">
 					<DataTable
 						columns={columns}
 						data={history}
 						searchKey="email"
+						searchValue={searchValue}
 						loading={loading}
 						loadingMessage="Memuat riwayat undangan..."
 					/>
-				</CardContent>
-			</Card>
+				</div>
+			</div>
 		</>
 	);
 };

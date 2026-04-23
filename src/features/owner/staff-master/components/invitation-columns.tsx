@@ -1,7 +1,7 @@
 import { type ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { CheckCircle2, CircleX, Clock, Trash2, XCircle } from "lucide-react";
 
 const ROLE_MAP: Record<
 	string,
@@ -10,9 +10,9 @@ const ROLE_MAP: Record<
 		variant: "default" | "secondary" | "outline" | "destructive";
 	}
 > = {
-	manager_company: { label: "Manager", variant: "default" },
-	staff_company: { label: "Staff", variant: "secondary" },
-	staff_unassigned: { label: "Unassigned", variant: "outline" },
+	manager_company: { label: "Manager Perusahaan", variant: "outline" },
+	staff_company: { label: "Pegawai Perusahaan", variant: "outline" },
+	staff_unassigned: { label: "Pegawai Belum Ditugaskan", variant: "outline" },
 };
 
 const STATUS_MAP: Record<
@@ -20,12 +20,13 @@ const STATUS_MAP: Record<
 	{
 		label: string;
 		variant: "default" | "secondary" | "outline" | "destructive";
+		icon: React.ComponentType<{ className?: string }>;
 	}
 > = {
-	pending: { label: "Menunggu", variant: "outline" },
-	accepted: { label: "Diterima", variant: "default" },
-	rejected: { label: "Ditolak", variant: "destructive" },
-	expired: { label: "Kadaluarsa", variant: "secondary" },
+	pending: { label: "Menunggu", icon: Clock, variant: "outline" },
+	accepted: { label: "Diterima", icon: CheckCircle2, variant: "outline" },
+	rejected: { label: "Ditolak", icon: XCircle, variant: "outline" },
+	expired: { label: "Kadaluarsa", icon: CircleX, variant: "outline" },
 };
 
 const formatDate = (date: string) =>
@@ -82,8 +83,20 @@ export const createInvitationColumns = ({
 			const info = STATUS_MAP[status] ?? {
 				label: status,
 				variant: "outline" as const,
+				icon: XCircle,
 			};
-			return <Badge variant={info.variant}>{info.label}</Badge>;
+			return (
+				<Badge variant={info.variant} className="flex items-center gap-1">
+					<info.icon
+						className={`h-4 w-4 ${
+							status === "accepted" ? "text-green-500"
+							: status === "rejected" ? "text-red-500"
+							: "text-yellow-500"
+						}`}
+					/>
+					{info.label}
+				</Badge>
+			);
 		},
 	},
 	{

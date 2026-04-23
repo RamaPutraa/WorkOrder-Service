@@ -26,8 +26,9 @@ export const columns: ColumnDef<Employee>[] = [
 		cell: ({ row }) => {
 			const role = row.getValue("role") as string;
 			const roleMap: Record<string, { label: string; variant: any }> = {
-				owner_company: { label: "Owner", variant: "default" },
-				staff_company: { label: "Staff", variant: "secondary" },
+				owner_company: { label: "Owner Perusahaan", variant: "outline" },
+				staff_company: { label: "Pegawai Perusahaan", variant: "outline" },
+				manager_company: { label: "Manager Perusahaan", variant: "outline" },
 				staff_unassigned: { label: "Unassigned", variant: "outline" },
 			};
 

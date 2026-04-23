@@ -1,18 +1,22 @@
 import { DataTable } from "@/components/ui/data-table";
 import { createPositionColumns } from "../components/position-columns";
 import usePosition from "../hooks/usePosition";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
+import { Input } from "@/components/ui/input";
 import EditPositionDialog from "../components/edit-position-dialog";
 import PageHeader from "@/shared/atoms/header-content";
 import { useDialogStore } from "@/store/dialogStore";
 import { TextLoading } from "@/shared/atoms/loading-state";
 
 const PositionView = () => {
-	const { fetchPositions, positions, loading, error, removePosition } = usePosition();
+	const { fetchPositions, positions, loading, error, removePosition } =
+		usePosition();
 	const { showDialog } = useDialogStore();
 	const navigate = useNavigate();
+
+	// ── Filter state ───────────────────────────────────────────────────────────
+	const [globalFilter, setGlobalFilter] = useState("");
 
 	// ── Edit dialog state ──────────────────────────────────────────────────────
 	const [editOpen, setEditOpen] = useState(false);
@@ -79,19 +83,34 @@ const PositionView = () => {
 			/>
 
 			{/* Data Table */}
-			<Card>
-				<CardHeader>
-					<h2 className="text-lg font-semibold">Daftar Departemen</h2>
-				</CardHeader>
-				<CardContent>
+			<div className="bg-muted/50 rounded-xl border">
+				{/* header */}
+				<div className="flex flex-row items-center justify-between px-5 py-4">
+					<div>
+						<h2 className="text-lg font-semibold">Daftar Departemen</h2>
+						<p className="text-sm text-muted-foreground">
+							Total {positions.length} departemen
+						</p>
+					</div>
+					<div className="flex items-center">
+						<Input
+							placeholder="Cari nama departemen..."
+							value={globalFilter}
+							onChange={(e) => setGlobalFilter(e.target.value)}
+							className="max-w-sm bg-white rounded-lg"
+						/>
+					</div>
+				</div>
+				<div className="px-2 pb-2">
 					<DataTable
 						columns={columns}
 						data={positions}
+						searchValue={globalFilter}
 						loading={loading}
 						loadingMessage="Memuat data posisi..."
 					/>
-				</CardContent>
-			</Card>
+				</div>
+			</div>
 
 			{/* Edit / Update Dialog */}
 			{selectedPosition && (
