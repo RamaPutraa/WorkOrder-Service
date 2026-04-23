@@ -8,8 +8,13 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import {
+	CheckCircleIcon,
+	MoreHorizontal,
+	Pencil,
+	Trash2,
+	XCircleIcon,
+} from "lucide-react";
 
 interface PositionColumnActions {
 	onEdit: (position: Position) => void;
@@ -22,11 +27,14 @@ export const createPositionColumns = ({
 }: PositionColumnActions): ColumnDef<Position>[] => [
 	{
 		id: "no",
-		header: "No",
 		cell: ({ row, table }) => {
 			const pageIndex = table.getState().pagination.pageIndex;
 			const pageSize = table.getState().pagination.pageSize;
-			return pageIndex * pageSize + row.index + 1;
+			return (
+				<p className="text-sm text-center text-muted-foreground">
+					{pageIndex * pageSize + row.index + 1}
+				</p>
+			);
 		},
 	},
 	{
@@ -43,14 +51,14 @@ export const createPositionColumns = ({
 		cell: ({ row }) => {
 			const { isActive } = row.original;
 			return isActive ?
-					<Badge className="bg-green-100 text-green-700 border-green-200 hover:bg-green-100">
+					<div className="flex w-fit items-center text-xs  border border-border px-2 py-1 rounded-full">
+						<CheckCircleIcon size={12} className="mr-1 text-green-500" />
 						Aktif
-					</Badge>
-				:	<Badge
-						variant="outline"
-						className="bg-red-50 text-red-500 border-red-200 hover:bg-red-50">
+					</div>
+				:	<div className="flex w-fit items-center text-xs  border border-border px-2 py-1 rounded-full">
+						<XCircleIcon size={12} className="mr-1 text-red-500" />
 						Nonaktif
-					</Badge>;
+					</div>;
 		},
 	},
 	{

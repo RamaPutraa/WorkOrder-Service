@@ -42,6 +42,18 @@ export const createInvitationColumns = ({
 	onDelete: (id: string) => void;
 }): ColumnDef<InvitationsHistory>[] => [
 	{
+		id: "no",
+		cell: ({ row, table }) => {
+			const pageIndex = table.getState().pagination.pageIndex;
+			const pageSize = table.getState().pagination.pageSize;
+			return (
+				<p className="text-sm text-center text-muted-foreground">
+					{pageIndex * pageSize + row.index + 1}
+				</p>
+			);
+		},
+	},
+	{
 		id: "email",
 		header: "Pegawai",
 		accessorFn: (row) => row.user?.email ?? "",
@@ -72,7 +84,11 @@ export const createInvitationColumns = ({
 				label: role,
 				variant: "outline" as const,
 			};
-			return <Badge variant={info.variant}>{info.label}</Badge>;
+			return (
+				<Badge variant={info.variant} className="rounded-full">
+					{info.label}
+				</Badge>
+			);
 		},
 	},
 	{
@@ -86,7 +102,7 @@ export const createInvitationColumns = ({
 				icon: XCircle,
 			};
 			return (
-				<Badge variant={info.variant} className="flex items-center gap-1">
+				<Badge variant={info.variant} className="rounded-full">
 					<info.icon
 						className={`h-4 w-4 ${
 							status === "accepted" ? "text-green-500"

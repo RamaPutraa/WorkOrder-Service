@@ -3,16 +3,16 @@ import { DataTable } from "@/components/ui/data-table";
 import { createInvitationColumns } from "../components/invitation-columns";
 import { useStaffHistory } from "../hooks/use-staff-history";
 import { useDialogStore } from "@/store/dialogStore";
-import { Badge } from "@/components/ui/badge";
 import PageHeader from "@/shared/atoms/header-content";
 import { TextLoading } from "@/shared/atoms/loading-state";
 import { Input } from "@/components/ui/input";
+import { Clock, CheckCircle, XCircle, Timer } from "lucide-react";
 
 const STATUS_SUMMARY = [
-	{ label: "Menunggu", key: "pending", variant: "outline" as const },
-	{ label: "Diterima", key: "accepted", variant: "default" as const },
-	{ label: "Ditolak", key: "rejected", variant: "destructive" as const },
-	{ label: "Kadaluarsa", key: "expired", variant: "secondary" as const },
+	{ label: "Menunggu", icon: Timer, key: "pending" },
+	{ label: "Diterima", icon: CheckCircle, key: "accepted" },
+	{ label: "Ditolak", icon: XCircle, key: "rejected" },
+	{ label: "Kadaluarsa", icon: Clock, key: "expired" },
 ];
 
 const HistoryStaffInvitations = () => {
@@ -52,7 +52,7 @@ const HistoryStaffInvitations = () => {
 	}
 
 	return (
-		<>
+		<div className="space-y-6 pb-8">
 			{/* Header */}
 			<PageHeader
 				title="Riwayat Undangan"
@@ -67,43 +67,48 @@ const HistoryStaffInvitations = () => {
 				backPath={true}
 			/>
 
-			<div className="">
-				{/* Status summary chips */}
-				{!loading && history.length > 0 && (
-					<div className="flex items-center justify-between ">
-						<div className="flex flex-wrap gap-2 ">
-							{STATUS_SUMMARY.map(({ label, key, variant }) => {
-								const count = history.filter((h) => h.status === key).length;
-								return (
-									<div
-										key={key}
-										className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border bg-white text-sm text-muted-foreground">
-										<Badge variant={variant} className="text-xs px-1.5">
-											{count}
-										</Badge>
+			{/* Status summary chips */}
+			{!loading && history.length > 0 && (
+				<div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+					{STATUS_SUMMARY.map(({ label, icon: Icon, key }) => {
+						const count = history.filter((h) => h.status === key).length;
+						return (
+							<div
+								key={key}
+								className="bg-muted/30 rounded-xl border p-1.5 transition-all hover:bg-muted/50">
+								<div className="flex items-center justify-between py-2 px-3">
+									<p className="text-muted-foreground text-xs sm:text-sm font-medium">
 										{label}
-									</div>
-								);
-							})}
-						</div>
-					</div>
-				)}
-			</div>
+									</p>
+									<Icon size={16} className="text-muted-foreground" />
+								</div>
+								<div className="pt-6 sm:pt-8 px-3 pb-3 mt-1 rounded-lg border bg-white shadow-sm">
+									<p className="text-2xl sm:text-3xl font-bold text-foreground">
+										{count}
+									</p>
+								</div>
+							</div>
+						);
+					})}
+				</div>
+			)}
 
 			{/* Table */}
-			<div className="bg-muted/50 rounded-xl border">
-				<div className="px-5 py-4">
-					<div className="flex items-center justify-between">
+			<div className="bg-white rounded-xl border shadow-sm overflow-hidden">
+				<div className="px-5 py-5 border-b bg-muted/30">
+					<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
 						<div>
-							<h2 className="text-lg font-semibold">Daftar Riwayat Undangan</h2>
-							<p className="text-sm text-muted-foreground">
-								Total {history.length} undangan
+							<h2 className="text-lg font-semibold text-foreground">
+								Daftar Riwayat Undangan
+							</h2>
+							<p className="text-sm text-muted-foreground mt-1">
+								Kelola dan pantau riwayat undangan staff
 							</p>
 						</div>
-						<div>
+						<div className="w-full sm:w-auto">
 							<Input
-								placeholder="Cari email"
-								className="w-[300px] bg-white rounded-lg"
+								placeholder="Cari email..."
+								className="w-full sm:w-[300px] bg-white transition-shadow focus-visible:shadow-sm"
 								value={searchValue}
 								onChange={(e) => setSearchValue(e.target.value)}
 							/>
@@ -111,7 +116,7 @@ const HistoryStaffInvitations = () => {
 					</div>
 				</div>
 
-				<div className="px-2 pb-2">
+				<div className="p-0 sm:p-2 bg-muted/30">
 					<DataTable
 						columns={columns}
 						data={history}
@@ -122,7 +127,7 @@ const HistoryStaffInvitations = () => {
 					/>
 				</div>
 			</div>
-		</>
+		</div>
 	);
 };
 

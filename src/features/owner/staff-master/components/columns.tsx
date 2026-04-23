@@ -13,6 +13,18 @@ import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
 export const columns: ColumnDef<Employee>[] = [
 	{
+		id: "no",
+		cell: ({ row, table }) => {
+			const pageIndex = table.getState().pagination.pageIndex;
+			const pageSize = table.getState().pagination.pageSize;
+			return (
+				<p className="text-sm text-center text-muted-foreground">
+					{pageIndex * pageSize + row.index + 1}
+				</p>
+			);
+		},
+	},
+	{
 		accessorKey: "name",
 		header: "Nama",
 	},
@@ -34,7 +46,11 @@ export const columns: ColumnDef<Employee>[] = [
 
 			const roleInfo = roleMap[role] || { label: role, variant: "outline" };
 
-			return <Badge variant={roleInfo.variant}>{roleInfo.label}</Badge>;
+			return (
+				<Badge variant={roleInfo.variant} className="rounded-full">
+					{roleInfo.label}
+				</Badge>
+			);
 		},
 	},
 	{

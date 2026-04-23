@@ -101,7 +101,7 @@ export const GenericFilter: React.FC<GenericFilterProps> = ({ config }) => {
 								}
 								value={currentValue}
 								onChange={(e) => setValue(item.id, e.target.value)}
-								className="pl-9 h-10 w-full  bg-background border-slate-200"
+								className="pl-9 h-10 w-full  bg-background border-slate-200 rounded-lg"
 							/>
 						</div>
 					);
@@ -115,7 +115,7 @@ export const GenericFilter: React.FC<GenericFilterProps> = ({ config }) => {
 								onValueChange={(val) =>
 									setValue(item.id, val === "all" ? "" : val)
 								}>
-								<SelectTrigger className="h-10  bg-background border-slate-200">
+								<SelectTrigger className="h-10  bg-background border-slate-200 rounded-lg">
 									<SelectValue
 										placeholder={item.placeholder || `Semua ${item.label}`}
 									/>
@@ -139,13 +139,13 @@ export const GenericFilter: React.FC<GenericFilterProps> = ({ config }) => {
 				if (item.type === "date") {
 					const dateValue = currentValue ? new Date(currentValue) : undefined;
 					return (
-						<div key={item.id} className="w-full sm:w-[200px]">
+						<div key={item.id} className="w-full sm:w-[200px] ">
 							<Popover>
 								<PopoverTrigger asChild>
 									<Button
 										variant={"outline"}
 										className={cn(
-											"w-full h-10  justify-start text-left font-normal border-slate-200",
+											"w-full h-10  justify-start text-left font-normal border-slate-200 rounded-lg",
 											!dateValue && "text-muted-foreground",
 										)}>
 										<CalendarIcon className="h-4 w-4" />
@@ -154,8 +154,9 @@ export const GenericFilter: React.FC<GenericFilterProps> = ({ config }) => {
 										:	<span>{item.label}</span>}
 									</Button>
 								</PopoverTrigger>
-								<PopoverContent className="w-auto p-0" align="start">
+								<PopoverContent className="w-auto p-0 rounded-lg" align="start">
 									<Calendar
+										className="rounded-lg"
 										mode="single"
 										selected={dateValue}
 										onSelect={(date) =>
