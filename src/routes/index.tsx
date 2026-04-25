@@ -49,6 +49,7 @@ import SrConfirmation from "@/features/staff/service-request-confirmation/pages/
 import CompanyReportWo from "@/features/owner/company-wo/pages/company-report-wo";
 import WoServicesList from "@/features/owner/wo-create/pages/services-list";
 import WoServicesDetail from "@/features/owner/wo-create/pages/services-detail";
+import SettingsPage from "@/features/settings/pages/settings-page";
 
 const router = createBrowserRouter([
 	{
@@ -359,6 +360,10 @@ const router = createBrowserRouter([
 					{
 						path: "",
 						element: <ProfilePage />,
+					},
+					{
+						path: "settings",
+						element: <SettingsPage />,
 					},
 				],
 			},

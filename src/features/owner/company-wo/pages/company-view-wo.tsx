@@ -152,7 +152,7 @@ const CompanyViewWo = () => {
 							<SectionLoading message="Memuat data tugas kerja..." />
 						</motion.div>
 					: filteredData.length > 0 ?
-						filteredData.map((wo) => {
+						filteredData.map((wo, index) => {
 							const statusConfig = getStatusConfig(wo.status);
 							const report = workReportMap[wo._id] ?? null;
 							// Kondisi alert work report
@@ -167,7 +167,7 @@ const CompanyViewWo = () => {
 
 							return (
 								<motion.div
-									key={wo._id}
+									key={wo._id ? `${wo._id}-${index}` : index}
 									initial={{ opacity: 0, y: 20 }}
 									animate={{ opacity: 1, y: 0 }}
 									whileHover={{ scale: 1.02, y: -4 }}
@@ -187,7 +187,7 @@ const CompanyViewWo = () => {
 												</div>
 												<div className="flex-1 min-w-0">
 													<h3 className="text-lg font-bold leading-tight mb-1 truncate">
-														{wo.service?.title}
+														{wo.service?.title || "-"}
 													</h3>
 													<p className="text-sm text-muted-foreground line-clamp-1 leading-relaxed">
 														{wo.service?.description || "-"}
@@ -202,7 +202,7 @@ const CompanyViewWo = () => {
 											<div className="space-y-3">
 												{/* Report Action Banner */}
 												{showNeedComplete && (
-													<div className="px-5 py-1 bg-green-500/5 rounded-lg">
+													<div className="px-5 py-2 bg-green-500/5 rounded-lg">
 														<div className="flex items-center gap-3">
 															<AlertCircle className="w-4 h-4 text-green-600" />
 															<p className="text-xs font-semibold   text-green-600 ">
@@ -211,8 +211,9 @@ const CompanyViewWo = () => {
 														</div>
 													</div>
 												)}
+												{/* TODO: belum buat requester by internal */}
 												{showNeedApproval && (
-													<div className="px-5 py-1 border-t border-border/50">
+													<div className="px-5 py-2 border-t border-border/50">
 														<div className="flex items-center gap-3 ">
 															<AlertCircle className="w-4 h-4 text-amber-600" />
 															<p className="text-xs font-semibold   text-amber-600 ">

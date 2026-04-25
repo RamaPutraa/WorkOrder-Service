@@ -1,4 +1,4 @@
-import { getToken, onMessage } from 'firebase/messaging';
+import { getToken, onMessage, deleteToken } from 'firebase/messaging';
 import { getFirebaseMessaging, firebaseConfig } from './firebase';
 
 const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY;
@@ -40,4 +40,16 @@ export const subscribeForegroundMessage = async (
       data: payload.data as Record<string, string>,
     });
   });
+};
+
+export const deleteNotificationToken = async (): Promise<boolean> => {
+  try {
+    const messaging = await getFirebaseMessaging();
+    if (!messaging) return false;
+
+    return await deleteToken(messaging);
+  } catch (err) {
+    console.error('[FCM] deleteToken gagal:', err);
+    return false;
+  }
 };

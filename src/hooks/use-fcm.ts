@@ -11,10 +11,16 @@ import type { FcmNotificationType } from "@/components/ui/fcm-toast";
 
 export const useFcm = () => {
 	const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-	const { fcmToken, setFcmToken, setPermission, setHasNewNotification } = useNotificationStore();
+	const {
+		fcmToken,
+		setFcmToken,
+		setPermission,
+		setHasNewNotification,
+		isNotificationEnabled,
+	} = useNotificationStore();
 
 	useEffect(() => {
-		if (!isAuthenticated) return;
+		if (!isAuthenticated || !isNotificationEnabled) return;
 
 		let isIgnore = false;
 		let unsubscribe: (() => void) | undefined;
@@ -49,7 +55,9 @@ export const useFcm = () => {
 							:	"info";
 
 						setHasNewNotification(true);
-
+						// FIXME: ini payload masi aneh ram
+						// TODO: kalo get notif history nanti buatin logic auto redirect ke halamannya
+						// TODO: masih yang diatas (redirect pas get all notif dan pas muncul toast)
 						showFcmToast({
 							title: title ?? "Notifikasi Baru",
 							body,
@@ -80,5 +88,12 @@ export const useFcm = () => {
 			if (unsubscribe) unsubscribe();
 			if (bc) bc.close();
 		};
-	}, [isAuthenticated, fcmToken, setFcmToken, setPermission, setHasNewNotification]);
+	}, [
+		isAuthenticated,
+		isNotificationEnabled,
+		fcmToken,
+		setFcmToken,
+		setPermission,
+		setHasNewNotification,
+	]);
 };

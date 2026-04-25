@@ -84,7 +84,7 @@ export function NavUser() {
 								<User className="mr-2 h-4 w-4" />
 								Profile
 							</DropdownMenuItem>
-							<DropdownMenuItem>
+							<DropdownMenuItem onClick={() => navigate("/dashboard/account/settings")}>
 								<Settings className="mr-2 h-4 w-4" />
 								Pengaturan
 							</DropdownMenuItem>

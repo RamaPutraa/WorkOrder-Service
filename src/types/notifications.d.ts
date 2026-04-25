@@ -4,7 +4,8 @@ type AppNotification = {
 	title: string;
 	body: string;
 	data: {
-		workOrderId: string;
+		resource: "service_request" | "work_order" | "invitation";
+		reseurceId: string;
 	};
 	isRead: boolean;
 	createdAt: string;
