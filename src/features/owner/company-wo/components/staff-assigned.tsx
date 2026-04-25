@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { Users, Settings, Save, Star, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -118,7 +118,7 @@ export const StaffAssigned = ({
 		}
 
 		setIsAssigningState(true);
-		const { data: error } = await handleApi(() =>
+		const { error } = await handleApi(() =>
 			assignStaffToWorkOrderApi(wo._id, {
 				assign_staffs: selectedStaffEmails,
 				...(picEmail ? { staff_pic: picEmail } : {}),
@@ -172,7 +172,7 @@ export const StaffAssigned = ({
 		let updatedPicEmail = wo.staffPIC?.email || "";
 
 		setIsAssigningState(true);
-		const { data: error } = await handleApi(() =>
+		const { error } = await handleApi(() =>
 			assignStaffToWorkOrderApi(wo._id, {
 				assign_staffs: updatedAssignStaffs,
 				...(updatedPicEmail ? { staff_pic: updatedPicEmail } : {}),

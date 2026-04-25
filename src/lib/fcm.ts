@@ -1,24 +1,32 @@
-import { getToken, onMessage, deleteToken } from 'firebase/messaging';
+import { getToken, onMessage } from 'firebase/messaging';
 import { getFirebaseMessaging, firebaseConfig } from './firebase';
 
 const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY;
 
+/**
+ * Meminta izin notifikasi dari browser dan mendapatkan FCM token.
+ * CATATAN: Fungsi ini harus dipanggil dalam konteks user gesture (klik)
+ * agar browser menampilkan dialog izin.
+ */
 export const requestNotificationPermission = async (): Promise<string | null> => {
+  // Minta izin PERTAMA, sebelum proses async lain,
+  // agar browser mendeteksi ini dipicu dari interaksi user (klik).
+  const permission = await Notification.requestPermission();
+  if (permission !== 'granted') return null;
+
   const messaging = await getFirebaseMessaging();
   if (!messaging) return null;
 
-  const permission = await Notification.requestPermission();
-  if (permission !== 'granted') {
-    return null;
-  }
-
   try {
     const swUrl = `/firebase-messaging-sw.js?apiKey=${firebaseConfig.apiKey}&authDomain=${firebaseConfig.authDomain}&projectId=${firebaseConfig.projectId}&storageBucket=${firebaseConfig.storageBucket}&messagingSenderId=${firebaseConfig.messagingSenderId}&appId=${firebaseConfig.appId}`;
-    const registration = await navigator.serviceWorker.register(swUrl);
-    
-    const token = await getToken(messaging, { 
-        vapidKey: VAPID_KEY,
-        serviceWorkerRegistration: registration 
+    await navigator.serviceWorker.register(swUrl);
+
+    // Tunggu hingga Service Worker benar-benar aktif sebelum getToken
+    const activeRegistration = await navigator.serviceWorker.ready;
+
+    const token = await getToken(messaging, {
+      vapidKey: VAPID_KEY,
+      serviceWorkerRegistration: activeRegistration,
     });
     return token;
   } catch (err) {
@@ -27,6 +35,10 @@ export const requestNotificationPermission = async (): Promise<string | null> =>
   }
 };
 
+/**
+ * Subscribe ke pesan FCM saat aplikasi aktif di foreground.
+ * Mengembalikan fungsi unsubscribe.
+ */
 export const subscribeForegroundMessage = async (
   callback: (payload: { title?: string; body?: string; data?: Record<string, string> }) => void,
 ) => {
@@ -40,16 +52,4 @@ export const subscribeForegroundMessage = async (
       data: payload.data as Record<string, string>,
     });
   });
-};
-
-export const deleteNotificationToken = async (): Promise<boolean> => {
-  try {
-    const messaging = await getFirebaseMessaging();
-    if (!messaging) return false;
-
-    return await deleteToken(messaging);
-  } catch (err) {
-    console.error('[FCM] deleteToken gagal:', err);
-    return false;
-  }
 };

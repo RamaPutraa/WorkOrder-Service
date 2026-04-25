@@ -1,127 +1,100 @@
-import { useNotificationStore } from "@/store/notificationStore";
-import { requestNotificationPermission, deleteNotificationToken } from "@/lib/fcm";
-import { registerFcmTokenApi, unregisterFcmTokenApi } from "@/features/notifications/services/notification-service";
-import { toast } from "sonner";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BellRing, ShieldAlert } from "lucide-react";
-import { useState } from "react";
+import { BellRing, CheckCircle2, ShieldAlert, Info } from "lucide-react";
+import PageHeader from "@/shared/atoms/header-content";
 
 export default function SettingsPage() {
-	const { 
-		isNotificationEnabled, 
-		setIsNotificationEnabled, 
-		fcmToken, 
-		setFcmToken 
-	} = useNotificationStore();
-	
-	const [isLoading, setIsLoading] = useState(false);
+	const permission = Notification.permission;
 
-	const handleToggleNotification = async (checked: boolean) => {
-		setIsLoading(true);
-
-		try {
-			if (checked) {
-				// User wants to enable notifications
-				if (Notification.permission === "denied") {
-					toast.error("Notifikasi diblokir oleh browser. Silakan izinkan lewat ikon gembok di sebelah URL (Address Bar).");
-					setIsLoading(false);
-					return;
-				}
-
-				const token = await requestNotificationPermission();
-				
-				if (token) {
-					setIsNotificationEnabled(true);
-					setFcmToken(token);
-					await registerFcmTokenApi(token).catch(console.error);
-					toast.success("Notifikasi berhasil diaktifkan");
-				} else {
-					toast.error("Gagal mendapatkan izin notifikasi");
-				}
-			} else {
-				// User wants to disable notifications
-				setIsNotificationEnabled(false);
-				
-				if (fcmToken) {
-					// Unregister from backend
-					await unregisterFcmTokenApi(fcmToken).catch(console.error);
-					// Delete token locally and from Firebase
-					await deleteNotificationToken();
-					setFcmToken(null);
-				}
-				
-				toast.info("Notifikasi telah dinonaktifkan");
-			}
-		} catch (error) {
-			console.error("[Settings] Toggle notification failed", error);
-			toast.error("Terjadi kesalahan saat mengubah pengaturan notifikasi");
-		} finally {
-			setIsLoading(false);
-		}
+	const permissionConfig = {
+		granted: {
+			icon: CheckCircle2,
+			label: "Aktif & Diizinkan",
+			description:
+				"Notifikasi push telah diizinkan. Anda akan menerima pemberitahuan secara real-time.",
+			iconClass: "text-emerald-500",
+			bgClass: "bg-emerald-50 border-emerald-100",
+			badgeClass: "bg-emerald-50 text-emerald-700 border-emerald-200",
+		},
+		denied: {
+			icon: ShieldAlert,
+			label: "Diblokir oleh Browser",
+			description:
+				"Notifikasi diblokir. Klik ikon gembok (🔒) di sebelah URL, lalu ubah izin notifikasi ke 'Izinkan' secara manual.",
+			iconClass: "text-rose-500",
+			bgClass: "bg-rose-50 border-rose-100",
+			badgeClass: "bg-rose-50 text-rose-700 border-rose-200",
+		},
+		default: {
+			icon: Info,
+			label: "Belum Ditentukan",
+			description:
+				"Izin notifikasi belum diberikan. Klik di mana saja pada halaman ini untuk memunculkan permintaan izin dari browser.",
+			iconClass: "text-amber-500",
+			bgClass: "bg-amber-50 border-amber-100",
+			badgeClass: "bg-amber-50 text-amber-700 border-amber-200",
+		},
 	};
 
+	const config = permissionConfig[permission];
+	const Icon = config.icon;
+
 	return (
-		<div className="container max-w-4xl py-8 space-y-8">
-			<div>
-				<h1 className="text-3xl font-bold tracking-tight">Pengaturan</h1>
-				<p className="text-muted-foreground">
-					Kelola pengaturan preferensi akun Anda.
+		<div className="space-y-6 pb-8">
+			<PageHeader
+				title="Pengaturan"
+				subtitle="Kelola preferensi dan konfigurasi akun Anda."
+			/>
+
+			<div className="max-w-2xl space-y-4">
+				{/* Section Label */}
+				<p className="text-xs font-semibold uppercase tracking-widest text-slate-400 px-1">
+					Notifikasi
 				</p>
-			</div>
 
-			<div className="grid gap-6">
-				<Card>
-					<CardHeader>
-						<CardTitle className="flex items-center gap-2">
-							<BellRing className="w-5 h-5" />
-							Notifikasi Push
-						</CardTitle>
-						<CardDescription>
-							Terima pemberitahuan secara real-time meskipun Anda tidak sedang membuka aplikasi.
-						</CardDescription>
-					</CardHeader>
-					<CardContent className="space-y-6">
-						<div className="flex items-center justify-between">
-							<div className="space-y-0.5">
-								<Label htmlFor="notif-toggle" className="text-base font-medium">
-									Izinkan Notifikasi Push
-								</Label>
-								<p className="text-sm text-muted-foreground">
-									Dapatkan update untuk tugas, pembaruan status, dan pesan baru.
-								</p>
-							</div>
-							<Switch
-								id="notif-toggle"
-								checked={isNotificationEnabled}
-								onCheckedChange={handleToggleNotification}
-								disabled={isLoading}
-							/>
+				{/* Notification Card */}
+				<div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+					{/* Card Header */}
+					<div className="flex items-center gap-3 px-5 py-4 border-b border-slate-100 bg-muted/20">
+						<div className="p-2 rounded-xl bg-blue-50">
+							<BellRing className="w-4 h-4 text-blue-500" />
 						</div>
+						<div>
+							<h2 className="text-sm font-semibold text-slate-800">
+								Notifikasi Push
+							</h2>
+							<p className="text-xs text-slate-400 mt-0.5">
+								Pemberitahuan real-time dari sistem
+							</p>
+						</div>
+					</div>
 
-						{Notification.permission === "denied" && (
-							<div className="rounded-md bg-destructive/10 p-4 mt-4">
-								<div className="flex">
-									<div className="flex-shrink-0">
-										<ShieldAlert className="h-5 w-5 text-destructive" aria-hidden="true" />
-									</div>
-									<div className="ml-3">
-										<h3 className="text-sm font-medium text-destructive">
-											Izin Browser Diperlukan
-										</h3>
-										<div className="mt-2 text-sm text-destructive/90">
-											<p>
-												Browser Anda saat ini memblokir notifikasi untuk situs ini. 
-												Anda harus mengizinkannya secara manual melalui ikon gembok di address bar browser Anda.
-											</p>
-										</div>
-									</div>
-								</div>
+					{/* Status Row */}
+					<div
+						className={`flex items-start gap-4 px-5 py-5 border ${config.bgClass} m-4 rounded-xl`}>
+						<Icon className={`w-5 h-5 mt-0.5 shrink-0 ${config.iconClass}`} />
+						<div className="flex-1 min-w-0">
+							<div className="flex items-center gap-2 flex-wrap">
+								<p className="text-sm font-semibold text-slate-800">
+									{config.label}
+								</p>
+								<span
+									className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border ${config.badgeClass}`}>
+									{permission}
+								</span>
 							</div>
-						)}
-					</CardContent>
-				</Card>
+							<p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
+								{config.description}
+							</p>
+						</div>
+					</div>
+
+					{/* Footer Note */}
+					<div className="px-5 py-3 border-t border-slate-100 bg-muted/10">
+						<p className="text-xs text-slate-400 leading-relaxed">
+							Izin notifikasi dikelola langsung oleh browser Anda. Untuk
+							mengubah, silahkan ke pengaturan browser Anda.
+						</p>
+					</div>
+				</div>
 			</div>
 		</div>
 	);
