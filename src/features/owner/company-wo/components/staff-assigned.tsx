@@ -118,7 +118,7 @@ export const StaffAssigned = ({
 		}
 
 		setIsAssigningState(true);
-		const { error } = await handleApi(() =>
+		const { data: error } = await handleApi(() =>
 			assignStaffToWorkOrderApi(wo._id, {
 				assign_staffs: selectedStaffEmails,
 				...(picEmail ? { staff_pic: picEmail } : {}),
@@ -172,7 +172,7 @@ export const StaffAssigned = ({
 		let updatedPicEmail = wo.staffPIC?.email || "";
 
 		setIsAssigningState(true);
-		const { error } = await handleApi(() =>
+		const { data: error } = await handleApi(() =>
 			assignStaffToWorkOrderApi(wo._id, {
 				assign_staffs: updatedAssignStaffs,
 				...(updatedPicEmail ? { staff_pic: updatedPicEmail } : {}),

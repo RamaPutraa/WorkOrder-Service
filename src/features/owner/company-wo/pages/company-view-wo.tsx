@@ -213,10 +213,10 @@ const CompanyViewWo = () => {
 												)}
 												{/* TODO: belum buat requester by internal */}
 												{showNeedApproval && (
-													<div className="px-5 py-2 border-t border-border/50">
+													<div className="px-5 py-2 bg-orange-500/5 rounded-lg">
 														<div className="flex items-center gap-3 ">
-															<AlertCircle className="w-4 h-4 text-amber-600" />
-															<p className="text-xs font-semibold   text-amber-600 ">
+															<AlertCircle className="w-4 h-4 text-orange-600" />
+															<p className="text-xs font-semibold   text-orange-600 ">
 																Laporan tugas kerja perlu disetujui
 															</p>
 														</div>

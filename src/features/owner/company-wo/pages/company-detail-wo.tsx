@@ -1,51 +1,25 @@
-import { useNavigate } from "react-router-dom";
-import { useCompanyWo } from "../hooks/use-company-wo";
+import { useCompanyDetailWo } from "../hooks/use-company-detail-wo";
 import { Button } from "@/components/ui/button";
 import StaffAssigned from "../components/staff-assigned";
 import { StatusBadge } from "../components/wo-status-badge";
 import { InfoRow } from "../components/wo-info-row";
 import { SiblingCard } from "../components/wo-sibling-card";
 import WorkOrderForms from "../components/work-order-forms";
+import { WoAlerts } from "../components/wo-alerts";
+import { WoActionButtons } from "../components/wo-action-buttons";
 import {
 	Calendar,
-	User,
-	CheckCircle2,
-	Play,
 	Shield,
 	AlertTriangle,
-	XCircle,
 	FileText,
 	Settings2,
 	ArrowLeftRight,
-	CheckCircle2Icon,
 	Info,
-	Ban,
-	Timer,
-	Eye,
-	CircleCheckBig,
-	Send,
-	RefreshCw,
+	User,
 } from "lucide-react";
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import {
-	approveWorkOrderApi,
-	cancelWorkOrderApi,
-	completeWorkOrderApi,
-	failWorkOrderApi,
-	recreateRejectedWorkOrderApi,
-	rejectWorkOrderApi,
-	sendWorkOrderApi,
-	startWorkOrderApi,
-	getWorkOrderReport,
-} from "../services/company-wo-service";
-import { handleApi } from "@/lib/handle-api";
-import { notifyError, notifySuccess } from "@/lib/toast-helper";
-import { useDialogStore } from "@/store/dialogStore";
-import { useAuthStore } from "@/store/authStore";
 import { SectionLoading } from "@/shared/atoms";
 import PageHeader from "@/shared/atoms/header-content";
-import { TextLoading } from "@/shared/atoms/loading-state";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
 	Dialog,
@@ -58,8 +32,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { WoStatusStepper } from "../components/wo-status-stepper";
-
-//  Helpers
+// Helpers
 
 const formatDate = (dateStr: string | null | undefined) => {
 	if (!dateStr) return "-";
@@ -73,344 +46,49 @@ const formatDate = (dateStr: string | null | undefined) => {
 //  Main Component
 
 const CompanyDetailWo = () => {
-	const navigate = useNavigate();
 	const {
-		detailData,
-		fecthDetailInternalCompanyWorkOrder,
-		loading,
+		navigate,
+		user,
+		isReadOnly,
+		isSticky,
+		activeAction,
+		isFailDialogOpen,
+		setIsFailDialogOpen,
+		failIssue,
+		setFailIssue,
+		isCompleteDialogOpen,
+		setIsCompleteDialogOpen,
+		completeIssue,
+		setCompleteIssue,
+		workReport,
+		wo,
+		meta,
+		currentStatus,
+		canStart,
+		canComplete,
+		canFail,
+		userPic,
+		userCreated,
+		userAssigned,
+		isDrafted,
+		canCancel,
+		canRecreateEdit,
+		getHeaderSubtitle,
+		isPageLoading,
+		handleSendWorkOrder,
+		handleStartWorkOrder,
+		handleApproveWorkOrder,
+		handleRejectWorkOrder,
+		handleCompleteWorkOrder,
+		handleCancelWorkOrder,
+		handleFailWorkOrder,
+		handleRecreateWorkOrder,
 		employees,
 		fetchEmployeeList,
-	} = useCompanyWo();
-	const { showDialog } = useDialogStore();
-	const { user } = useAuthStore();
-
-	const isReadOnly = user?.role === "staff_company";
-
-	const [isSticky, setIsSticky] = useState(false);
-	const [activeAction, setActiveAction] = useState<string | null>(null);
-	const [isHeaderRefreshing, setIsHeaderRefreshing] = useState(false);
-	const [isCardRefreshing, setIsCardRefreshing] = useState(false);
-	const [isFailDialogOpen, setIsFailDialogOpen] = useState(false);
-	const [failIssue, setFailIssue] = useState("");
-	const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
-	const [completeIssue, setCompleteIssue] = useState("");
-	const [workReport, setWorkReport] = useState<WorkReport | null>(null);
-	const [isReportFetching, setIsReportFetching] = useState(true);
-
-	// Detect scroll for sticky header
-	useEffect(() => {
-		const handleScroll = () => setIsSticky(window.scrollY > 20);
-		window.addEventListener("scroll", handleScroll);
-		return () => window.removeEventListener("scroll", handleScroll);
-	}, []);
-
-	// Fetch work report when WO is in relevant status
-	useEffect(() => {
-		if ((loading && !detailData) || isHeaderRefreshing) {
-			setIsReportFetching(true);
-			return;
-		}
-
-		const fetchReport = async () => {
-			const d = detailData as
-				| (WorkOrderDetail & { meta?: WorkOrderMeta })
-				| undefined;
-			const id = d?._id;
-			if (!id) {
-				setIsReportFetching(false);
-				return;
-			}
-			const reportableStatuses = ["on_progress", "completed", "failed"];
-			if (!reportableStatuses.includes(d?.status ?? "")) {
-				setWorkReport(null);
-				setIsReportFetching(false);
-				return;
-			}
-
-			setIsReportFetching(true);
-			const { data: res } = await handleApi(() => getWorkOrderReport(id));
-			if (res?.data) {
-				setWorkReport(res.data);
-			} else {
-				setWorkReport(null);
-			}
-			setIsReportFetching(false);
-		};
-		void fetchReport();
-	}, [detailData, loading, isHeaderRefreshing]);
-
-	//  Handlers
-	const handleSendWorkOrder = () => {
-		showDialog({
-			title: "Konfirmasi Konfigurasi Selesai",
-			description:
-				"Apakah Anda yakin konfigurasi sudah selesai dan siap untuk memulai perintah kerja?",
-			confirmText: "Ya, Selesai",
-			cancelText: "Batal",
-			onConfirm: async () => {
-				setActiveAction("send");
-				const { error } = await handleApi(() =>
-					sendWorkOrderApi(wo?._id ?? ""),
-				);
-				if (error) {
-					notifyError("Gagal menandai konfigurasi selesai", error.message);
-					setActiveAction(null);
-					return;
-				}
-				notifySuccess("Konfigurasi Selesai", "Work order siap untuk dimulai");
-				if (wo?._id) {
-					setIsHeaderRefreshing(true);
-					await fecthDetailInternalCompanyWorkOrder(wo._id);
-					setIsHeaderRefreshing(false);
-				}
-				setActiveAction(null);
-			},
-		});
-	};
-
-	const handleStartWorkOrder = () => {
-		showDialog({
-			title: "Mulai Perintah Kerja",
-			description:
-				"Apakah Anda yakin ingin memulai perintah kerja ini? Status akan berubah menjadi 'Sedang Dikerjakan'.",
-			confirmText: "Ya, Mulai",
-			cancelText: "Batal",
-			onConfirm: async () => {
-				setActiveAction("start");
-				const { error } = await handleApi(() =>
-					startWorkOrderApi(wo?._id ?? ""),
-				);
-				if (error) {
-					notifyError("Gagal memulai perintah kerja", error.message);
-					setActiveAction(null);
-					return;
-				}
-				notifySuccess("Berhasil Dimulai", "Perintah kerja telah dimulai");
-				if (wo?._id) {
-					setIsHeaderRefreshing(true);
-					await fecthDetailInternalCompanyWorkOrder(wo._id);
-					setIsHeaderRefreshing(false);
-				}
-				setActiveAction(null);
-			},
-		});
-	};
-
-	const handleApproveWorkOrder = () => {
-		showDialog({
-			title: "Konfirmasi Persetujuan",
-			description:
-				"Apakah Anda yakin ingin menyetujui perintah kerja ini? Status akan berubah menjadi 'Disetujui'.",
-			confirmText: "Ya, Setujui",
-			cancelText: "Batal",
-			onConfirm: async () => {
-				setActiveAction("approve");
-				const { error } = await handleApi(() =>
-					approveWorkOrderApi(wo?._id ?? ""),
-				);
-				if (error) {
-					notifyError("Gagal menyetujui perintah kerja", error.message);
-					setActiveAction(null);
-					return;
-				}
-				notifySuccess("Berhasil Disetujui", "Perintah kerja telah disetujui");
-				if (wo?._id) {
-					setIsHeaderRefreshing(true);
-					await fecthDetailInternalCompanyWorkOrder(wo._id);
-					setIsHeaderRefreshing(false);
-				}
-				setActiveAction(null);
-			},
-		});
-	};
-
-	const handleRejectWorkOrder = () => {
-		showDialog({
-			title: "Konfirmasi Penolakan",
-			description:
-				"Apakah Anda yakin ingin menolak perintah kerja ini? Status akan berubah menjadi 'Ditolak'.",
-			confirmText: "Ya, Tolak",
-			cancelText: "Batal",
-			onConfirm: async () => {
-				setActiveAction("reject");
-				const { error } = await handleApi(() =>
-					rejectWorkOrderApi(wo?._id ?? ""),
-				);
-				if (error) {
-					notifyError("Gagal menolak perintah kerja", error.message);
-					setActiveAction(null);
-					return;
-				}
-				notifySuccess("Berhasil Ditolak", "Perintah kerja telah ditolak");
-				if (wo?._id) {
-					setIsHeaderRefreshing(true);
-					await fecthDetailInternalCompanyWorkOrder(wo._id);
-					setIsHeaderRefreshing(false);
-				}
-				setActiveAction(null);
-			},
-		});
-	};
-
-	const handleCompleteWorkOrder = async () => {
-		setActiveAction("complete");
-		const { error } = await handleApi(() =>
-			completeWorkOrderApi(wo?._id ?? "", { issue: completeIssue }),
-		);
-		if (error) {
-			notifyError("Gagal menyelesaikan perintah kerja", error.message);
-			setActiveAction(null);
-			return;
-		}
-		notifySuccess("Berhasil Selesai", "Perintah kerja telah selesai");
-		setIsCompleteDialogOpen(false);
-		setCompleteIssue("");
-		if (wo?._id) {
-			setIsHeaderRefreshing(true);
-			await fecthDetailInternalCompanyWorkOrder(wo._id);
-			setIsHeaderRefreshing(false);
-		}
-		setActiveAction(null);
-	};
-
-	const handleCancelWorkOrder = () => {
-		showDialog({
-			title: "Konfirmasi Pembatalan",
-			description:
-				"Apakah Anda yakin ingin membatalkan perintah kerja ini? Status akan berubah menjadi 'Dibatalkan'.",
-			confirmText: "Ya, Batalkan",
-			cancelText: "Batal",
-			onConfirm: async () => {
-				setActiveAction("cancel");
-				const { error } = await handleApi(() =>
-					cancelWorkOrderApi(wo?._id ?? ""),
-				);
-				if (error) {
-					notifyError("Gagal membatalkan perintah kerja", error.message);
-					setActiveAction(null);
-					return;
-				}
-				notifySuccess("Berhasil Dibatalkan", "Perintah kerja telah dibatalkan");
-				if (wo?._id) {
-					setIsHeaderRefreshing(true);
-					await fecthDetailInternalCompanyWorkOrder(wo._id);
-					setIsHeaderRefreshing(false);
-				}
-				setActiveAction(null);
-			},
-		});
-	};
-
-	const handleFailWorkOrder = async () => {
-		if (!failIssue.trim()) {
-			notifyError("Catatan Kendala", "Harap isi alasan kendala");
-			return;
-		}
-		setActiveAction("fail");
-		const { error } = await handleApi(() =>
-			failWorkOrderApi(wo?._id ?? "", { issue: failIssue }),
-		);
-		if (error) {
-			notifyError("Gagal", error.message);
-			setActiveAction(null);
-			return;
-		}
-		notifySuccess("Berhasil Digagalkan", "Perintah kerja telah digagalkan");
-		setIsFailDialogOpen(false);
-		setFailIssue("");
-		if (wo?._id) {
-			setIsHeaderRefreshing(true);
-			await fecthDetailInternalCompanyWorkOrder(wo._id);
-			setIsHeaderRefreshing(false);
-		}
-		setActiveAction(null);
-	};
-
-	const handleRecreateWorkOrder = () => {
-		showDialog({
-			title: "Konfirmasi Pembuatan Ulang",
-			description:
-				"Apakah Anda yakin ingin membuat ulang perintah kerja ini? Status akan berubah menjadi 'Dibuat'.",
-			confirmText: "Ya, Buat Ulang",
-			cancelText: "Batal",
-			onConfirm: async () => {
-				setActiveAction("recreate");
-				const { error } = await handleApi(() =>
-					recreateRejectedWorkOrderApi(wo?._id ?? ""),
-				);
-				if (error) {
-					notifyError("Gagal membuat ulang perintah kerja", error.message);
-					setActiveAction(null);
-					return;
-				}
-				notifySuccess(
-					"Berhasil Dibuat Ulang",
-					"Perintah kerja telah dibuat ulang",
-				);
-				navigate(-1);
-				if (wo?._id) {
-					setIsHeaderRefreshing(true);
-					await fecthDetailInternalCompanyWorkOrder(wo._id);
-					setIsHeaderRefreshing(false);
-				}
-				setActiveAction(null);
-			},
-		});
-	};
-
-	// WorkOrderDetailResponse = ApiResponse<WorkOrderDetail & { meta: WorkOrderMeta }>
-	// so detailData.data is WorkOrderDetail & { meta: WorkOrderMeta }
-	const wo = detailData as
-		| (WorkOrderDetail & { meta?: WorkOrderMeta })
-		| undefined;
-	const meta =
-		wo?.meta ?? (detailData as unknown as { meta?: WorkOrderMeta })?.meta;
-	const currentStatus = wo?.status;
-	const canStart = meta?.workOrderCapabilities.can_start;
-	const canComplete = meta?.workOrderCapabilities.can_complete;
-	const canFail = meta?.workOrderCapabilities.can_fail;
-	const userPic = wo?.staffPIC?.email == user?.email;
-
-	const userCreated: boolean | null =
-		wo?.createdBy == null ? null
-		: wo.createdBy.email === user?.email ? true
-		: false;
-	const userAssigned = wo?.assignedStaff?.some((s) => s.email == user?.email);
-	const isDrafted = currentStatus === "drafted";
-	const canCancel = meta?.workOrderCapabilities.can_cancel;
-
-	// can_recreate: owner selalu, manager hanya jika dia pembuat atau createdBy null
-	const isOwnerOrAllowedManager =
-		user?.role === "owner_company" ||
-		(user?.role === "manager_company" &&
-			(userCreated === true || userCreated === null));
-	const canRecreateEdit =
-		!!meta?.workOrderCapabilities?.can_recreate && isOwnerOrAllowedManager;
-
-	const getHeaderSubtitle = () => {
-		if (!wo) return <TextLoading variant="skeleton" />;
-		switch (currentStatus) {
-			case "drafted":
-				return "Lakukan konfigurasi sebelum memulai perintah kerja.";
-			case "sent":
-				return "Menunggu persetujuan perintah kerja.";
-			case "approved":
-				return "Perintah kerja telah disetujui dan siap dimulai.";
-			case "unprocessable":
-				return "Perintah kerja belum dapat dikerjakan saat ini.";
-			case "on_progress":
-				return "Perintah kerja sedang dikerjakan.";
-			case "failed":
-				return "Perintah kerja mengalami kegagalan.";
-			case "completed":
-				return "Perintah kerja telah selesai.";
-			default:
-				return "Detail perintah kerja.";
-		}
-	};
-
-	const isPageLoading =
-		(loading && !wo) || isHeaderRefreshing || isReportFetching;
+		refreshBackground,
+		isCardRefreshing,
+		setIsCardRefreshing,
+	} = useCompanyDetailWo();
 
 	return (
 		<div className="space-y-6">
@@ -421,135 +99,32 @@ const CompanyDetailWo = () => {
 				backPath={true}
 				className={`sticky top-0 z-30 transition-shadow duration-300 ${isSticky ? "shadow-md rounded-b-md px-4 sm:px-6 bg-background" : ""}`}
 				actionButtons={
-					(!isReadOnly || userPic || userAssigned) && (
-						<>
-							{(currentStatus === "drafted" ||
-								currentStatus === "approved" ||
-								currentStatus === "rejected" ||
-								currentStatus === "sent") && (
-								<>
-									{}
-									{(user?.role === "owner_company" ||
-										(user?.role === "manager_company" &&
-											(userCreated === true || userCreated === null))) && (
-										<Button
-											className=" bg-red-600 hover:bg-red-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-red-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
-											onClick={handleCancelWorkOrder}
-											disabled={activeAction !== null || !canCancel}>
-											<XCircle className="h-4 w-4" />
-											{activeAction === "cancel" ? "Memproses..." : "Batalkan"}
-										</Button>
-									)}
-								</>
-							)}
-
-							{currentStatus === "drafted" && (
-								<Button
-									className=" bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
-									onClick={handleSendWorkOrder}
-									disabled={activeAction !== null}>
-									<CheckCircle2 className="h-4 w-4" />
-									{activeAction === "send" ? "Memproses..." : "Kirim"}
-								</Button>
-							)}
-
-							{currentStatus === "sent" && (
-								<>
-									{(user?.role === "owner_company" ||
-										user?.role === "manager_company") && (
-										<div className="px-5 bg-amber-100 w-full font-semibold text-sm md:w-auto text-amber-700 border-1 border-amber-200 rounded-xl  h-11 shadow-sm shadow-amber-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed">
-											<Timer className="h-4 w-4 mr-2" />
-											Menunggu Persetujuan
-										</div>
-									)}
-
-									{user?.role === "staff_company" && (
-										<>
-											<Button
-												className="bg-red-600 hover:bg-red-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-red-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
-												onClick={handleRejectWorkOrder}
-												disabled={activeAction !== null}>
-												<XCircle className="h-4 w-4" />
-												{activeAction === "reject" ? "Memproses..." : "Tolak"}
-											</Button>
-											<Button
-												className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
-												onClick={handleApproveWorkOrder}
-												disabled={activeAction !== null}>
-												<CheckCircle2 className="h-4 w-4" />
-												{activeAction === "approve" ?
-													"Memproses..."
-												:	"Setujui"}
-											</Button>
-										</>
-									)}
-								</>
-							)}
-
-							{currentStatus === "approved" && (
-								<>
-									<Button
-										className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
-										onClick={handleStartWorkOrder}
-										disabled={
-											activeAction !== null || !canStart || !userAssigned
-										}>
-										<Play className="h-4 w-4" />
-										{activeAction === "start" ?
-											"Memproses..."
-										:	"Mulai Perintah Kerja"}
-									</Button>
-								</>
-							)}
-
-							{/* TODO:Kalau reject auto cancel ato ga  */}
-							{meta?.workOrderCapabilities.can_recreate &&
-								(user?.role === "owner_company" ||
-									(user?.role === "manager_company" &&
-										(userCreated === true || userCreated === null))) && (
-									<Button
-										className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
-										onClick={handleRecreateWorkOrder}
-										disabled={activeAction !== null}>
-										<Send className="h-4 w-4" />{" "}
-										{activeAction === "recreate" ?
-											"Memproses..."
-										:	"Ajukan Ulang"}
-									</Button>
-								)}
-
-							{(currentStatus === "on_progress" ||
-								currentStatus === "completed" ||
-								currentStatus === "failed") && (
-								<>
-									<Button
-										className="bg-red-600 hover:bg-red-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-red-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
-										onClick={() => setIsFailDialogOpen(true)}
-										disabled={activeAction !== null || !canFail}>
-										<XCircle className="h-4 w-4" />
-										Gagal
-									</Button>
-									<Button
-										className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
-										onClick={() => setIsCompleteDialogOpen(true)}
-										disabled={activeAction !== null || !canComplete}>
-										<CircleCheckBig className="h-4 w-4" />
-										Selesaikan
-									</Button>
-
-									<Button
-										onClick={() =>
-											navigate(
-												`/dashboard/internal/workorders/${wo?._id}/report`,
-											)
-										}
-										className="bg-white hover:bg-muted/20 w-full md:w-auto text-black rounded-xl  h-11 shadow-sm shadow-white-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer">
-										<Eye className="h-4 w-4" /> Laporan Pengerjaan
-									</Button>
-								</>
-							)}
-						</>
-					)
+					wo ?
+						<WoActionButtons
+							user={user}
+							woId={wo._id}
+							isReadOnly={isReadOnly}
+							userPic={userPic}
+							userAssigned={userAssigned ?? false}
+							userCreated={userCreated}
+							currentStatus={currentStatus ?? ""}
+							canCancel={canCancel ?? false}
+							canStart={canStart ?? false}
+							canFail={canFail ?? false}
+							canComplete={canComplete ?? false}
+							canRecreate={canRecreateEdit ?? false}
+							activeAction={activeAction}
+							navigate={navigate}
+							onCancel={handleCancelWorkOrder}
+							onSend={handleSendWorkOrder}
+							onReject={handleRejectWorkOrder}
+							onApprove={handleApproveWorkOrder}
+							onStart={handleStartWorkOrder}
+							onRecreate={handleRecreateWorkOrder}
+							onFail={() => setIsFailDialogOpen(true)}
+							onComplete={() => setIsCompleteDialogOpen(true)}
+						/>
+					:	null
 				}
 			/>
 
@@ -624,165 +199,11 @@ const CompanyDetailWo = () => {
 													</span>
 
 													<div className="flex flex-col gap-2">
-														{/* Alert jika canStart = true (Warna Biru) */}
-														{meta.workOrderCapabilities.can_start && (
-															<Alert className="max-w-full bg-blue-50 text-blue-800 border-blue-200 [&>svg]:text-blue-800">
-																<Info className="h-4 w-4" />
-																<AlertTitle>Bisa Dimulai</AlertTitle>
-																<AlertDescription>
-																	Tugas kerja ini bisa mulai dikerjakan
-																	sekarang.
-																</AlertDescription>
-															</Alert>
-														)}
-
-														{meta.workOrderCapabilities.can_complete && (
-															<Alert className="max-w-full bg-green-50 text-green-800 border-green-200 [&>svg]:text-green-800">
-																<CheckCircle2Icon className="h-4 w-4" />
-																<AlertTitle>Siap Diselesaikan</AlertTitle>
-																<AlertDescription>
-																	Tugas kerja ini dapat ditutup.
-																</AlertDescription>
-															</Alert>
-														)}
-
-														{wo.status === "cancelled" && (
-															<Alert className="max-w-full bg-red-50 text-red-800 border-red-200 [&>svg]:text-red-800">
-																<XCircle className="h-4 w-4" />
-																<AlertTitle>Dibatalkan</AlertTitle>
-																<AlertDescription>
-																	Tugas kerja ini telah dibatalkan.
-																</AlertDescription>
-															</Alert>
-														)}
-
-														{wo.status === "failed" && (
-															<Alert className="max-w-full bg-red-50 text-red-800 border-red-200 [&>svg]:text-red-800">
-																<XCircle className="h-4 w-4" />
-																<AlertTitle>Terdapat Masalah</AlertTitle>
-																<AlertDescription>
-																	Tugas kerja memiliki kendala, tugas kerja
-																	tidak terselesaikan.
-																</AlertDescription>
-															</Alert>
-														)}
-
-														{meta.workOrderCapabilities.can_recreate && (
-															<Alert className="max-w-full bg-red-50 text-red-800 border-red-200 [&>svg]:text-red-800">
-																<RefreshCw className="h-4 w-4" />
-																<AlertTitle>Ditolak</AlertTitle>
-																<AlertDescription>
-																	Tugas kerja ini dapat dibuat ulang atau
-																	dibatalkan.
-																</AlertDescription>
-															</Alert>
-														)}
-
-														{!meta.workOrderCapabilities.can_start &&
-															!meta.workOrderCapabilities.can_complete &&
-															!meta.workOrderCapabilities.can_fail &&
-															wo.status === "drafted" && (
-																<Alert className="max-w-full bg-yellow-50 text-yellow-800 border-yellow-200 [&>svg]:text-yellow-800">
-																	<Ban className="h-4 w-4" />
-																	<AlertTitle>Dirancang</AlertTitle>
-																	<AlertDescription>
-																		Perintah kerja ini masih dalam tahap
-																		desain/konfigurasi
-																	</AlertDescription>
-																</Alert>
-															)}
-
-														{!meta.workOrderCapabilities.can_start &&
-															!meta.workOrderCapabilities.can_complete &&
-															!meta.workOrderCapabilities.can_fail &&
-															wo.status === "completed" && (
-																<Alert className="max-w-full bg-green-50 text-green-800 border-green-200 [&>svg]:text-green-800">
-																	<CircleCheckBig className="h-4 w-4" />
-																	<AlertTitle>Selesai</AlertTitle>
-																	<AlertDescription>
-																		Perintah kerja ini telah selesai.
-																	</AlertDescription>
-																</Alert>
-															)}
-
-														{!meta.workOrderCapabilities.can_start &&
-															!meta.workOrderCapabilities.can_complete &&
-															!meta.workOrderCapabilities.can_fail &&
-															wo.status === "sent" && (
-																<Alert className="max-w-full bg-yellow-50 text-yellow-800 border-yellow-200 [&>svg]:text-yellow-800">
-																	<Ban className="h-4 w-4" />
-																	<AlertTitle>Menunggu Persetujuan</AlertTitle>
-																	<AlertDescription>
-																		Menunggu konfirmasi departemen terkait.
-																	</AlertDescription>
-																</Alert>
-															)}
-
-														{!meta.workOrderCapabilities.can_start &&
-															!meta.workOrderCapabilities.can_complete &&
-															!meta.workOrderCapabilities.can_fail &&
-															wo.status === "approved" && (
-																<Alert className="max-w-full bg-green-50 text-green-800 border-green-200 [&>svg]:text-green-800">
-																	<CheckCircle2Icon className="h-4 w-4" />
-																	<AlertTitle>Disetujui</AlertTitle>
-																	<AlertDescription>
-																		Menunggu konfirmasi perintah kerja terkait.
-																	</AlertDescription>
-																</Alert>
-															)}
-
-														{!meta.workOrderCapabilities.can_start &&
-															!meta.workOrderCapabilities.can_complete &&
-															!meta.workOrderCapabilities.can_fail &&
-															wo.status === "on_progress" &&
-															(!workReport ||
-																workReport.status === "on_progress") && (
-																<Alert className="max-w-full bg-blue-50 text-blue-800 border-blue-200 [&>svg]:text-blue-800">
-																	<CheckCircle2Icon className="h-4 w-4" />
-																	<AlertTitle>Sedang Dikerjakan</AlertTitle>
-																	<AlertDescription>
-																		Perintah kerja sedang dikerjakan.
-																	</AlertDescription>
-																</Alert>
-															)}
-														{/* Alert: work report perlu diselesaikan (auto + approved) */}
-														{/* {wo.status === "on_progress" && (
-															<>
-																{workReport &&
-																	workReport.workReportApprovalAccessType ===
-																		"auto" &&
-																	workReport.status === "approved" && (
-																		<Alert className="max-w-full bg-green-50 text-green-800 border-green-200 [&>svg]:text-green-800">
-																			<CircleCheckBig className="h-4 w-4" />
-																			<AlertTitle>
-																				Laporan Disetujui Otomatis
-																			</AlertTitle>
-																			<AlertDescription>
-																				Laporan kerja telah disetujui secara
-																				otomatis. Tugas kerja perlu
-																				diselesaikan.
-																			</AlertDescription>
-																		</Alert>
-																	)}
-															</>
-														)} */}
-
-														{/* Alert: work report perlu disetujui (manager + submitted) */}
-														{workReport &&
-															workReport.workReportApprovalAccessType ===
-																"manager" &&
-															workReport.status === "submitted" && (
-																<Alert className="max-w-full bg-amber-50 text-amber-800 border-amber-200 [&>svg]:text-amber-800">
-																	<Shield className="h-4 w-4" />
-																	<AlertTitle>
-																		Menunggu Persetujuan Manager
-																	</AlertTitle>
-																	<AlertDescription>
-																		Laporan kerja telah dikirim dan menunggu
-																		persetujuan. Tugas kerja perlu disetujui.
-																	</AlertDescription>
-																</Alert>
-															)}
+														<WoAlerts
+															wo={wo}
+															meta={meta}
+															workReport={workReport}
+														/>
 													</div>
 												</div>
 											)}
@@ -935,7 +356,7 @@ const CompanyDetailWo = () => {
 							canRecreateEdit={canRecreateEdit}
 							onAssignSuccess={async () => {
 								setIsCardRefreshing(true);
-								await fecthDetailInternalCompanyWorkOrder(wo._id);
+								refreshBackground();
 								setIsCardRefreshing(false);
 							}}
 							isRefreshing={isCardRefreshing}
@@ -950,7 +371,7 @@ const CompanyDetailWo = () => {
 						isReadOnly={isReadOnly || (!isDrafted && !canRecreateEdit)}
 						onSaveSuccess={async () => {
 							setIsCardRefreshing(true);
-							await fecthDetailInternalCompanyWorkOrder(wo._id);
+							refreshBackground();
 							setIsCardRefreshing(false);
 						}}
 						isRefreshing={isCardRefreshing}
@@ -1047,7 +468,5 @@ const CompanyDetailWo = () => {
 		</div>
 	);
 };
-
-//  Small helpers
 
 export default CompanyDetailWo;

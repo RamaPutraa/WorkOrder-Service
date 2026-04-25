@@ -135,7 +135,7 @@ const WorkOrderForms = ({
 					updatedAt: new Date().toISOString(),
 				};
 
-				const { error } = await handleApi(() =>
+				const { data: error } = await handleApi(() =>
 					submitWorkOrderFormApi(workOrderId, submissionToSend),
 				);
 

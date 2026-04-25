@@ -1,41 +1,24 @@
 import { handleApi } from "@/lib/handle-api";
-import {
-	getInternalCompanyWorkOrderDetail,
-	getInternalCompanyWorkOrders,
-	getStaffListForAssign,
-} from "../services/company-wo-service";
+import { getInternalCompanyWorkOrders } from "../services/company-wo-service";
 import { notifyError } from "@/lib/toast-helper";
 import { useEffect, useState, useMemo } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { type FilterConfig } from "@/shared/molecules/generic-filter";
 
+/**
+ * Hook ini sekarang hanya bertanggung jawab atas:
+ * 1. Fetch daftar semua WO (untuk halaman list/view)
+ * 2. Fetch daftar employee untuk assign staff
+ * 3. Filter logic untuk halaman list
+ *
+ * Data detail WO sekarang dikelola oleh `useWoDetailSync` + `wo-detail-store` (Zustand cache).
+ */
 export const useCompanyWo = () => {
-	const { id } = useParams<{ id: string }>();
-	const [employees, setEmployees] = useState<StaffItem[]>([]);
-
 	const [data, setData] = useState<WorkOrder[]>([]);
-	const [detailData, setDetailData] = useState<WorkOrderDetail | null>(null);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	// fecth employee list
-	const fetchEmployeeList = async () => {
-		setLoading(true);
-		setError(null);
-
-		const { data: res, error } = await handleApi(() => getStaffListForAssign());
-
-		setLoading(false);
-
-		if (error) {
-			setError(error.message);
-			notifyError("Gagal memuat data karyawan", error.message);
-			return;
-		}
-
-		setEmployees(res?.data ?? []);
-	};
-	// Fetch internal company work orders
+	// Fetch daftar semua WO (untuk halaman list)
 	const fetchInternalCompanyWorkOrders = async () => {
 		setLoading(true);
 		setError(null);
@@ -51,42 +34,18 @@ export const useCompanyWo = () => {
 		setData(res?.data ?? []);
 	};
 
-	const fecthDetailInternalCompanyWorkOrder = async (id: string) => {
-		setLoading(true);
-		setError(null);
-		const { data: res, error } = await handleApi(() =>
-			getInternalCompanyWorkOrderDetail(id),
-		);
-		setLoading(false);
-		if (error) {
-			setError(error.message);
-			notifyError("Gagal memuat detail tugas kerja", error.message);
-			return;
-		}
-		if (res?.data) {
-			setDetailData({
-				...res.data,
-				...(res.meta ? { meta: res.meta } : {}),
-			});
-		} else {
-			setDetailData(null);
-		}
-		console.log(res);
-	};
-
+	// Hanya fetch list saat tidak ada id (halaman list view)
 	useEffect(() => {
 		void fetchInternalCompanyWorkOrders();
-		if (id) fecthDetailInternalCompanyWorkOrder(id);
 	}, []);
 
-	// ─── Filter Logic ──────────────────────────────────────────────────────────
+	// ─── Filter Logic ─────────────────────────────────────────────────────────
 	const [searchParams] = useSearchParams();
 	const searchQuery = (searchParams.get("search") || "").toLowerCase();
 	const statusQuery = searchParams.get("status") || "";
 	const dateFromQuery = searchParams.get("date");
 	const dateToQuery = searchParams.get("date_end");
 
-	// Menyaring data yang asli (Front-end filtering)
 	const filteredData = useMemo(() => {
 		return data.filter((wo) => {
 			const matchesSearch =
@@ -102,7 +61,6 @@ export const useCompanyWo = () => {
 				const woDate = new Date(wo.createdAt).getTime();
 				const fromDate = new Date(dateFromQuery).getTime();
 
-				// Set the end date to the end of the day if it exists, otherwise use fromDate
 				const toDate =
 					dateToQuery ?
 						new Date(dateToQuery).setHours(23, 59, 59, 999)
@@ -148,15 +106,11 @@ export const useCompanyWo = () => {
 	);
 
 	return {
-		employees,
-		detailData,
 		data,
 		filteredData,
 		filterConfig,
 		loading,
 		error,
 		fetchInternalCompanyWorkOrders,
-		fecthDetailInternalCompanyWorkOrder,
-		fetchEmployeeList,
 	};
 };
