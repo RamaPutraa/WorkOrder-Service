@@ -11,8 +11,11 @@ import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
 import { CheckCircle2, Info, AlertTriangle, Bell } from "lucide-react";
 import { getNotificationsApi } from "@/features/notifications/services/notification-service";
 import { useNotificationStore } from "@/store/notificationStore";
+import { useProfileStore } from "@/store/profileStore";
 import { formatDistanceToNow } from "date-fns";
 import { id as localeId } from "date-fns/locale";
+import { useNavigate } from "react-router-dom";
+import useAuth from "@/features/auth/hooks/useAuth";
 
 // --- Helper: tentukan tipe visual dari isi notifikasi ---
 const resolveType = (
@@ -77,6 +80,8 @@ const NotificationSkeleton = () => (
 const LS_KEY = "notif_last_seen_at";
 
 export function NavActions() {
+	const navigate = useNavigate();
+	const { user } = useAuth();
 	const [isOpen, setIsOpen] = React.useState(false);
 	const [notifications, setNotifications] = React.useState<AppNotification[]>(
 		[],
@@ -87,10 +92,10 @@ export function NavActions() {
 	// state reaktif dari FCM realtime (jika user menerima notif saat aplikasi open)
 	const { hasNewNotification, setHasNewNotification } = useNotificationStore();
 
-	const isRedDotVisible = hasNewNotification;
-
 	// Jumlah unread — untuk badge di header popover
 	const unreadCount = notifications.filter((n) => !n.isRead).length;
+
+	const isRedDotVisible = hasNewNotification || unreadCount > 0;
 	const fetchNotifications = React.useCallback(
 		async (isSilent = false) => {
 			if (!isSilent) setIsLoading(true);
@@ -111,6 +116,11 @@ export function NavActions() {
 		[], // Removed checkForNew dependency as we don't auto-check anymore
 	);
 
+	// Fetch awal saat komponen dimuat agar jumlah unread bisa ditampilkan
+	React.useEffect(() => {
+		fetchNotifications(true);
+	}, [fetchNotifications]);
+
 	// Handler saat Popover diklik
 	const handleOpenChange = React.useCallback(
 		(open: boolean) => {
@@ -126,6 +136,35 @@ export function NavActions() {
 		},
 		[fetchNotifications, hasNewNotification, setHasNewNotification],
 	);
+
+	// Handler saat Notifikasi diklik
+	const handleNotificationClick = (notif: AppNotification) => {
+		// API mapping: handle typo 'reseurceId' or 'resourceId'
+		const resourceId =
+			(notif.data as any)?.reseurceId || (notif.data as any)?.resourceId;
+		const resource = notif.data?.resource;
+		const isClient = user?.role === "client";
+
+		const resourceUrlMap: Record<string, string> = {
+			work_order:
+				resourceId ?
+					`/dashboard/internal/workorders/detail/${resourceId}`
+				:	"/dashboard/internal/workorders",
+			invitation: "/dashboard/unassigned/invitations-history",
+			service_request:
+				isClient ?
+					resourceId ? `/dashboard/client/submissions/${resourceId}`
+					:	"/dashboard/client/submissions"
+				: resourceId ?
+					`/dashboard/internal/business/services/request/detail/${resourceId}`
+				:	"/dashboard/internal/business/services/request",
+		};
+
+		const url = resource ? resourceUrlMap[resource] : "/dashboard/internal";
+
+		setIsOpen(false);
+		if (url) navigate(url);
+	};
 
 	return (
 		<div className="flex items-center gap-2 text-sm mr-7">
@@ -153,18 +192,6 @@ export function NavActions() {
 					align="end">
 					<Sidebar collapsible="none" className="bg-transparent">
 						<SidebarContent>
-							{/* ── Header ── */}
-							<div className="flex items-center justify-between px-4 py-4 border-b border-border">
-								<div className="flex items-center gap-2">
-									<span className="flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-primary rounded-full">
-										{unreadCount}
-									</span>
-									<h2 className="text-xs font-semibold text-foreground">
-										Notifikasi baru
-									</h2>
-								</div>
-							</div>
-
 							{/* ── List ── */}
 							<div className="flex-1 overflow-y-auto max-h-[400px] p-2 space-y-1">
 								{/* Loading skeleton */}
@@ -210,6 +237,7 @@ export function NavActions() {
 										return (
 											<div
 												key={notif._id}
+												onClick={() => handleNotificationClick(notif)}
 												className={`group relative flex items-start gap-3 p-3 rounded-lg hover:bg-muted/60 transition-colors cursor-pointer ${
 													!notif.isRead ? "bg-primary/5" : "bg-transparent"
 												}`}>

@@ -161,9 +161,12 @@ const ViewServiceRequest = () => {
 														<ClipboardPenLine className="w-5 h-5 sm:w-6 sm:h-6" />
 													</div>
 													<div className="flex-1 min-w-0">
-														<h3 className="text-sm sm:text-base font-semibold text-slate-900 leading-snug truncate">
-															{item.service?.title || "Untitled Form"}
+														<h3 className="text-lg font-bold leading-tight mb-1 truncate">
+															{item.code || "-"}
 														</h3>
+														<p className="text-sm text-muted-foreground line-clamp-1 leading-relaxed">
+															{item.service?.title || "-"}
+														</p>
 													</div>
 												</div>
 											</div>

@@ -187,10 +187,10 @@ const CompanyViewWo = () => {
 												</div>
 												<div className="flex-1 min-w-0">
 													<h3 className="text-lg font-bold leading-tight mb-1 truncate">
-														{wo.service?.title || "-"}
+														{wo.code || "-"}
 													</h3>
 													<p className="text-sm text-muted-foreground line-clamp-1 leading-relaxed">
-														{wo.service?.description || "-"}
+														{wo.service?.title || "-"}
 													</p>
 												</div>
 											</div>
