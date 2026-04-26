@@ -1,8 +1,8 @@
 import { AppLayout, PublicLayout, RootLayout } from "@/shared/templates";
 import LoginPage from "@/features/auth/pages/login-page";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import DashboardOwner from "@/features/owner/dahsboard-owner";
-import DashboardClient from "@/features/client/dashboard-client";
+import DashboardOwner from "@/features/owner/dashboard/pages/dahsboard-owner";
+import DashboardClient from "@/features/client/dashboard/pages/dashboard-client";
 import LandingPage from "@/features/public/landing-page";
 import ProtectedRoute from "./ProtectedRoute";
 import GuestRoute from "./GuestRoute";
