@@ -15,7 +15,7 @@ function App() {
 			<AppRoutes />
 			<Toaster
 				position="bottom-right"
-				offset={{ bottom: 68, right: 12 }}
+				offset={{ top: 55, bottom: 30, right: 40 }}
 				closeButton={false}
 			/>
 			<ConfirmDialog />

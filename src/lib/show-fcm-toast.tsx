@@ -29,7 +29,7 @@ export const showFcmToast = (opts: ShowFcmToastOptions) => {
 		),
 		{
 			duration: DURATION,
-			// No position override — inherits from <Toaster> in App.tsx
+			position: "top-right", // FCM toasts always appear at the top right near the bell icon
 		},
 	);
 };

@@ -21,7 +21,7 @@ if (typeof document !== "undefined") {
       @keyframes fcm-popup {
         0%   { opacity: 0; transform: scale(0.55) translateY(-10px); }
         60%  { opacity: 1; transform: scale(1.02) translateY(2px);   }
-        100% { opacity: 1; transform: scale(1)    translateY(0);     }
+        100% { opacity: 1; transform: scale(1)     translateY(0);     }
       }
       .fcm-enter {
         animation: fcm-popup 0.48s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -45,14 +45,15 @@ interface FcmToastProps {
 }
 
 // ─── Per-type config ────────────────────────────────────────────────────────
+// Hex colors removed to use shadcn primary theme
 const TYPE_CFG = {
-	success: { Icon: CheckCircle2, hex: "#10b981", label: "Berhasil" },
-	warning: { Icon: AlertTriangle, hex: "#f59e0b", label: "Peringatan" },
-	error: { Icon: XCircle, hex: "#ef4444", label: "Error" },
-	info: { Icon: Info, hex: "#6366f1", label: "Info" },
+	success: { Icon: CheckCircle2, label: "Berhasil" },
+	warning: { Icon: AlertTriangle, label: "Peringatan" },
+	error: { Icon: XCircle, label: "Error" },
+	info: { Icon: Info, label: "Info" },
 } as const satisfies Record<
 	FcmNotificationType,
-	{ Icon: React.ElementType; hex: string; label: string }
+	{ Icon: React.ElementType; label: string }
 >;
 
 // ─── Component ──────────────────────────────────────────────────────────────
@@ -72,7 +73,7 @@ export const FcmToast: React.FC<FcmToastProps> = ({
 	const lastTick = useRef(Date.now());
 	const paused = useRef(false);
 
-	const { Icon, hex } = TYPE_CFG[type];
+	const { Icon } = TYPE_CFG[type];
 
 	// ── Progress bar ticker ──────────────────────────────────────────────
 	useEffect(() => {
@@ -103,146 +104,145 @@ export const FcmToast: React.FC<FcmToastProps> = ({
 
 	return (
 		<>
-		{/* ── Outer wrapper: handles animation & caret (no overflow-hidden) ── */}
-		<div
-			className="fcm-enter relative"
-			style={{ width: 360, position: "relative" }}
-		>
-			{/* ── Arrow caret pointing up toward the NavActions bell button ── */}
+			{/* ── Outer wrapper: handles animation & caret (no overflow-hidden) ── */}
 			<div
-				style={{
-					position: "absolute",
-					// Align caret roughly below the bell button (mr-7 ≈ 28px from right, button ~30px wide)
-					top: -8,
-					right: 28,
-					width: 16,
-					height: 9,
-					zIndex: 1,
-					overflow: "hidden",
-				}}
-			>
-				{/* Rotated square trick: shows top half as a triangle */}
+				className="fcm-enter relative"
+				style={{ width: 360, position: "relative" }}>
+				{/* ── Arrow caret pointing up toward the NavActions bell button ── */}
 				<div
 					style={{
 						position: "absolute",
-						bottom: -5,
-						left: "50%",
-						transform: "translateX(-50%) rotate(45deg)",
-						width: 12,
-						height: 12,
-						background: "hsl(var(--background))",
-						border: "1px solid hsl(var(--border))",
-						borderRight: "none",
-						borderBottom: "none",
-					}}
-				/>
-			</div>
-
-			{/* ── Card: overflow-hidden for border-radius clipping ── */}
-			<div
-				className="bg-background border border-border rounded-[14px] overflow-hidden"
-				onMouseEnter={handleMouseEnter}
-				onMouseLeave={handleMouseLeave}
-				style={{
-					borderLeft: `4px solid ${hex}`,
-					boxShadow: hovered
-						? "0 24px 56px rgba(0,0,0,0.18), 0 8px 20px rgba(0,0,0,0.10)"
-						: "0 6px 28px rgba(0,0,0,0.09), 0 2px 8px rgba(0,0,0,0.05)",
-					transform: hovered
-						? "translateY(-2px) scale(1.004)"
-						: "translateY(0) scale(1)",
-					transition: "box-shadow 0.25s ease, transform 0.25s ease",
-				}}
-			>
-				{/* ── Main Content ────────────────────────────────────────── */}
-				<div className="flex items-start gap-3 px-4 pt-3.5 pb-3">
-					{/* Icon */}
-					<div
-						className="shrink-0 flex items-center justify-center rounded-xl mt-0.5"
-						style={{ width: 36, height: 36, background: `${hex}1a` }}
-					>
-						<Icon size={16} color={hex} strokeWidth={2.2} />
-					</div>
-
-					{/* Content */}
-					<div className="flex-1 min-w-0">
-						{/* Source tag */}
-						<div className="flex items-center gap-1 mb-0.5">
-							<Bell
-								size={9}
-								style={{ color: hex, flexShrink: 0 }}
-								strokeWidth={2.5}
-							/>
-							<span
-								className="text-[10px] font-extrabold uppercase tracking-widest"
-								style={{ color: hex }}
-							>
-								WorkOrder &bull; Notifikasi
-							</span>
-						</div>
-
-						{/* Title */}
-						<p className="text-[13px] font-bold text-foreground leading-snug line-clamp-1">
-							{title}
-						</p>
-
-						{/* Body */}
-						{body && (
-							<p className="text-[11.5px] text-muted-foreground leading-relaxed line-clamp-2 mt-0.5">
-								{body}
-							</p>
-						)}
-
-						{/* CTA button */}
-						{url && (
-							<button
-								onClick={() => {
-									window.location.href = url;
-									dismiss();
-								}}
-								className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-semibold hover:opacity-75 transition-opacity"
-								style={{
-									color: hex,
-									background: "transparent",
-									border: "none",
-									cursor: "pointer",
-									padding: 0,
-								}}
-							>
-								Lihat detail <ExternalLink size={10} />
-							</button>
-						)}
-					</div>
-
-					{/* Dismiss button */}
-					<button
-						onClick={dismiss}
-						className="shrink-0 flex items-center justify-center rounded-full bg-muted hover:bg-muted/80 transition-colors text-muted-foreground mt-0.5"
-						style={{
-							width: 20,
-							height: 20,
-							border: "none",
-							cursor: "pointer",
-						}}
-					>
-						<X size={11} />
-					</button>
-				</div>
-
-				{/* ── Progress bar ──────────────────────────────────────── */}
-				<div className="h-[3px] bg-border/60">
+						// Align caret roughly below the bell button (mr-7 ≈ 28px from right, button ~30px wide)
+						top: -8,
+						right: 28,
+						width: 16,
+						height: 9,
+						zIndex: 1,
+						overflow: "hidden",
+					}}>
+					{/* Rotated square trick: shows top half as a triangle */}
 					<div
 						style={{
-							height: "100%",
-							width: `${progress}%`,
-							background: `linear-gradient(90deg, ${hex}55, ${hex})`,
-							borderRadius: "0 3px 0 0",
-							transition: "width 55ms linear",
+							position: "absolute",
+							bottom: -5,
+							left: "50%",
+							transform: "translateX(-50%) rotate(45deg)",
+							width: 12,
+							height: 12,
+							background: "hsl(var(--background))",
+							border: "1px solid hsl(var(--border))",
+							borderRight: "none",
+							borderBottom: "none",
 						}}
 					/>
 				</div>
+
+				{/* ── Card: overflow-hidden for border-radius clipping ── */}
+				<div
+					// Tambahkan border-l-4 dan border-l-primary di sini
+					className="bg-background border border-border border-l-4 border-l-primary rounded-[14px] overflow-hidden"
+					onMouseEnter={handleMouseEnter}
+					onMouseLeave={handleMouseLeave}
+					style={{
+						boxShadow:
+							hovered ?
+								"0 24px 56px rgba(0,0,0,0.18), 0 8px 20px rgba(0,0,0,0.10)"
+							:	"0 6px 28px rgba(0,0,0,0.09), 0 2px 8px rgba(0,0,0,0.05)",
+						transform:
+							hovered ?
+								"translateY(-2px) scale(1.004)"
+							:	"translateY(0) scale(1)",
+						transition: "box-shadow 0.25s ease, transform 0.25s ease",
+					}}>
+					{/* ── Main Content ────────────────────────────────────────── */}
+					<div className="flex items-start gap-3 px-4 pt-3.5 pb-3">
+						{/* Icon Container - Use bg-primary/5 */}
+						<div
+							className="shrink-0 flex items-center justify-center rounded-xl mt-0.5 bg-primary/5"
+							style={{ width: 36, height: 36 }}>
+							{/* Lucide icon - Use text-primary */}
+							<Icon
+								size={16}
+								className="text-primary"
+								color="currentColor"
+								strokeWidth={2.2}
+							/>
+						</div>
+
+						{/* Content */}
+						<div className="flex-1 min-w-0">
+							{/* Source tag */}
+							<div className="flex items-center gap-1 mb-0.5">
+								<Bell
+									size={9}
+									className="shrink-0 text-primary"
+									strokeWidth={2.5}
+									color="currentColor"
+								/>
+								<span className="text-[10px] font-extrabold uppercase tracking-widest text-primary">
+									WorkOrder &bull; Notifikasi
+								</span>
+							</div>
+
+							{/* Title */}
+							<p className="text-[13px] font-bold text-foreground leading-snug line-clamp-1">
+								{title}
+							</p>
+
+							{/* Body */}
+							{body && (
+								<p className="text-[11.5px] text-muted-foreground leading-relaxed line-clamp-2 mt-0.5">
+									{body}
+								</p>
+							)}
+
+							{/* CTA button - Use text-primary */}
+							{url && (
+								<button
+									onClick={() => {
+										window.location.href = url;
+										dismiss();
+									}}
+									className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-semibold hover:opacity-75 transition-opacity text-primary"
+									style={{
+										background: "transparent",
+										border: "none",
+										cursor: "pointer",
+										padding: 0,
+									}}>
+									Lihat detail <ExternalLink size={10} />
+								</button>
+							)}
+						</div>
+
+						{/* Dismiss button */}
+						<button
+							onClick={dismiss}
+							className="shrink-0 flex items-center justify-center rounded-full bg-muted hover:bg-muted/80 transition-colors text-muted-foreground mt-0.5"
+							style={{
+								width: 20,
+								height: 20,
+								border: "none",
+								cursor: "pointer",
+							}}>
+							<X size={11} />
+						</button>
+					</div>
+
+					{/* ── Progress bar ──────────────────────────────────────── */}
+					<div className="h-[3px] bg-border/60">
+						<div
+							className="bg-gradient-to-r from-primary/30 to-primary"
+							style={{
+								height: "100%",
+								width: `${progress}%`,
+								borderRadius: "0 3px 0 0",
+								transition: "width 55ms linear",
+							}}
+						/>
+					</div>
+				</div>
 			</div>
-		</div>
 		</>
 	);
 };

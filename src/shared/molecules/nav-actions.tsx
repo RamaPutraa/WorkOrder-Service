@@ -11,7 +11,6 @@ import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
 import { CheckCircle2, Info, AlertTriangle, Bell } from "lucide-react";
 import { getNotificationsApi } from "@/features/notifications/services/notification-service";
 import { useNotificationStore } from "@/store/notificationStore";
-import { useProfileStore } from "@/store/profileStore";
 import { formatDistanceToNow } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import { useNavigate } from "react-router-dom";
@@ -76,9 +75,6 @@ const NotificationSkeleton = () => (
 	</div>
 );
 
-// Key localStorage untuk menyimpan waktu terakhir user membuka popover
-const LS_KEY = "notif_last_seen_at";
-
 export function NavActions() {
 	const navigate = useNavigate();
 	const { user } = useAuth();
@@ -121,6 +117,13 @@ export function NavActions() {
 		fetchNotifications(true);
 	}, [fetchNotifications]);
 
+	// Fetch otomatis saat ada notif baru masuk via FCM (Realtime) agar angka di badge terupdate
+	React.useEffect(() => {
+		if (hasNewNotification) {
+			fetchNotifications(true);
+		}
+	}, [hasNewNotification, fetchNotifications]);
+
 	// Handler saat Popover diklik
 	const handleOpenChange = React.useCallback(
 		(open: boolean) => {
@@ -138,7 +141,13 @@ export function NavActions() {
 	);
 
 	// Handler saat Notifikasi diklik
-	const handleNotificationClick = (notif: AppNotification) => {
+	const handleNotificationClick = async (notif: AppNotification) => {
+		// 1. Optimistic update: Langsung ubah status isRead menjadi true secara lokal
+		// Ini akan membuat unreadCount langsung berkurang dan menghilangkan red dot
+		setNotifications((prev) =>
+			prev.map((n) => (n._id === notif._id ? { ...n, isRead: true } : n)),
+		);
+
 		// API mapping: handle typo 'reseurceId' or 'resourceId'
 		const resourceId =
 			(notif.data as any)?.reseurceId || (notif.data as any)?.resourceId;
@@ -172,12 +181,18 @@ export function NavActions() {
 				<PopoverTrigger asChild>
 					<div className="flex items-center gap-2 border border-primary/30 rounded-full px-3 py-1.5 hover:cursor-pointer hover:bg-muted transition-all">
 						<div className="relative flex items-center justify-center">
-							<Bell size={14} className="text-primary" strokeWidth={1.5} />
+							<Bell size={16} className="text-primary" />
 							{/* Ping — muncul saat ada notif baru (dari init API / via Realtime FCM) */}
 							{isRedDotVisible && (
-								<span className="absolute -top-1 -right-0.5 flex h-2 w-2">
+								<span className="absolute -top-1.5 -right-1.5 flex h-4 w-4">
 									<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-									<span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+									<span className="relative inline-flex items-center justify-center rounded-full h-4 w-4 bg-red-500 text-[9px] font-bold text-white border border-background">
+										{unreadCount > 0 ?
+											unreadCount > 9 ?
+												"9+"
+											:	unreadCount
+										:	"1"}
+									</span>
 								</span>
 							)}
 						</div>
