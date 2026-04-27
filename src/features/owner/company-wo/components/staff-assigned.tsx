@@ -98,7 +98,8 @@ export const StaffAssigned = ({
 	const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
 	const handleOpenStaffDialog = () => {
-		if (employees.length === 0) fetchEmployeeList();
+		// Selalu fetch ulang agar list employee selalu sesuai posisi WO
+		fetchEmployeeList();
 		// Mapping initial values based on current WO using emails
 		setSelectedStaffEmails(wo?.assignedStaff?.map((s) => s.email) || []);
 		setPicEmail(wo?.staffPIC?.email || "");
@@ -332,9 +333,30 @@ export const StaffAssigned = ({
 
 					<div className="border border-border/50 mx-3 rounded-2xl">
 						<div className="flex-1 overflow-y-auto p-3 space-y-3">
-							{employees.length === 0 ?
-								<SectionLoading message="Memuat data pegawai..." />
-							:	employees.map((emp) => {
+							{(() => {
+								const filteredEmployees = employees.filter(
+									(emp) => emp.position?._id === wo.positionsOnDuty?._id,
+								);
+
+								if (employees.length === 0) {
+									return <SectionLoading message="Memuat data pegawai..." />;
+								}
+
+								if (filteredEmployees.length === 0) {
+									return (
+										<div className="flex flex-col items-center justify-center py-8 text-center text-muted-foreground">
+											<Users className="w-10 h-10 mb-2 opacity-30" />
+											<p className="text-sm">
+												Tidak ada pegawai dengan posisi{" "}
+												<span className="font-semibold text-primary">
+													{wo.positionsOnDuty.name}
+												</span>
+											</p>
+										</div>
+									);
+								}
+
+								return filteredEmployees.map((emp) => {
 									const isSelected = selectedStaffEmails.includes(emp.email);
 									const isPic = picEmail === emp.email;
 									return (
@@ -384,8 +406,8 @@ export const StaffAssigned = ({
 											)}
 										</div>
 									);
-								})
-							}
+								});
+							})()}
 						</div>
 					</div>
 

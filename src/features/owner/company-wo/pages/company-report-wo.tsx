@@ -53,17 +53,34 @@ const CompanyReportWo = () => {
 				subtitle="Tinjau dan kelola rincian penyelesaian tugas kerja"
 				backPath={true}
 				addIcon={<Send className="h-4 w-4" />}
-				// addLabel="Kirim Laporan"
-				// onAddClick={handleSendWorkReport}
 				loading={isSaving}
 				actionButtons={
-					<Button
-						className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
-						onClick={handleSendWorkReport}
-						disabled={isSaving || !canSendReport}>
-						<Send className="h-4 w-4" />
-						{isSaving ? "Memproses..." : "Finalisasi Laporan"}
-					</Button>
+					!canSendReport ?
+						reportData?.status === "submitted" && (
+							<>
+								<Button
+									onClick={handleRejectReport}
+									disabled={isProcessing}
+									className="bg-red-600 hover:bg-red-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-red-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer">
+									<XCircle className="w-4 h-4" />
+									{isProcessing ? "..." : "Tolak"}
+								</Button>
+								<Button
+									onClick={handleApproveReport}
+									disabled={isProcessing}
+									className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer">
+									<CheckCircle2 className="w-4 h-4" />
+									{isProcessing ? "..." : "Setujui"}
+								</Button>
+							</>
+						)
+					:	<Button
+							className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
+							onClick={handleSendWorkReport}
+							disabled={isSaving}>
+							<Send className="h-4 w-4" />
+							{isSaving ? "Memproses..." : "Finalisasi Laporan"}
+						</Button>
 				}
 			/>
 
@@ -149,24 +166,6 @@ const CompanyReportWo = () => {
 							</div>
 
 							{/* Approve / Reject buttons — hanya untuk reviewer & laporan sudah terkirim */}
-							{isReviewer && reportData.status === "submitted" && (
-								<div className="flex items-center gap-2 xl:border-l xl:pl-6 border-gray-100 sm:col-span-2 lg:col-span-3 xl:col-span-1">
-									<Button
-										onClick={handleRejectReport}
-										disabled={isProcessing}
-										className="flex-1 sm:flex-none bg-red-600 hover:bg-red-700 text-white rounded-xl h-10 px-4 shadow-sm shadow-red-200 transition-all flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer text-sm">
-										<XCircle className="w-4 h-4" />
-										{isProcessing ? "..." : "Tolak"}
-									</Button>
-									<Button
-										onClick={handleApproveReport}
-										disabled={isProcessing}
-										className="flex-1 sm:flex-none bg-green-600 hover:bg-green-700 text-white rounded-xl h-10 px-4 shadow-sm shadow-green-200 transition-all flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer text-sm">
-										<CheckCircle2 className="w-4 h-4" />
-										{isProcessing ? "..." : "Setujui"}
-									</Button>
-								</div>
-							)}
 						</div>
 					</div>
 

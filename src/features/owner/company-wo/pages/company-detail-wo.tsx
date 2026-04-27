@@ -89,7 +89,7 @@ const CompanyDetailWo = () => {
 		isCardRefreshing,
 		setIsCardRefreshing,
 	} = useCompanyDetailWo();
-
+	// FIXME: cahce masih broken, ketika di view wo,lalu masuk ke detail cachenya kadang masih belum update kasus di recreate
 	return (
 		<div className="space-y-6">
 			{/*  Sticky Header  */}

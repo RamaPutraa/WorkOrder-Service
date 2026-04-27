@@ -22,7 +22,7 @@ type WorkOrder = {
 	createdBy: User;
 	approvedBy: User;
 	workOrderApprovalAccessType: "auto" | "staff_pic";
-	positionOnDuty: Position;
+	positionsOnDuty: Position;
 	minStaff: number;
 	maxStaff: number;
 	assignedStaff: User[];
@@ -66,7 +66,7 @@ type WorkOrderDetail = {
 	createdBy: User;
 	approvedBy: User;
 	workOrderApprovalAccessType: "auto" | "staff_pic";
-	positionOnDuty: Position;
+	positionsOnDuty: Position;
 	minStaff: number;
 	maxStaff: number;
 	assignedStaff: User[];

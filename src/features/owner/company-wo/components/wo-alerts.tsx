@@ -144,7 +144,21 @@ export const WoAlerts = ({ wo, meta, workReport }: WoAlertsProps) => {
 				</Alert>,
 			);
 		}
-
+		if (!can_recreate) {
+			if (wo.status === "rejected") {
+				alerts.push(
+					<Alert
+						key="status-rejected"
+						className="max-w-full bg-red-50 text-red-800 border-red-200 [&>svg]:text-red-800">
+						<XCircle className="h-4 w-4" />
+						<AlertTitle>Ditolak</AlertTitle>
+						<AlertDescription>
+							Perintah kerja ini telah ditolak.
+						</AlertDescription>
+					</Alert>,
+				);
+			}
+		}
 		if (
 			wo.status === "on_progress" &&
 			(!workReport || workReport.status === "on_progress")
