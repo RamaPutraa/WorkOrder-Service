@@ -153,13 +153,17 @@ export function NavActions() {
 			(notif.data as any)?.reseurceId || (notif.data as any)?.resourceId;
 		const resource = notif.data?.resource;
 		const isClient = user?.role === "client";
+		const isUnassigned = user?.role === "staff_unassigned";
 
 		const resourceUrlMap: Record<string, string> = {
 			work_order:
 				resourceId ?
 					`/dashboard/internal/workorders/detail/${resourceId}`
 				:	"/dashboard/internal/workorders",
-			invitation: "/dashboard/unassigned/invitations-history",
+			invitation:
+				isUnassigned ?
+					`/dashboard/unassigned/invitations-history`
+				:	"/dashboard/internal/staff/history-invitations",
 			service_request:
 				isClient ?
 					resourceId ? `/dashboard/client/submissions/${resourceId}`
@@ -281,7 +285,7 @@ export function NavActions() {
 															})}
 														</span>
 													</div>
-													<p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+													<p className="text-xs text-muted-foreground leading-relaxed ">
 														{notif.body}
 													</p>
 												</div>
