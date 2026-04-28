@@ -45,6 +45,16 @@ type InboxSR = {
 	reviewSubmission: SubmissionObject | null;
 	createdAt: string;
 	updatedAt: string;
+	approvedAt: string;
+	onProgressAt: string;
+	startedAt: string;
+	completedAt: string;
+	partialCompletedAt: string;
+	rejectedAt: string;
+	unprocessableAt: string;
+	cancelledAt: string;
+	closedAt: string;
+	failedAt: string;
 };
 type InboxSRResponse = ApiResponse<InboxSR[]>;
 
@@ -52,7 +62,7 @@ type InboxSRResponse = ApiResponse<InboxSR[]>;
 type InboxSRDetailRequest = {
 	_id: string;
 	code: string;
-	servicesRequestStatus:
+	serviceRequestStatus:
 		| "received"
 		| "cancelled"
 		| "rejected"
@@ -73,6 +83,16 @@ type InboxSRDetailRequest = {
 	reviewSubmission: SubmissionObject;
 	createdAt: string;
 	updatedAt: string;
+	approvedAt: string;
+	onProgressAt: string;
+	startedAt: string;
+	completedAt: string;
+	partialCompletedAt: string;
+	rejectedAt: string;
+	unprocessableAt: string;
+	cancelledAt: string;
+	closedAt: string;
+	failedAt: string;
 };
 type InboxSRDetailResponse = ApiResponse<InboxSRDetailRequest>;
 
@@ -100,6 +120,16 @@ type RequesterSR = {
 	reviewSubmission: SubmissionObject;
 	createdAt: string;
 	updatedAt: string;
+	approvedAt: string;
+	onProgressAt: string;
+	startedAt: string;
+	completedAt: string;
+	partialCompletedAt: string;
+	rejectedAt: string;
+	unprocessableAt: string;
+	cancelledAt: string;
+	closedAt: string;
+	failedAt: string;
 };
 type RequesterSRResponse = ApiResponse<RequesterSR[]>;
 
@@ -127,6 +157,16 @@ type RequesterSRDetailRequest = {
 	reviewSubmission: SubmissionObject | null;
 	createdAt: string;
 	updatedAt: string;
+	approvedAt: string;
+	onProgressAt: string;
+	startedAt: string;
+	completedAt: string;
+	partialCompletedAt: string;
+	rejectedAt: string;
+	unprocessableAt: string;
+	cancelledAt: string;
+	closedAt: string;
+	failedAt: string;
 };
 type RequesterSRDetailResponse = ApiResponse<RequesterSRDetailRequest>;
 

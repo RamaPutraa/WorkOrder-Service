@@ -216,7 +216,6 @@ const ViewServiceRequest = () => {
 											</div>
 											{/* Divider */}
 										</div>
-										{/* TODO: nanti bsisa berubah ke approved */}
 										{item.serviceRequestStatus === "approved" && (
 											<div className="px-6 py-4 mt-auto flex flex-col justify-end border-t border-slate-200/70">
 												{/* Info Row (Client & Date) */}

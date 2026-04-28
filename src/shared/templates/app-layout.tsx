@@ -58,7 +58,7 @@ const AppLayout = () => {
 							orientation="vertical"
 							className="mr-2 data-[orientation=vertical]:h-4"
 						/>
-						<Breadcrumb>
+						<Breadcrumb className="hidden md:block">
 							<BreadcrumbList>
 								{mappedCrumbs.length === 0 ?
 									<BreadcrumbItem>

@@ -48,7 +48,7 @@ self.addEventListener("notificationclick", (event) => {
 
 	const data = event.notification.data ?? {};
 	const { resource, resourceId } = data;
-
+	// TODO: disini masi belum bener navigasinya
 	// Mapping resource ke URL halaman yang sesuai
 	const resourceUrlMap = {
 		work_order:

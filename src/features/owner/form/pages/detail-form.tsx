@@ -85,7 +85,6 @@ const DetailForm = () => {
 							<div className="shrink-0 p-3 bg-primary/10 text-primary rounded-xl">
 								<ScrollText className="w-6 h-6" />
 							</div>
-							{/* TODO: masi diskusi */}
 
 							<Button
 								variant="destructive"

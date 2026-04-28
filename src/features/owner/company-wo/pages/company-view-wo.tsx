@@ -211,7 +211,6 @@ const CompanyViewWo = () => {
 														</div>
 													</div>
 												)}
-												{/* TODO: belum buat requester by internal */}
 												{showNeedApproval && (
 													<div className="px-5 py-2 bg-orange-500/5 rounded-lg">
 														<div className="flex items-center gap-3 ">

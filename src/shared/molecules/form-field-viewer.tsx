@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
-import { Card } from "@/components/ui/card";
 
 export type AnswerValue = string | string[] | number | File | null;
 
@@ -336,9 +335,6 @@ export default function FormFieldViewer({
 							{index}
 						</span>
 					)}
-					<span className="text-[10px] text-muted-foreground/70 uppercase tracking-wide font-medium hidden sm:block">
-						{`Pertanyaan ${index}`}
-					</span>
 				</div>
 
 				<div className="flex items-center gap-2.5">

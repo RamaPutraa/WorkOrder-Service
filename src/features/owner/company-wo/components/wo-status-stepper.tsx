@@ -45,7 +45,7 @@ export const WoStatusStepper = ({ wo }: StepperProps) => {
 			steps[2] = {
 				key: "rejected",
 				label: "Ditolak",
-				date: wo.rejectedAt || wo.updatedAt,
+				date: wo.rejectedAt,
 			};
 			break;
 		case "approved":
@@ -57,7 +57,7 @@ export const WoStatusStepper = ({ wo }: StepperProps) => {
 			steps[3] = {
 				key: "unprocessable",
 				label: "Gagal Proses",
-				date: wo.unprocessableAt || wo.updatedAt,
+				date: wo.unprocessableAt,
 			};
 			break;
 		case "on_progress":
@@ -96,10 +96,6 @@ export const WoStatusStepper = ({ wo }: StepperProps) => {
 					(index === currentIdx && wo.status === "completed");
 				const isErrorStep = index === currentIdx && isError;
 				const isCurrent = index === currentIdx && !isCompleted && !isErrorStep;
-
-				// --- LOGIKA WARNA DINAMIS ---
-				// Jika statusnya batal, kita gunakan red-400 (merah muda/terang).
-				// Jika error lain (seperti rejected), pakai red-600.
 
 				let barColor = isCancelled ? "bg-red-400/20" : "bg-primary/20";
 				if (isCompleted || isCurrent)
