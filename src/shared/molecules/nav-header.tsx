@@ -17,7 +17,7 @@ import {
 	useSidebar,
 } from "@/components/ui/sidebar";
 import { useNavigate } from "react-router-dom";
-import { useCompanyProfile } from "@/features/owner/company/hooks/companyHooks";
+import { useProfileStore } from "@/store/profileStore";
 
 export function TeamManagement({
 	teams,
@@ -32,7 +32,7 @@ export function TeamManagement({
 	const { isMobile } = useSidebar();
 	const [activeTeam, setActiveTeam] = React.useState(teams[0]);
 	const navigate = useNavigate();
-	const { company } = useCompanyProfile();
+	const user_profile = useProfileStore();
 
 	if (!activeTeam) {
 		return null;
@@ -51,7 +51,9 @@ export function TeamManagement({
 							</div>
 							<div className="grid flex-1 text-left text-sm leading-tight">
 								<span className="truncate font-medium">Perusahaan</span>
-								<span className="truncate text-xs">{company?.name}</span>
+								<span className="truncate text-xs">
+									{user_profile.profile?.company?.name}
+								</span>
 							</div>
 							<ChevronsUpDown className="ml-auto" />
 						</SidebarMenuButton>

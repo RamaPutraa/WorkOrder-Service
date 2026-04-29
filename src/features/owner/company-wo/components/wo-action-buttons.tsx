@@ -166,7 +166,7 @@ export const WoActionButtons = ({
 						onClick={() =>
 							navigate(`/dashboard/internal/workorders/${woId}/report`)
 						}
-						className="bg-white hover:bg-muted/20 w-full md:w-auto text-black rounded-xl h-11 shadow-sm shadow-white-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer">
+						className="border bg-white hover:bg-muted/20 w-full md:w-auto text-black rounded-xl h-11 shadow-sm shadow-white-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer">
 						<Eye className="h-4 w-4" /> Laporan Pengerjaan
 					</Button>
 				</>

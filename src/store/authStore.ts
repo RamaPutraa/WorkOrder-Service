@@ -70,6 +70,8 @@ export const useAuthStore = create<AuthState>((set) => ({
 			// Always clear local storage and state
 			localStorage.removeItem("token");
 			localStorage.removeItem("user");
+			localStorage.removeItem("profile-storage");
+			localStorage.removeItem("notification-storage");
 			set({ token: null, user: null, isAuthenticated: false });
 		}
 	},

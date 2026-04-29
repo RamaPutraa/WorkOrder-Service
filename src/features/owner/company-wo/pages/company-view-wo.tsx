@@ -6,61 +6,42 @@ import { SectionLoading } from "@/shared/atoms";
 import PageHeader from "@/shared/atoms/header-content";
 import { GenericFilter } from "@/shared/molecules/generic-filter";
 import { EmptyData } from "@/shared/molecules/empty-data";
-import { useEffect, useState } from "react";
-import { getWorkOrderReport } from "../services/company-wo-service";
-import { handleApi } from "@/lib/handle-api";
+import { getNotificationsApi } from "@/features/notifications/services/notification-service";
+import { useEffect, useState, useMemo } from "react";
 
 const CompanyViewWo = () => {
 	const { filteredData, filterConfig, loading, error } = useCompanyWo();
 	const navigate = useNavigate();
-	// workReportMap: woId -> WorkReport (hanya untuk WO on_progress/completed/failed)
-	const [workReportMap, setWorkReportMap] = useState<
-		Record<string, WorkReport>
-	>({});
-	const [isReportFetching, setIsReportFetching] = useState(true);
 
-	// Fetch work reports secara paralel untuk WO yang relevan
+	// ── Notifikasi: ambil daftar WO yang perlu aksi (laporan submitted) ──
+	const [notifications, setNotifications] = useState<AppNotification[]>([]);
+
 	useEffect(() => {
-		if (loading) {
-			setIsReportFetching(true);
-			return;
-		}
-
-		if (!filteredData || filteredData.length === 0) {
-			setIsReportFetching(false);
-			return;
-		}
-
-		const relevantWos = filteredData.filter((wo) =>
-			["on_progress", "completed", "failed"].includes(wo.status),
-		);
-
-		if (relevantWos.length === 0) {
-			setIsReportFetching(false);
-			return;
-		}
-
-		setIsReportFetching(true);
-
-		const fetchAll = async () => {
-			const results = await Promise.all(
-				relevantWos.map(async (wo) => {
-					const { data: res } = await handleApi(() =>
-						getWorkOrderReport(wo._id),
-					);
-					if (res?.data) return { id: wo._id, report: res.data as WorkReport };
-					return null;
-				}),
-			);
-			const map: Record<string, WorkReport> = {};
-			results.forEach((r) => {
-				if (r) map[r.id] = r.report;
+		getNotificationsApi()
+			.then((res) => {
+				setNotifications(res.data?.data ?? []);
+			})
+			.catch(() => {
+				// Abaikan error notifikasi, tidak kritis
 			});
-			setWorkReportMap(map);
-			setIsReportFetching(false);
-		};
-		void fetchAll();
-	}, [filteredData, loading]);
+	}, []);
+
+	// Set berisi _id WO yang memiliki notifikasi status "submitted"
+	const submittedWoIds = useMemo(() => {
+		const ids = new Set<string>();
+		for (const notif of notifications) {
+			if (notif.data?.resource !== "work_order") continue;
+			if (
+				notif.data?.status !== "report_submited" &&
+				notif.data?.status !== "completed_needed"
+			)
+				continue;
+			// Backend mengirim "resourceId" (benar), fallback ke typo lama "reseurceId"
+			const resourceId = notif.data?.resourceId || notif.data?.reseurceId;
+			if (resourceId) ids.add(resourceId);
+		}
+		return ids;
+	}, [notifications]);
 
 	if (error) {
 		return (
@@ -142,7 +123,7 @@ const CompanyViewWo = () => {
 			{/* Work Orders Grid */}
 			<div className="grid gap-4 sm:gap-5 grid-cols-1 xl:grid-cols-3">
 				<AnimatePresence mode="wait">
-					{loading || isReportFetching ?
+					{loading ?
 						<motion.div
 							initial={{ opacity: 0 }}
 							animate={{ opacity: 1 }}
@@ -154,16 +135,8 @@ const CompanyViewWo = () => {
 					: filteredData.length > 0 ?
 						filteredData.map((wo, index) => {
 							const statusConfig = getStatusConfig(wo.status);
-							const report = workReportMap[wo._id] ?? null;
-							// Kondisi alert work report
-							const showNeedComplete =
-								report?.workReportApprovalAccessType === "auto" &&
-								report?.status === "approved" &&
-								wo.status === "on_progress";
-							const showNeedApproval =
-								report?.workReportApprovalAccessType === "manager" &&
-								report?.status === "submitted" &&
-								wo.status === "on_progress";
+
+							const needsAction = wo._id ? submittedWoIds.has(wo._id) : false;
 
 							return (
 								<motion.div
@@ -179,6 +152,13 @@ const CompanyViewWo = () => {
 											)
 										}
 										className="flex flex-col h-full border shadow-md hover:shadow-lg rounded-lg transition-all duration-200 bg-gradient-to-br from-background to-muted/10 overflow-hidden hover:cursor-pointer">
+										{/* Alert banner: perlu aksi */}
+										{needsAction && (
+											<div className="flex items-center gap-1.5 px-4 py-1.5 bg-amber-50 border-b border-amber-200 text-amber-700 text-xs font-semibold">
+												<AlertCircle className="w-3.5 h-3.5 shrink-0" />
+												Tugas kerja ini perlu aksi
+											</div>
+										)}
 										{/* Header */}
 										<div className="p-5 ">
 											<div className="flex items-center justify-between gap-3">
@@ -200,27 +180,6 @@ const CompanyViewWo = () => {
 										<div className="flex-1 flex flex-col gap-4 p-5 ">
 											{/* Info Grid */}
 											<div className="space-y-3">
-												{/* Report Action Banner */}
-												{showNeedComplete && (
-													<div className="px-5 py-2 bg-green-500/5 rounded-lg">
-														<div className="flex items-center gap-3">
-															<AlertCircle className="w-4 h-4 text-green-600" />
-															<p className="text-xs font-semibold   text-green-600 ">
-																Tugas kerja perlu diselesaikan
-															</p>
-														</div>
-													</div>
-												)}
-												{showNeedApproval && (
-													<div className="px-5 py-2 bg-orange-500/5 rounded-lg">
-														<div className="flex items-center gap-3 ">
-															<AlertCircle className="w-4 h-4 text-orange-600" />
-															<p className="text-xs font-semibold   text-orange-600 ">
-																Laporan tugas kerja perlu disetujui
-															</p>
-														</div>
-													</div>
-												)}
 												{/* status */}
 												<div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
 													<div className="p-2 rounded-md bg-background">

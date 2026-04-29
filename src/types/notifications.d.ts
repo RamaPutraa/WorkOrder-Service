@@ -5,7 +5,9 @@ type AppNotification = {
 	body: string;
 	data: {
 		resource: "service_request" | "work_order" | "invitation";
-		reseurceId: string;
+		resourceId: string;
+		reseurceId?: string; // typo dari backend lama, backward-compat
+		status: string;
 	};
 	isRead: boolean;
 	createdAt: string;

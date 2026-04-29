@@ -188,8 +188,7 @@ export const WoAlerts = ({ wo, meta, workReport }: WoAlertsProps) => {
 				<Shield className="h-4 w-4" />
 				<AlertTitle>Menunggu Persetujuan Manager</AlertTitle>
 				<AlertDescription>
-					Laporan kerja telah dikirim dan menunggu persetujuan. Tugas kerja
-					perlu disetujui.
+					Laporan kerja telah dikirim dan menunggu persetujuan.
 				</AlertDescription>
 			</Alert>,
 		);
