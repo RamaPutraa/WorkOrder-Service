@@ -11,7 +11,6 @@ import {
 	rejectWorkOrderApi,
 	sendWorkOrderApi,
 	startWorkOrderApi,
-	getWorkOrderReport,
 } from "../services/company-wo-service";
 import { handleApi } from "@/lib/handle-api";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
@@ -25,9 +24,13 @@ export const useCompanyDetailWo = () => {
 	// ─── Data WO dari cache Zustand + Window Focus Refetch ───────────────────────
 	const {
 		woDetail,
+		reportData,
 		isLoading: isWoLoading,
+		isReportFetching,
 		isBackgroundRefreshing,
 		refreshBackground,
+		refreshReport,
+		forceRefetch,
 	} = useWoDetailSync(id);
 
 	// ─── Employee list ───────────────────────────────────────────────────────────
@@ -45,8 +48,6 @@ export const useCompanyDetailWo = () => {
 	const [failIssue, setFailIssue] = useState("");
 	const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
 	const [completeIssue, setCompleteIssue] = useState("");
-	const [workReport, setWorkReport] = useState<WorkReport | null>(null);
-	const [isReportFetching, setIsReportFetching] = useState(true);
 
 	// ─── Scroll → Sticky Header ──────────────────────────────────────────────────
 	useEffect(() => {
@@ -59,26 +60,16 @@ export const useCompanyDetailWo = () => {
 	useEffect(() => {
 		// Tunggu sampai data WO tersedia
 		if (isWoLoading || isBackgroundRefreshing || !woDetail) {
-			setIsReportFetching(true);
 			return;
 		}
 
 		const reportableStatuses = ["on_progress", "completed", "failed"];
 		if (!reportableStatuses.includes(woDetail.status ?? "")) {
-			setWorkReport(null);
-			setIsReportFetching(false);
 			return;
 		}
 
-		const fetchReport = async () => {
-			setIsReportFetching(true);
-			const { data: res } = await handleApi(() =>
-				getWorkOrderReport(woDetail._id),
-			);
-			setWorkReport(res?.data ?? null);
-			setIsReportFetching(false);
-		};
-		void fetchReport();
+		// Fetch report and save to cache
+		void refreshReport(false);
 	}, [woDetail, isWoLoading, isBackgroundRefreshing]);
 
 	// ─── Parsing Data WO ─────────────────────────────────────────────────────────
@@ -86,6 +77,7 @@ export const useCompanyDetailWo = () => {
 		| (WorkOrderDetail & { meta?: WorkOrderMeta })
 		| undefined;
 	const meta = wo?.meta;
+	const workReport = reportData;
 	const currentStatus = wo?.status;
 	const canStart = meta?.workOrderCapabilities.can_start;
 	const canComplete = meta?.workOrderCapabilities.can_complete;
@@ -237,7 +229,8 @@ export const useCompanyDetailWo = () => {
 					return;
 				}
 				notifySuccess("Berhasil Dibatalkan", "Perintah kerja telah dibatalkan");
-				refreshBackground();
+				// Clear cache agar next visit selalu dapat data segar
+				forceRefetch();
 			},
 		});
 	};
@@ -283,6 +276,8 @@ export const useCompanyDetailWo = () => {
 					"Berhasil Dibuat Ulang",
 					"Perintah kerja telah dibuat ulang",
 				);
+				// Clear cache agar halaman detail menampilkan data segar
+				forceRefetch();
 				navigate(-1);
 			},
 		});
@@ -310,9 +305,9 @@ export const useCompanyDetailWo = () => {
 		}
 	};
 
-	// isPageLoading: true hanya saat initial load (tidak ada data di cache sama sekali)
-	// isBackgroundRefreshing tidak memblokir UI, sehingga user tetap bisa melihat data lama
-	const isPageLoading = isWoLoading || isReportFetching;
+	// isPageLoading: true hanya saat initial load WO (tidak ada data di cache sama sekali).
+	// isReportFetching dikelola terpisah agar tidak memblokir tampilan data WO utama.
+	const isPageLoading = isWoLoading;
 
 	return {
 		navigate,

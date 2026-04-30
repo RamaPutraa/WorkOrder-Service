@@ -12,7 +12,6 @@ import {
 	approvedWorkOrderReportApi,
 	rejectWorkOrderReportApi,
 } from "../services/company-wo-service";
-import { getFormByIdApi } from "@/features/owner/form/services/formService";
 import type { AnswerValue } from "@/shared/molecules/form-field-viewer";
 import { Clock, CheckCircle2, XCircle } from "lucide-react";
 
@@ -21,11 +20,18 @@ export const useCompanyReportWo = () => {
 	const { id } = useParams<{ id: string }>();
 	const { showDialog } = useDialogStore();
 	const { user } = useAuthStore();
-	const { woDetail: detailData } = useWoDetailSync(id);
+	const {
+		woDetail: detailData,
+		reportData: cachedReport,
+		formObject: cachedForm,
+		isReportFetching: isReportLoading,
+		isFormFetching,
+		refreshReport,
+		refreshFormObject,
+		updateReport,
+		refreshBackground: refreshWoCache,
+	} = useWoDetailSync(id);
 
-	const [reportData, setReportData] = useState<WorkReport | null>(null);
-	const [formObject, setFormObject] = useState<Form | null>(null);
-	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [isSaving, setIsSaving] = useState(false);
 	const [isProcessing, setIsProcessing] = useState(false);
@@ -49,55 +55,32 @@ export const useCompanyReportWo = () => {
 
 	// Fetch Report Data
 	useEffect(() => {
-		const fetchReportData = async () => {
-			if (!id) return;
-			setLoading(true);
-			setError(null);
-			const { data: res, error } = await handleApi(() =>
-				getWorkOrderReport(id),
-			);
-
-			if (error) {
-				setLoading(false);
-				setError(error.message);
-				notifyError("Gagal memuat laporan", error.message);
-				return;
-			}
-
-			const newReportData = res?.data ?? null;
-			setReportData(newReportData);
-
-			if (newReportData?.reportForm) {
-				const formIdToFetch =
-					typeof newReportData.reportForm === "string" ?
-						newReportData.reportForm
-					:	(newReportData.reportForm as any)._id;
-
-				const { data: formRes, error: formError } = await handleApi(() =>
-					getFormByIdApi(formIdToFetch),
-				);
-
-				if (formError) {
-					notifyError("Gagal memuat formulir", formError.message);
-				} else {
-					setFormObject(formRes?.data ?? null);
-				}
-			}
-
-			setLoading(false);
-		};
-		void fetchReportData();
+		if (!id) return;
+		setError(null);
+		void refreshReport(false);
 	}, [id]);
 
-	// Initialize form data when reportData and formObject are loaded
+	// Fetch Form Object when report data is available
 	useEffect(() => {
-		if (!reportData || !formObject) return;
+		if (cachedReport?.reportForm) {
+			const formIdToFetch =
+				typeof cachedReport.reportForm === "string" ?
+					cachedReport.reportForm
+				:	(cachedReport.reportForm as any)._id;
+
+			void refreshFormObject(formIdToFetch);
+		}
+	}, [cachedReport?.reportForm]);
+
+	// Initialize form data when cachedReport and cachedForm are loaded
+	useEffect(() => {
+		if (!cachedReport || !cachedForm) return;
 
 		const fieldMap = new Map<number, AnswerValue>();
 
 		const getLatestSubmission = (submissions: SubmissionObject[]) => {
 			if (!submissions || submissions.length === 0) return null;
-			const relevant = submissions.filter((s) => s.formId === formObject._id);
+			const relevant = submissions.filter((s) => s.formId === cachedForm._id);
 			if (relevant.length === 0) return null;
 			return relevant.reduce((latest, current) =>
 				new Date(current.updatedAt) > new Date(latest.updatedAt) ?
@@ -106,10 +89,12 @@ export const useCompanyReportWo = () => {
 			);
 		};
 
-		const latestSubmission = getLatestSubmission(reportData.submissions || []);
+		const latestSubmission = getLatestSubmission(
+			cachedReport.submissions || [],
+		);
 
-		if (formObject && formObject.fields) {
-			formObject.fields.forEach((field) => {
+		if (cachedForm && cachedForm.fields) {
+			cachedForm.fields.forEach((field) => {
 				let answer: AnswerValue = null;
 				if (latestSubmission) {
 					const submittedData = latestSubmission.fieldsData.find(
@@ -128,7 +113,7 @@ export const useCompanyReportWo = () => {
 		if (!latestSubmission) {
 			setIsEditMode(true);
 		}
-	}, [reportData, formObject]);
+	}, [cachedReport, cachedForm]);
 
 	// Listen to field changes
 	const handleFieldChange = (order: number, value: AnswerValue) => {
@@ -153,7 +138,7 @@ export const useCompanyReportWo = () => {
 
 	// Save Function
 	const handleSave = () => {
-		if (!reportData || !id) return;
+		if (!cachedReport || !id) return;
 		showDialog({
 			title: "Konfirmasi Simpan",
 			description:
@@ -164,11 +149,11 @@ export const useCompanyReportWo = () => {
 				setIsSaving(true);
 
 				const formIdToSave =
-					typeof reportData.reportForm === "string" ?
-						reportData.reportForm
-					:	(reportData.reportForm as any)._id;
+					typeof cachedReport.reportForm === "string" ?
+						cachedReport.reportForm
+					:	(cachedReport.reportForm as any)._id;
 
-				const latestSubmission = reportData.submissions?.find(
+				const latestSubmission = cachedReport.submissions?.find(
 					(s) => s.formId === formIdToSave,
 				);
 
@@ -194,7 +179,7 @@ export const useCompanyReportWo = () => {
 				};
 
 				const { error } = await handleApi(() =>
-					submitWorkOrderReportApi(reportData._id, submissionToSend),
+					submitWorkOrderReportApi(cachedReport._id, submissionToSend),
 				);
 
 				setIsSaving(false);
@@ -211,7 +196,7 @@ export const useCompanyReportWo = () => {
 
 				const { data: res } = await handleApi(() => getWorkOrderReport(id));
 				if (res?.data) {
-					setReportData(res.data);
+					updateReport(res.data);
 				}
 			},
 		});
@@ -265,14 +250,14 @@ export const useCompanyReportWo = () => {
 	};
 
 	const handleSendWorkReport = () => {
-		if (!reportData || !id) return;
+		if (!cachedReport || !id) return;
 
 		const formIdToSend =
-			typeof reportData.reportForm === "string" ?
-				reportData.reportForm
-			:	(reportData.reportForm as any)._id;
+			typeof cachedReport.reportForm === "string" ?
+				cachedReport.reportForm
+			:	(cachedReport.reportForm as any)._id;
 
-		const latestSubmission = reportData.submissions?.find(
+		const latestSubmission = cachedReport.submissions?.find(
 			(s) => s.formId === formIdToSend,
 		);
 
@@ -293,7 +278,7 @@ export const useCompanyReportWo = () => {
 			onConfirm: async () => {
 				setIsSaving(true);
 				const { error } = await handleApi(() =>
-					sentWorkOrderReportApi(reportData._id, latestSubmission),
+					sentWorkOrderReportApi(cachedReport._id, latestSubmission),
 				);
 
 				setIsSaving(false);
@@ -310,16 +295,19 @@ export const useCompanyReportWo = () => {
 
 				setIsEditMode(false);
 
+				// Update cache WO detail agar status alert di halaman detail ikut berubah
+				refreshWoCache();
+
 				const { data: res } = await handleApi(() => getWorkOrderReport(id));
 				if (res?.data) {
-					setReportData(res.data);
+					updateReport(res.data);
 				}
 			},
 		});
 	};
 
 	const handleApproveReport = () => {
-		if (!reportData) return;
+		if (!cachedReport) return;
 		showDialog({
 			title: "Konfirmasi Persetujuan Laporan",
 			description:
@@ -329,7 +317,7 @@ export const useCompanyReportWo = () => {
 			onConfirm: async () => {
 				setIsProcessing(true);
 				const { error } = await handleApi(() =>
-					approvedWorkOrderReportApi(reportData._id),
+					approvedWorkOrderReportApi(cachedReport._id),
 				);
 				setIsProcessing(false);
 				if (error) {
@@ -340,16 +328,18 @@ export const useCompanyReportWo = () => {
 					"Laporan Disetujui",
 					"Laporan tugas kerja telah berhasil disetujui.",
 				);
+				// Update cache WO detail agar status alert di halaman detail ikut berubah
+				refreshWoCache();
 				if (id) {
 					const { data: res } = await handleApi(() => getWorkOrderReport(id));
-					if (res?.data) setReportData(res.data);
+					if (res?.data) updateReport(res.data);
 				}
 			},
 		});
 	};
 
 	const handleRejectReport = () => {
-		if (!reportData) return;
+		if (!cachedReport) return;
 		showDialog({
 			title: "Konfirmasi Penolakan Laporan",
 			description:
@@ -359,7 +349,7 @@ export const useCompanyReportWo = () => {
 			onConfirm: async () => {
 				setIsProcessing(true);
 				const { error } = await handleApi(() =>
-					rejectWorkOrderReportApi(reportData._id),
+					rejectWorkOrderReportApi(cachedReport._id),
 				);
 				setIsProcessing(false);
 				if (error) {
@@ -367,9 +357,11 @@ export const useCompanyReportWo = () => {
 					return;
 				}
 				notifySuccess("Laporan Ditolak", "Laporan tugas kerja telah ditolak.");
+				// Update cache WO detail agar status alert di halaman detail ikut berubah
+				refreshWoCache();
 				if (id) {
 					const { data: res } = await handleApi(() => getWorkOrderReport(id));
-					if (res?.data) setReportData(res.data);
+					if (res?.data) updateReport(res.data);
 				}
 			},
 		});
@@ -377,9 +369,9 @@ export const useCompanyReportWo = () => {
 
 	return {
 		navigate,
-		reportData,
-		formObject,
-		loading,
+		reportData: cachedReport,
+		formObject: cachedForm,
+		loading: isReportLoading || isFormFetching,
 		error,
 		isSaving,
 		isProcessing,

@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/popover";
 import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
 import { CheckCircle2, Info, AlertTriangle, Bell } from "lucide-react";
-import { getNotificationsApi } from "@/features/notifications/services/notification-service";
 import { useNotificationStore } from "@/store/notificationStore";
 import { formatDistanceToNow } from "date-fns";
 import { id as localeId } from "date-fns/locale";
@@ -79,50 +78,25 @@ export function NavActions() {
 	const navigate = useNavigate();
 	const { user } = useAuth();
 	const [isOpen, setIsOpen] = React.useState(false);
-	const [notifications, setNotifications] = React.useState<AppNotification[]>(
-		[],
-	);
-	const [isLoading, setIsLoading] = React.useState(false);
-	const [error, setError] = React.useState<string | null>(null);
-
-	// state reaktif dari FCM realtime (jika user menerima notif saat aplikasi open)
-	const { hasNewNotification, setHasNewNotification } = useNotificationStore();
+	const {
+		notifications,
+		isLoading,
+		error,
+		fetchNotifications,
+		markAsReadLocal,
+		hasNewNotification,
+		setHasNewNotification,
+	} = useNotificationStore();
 
 	// Jumlah unread — untuk badge di header popover
 	const unreadCount = notifications.filter((n) => !n.isRead).length;
 
 	const isRedDotVisible = hasNewNotification || unreadCount > 0;
-	const fetchNotifications = React.useCallback(
-		async (isSilent = false) => {
-			if (!isSilent) setIsLoading(true);
-			setError(null);
-			try {
-				const res = await getNotificationsApi();
-				const data = res.data?.data ?? [];
-				setNotifications(data);
-				// checkForNew(data); // Red dot is now handled exclusively by FCM
-				return data;
-			} catch {
-				if (!isSilent) setError("Gagal memuat notifikasi.");
-				return [];
-			} finally {
-				if (!isSilent) setIsLoading(false);
-			}
-		},
-		[], // Removed checkForNew dependency as we don't auto-check anymore
-	);
 
 	// Fetch awal saat komponen dimuat agar jumlah unread bisa ditampilkan
 	React.useEffect(() => {
 		fetchNotifications(true);
 	}, [fetchNotifications]);
-
-	// Fetch otomatis saat ada notif baru masuk via FCM (Realtime) agar angka di badge terupdate
-	React.useEffect(() => {
-		if (hasNewNotification) {
-			fetchNotifications(true);
-		}
-	}, [hasNewNotification, fetchNotifications]);
 
 	// Handler saat Popover diklik
 	const handleOpenChange = React.useCallback(
@@ -144,9 +118,7 @@ export function NavActions() {
 	const handleNotificationClick = async (notif: AppNotification) => {
 		// 1. Optimistic update: Langsung ubah status isRead menjadi true secara lokal
 		// Ini akan membuat unreadCount langsung berkurang dan menghilangkan red dot
-		setNotifications((prev) =>
-			prev.map((n) => (n._id === notif._id ? { ...n, isRead: true } : n)),
-		);
+		if (notif._id) markAsReadLocal(notif._id);
 
 		// API mapping: handle typo 'reseurceId' or 'resourceId'
 		const resourceId =

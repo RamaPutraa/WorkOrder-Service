@@ -6,6 +6,7 @@ import { InfoRow } from "../components/wo-info-row";
 import { SiblingCard } from "../components/wo-sibling-card";
 import WorkOrderForms from "../components/work-order-forms";
 import { WoAlerts } from "../components/wo-alerts";
+import { WoAlertsReport } from "../components/wo-alerts-report";
 import { WoActionButtons } from "../components/wo-action-buttons";
 import {
 	Calendar,
@@ -89,7 +90,6 @@ const CompanyDetailWo = () => {
 		isCardRefreshing,
 		setIsCardRefreshing,
 	} = useCompanyDetailWo();
-	// FIXME: cahce masih broken, ketika di view wo,lalu masuk ke detail cachenya kadang masih belum update kasus di recreate
 	return (
 		<div className="space-y-6">
 			{/*  Sticky Header  */}
@@ -199,11 +199,7 @@ const CompanyDetailWo = () => {
 													</span>
 
 													<div className="flex flex-col gap-2">
-														<WoAlerts
-															wo={wo}
-															meta={meta}
-															workReport={workReport}
-														/>
+														<WoAlerts wo={wo} meta={meta} />
 													</div>
 												</div>
 											)}
@@ -247,6 +243,19 @@ const CompanyDetailWo = () => {
 												</div>
 											</div>
 										</div>
+
+										{/* work report */}
+										{(wo.status === "on_progress" ||
+											wo.status === "completed" ||
+											wo.status === "failed") && (
+											<div className="pt-8  w-full hidden md:block">
+												<span className="mb-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center">
+													<Settings2 className="w-3.5 h-3.5 mr-1" />
+													Laporan Perintah Kerja:
+												</span>
+												<WoAlertsReport wo={wo} workReport={workReport} />
+											</div>
+										)}
 									</div>
 								</div>
 

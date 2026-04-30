@@ -8,7 +8,6 @@ import {
 import { registerFcmTokenApi } from "@/features/notifications/services/notification-service";
 import { showFcmToast } from "@/lib/show-fcm-toast";
 import type { FcmNotificationType } from "@/components/ui/fcm-toast";
-import useAuth from "@/features/auth/hooks/useAuth";
 
 const VALID_TOAST_TYPES: FcmNotificationType[] = [
 	"success",
@@ -21,11 +20,11 @@ const VALID_TOAST_TYPES: FcmNotificationType[] = [
 const getResourceUrl = (
 	resource?: string,
 	resourceId?: string,
+	role?: string,
 ): string | undefined => {
 	if (!resource) return undefined;
-	const { user } = useAuth();
-	const isClient = user?.role === "client";
-	const isUnassigned = user?.role === "staff_unassigned";
+	const isClient = role === "client";
+	const isUnassigned = role === "staff_unassigned";
 	const map: Record<string, string> = {
 		work_order:
 			resourceId ?
@@ -48,6 +47,7 @@ const getResourceUrl = (
 
 const setupForegroundListeners = async (
 	setHasNewNotification: (val: boolean) => void,
+	role?: string,
 ) => {
 	const unsubscribe = await subscribeForegroundMessage(
 		({ title, body, data }) => {
@@ -59,7 +59,7 @@ const setupForegroundListeners = async (
 			showFcmToast({
 				title: title ?? "Notifikasi Baru",
 				body,
-				url: getResourceUrl(data?.resource, data?.resourceId),
+				url: getResourceUrl(data?.resource, data?.resourceId, role),
 				type,
 			});
 		},
@@ -80,6 +80,7 @@ const setupForegroundListeners = async (
 
 export const useFcm = () => {
 	const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+	const role = useAuthStore((state) => state.user?.role);
 	const { fcmToken, setFcmToken, setHasNewNotification } =
 		useNotificationStore();
 
@@ -94,7 +95,7 @@ export const useFcm = () => {
 
 			// Kasus 1: Izin sudah granted DAN token sudah ada → langsung setup listener.
 			if (currentPermission === "granted" && fcmToken) {
-				cleanup = await setupForegroundListeners(setHasNewNotification);
+				cleanup = await setupForegroundListeners(setHasNewNotification, role);
 				return;
 			}
 
@@ -107,13 +108,13 @@ export const useFcm = () => {
 					setFcmToken(token);
 					await registerFcmTokenApi(token).catch(console.error);
 					if (isIgnore) return;
-					cleanup = await setupForegroundListeners(setHasNewNotification);
+					cleanup = await setupForegroundListeners(setHasNewNotification, role);
 				} catch (error) {
 					console.error("[FCM] Failed to refresh token:", error);
 				}
 				return;
 			}
-
+			// TODO: sync new notification in local
 			// Kasus 3: Izin belum ditentukan (default) → tunggu klik pertama user
 			// agar browser menampilkan dialog izin (wajib ada user gesture).
 			if (currentPermission === "default") {
@@ -126,7 +127,10 @@ export const useFcm = () => {
 						setFcmToken(token);
 						await registerFcmTokenApi(token).catch(console.error);
 						if (isIgnore) return;
-						cleanup = await setupForegroundListeners(setHasNewNotification);
+						cleanup = await setupForegroundListeners(
+							setHasNewNotification,
+							role,
+						);
 					} catch (error) {
 						console.error("[FCM] Setup failed:", error);
 					}

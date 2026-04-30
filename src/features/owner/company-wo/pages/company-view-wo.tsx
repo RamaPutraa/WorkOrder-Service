@@ -6,50 +6,40 @@ import { SectionLoading } from "@/shared/atoms";
 import PageHeader from "@/shared/atoms/header-content";
 import { GenericFilter } from "@/shared/molecules/generic-filter";
 import { EmptyData } from "@/shared/molecules/empty-data";
-import { getNotificationsApi } from "@/features/notifications/services/notification-service";
-import { useEffect, useState, useMemo } from "react";
+import { useNotificationStore } from "@/store/notificationStore";
+import { useMemo } from "react";
 
 const CompanyViewWo = () => {
-	const { filteredData, filterConfig, loading, error } = useCompanyWo();
+	const { filteredData, filterConfig, loading } = useCompanyWo();
 	const navigate = useNavigate();
 
-	// ── Notifikasi: ambil daftar WO yang perlu aksi (laporan submitted) ──
-	const [notifications, setNotifications] = useState<AppNotification[]>([]);
+	// ── Notifikasi: ambil daftar dari store (sudah di-fetch oleh NavActions di layout) ──
+	const { notifications } = useNotificationStore();
 
-	useEffect(() => {
-		getNotificationsApi()
-			.then((res) => {
-				setNotifications(res.data?.data ?? []);
-			})
-			.catch(() => {
-				// Abaikan error notifikasi, tidak kritis
-			});
-	}, []);
 
 	// Set berisi _id WO yang memiliki notifikasi status "submitted"
 	const submittedWoIds = useMemo(() => {
 		const ids = new Set<string>();
+		// Kita gunakan Map untuk melacak status terbaru per resourceId
+		const latestStatusMap = new Map<string, string>();
+		// Asumsi: notifications sudah terurut dari yang terbaru (descending)
 		for (const notif of notifications) {
-			if (notif.data?.resource !== "work_order") continue;
-			if (
-				notif.data?.status !== "report_submited" &&
-				notif.data?.status !== "completed_needed"
-			)
-				continue;
-			// Backend mengirim "resourceId" (benar), fallback ke typo lama "reseurceId"
 			const resourceId = notif.data?.resourceId || notif.data?.reseurceId;
-			if (resourceId) ids.add(resourceId);
+			if (!resourceId || notif.data?.resource !== "work_order") continue;
+			// Jika kita belum mencatat status untuk WO ini, maka ini adalah yang terbaru
+			if (!latestStatusMap.has(resourceId)) {
+				latestStatusMap.set(resourceId, notif.data?.status);
+			}
 		}
+		// Sekarang baru kita filter berdasarkan status terbaru tersebut
+		for (const [resourceId, status] of latestStatusMap.entries()) {
+			if (status === "report_submitted" || status === "complete_needed") {
+				ids.add(resourceId);
+			}
+		}
+
 		return ids;
 	}, [notifications]);
-
-	if (error) {
-		return (
-			<div className="container py-8 px-10">
-				<p className="text-red-500">{error}</p>
-			</div>
-		);
-	}
 
 	// Status badge configuration
 	const getStatusConfig = (status: string) => {
@@ -152,13 +142,6 @@ const CompanyViewWo = () => {
 											)
 										}
 										className="flex flex-col h-full border shadow-md hover:shadow-lg rounded-lg transition-all duration-200 bg-gradient-to-br from-background to-muted/10 overflow-hidden hover:cursor-pointer">
-										{/* Alert banner: perlu aksi */}
-										{needsAction && (
-											<div className="flex items-center gap-1.5 px-4 py-1.5 bg-amber-50 border-b border-amber-200 text-amber-700 text-xs font-semibold">
-												<AlertCircle className="w-3.5 h-3.5 shrink-0" />
-												Tugas kerja ini perlu aksi
-											</div>
-										)}
 										{/* Header */}
 										<div className="p-5 ">
 											<div className="flex items-center justify-between gap-3">
@@ -180,6 +163,13 @@ const CompanyViewWo = () => {
 										<div className="flex-1 flex flex-col gap-4 p-5 ">
 											{/* Info Grid */}
 											<div className="space-y-3">
+												{/* Alert banner: perlu aksi */}
+												{needsAction && (
+													<div className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-amber-50  text-amber-700 text-xs font-semibold">
+														<AlertCircle className="w-3.5 h-3.5 shrink-0" />
+														Tugas kerja ini perlu aksi
+													</div>
+												)}
 												{/* status */}
 												<div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
 													<div className="p-2 rounded-md bg-background">

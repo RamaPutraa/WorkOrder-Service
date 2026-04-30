@@ -6,16 +6,14 @@ import {
 	RefreshCw,
 	Ban,
 	CircleCheckBig,
-	Shield,
 } from "lucide-react";
 
 interface WoAlertsProps {
 	wo: WorkOrderDetail;
 	meta: WorkOrderMeta;
-	workReport: WorkReport | null;
 }
 
-export const WoAlerts = ({ wo, meta, workReport }: WoAlertsProps) => {
+export const WoAlerts = ({ wo, meta }: WoAlertsProps) => {
 	const { can_start, can_complete, can_fail, can_recreate } =
 		meta.workOrderCapabilities;
 	const isActionable = can_start || can_complete || can_fail;
@@ -159,10 +157,7 @@ export const WoAlerts = ({ wo, meta, workReport }: WoAlertsProps) => {
 				);
 			}
 		}
-		if (
-			wo.status === "on_progress" &&
-			(!workReport || workReport.status === "on_progress")
-		) {
+		if (wo.status === "on_progress") {
 			alerts.push(
 				<Alert
 					key="status-on-progress"
@@ -173,25 +168,6 @@ export const WoAlerts = ({ wo, meta, workReport }: WoAlertsProps) => {
 				</Alert>,
 			);
 		}
-	}
-
-	// 3. Work report alerts
-	if (
-		workReport &&
-		workReport.workReportApprovalAccessType === "manager" &&
-		workReport.status === "submitted"
-	) {
-		alerts.push(
-			<Alert
-				key="report-manager"
-				className="max-w-full bg-amber-50 text-amber-800 border-amber-200 [&>svg]:text-amber-800">
-				<Shield className="h-4 w-4" />
-				<AlertTitle>Menunggu Persetujuan Manager</AlertTitle>
-				<AlertDescription>
-					Laporan kerja telah dikirim dan menunggu persetujuan.
-				</AlertDescription>
-			</Alert>,
-		);
 	}
 
 	return <>{alerts}</>;

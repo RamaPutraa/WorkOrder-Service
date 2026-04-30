@@ -16,13 +16,22 @@ import { useWoDetailStore } from "../../../../store/wo-detail-store";
 export const useWoDetailSync = (woId: string | undefined) => {
 	const {
 		fetchWoDetail,
+		fetchReport,
+		fetchReportForm,
 		updateWoLocal,
+		updateReportLocal,
+		updateFormLocal,
 		invalidateCache,
 		getWoDetail,
+		getReportDetail,
+		getFormObject,
 		isInitialLoading,
 		isRefreshing,
-		isReady,
+		isReportLoading,
+		isFormLoading,
 		getError,
+		getReportError,
+		getFormError,
 	} = useWoDetailStore();
 
 	// ─── Initial Fetch ──────────────────────────────────────────────────────────
@@ -32,42 +41,40 @@ export const useWoDetailSync = (woId: string | undefined) => {
 		void fetchWoDetail(woId);
 	}, [woId]);
 
-	// ─── Window Focus Refetch ───────────────────────────────────────────────────
-	// Ketika tab kembali aktif (user kembali ke browser/tab ini),
-	// lakukan refetch di background untuk menangkap perubahan dari user lain (multi-role).
-	useEffect(() => {
-		if (!woId) return;
-
-		const handleFocus = () => {
-			// Hanya refetch jika data sudah pernah berhasil di-fetch sebelumnya.
-			// Ini mencegah double-fetch saat halaman pertama kali dimuat.
-			if (isReady(woId)) {
-				void fetchWoDetail(woId, true); // force = true → background refresh
-			}
-		};
-
-		window.addEventListener("focus", handleFocus);
-		return () => window.removeEventListener("focus", handleFocus);
-	}, [woId]);
-
 	// ─── Exposed API ────────────────────────────────────────────────────────────
 
 	/** Data WO dari cache (null jika belum ada). */
 	const woDetail = woId ? getWoDetail(woId) : null;
 
+	/** Data Report dari cache (null jika belum ada). */
+	const reportData = woId ? getReportDetail(woId) : null;
+
+	/** Data Form dari cache. */
+	const formObject = woId ? getFormObject(woId) : null;
+
 	/** True saat loading PERTAMA KALI (belum ada cache) → tampilkan skeleton/loading. */
 	const isLoading = woId ? isInitialLoading(woId) : false;
+
+	/** True saat loading report PERTAMA KALI. */
+	const isReportFetching = woId ? isReportLoading(woId) : false;
+
+	/** True saat loading form PERTAMA KALI. */
+	const isFormFetching = woId ? isFormLoading(woId) : false;
 
 	/** True saat refetch di background → JANGAN tampilkan loading spinner utama. */
 	const isBackgroundRefreshing = woId ? isRefreshing(woId) : false;
 
-	/** Error jika fetch gagal. */
+	/** Error jika fetch WO gagal. */
 	const error = woId ? getError(woId) : null;
 
+	/** Error jika fetch report gagal. */
+	const reportError = woId ? getReportError(woId) : null;
+
+	/** Error jika fetch form gagal. */
+	const formError = woId ? getFormError(woId) : null;
+
 	/**
-	 * Trigger refetch dari server secara background.
-	 * Gunakan setelah mutasi yang dampaknya tidak dapat diprediksi secara lokal
-	 * (misal: `approveWorkOrderApi` yang mengubah `meta.workOrderCapabilities`).
+	 * Trigger refetch WO dari server secara background.
 	 */
 	const refreshBackground = () => {
 		if (!woId) return;
@@ -75,12 +82,23 @@ export const useWoDetailSync = (woId: string | undefined) => {
 	};
 
 	/**
-	 * Update state lokal di cache tanpa hit API.
-	 * Gunakan setelah mutasi yang dampaknya sudah diketahui pasti
-	 * (misal: `assignStaffToWorkOrderApi` → update `assignedStaff` & `staffPIC`).
-	 *
-	 * CATATAN: Setelah ini, background refresh tetap akan terjadi saat
-	 * window kembali fokus, jadi data tidak akan basi untuk waktu yang lama.
+	 * Trigger fetch report dari server.
+	 */
+	const refreshReport = (force = true) => {
+		if (!woId) return;
+		void fetchReport(woId, force);
+	};
+
+	/**
+	 * Trigger fetch form dari server.
+	 */
+	const refreshFormObject = (formId: string, force = false) => {
+		if (!woId) return;
+		void fetchReportForm(woId, formId, force);
+	};
+
+	/**
+	 * Update state lokal WO di cache tanpa hit API.
 	 */
 	const updateLocal = (
 		updatedFields: Partial<WorkOrderDetail & { meta?: WorkOrderMeta }>,
@@ -90,8 +108,23 @@ export const useWoDetailSync = (woId: string | undefined) => {
 	};
 
 	/**
+	 * Update state lokal report di cache.
+	 */
+	const updateReport = (report: WorkReport) => {
+		if (!woId) return;
+		updateReportLocal(woId, report);
+	};
+
+	/**
+	 * Update state lokal form di cache.
+	 */
+	const updateForm = (form: Form) => {
+		if (!woId) return;
+		updateFormLocal(woId, form);
+	};
+
+	/**
 	 * Hapus cache dan paksa fetch ulang dari server.
-	 * Gunakan untuk kasus yang benar-benar perlu data fresh (jarang digunakan).
 	 */
 	const forceRefetch = () => {
 		if (!woId) return;
@@ -101,11 +134,21 @@ export const useWoDetailSync = (woId: string | undefined) => {
 
 	return {
 		woDetail,
+		reportData,
+		formObject,
 		isLoading,
+		isReportFetching,
+		isFormFetching,
 		isBackgroundRefreshing,
 		error,
+		reportError,
+		formError,
 		refreshBackground,
+		refreshReport,
+		refreshFormObject,
 		updateLocal,
+		updateReport,
+		updateForm,
 		forceRefetch,
 	};
 };
