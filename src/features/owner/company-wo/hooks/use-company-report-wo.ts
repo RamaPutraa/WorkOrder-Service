@@ -12,6 +12,7 @@ import {
 	approvedWorkOrderReportApi,
 	rejectWorkOrderReportApi,
 } from "../services/company-wo-service";
+import { uploadFileApi } from "@/lib/file-service";
 import type { AnswerValue } from "@/shared/molecules/form-field-viewer";
 import { Clock, CheckCircle2, XCircle } from "lucide-react";
 
@@ -107,34 +108,6 @@ export const useCompanyReportWo = () => {
 		}
 
 		setOriginalFormData(new Map(fieldMap));
-
-		const draftKey = id && cachedForm ? `wo-report-draft-${id}-${cachedForm._id}` : null;
-		if (draftKey) {
-			try {
-				const draftStr = localStorage.getItem(draftKey);
-				if (draftStr && canEdit) {
-					const draftParsed = JSON.parse(draftStr);
-					for (const [orderStr, value] of Object.entries(draftParsed)) {
-						const order = parseInt(orderStr, 10);
-						if (!isNaN(order)) {
-							const fieldDef = cachedForm.fields.find(
-								(f) => f.order === order,
-							);
-
-							// Abaikan draft null/kosong khusus untuk field gambar.
-							if (fieldDef?.type === "image" && !value) {
-								continue;
-							}
-
-							fieldMap.set(order, value as AnswerValue);
-						}
-					}
-				}
-			} catch (e) {
-				console.error("Failed to load report draft", e);
-			}
-		}
-
 		setFormData(fieldMap);
 
 		// Auto masuk mode edit jika belum pernah diisi (submissions kosong)
@@ -142,39 +115,6 @@ export const useCompanyReportWo = () => {
 			setIsEditMode(true);
 		}
 	}, [cachedReport, cachedForm, id, canEdit]);
-
-	// Save to local storage whenever formData changes
-	useEffect(() => {
-		const draftKey = id && cachedForm ? `wo-report-draft-${id}-${cachedForm._id}` : null;
-		if (!canEdit || !cachedForm || formData.size === 0 || !draftKey) return;
-
-		let changed = false;
-		for (const [order, value] of formData.entries()) {
-			const originalValue = originalFormData.get(order);
-			if (JSON.stringify(value) !== JSON.stringify(originalValue)) {
-				changed = true;
-				break;
-			}
-		}
-
-		if (changed) {
-			const draftObj: Record<string, any> = {};
-			for (const [order, value] of formData.entries()) {
-				const fieldDef = cachedForm.fields.find((f) => f.order === order);
-				if (fieldDef?.type === "image") {
-					draftObj[order] = value;
-				}
-			}
-			
-			if (Object.keys(draftObj).length > 0) {
-				localStorage.setItem(draftKey, JSON.stringify(draftObj));
-			} else {
-				localStorage.removeItem(draftKey);
-			}
-		} else {
-			localStorage.removeItem(draftKey);
-		}
-	}, [formData, originalFormData, canEdit, cachedForm, id]);
 
 	// Listen to field changes
 	const handleFieldChange = (order: number, value: AnswerValue) => {
@@ -218,6 +158,20 @@ export const useCompanyReportWo = () => {
 					(s) => s.formId === formIdToSave,
 				);
 
+				// 1. Upload pending files first
+				for (const [order, value] of formData.entries()) {
+					if (value instanceof File) {
+						const { error, data } = await handleApi(() => uploadFileApi(value));
+						if (error || !data) {
+							setIsSaving(false);
+							notifyError("Gagal menyimpan", "Gagal mengunggah gambar. Silakan coba lagi.");
+							return;
+						}
+						// Replace File object with URL string in formData
+						formData.set(order, data.data.url);
+					}
+				}
+
 				const fieldsData = Array.from(formData.entries()).map(
 					([order, value]) => ({
 						order: order,
@@ -254,8 +208,6 @@ export const useCompanyReportWo = () => {
 					"Laporan tugas kerja telah diperbarui",
 				);
 				setIsEditMode(false);
-				const draftKey = id && cachedForm ? `wo-report-draft-${id}-${cachedForm._id}` : null;
-				if (draftKey) localStorage.removeItem(draftKey);
 
 				const { data: res } = await handleApi(() => getWorkOrderReport(id));
 				if (res?.data) {
@@ -313,8 +265,7 @@ export const useCompanyReportWo = () => {
 	};
 
 	const checkUnsavedForm = () => {
-		const draftKey = id && cachedForm ? `wo-report-draft-${id}-${cachedForm._id}` : null;
-		if (draftKey && localStorage.getItem(draftKey)) {
+		if (hasChanges()) {
 			notifyError(
 				"Perubahan Belum Disimpan",
 				"Mohon simpan laporan kerja terlebih dahulu sebelum melanjutkan.",
@@ -327,7 +278,6 @@ export const useCompanyReportWo = () => {
 	const handleSendWorkReport = () => {
 		if (!cachedReport || !id) return;
 		if (checkUnsavedForm()) return;
-		if (!cachedReport || !id) return;
 
 		const formIdToSend =
 			typeof cachedReport.reportForm === "string" ?
@@ -385,6 +335,7 @@ export const useCompanyReportWo = () => {
 
 	const handleApproveReport = () => {
 		if (!cachedReport) return;
+		if (checkUnsavedForm()) return;
 		showDialog({
 			title: "Konfirmasi Persetujuan Laporan",
 			description:
@@ -417,6 +368,7 @@ export const useCompanyReportWo = () => {
 
 	const handleRejectReport = () => {
 		if (!cachedReport) return;
+		if (checkUnsavedForm()) return;
 		showDialog({
 			title: "Konfirmasi Penolakan Laporan",
 			description:

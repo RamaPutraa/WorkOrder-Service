@@ -89,6 +89,7 @@ const CompanyDetailWo = () => {
 		refreshBackground,
 		isCardRefreshing,
 		setIsCardRefreshing,
+		setIsFormDirty,
 	} = useCompanyDetailWo();
 	return (
 		<div className="space-y-6">
@@ -379,11 +380,13 @@ const CompanyDetailWo = () => {
 						submissions={wo.submissions || []}
 						isReadOnly={isReadOnly || (!isDrafted && !canRecreateEdit)}
 						onSaveSuccess={async () => {
+							setIsFormDirty(false);
 							setIsCardRefreshing(true);
 							refreshBackground();
 							setIsCardRefreshing(false);
 						}}
 						isRefreshing={isCardRefreshing}
+						onDirtyChange={setIsFormDirty}
 					/>
 				</motion.div>
 			)}

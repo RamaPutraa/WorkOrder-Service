@@ -6,6 +6,7 @@ import {
 	submitIntakeApi,
 } from "../services/public-services";
 import { useEffect, useState } from "react";
+import { uploadFileApi } from "@/lib/file-service";
 
 type FieldValue = string | number | File | string[] | null;
 // Changed: Now using field order (number) as key instead of field label (string)
@@ -59,63 +60,7 @@ export const usePublicServices = () => {
 		return () => window.removeEventListener("scroll", handleScroll);
 	}, []);
 
-	// Load draft
-	useEffect(() => {
-		if (!data || !id) return;
-		const draftKey = `intake-draft-${id}`;
-		try {
-			const draftStr = localStorage.getItem(draftKey);
-			if (draftStr) {
-				const draftParsed = JSON.parse(draftStr) as FormValues;
-				const initialValues = { ...draftParsed };
-				
-				data.forEach(form => {
-					if (!initialValues[form._id]) return;
-					form.fields?.forEach(field => {
-						if (field.type === 'image') {
-							const val = initialValues[form._id][field.order];
-							// Abaikan draft null/kosong khusus untuk field gambar.
-							if (!val) {
-								delete initialValues[form._id][field.order];
-							}
-						}
-					});
-				});
 
-				setFormValues(initialValues);
-			}
-		} catch (e) {
-			console.error("Failed to load intake draft", e);
-		}
-	}, [data, id]);
-
-	// Save draft
-	useEffect(() => {
-		if (!id || !data) return;
-		const draftKey = `intake-draft-${id}`;
-		if (Object.keys(formValues).length === 0) return;
-		
-		const draftObj: FormValues = {};
-		data.forEach(form => {
-			if (!formValues[form._id]) return;
-			form.fields?.forEach(field => {
-				if (field.type === 'image') {
-					const val = formValues[form._id][field.order];
-					// Hanya simpan jika val ada (tidak null)
-					if (val !== undefined && val !== null) {
-						if (!draftObj[form._id]) draftObj[form._id] = {};
-						draftObj[form._id][field.order] = val;
-					}
-				}
-			});
-		});
-
-		if (Object.keys(draftObj).length > 0) {
-			localStorage.setItem(draftKey, JSON.stringify(draftObj));
-		} else {
-			localStorage.removeItem(draftKey);
-		}
-	}, [formValues, id, data]);
 
 	// handle input form - now using field order instead of field label
 	const handleChange = (
@@ -172,6 +117,42 @@ export const usePublicServices = () => {
 		setSubmitting(true);
 		setError(null);
 
+		// 1. Upload pending files first
+		for (const form of data) {
+			const formVals = formValues[form._id] || {};
+			
+			// Validate mandatory fields for this form
+			const missingFields: string[] = [];
+			form.fields?.forEach(field => {
+				if (field.required) {
+					const value = formVals[field.order];
+					const isEmpty = value === null || value === undefined || value === "" || (Array.isArray(value) && value.length === 0);
+					if (isEmpty) {
+						missingFields.push(field.label || `Field #${field.order}`);
+					}
+				}
+			});
+
+			if (missingFields.length > 0) {
+				setSubmitting(false);
+				notifyError("Validasi Gagal", `Harap isi field wajib pada ${form.title}: ${missingFields.join(", ")}`);
+				return;
+			}
+
+			for (const [orderStr, value] of Object.entries(formVals)) {
+				if (value instanceof File) {
+					const { error, data: uploadData } = await handleApi(() => uploadFileApi(value));
+					if (error || !uploadData) {
+						setSubmitting(false);
+						notifyError("Gagal mengajukan", "Gagal mengunggah gambar. Silakan coba lagi.");
+						return;
+					}
+					// Replace File object with URL string
+					formVals[Number(orderStr)] = uploadData.data.url;
+				}
+			}
+		}
+
 		// Build submissions array
 		const submissions = data.map((form) => ({
 			formId: form._id,
@@ -202,8 +183,6 @@ export const usePublicServices = () => {
 
 		if (res?.data) {
 			notifySuccess("Layanan berhasil diajukan!");
-			const draftKey = `intake-draft-${id}`;
-			localStorage.removeItem(draftKey);
 			console.log("Response:", res.data);
 			navigate("/dashboard/client/submissions");
 		} else {

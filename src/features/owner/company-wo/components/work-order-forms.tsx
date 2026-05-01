@@ -9,6 +9,7 @@ import { handleApi } from "@/lib/handle-api";
 import { notifySuccess, notifyError } from "@/lib/toast-helper";
 import { FileText, Save, XCircle } from "lucide-react";
 import { EmptyData } from "@/shared/molecules/empty-data";
+import { uploadFileApi } from "@/lib/file-service";
 
 interface WorkOrderFormsProps {
 	workOrderForm: Form | undefined;
@@ -17,6 +18,7 @@ interface WorkOrderFormsProps {
 	isReadOnly?: boolean;
 	onSaveSuccess?: () => void;
 	isRefreshing?: boolean;
+	onDirtyChange?: (isDirty: boolean) => void;
 }
 
 const WorkOrderForms = ({
@@ -26,6 +28,7 @@ const WorkOrderForms = ({
 	isReadOnly = false,
 	onSaveSuccess,
 	isRefreshing = false,
+	onDirtyChange,
 }: WorkOrderFormsProps) => {
 	const { showDialog } = useDialogStore();
 	const [isSaving, setIsSaving] = useState(false);
@@ -53,8 +56,6 @@ const WorkOrderForms = ({
 		);
 	};
 
-	const draftKey = `wo-form-draft-${workOrderId}-${workOrderForm?._id}`;
-
 	// Initialize form data
 	useEffect(() => {
 		const fieldMap = new Map<number, AnswerValue>();
@@ -76,67 +77,8 @@ const WorkOrderForms = ({
 
 		setOriginalFormData(new Map(fieldMap));
 
-		// Check local storage for drafts
-		try {
-			const draftStr = localStorage.getItem(draftKey);
-			if (draftStr && !isReadOnly) {
-				const draftParsed = JSON.parse(draftStr);
-				for (const [orderStr, value] of Object.entries(draftParsed)) {
-					const order = parseInt(orderStr, 10);
-					if (!isNaN(order)) {
-						const fieldDef = workOrderForm.fields.find(
-							(f) => f.order === order,
-						);
-
-						// Abaikan draft null/kosong khusus untuk field gambar.
-						// Ini membuat gambar revert ke state database jika user melakukan refresh
-						// setelah menghapus gambar tanpa menyimpannya.
-						if (fieldDef?.type === "image" && !value) {
-							continue;
-						}
-
-						fieldMap.set(order, value as AnswerValue);
-					}
-				}
-			}
-		} catch (e) {
-			console.error("Failed to load form draft", e);
-		}
-
 		setFormData(fieldMap);
-	}, [workOrderForm, submissions, isReadOnly, draftKey]);
-
-	// Save to local storage whenever formData changes
-	useEffect(() => {
-		if (isReadOnly || !workOrderForm || formData.size === 0) return;
-
-		let changed = false;
-		for (const [order, value] of formData.entries()) {
-			const originalValue = originalFormData.get(order);
-			if (JSON.stringify(value) !== JSON.stringify(originalValue)) {
-				changed = true;
-				break;
-			}
-		}
-
-		if (changed) {
-			const draftObj: Record<string, any> = {};
-			for (const [order, value] of formData.entries()) {
-				const fieldDef = workOrderForm.fields.find((f) => f.order === order);
-				if (fieldDef?.type === "image") {
-					draftObj[order] = value;
-				}
-			}
-			
-			if (Object.keys(draftObj).length > 0) {
-				localStorage.setItem(draftKey, JSON.stringify(draftObj));
-			} else {
-				localStorage.removeItem(draftKey);
-			}
-		} else {
-			localStorage.removeItem(draftKey);
-		}
-	}, [formData, originalFormData, draftKey, isReadOnly, workOrderForm]);
+	}, [workOrderForm, submissions, isReadOnly]);
 
 	// Handle field value change
 	const handleFieldChange = (order: number, value: AnswerValue) => {
@@ -161,6 +103,13 @@ const WorkOrderForms = ({
 		return false;
 	};
 
+	// Notify parent if form becomes dirty
+	useEffect(() => {
+		if (onDirtyChange) {
+			onDirtyChange(hasChanges());
+		}
+	}, [formData, originalFormData, onDirtyChange]);
+
 	// Handle save with confirmation
 	const handleSave = () => {
 		showDialog({
@@ -171,6 +120,24 @@ const WorkOrderForms = ({
 			cancelText: "Batal",
 			onConfirm: async () => {
 				setIsSaving(true);
+
+				// 1. Upload pending files first
+				for (const [order, value] of formData.entries()) {
+					if (value instanceof File) {
+						const { error, data } = await handleApi(() => uploadFileApi(value));
+						if (error || !data) {
+							setIsSaving(false);
+							notifyError(
+								"Gagal menyimpan",
+								"Gagal mengunggah gambar. Silakan coba lagi.",
+							);
+							return;
+						}
+						// Replace File object with URL string in formData
+						formData.set(order, data.data.url);
+					}
+				}
+
 				if (!workOrderForm) return;
 
 				const fieldsData = Array.from(formData.entries()).map(
@@ -213,9 +180,6 @@ const WorkOrderForms = ({
 					"Formulir perintah kerja telah disimpan",
 				);
 
-				// Clear draft on success
-				localStorage.removeItem(draftKey);
-
 				// Call parent callback to refetch data
 				if (onSaveSuccess) {
 					onSaveSuccess();
@@ -233,7 +197,6 @@ const WorkOrderForms = ({
 			confirmText: "Ya, Batalkan",
 			cancelText: "Tidak",
 			onConfirm: () => {
-				localStorage.removeItem(draftKey);
 				setFormData(new Map(originalFormData));
 			},
 		});

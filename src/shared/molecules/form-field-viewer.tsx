@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useDialogStore } from "@/store/dialogStore";
 import { Switch } from "@/components/ui/switch";
 import {
 	ImageIcon,
@@ -8,8 +9,6 @@ import {
 	Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { uploadFileApi } from "@/lib/file-service";
-import { handleApi } from "@/lib/handle-api";
 import { notifyError } from "@/lib/toast-helper";
 import {
 	Dialog,
@@ -46,6 +45,7 @@ export default function FormFieldViewer({
 	readOnly = false,
 	index,
 }: Props) {
+	const { showDialog } = useDialogStore();
 	const [localValue, setLocalValue] = useState<AnswerValue>(answer);
 	const [uploadState, setUploadState] = useState<
 		"idle" | "uploading" | "success" | "error"
@@ -314,36 +314,31 @@ export default function FormFieldViewer({
 			case "image": {
 				const hasFile =
 					uploadState !== "idle" ||
-					(typeof localValue === "string" && localValue);
+					(typeof localValue === "string" && localValue) ||
+					localValue instanceof File;
 
 				const handleFileUpload = async (file: File) => {
 					setSelectedFileName(file.name);
 					setUploadState("uploading");
 					setUploadProgress(15);
 
+					// Animasi progress bar palsu agar UI tetap interaktif
 					const timer = setInterval(() => {
 						setUploadProgress((p) =>
-							p < 90 ? p + Math.floor(Math.random() * 15) : p,
+							p < 90 ? p + Math.floor(Math.random() * 20) : p,
 						);
-					}, 400);
+					}, 150);
 
-					const { error, data } = await handleApi(() => uploadFileApi(file));
+					// Jeda buatan selama ~800ms
+					await new Promise((resolve) => setTimeout(resolve, 800));
 
 					clearInterval(timer);
 					setUploadProgress(100);
 
-					if (error || !data) {
-						setTimeout(() => setUploadState("error"), 300);
-						notifyError(
-							"Gagal mengunggah",
-							"Gagal mengunggah gambar. Silakan coba lagi.",
-						);
-					} else {
-						setTimeout(() => {
-							setUploadState("success");
-							handleValueChange(data.data.url);
-						}, 300);
-					}
+					setTimeout(() => {
+						setUploadState("success");
+						handleValueChange(file);
+					}, 300);
 				};
 
 				return (
@@ -368,8 +363,8 @@ export default function FormFieldViewer({
 											: (
 												uploadState === "success" ||
 												(uploadState === "idle" &&
-													typeof localValue === "string" &&
-													localValue)
+													((typeof localValue === "string" && localValue) ||
+														localValue instanceof File))
 											) ?
 												<>
 													<button
@@ -388,7 +383,11 @@ export default function FormFieldViewer({
 															</DialogHeader>
 															<div className="relative w-full h-full flex items-center justify-center">
 																<img
-																	src={localValue as string}
+																	src={
+																		localValue instanceof File ?
+																			URL.createObjectURL(localValue)
+																		:	(localValue as string)
+																	}
 																	alt="Preview"
 																	className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl transition-transform"
 																/>
@@ -411,8 +410,8 @@ export default function FormFieldViewer({
 												<XCircle className="w-4 h-4 text-red-500" />
 											)}
 											{uploadState === "idle" &&
-												typeof localValue === "string" &&
-												localValue && (
+												((typeof localValue === "string" && localValue) ||
+													localValue instanceof File) && (
 													<CheckCircle2 className="w-4 h-4 text-green-500" />
 												)}
 										</div>
@@ -445,10 +444,19 @@ export default function FormFieldViewer({
 												variant="ghost"
 												size="icon"
 												onClick={() => {
-													handleValueChange(null);
-													setUploadState("idle");
-													setSelectedFileName("");
-													setUploadProgress(0);
+													showDialog({
+														title: "Hapus Gambar",
+														description:
+															"Apakah Anda yakin ingin menghapus gambar ini? Perubahan akan permanen setelah Anda menekan tombol Simpan.",
+														confirmText: "Hapus",
+														cancelText: "Batal",
+														onConfirm: () => {
+															handleValueChange(null);
+															setUploadState("idle");
+															setSelectedFileName("");
+															setUploadProgress(0);
+														},
+													});
 												}}
 												className="text-red-500 hover:text-red-600 hover:bg-red-50 h-8 w-8">
 												<Trash2 className="w-4 h-4" />
@@ -457,12 +465,12 @@ export default function FormFieldViewer({
 									)}
 							</div>
 						:	<div className="space-y-1.5 w-full">
-								<div 
+								<div
 									className={[
 										"flex flex-col items-center justify-center gap-2 p-5 w-full rounded-xl border-2 border-dashed transition-all relative overflow-hidden",
-										isDragging 
-											? "border-primary bg-primary/5 scale-[0.99] shadow-sm" 
-											: "border-muted bg-muted/5 hover:bg-muted/10"
+										isDragging ?
+											"border-primary bg-primary/5 scale-[0.99] shadow-sm"
+										:	"border-muted bg-muted/5 hover:bg-muted/10",
 									].join(" ")}
 									onDragOver={(e) => {
 										if (readOnly) return;
@@ -478,29 +486,38 @@ export default function FormFieldViewer({
 										if (readOnly) return;
 										e.preventDefault();
 										setIsDragging(false);
-										
+
 										const file = e.dataTransfer.files?.[0];
 										if (!file) return;
-										
+
 										const validTypes = ["image/jpeg", "image/png", "image/jpg"];
 										if (!validTypes.includes(file.type)) {
-											notifyError("Tipe File Tidak Valid", "Harap unggah file berformat JPG, JPEG, atau PNG.");
+											notifyError(
+												"Tipe File Tidak Valid",
+												"Harap unggah file berformat JPG, JPEG, atau PNG.",
+											);
 											return;
 										}
-										
+
 										if (file.size > 5 * 1024 * 1024) {
-											notifyError("File Terlalu Besar", "Ukuran file maksimal adalah 5MB.");
+											notifyError(
+												"File Terlalu Besar",
+												"Ukuran file maksimal adalah 5MB.",
+											);
 											return;
 										}
 
 										await handleFileUpload(file);
-									}}
-								>
-									<div className={`p-2 rounded-xl transition-colors ${isDragging ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
+									}}>
+									<div
+										className={`p-2 rounded-xl transition-colors ${isDragging ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"}`}>
 										<ImageIcon className="w-5 h-5" />
 									</div>
-									<span className={`text-xs font-medium tracking-wider text-center ${isDragging ? 'text-primary' : ''}`}>
-										{isDragging ? "Lepaskan gambar di sini..." : "Klik untuk unggah atau seret & letakkan"}
+									<span
+										className={`text-xs font-medium tracking-wider text-center ${isDragging ? "text-primary" : ""}`}>
+										{isDragging ?
+											"Lepaskan gambar di sini..."
+										:	"Klik untuk unggah atau seret & letakkan"}
 									</span>
 									<span className="text-xs text-muted-foreground font-medium tracking-wider text-center">
 										JPG, JPEG, PNG (maksimal 5MB)
@@ -514,13 +531,23 @@ export default function FormFieldViewer({
 												onChange={async (e) => {
 													const file = e.target.files?.[0];
 													if (file) {
-														const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+														const validTypes = [
+															"image/jpeg",
+															"image/png",
+															"image/jpg",
+														];
 														if (!validTypes.includes(file.type)) {
-															notifyError("Tipe File Tidak Valid", "Harap unggah file berformat JPG, JPEG, atau PNG.");
+															notifyError(
+																"Tipe File Tidak Valid",
+																"Harap unggah file berformat JPG, JPEG, atau PNG.",
+															);
 															return;
 														}
 														if (file.size > 5 * 1024 * 1024) {
-															notifyError("File Terlalu Besar", "Ukuran file maksimal adalah 5MB.");
+															notifyError(
+																"File Terlalu Besar",
+																"Ukuran file maksimal adalah 5MB.",
+															);
 															return;
 														}
 														await handleFileUpload(file);

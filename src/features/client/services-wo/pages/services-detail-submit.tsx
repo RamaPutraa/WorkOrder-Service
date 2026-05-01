@@ -6,6 +6,7 @@ import {
 	getDetailClientServiceRequestApi,
 	submitReviewApi,
 } from "../services/public-services";
+import { uploadFileApi } from "@/lib/file-service";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -182,56 +183,7 @@ const ServiceDetailSubmit = () => {
 	const srStatus = detail?.serviceRequestStatus;
 	const canFillReview = srStatus === "completed" && !detail?.reviewSubmission;
 
-	// ── Draft Review Form ──
-	useEffect(() => {
-		if (!detail?.reviewForm || !canFillReview) return;
-		const draftKey = `review-draft-${id}-${detail.reviewForm._id}`;
-		try {
-			const draftStr = localStorage.getItem(draftKey);
-			if (draftStr) {
-				const draftParsed = JSON.parse(draftStr);
-				setReviewFormData((prev) => {
-					const next = new Map(prev);
-					for (const [orderStr, value] of Object.entries(draftParsed)) {
-						const order = parseInt(orderStr, 10);
-						if (!isNaN(order)) {
-							const fieldDef = detail.reviewForm?.fields?.find(
-								(f) => f.order === order,
-							);
-							// Abaikan draft null/kosong khusus untuk field gambar.
-							if (fieldDef?.type === "image" && !value) {
-								continue;
-							}
-							next.set(order, value as AnswerValue);
-						}
-					}
-					return next;
-				});
-			}
-		} catch (e) {
-			console.error("Failed to load review draft", e);
-		}
-	}, [detail, id, canFillReview]);
 
-	// Save draft whenever it changes
-	useEffect(() => {
-		if (!detail?.reviewForm || reviewFormData.size === 0 || !canFillReview) return;
-		const draftKey = `review-draft-${id}-${detail.reviewForm._id}`;
-		
-		const draftObj: Record<string, any> = {};
-		for (const [order, value] of reviewFormData.entries()) {
-			const fieldDef = detail.reviewForm.fields?.find((f) => f.order === order);
-			if (fieldDef?.type === "image") {
-				draftObj[order] = value;
-			}
-		}
-
-		if (Object.keys(draftObj).length > 0) {
-			localStorage.setItem(draftKey, JSON.stringify(draftObj));
-		} else {
-			localStorage.removeItem(draftKey);
-		}
-	}, [reviewFormData, detail, id, canFillReview]);
 
 	// ── Handlers ──
 	const handleReviewFieldChange = (order: number, value: AnswerValue) => {
@@ -251,6 +203,22 @@ const ServiceDetailSubmit = () => {
 			return;
 		}
 
+		setIsSubmittingReview(true);
+
+		// 1. Upload pending files first
+		for (const [order, value] of reviewFormData.entries()) {
+			if (value instanceof File) {
+				const { error, data } = await handleApi(() => uploadFileApi(value));
+				if (error || !data) {
+					setIsSubmittingReview(false);
+					notifyError("Gagal mengirim ulasan", "Gagal mengunggah gambar. Silakan coba lagi.");
+					return;
+				}
+				// Replace File object with URL string
+				reviewFormData.set(order, data.data.url);
+			}
+		}
+
 		const fieldsData: FieldData[] = Array.from(reviewFormData.entries()).map(
 			([order, value]) => ({
 				order,
@@ -258,16 +226,34 @@ const ServiceDetailSubmit = () => {
 			}),
 		);
 
+		// 2. Validate mandatory fields
+		const missingFields: string[] = [];
+		detail.reviewForm?.fields?.forEach((field) => {
+			if (field.required) {
+				const value = reviewFormData.get(field.order);
+				const isEmpty = value === null || value === undefined || value === "" || (Array.isArray(value) && value.length === 0);
+				if (isEmpty) {
+					missingFields.push(field.label || `Field #${field.order}`);
+				}
+			}
+		});
+
+		if (missingFields.length > 0) {
+			setIsSubmittingReview(false);
+			notifyError("Validasi Gagal", `Harap isi field wajib: ${missingFields.join(", ")}`);
+			return;
+		}
+
 		// Cek semua field terisi (minimal tidak semua kosong)
 		const hasAnyFilled = fieldsData.some(
 			(fd) => fd.value !== null && fd.value !== "",
 		);
 		if (!hasAnyFilled) {
+			setIsSubmittingReview(false);
 			notifyError("Validasi", "Isi minimal satu field pada formulir ulasan.");
 			return;
 		}
 
-		setIsSubmittingReview(true);
 		// TODO:ini beda dari yg lain, next cek
 		const submissionPayload: RequesterSubmitRequest = {
 			submission: {
@@ -289,8 +275,6 @@ const ServiceDetailSubmit = () => {
 		}
 
 		notifySuccess("Ulasan Terkirim", "Ulasan layanan berhasil dikirimkan.");
-		const draftKey = `review-draft-${id}-${reviewFormId}`;
-		localStorage.removeItem(draftKey);
 		// Re-fetch untuk update UI
 		await fetchDetail();
 	};

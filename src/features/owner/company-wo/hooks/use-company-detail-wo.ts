@@ -48,6 +48,7 @@ export const useCompanyDetailWo = () => {
 	const [failIssue, setFailIssue] = useState("");
 	const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
 	const [completeIssue, setCompleteIssue] = useState("");
+	const [isFormDirty, setIsFormDirty] = useState(false);
 
 	// ─── Scroll → Sticky Header ──────────────────────────────────────────────────
 	useEffect(() => {
@@ -104,12 +105,10 @@ export const useCompanyDetailWo = () => {
 	// karena server perlu menghitung ulang meta.workOrderCapabilities.
 	// TODO: work report dan submit intake belum isi
 	const checkUnsavedForm = () => {
-		if (!wo || !wo.workOrderForm) return false;
-		const draftKey = `wo-form-draft-${wo._id}-${wo.workOrderForm._id}`;
-		if (localStorage.getItem(draftKey)) {
+		if (isFormDirty) {
 			notifyError(
 				"Perubahan Belum Disimpan",
-				"Mohon gulir ke bawah dan klik 'Simpan' pada formulir Perintah Kerja terlebih dahulu sebelum melanjutkan.",
+				"Simpan formulir Perintah Kerja terlebih dahulu sebelum melanjutkan.",
 			);
 			return true;
 		}
@@ -371,5 +370,7 @@ export const useCompanyDetailWo = () => {
 		refreshBackground,
 		isCardRefreshing,
 		setIsCardRefreshing,
+		isFormDirty,
+		setIsFormDirty,
 	};
 };
