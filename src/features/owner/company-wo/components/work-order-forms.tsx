@@ -53,6 +53,8 @@ const WorkOrderForms = ({
 		);
 	};
 
+	const draftKey = `wo-form-draft-${workOrderId}-${workOrderForm?._id}`;
+
 	// Initialize form data
 	useEffect(() => {
 		const fieldMap = new Map<number, AnswerValue>();
@@ -72,9 +74,69 @@ const WorkOrderForms = ({
 			fieldMap.set(field.order, answer);
 		});
 
-		setFormData(fieldMap);
 		setOriginalFormData(new Map(fieldMap));
-	}, [workOrderForm, submissions]);
+
+		// Check local storage for drafts
+		try {
+			const draftStr = localStorage.getItem(draftKey);
+			if (draftStr && !isReadOnly) {
+				const draftParsed = JSON.parse(draftStr);
+				for (const [orderStr, value] of Object.entries(draftParsed)) {
+					const order = parseInt(orderStr, 10);
+					if (!isNaN(order)) {
+						const fieldDef = workOrderForm.fields.find(
+							(f) => f.order === order,
+						);
+
+						// Abaikan draft null/kosong khusus untuk field gambar.
+						// Ini membuat gambar revert ke state database jika user melakukan refresh
+						// setelah menghapus gambar tanpa menyimpannya.
+						if (fieldDef?.type === "image" && !value) {
+							continue;
+						}
+
+						fieldMap.set(order, value as AnswerValue);
+					}
+				}
+			}
+		} catch (e) {
+			console.error("Failed to load form draft", e);
+		}
+
+		setFormData(fieldMap);
+	}, [workOrderForm, submissions, isReadOnly, draftKey]);
+
+	// Save to local storage whenever formData changes
+	useEffect(() => {
+		if (isReadOnly || !workOrderForm || formData.size === 0) return;
+
+		let changed = false;
+		for (const [order, value] of formData.entries()) {
+			const originalValue = originalFormData.get(order);
+			if (JSON.stringify(value) !== JSON.stringify(originalValue)) {
+				changed = true;
+				break;
+			}
+		}
+
+		if (changed) {
+			const draftObj: Record<string, any> = {};
+			for (const [order, value] of formData.entries()) {
+				const fieldDef = workOrderForm.fields.find((f) => f.order === order);
+				if (fieldDef?.type === "image") {
+					draftObj[order] = value;
+				}
+			}
+			
+			if (Object.keys(draftObj).length > 0) {
+				localStorage.setItem(draftKey, JSON.stringify(draftObj));
+			} else {
+				localStorage.removeItem(draftKey);
+			}
+		} else {
+			localStorage.removeItem(draftKey);
+		}
+	}, [formData, originalFormData, draftKey, isReadOnly, workOrderForm]);
 
 	// Handle field value change
 	const handleFieldChange = (order: number, value: AnswerValue) => {
@@ -151,6 +213,9 @@ const WorkOrderForms = ({
 					"Formulir perintah kerja telah disimpan",
 				);
 
+				// Clear draft on success
+				localStorage.removeItem(draftKey);
+
 				// Call parent callback to refetch data
 				if (onSaveSuccess) {
 					onSaveSuccess();
@@ -168,6 +233,7 @@ const WorkOrderForms = ({
 			confirmText: "Ya, Batalkan",
 			cancelText: "Tidak",
 			onConfirm: () => {
+				localStorage.removeItem(draftKey);
 				setFormData(new Map(originalFormData));
 			},
 		});

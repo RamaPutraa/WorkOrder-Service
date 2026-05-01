@@ -5,7 +5,7 @@ type FieldType =
 	| "single_select"
 	| "multi_select"
 	| "date"
-	| "file";
+	| "image";
 
 type FieldConfig = {
 	name: Path<T>;

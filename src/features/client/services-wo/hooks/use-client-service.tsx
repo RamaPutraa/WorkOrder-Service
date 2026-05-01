@@ -59,6 +59,64 @@ export const usePublicServices = () => {
 		return () => window.removeEventListener("scroll", handleScroll);
 	}, []);
 
+	// Load draft
+	useEffect(() => {
+		if (!data || !id) return;
+		const draftKey = `intake-draft-${id}`;
+		try {
+			const draftStr = localStorage.getItem(draftKey);
+			if (draftStr) {
+				const draftParsed = JSON.parse(draftStr) as FormValues;
+				const initialValues = { ...draftParsed };
+				
+				data.forEach(form => {
+					if (!initialValues[form._id]) return;
+					form.fields?.forEach(field => {
+						if (field.type === 'image') {
+							const val = initialValues[form._id][field.order];
+							// Abaikan draft null/kosong khusus untuk field gambar.
+							if (!val) {
+								delete initialValues[form._id][field.order];
+							}
+						}
+					});
+				});
+
+				setFormValues(initialValues);
+			}
+		} catch (e) {
+			console.error("Failed to load intake draft", e);
+		}
+	}, [data, id]);
+
+	// Save draft
+	useEffect(() => {
+		if (!id || !data) return;
+		const draftKey = `intake-draft-${id}`;
+		if (Object.keys(formValues).length === 0) return;
+		
+		const draftObj: FormValues = {};
+		data.forEach(form => {
+			if (!formValues[form._id]) return;
+			form.fields?.forEach(field => {
+				if (field.type === 'image') {
+					const val = formValues[form._id][field.order];
+					// Hanya simpan jika val ada (tidak null)
+					if (val !== undefined && val !== null) {
+						if (!draftObj[form._id]) draftObj[form._id] = {};
+						draftObj[form._id][field.order] = val;
+					}
+				}
+			});
+		});
+
+		if (Object.keys(draftObj).length > 0) {
+			localStorage.setItem(draftKey, JSON.stringify(draftObj));
+		} else {
+			localStorage.removeItem(draftKey);
+		}
+	}, [formValues, id, data]);
+
 	// handle input form - now using field order instead of field label
 	const handleChange = (
 		formId: string,
@@ -144,10 +202,12 @@ export const usePublicServices = () => {
 
 		if (res?.data) {
 			notifySuccess("Layanan berhasil diajukan!");
+			const draftKey = `intake-draft-${id}`;
+			localStorage.removeItem(draftKey);
 			console.log("Response:", res.data);
 			navigate("/dashboard/client/submissions");
 		} else {
-			notifyError("Gagal mengajukan lanyanan. Respon tidak valid.");
+			notifyError("Gagal mengajukan layanan. Respon tidak valid.");
 			console.error("Response:", res);
 		}
 	};

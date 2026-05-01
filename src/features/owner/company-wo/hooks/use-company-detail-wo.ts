@@ -102,8 +102,22 @@ export const useCompanyDetailWo = () => {
 	// ─── Action Handlers ─────────────────────────────────────────────────────────
 	// Semua action yang mengubah status/meta menggunakan refreshBackground()
 	// karena server perlu menghitung ulang meta.workOrderCapabilities.
+	// TODO: work report dan submit intake belum isi
+	const checkUnsavedForm = () => {
+		if (!wo || !wo.workOrderForm) return false;
+		const draftKey = `wo-form-draft-${wo._id}-${wo.workOrderForm._id}`;
+		if (localStorage.getItem(draftKey)) {
+			notifyError(
+				"Perubahan Belum Disimpan",
+				"Mohon gulir ke bawah dan klik 'Simpan' pada formulir Perintah Kerja terlebih dahulu sebelum melanjutkan.",
+			);
+			return true;
+		}
+		return false;
+	};
 
 	const handleSendWorkOrder = () => {
+		if (checkUnsavedForm()) return;
 		showDialog({
 			title: "Konfirmasi Konfigurasi Selesai",
 			description:
@@ -127,6 +141,7 @@ export const useCompanyDetailWo = () => {
 	};
 
 	const handleStartWorkOrder = () => {
+		if (checkUnsavedForm()) return;
 		showDialog({
 			title: "Mulai Perintah Kerja",
 			description:
@@ -150,6 +165,7 @@ export const useCompanyDetailWo = () => {
 	};
 
 	const handleApproveWorkOrder = () => {
+		if (checkUnsavedForm()) return;
 		showDialog({
 			title: "Konfirmasi Persetujuan",
 			description:
@@ -196,6 +212,7 @@ export const useCompanyDetailWo = () => {
 	};
 
 	const handleCompleteWorkOrder = async () => {
+		if (checkUnsavedForm()) return;
 		setActiveAction("complete");
 		const { error } = await handleApi(() =>
 			completeWorkOrderApi(wo?._id ?? "", { issue: completeIssue }),
@@ -236,6 +253,7 @@ export const useCompanyDetailWo = () => {
 	};
 
 	const handleFailWorkOrder = async () => {
+		if (checkUnsavedForm()) return;
 		if (!failIssue.trim()) {
 			notifyError("Catatan Kendala", "Harap isi alasan kendala");
 			return;

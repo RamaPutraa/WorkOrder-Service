@@ -14,6 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { Trash2 } from "lucide-react";
 import { FieldText } from "../field-type/field-text";
 import { FieldNumber } from "../field-type/field-number";
+import FieldImage from "../field-type/field-image";
 
 type Props = {
 	field: Field;
@@ -39,6 +40,8 @@ export const FieldItem: React.FC<Props> = ({
 			case "single_select":
 			case "date":
 				return <FieldOption field={field} onUpdate={onUpdate} error={error} />;
+			case "image":
+				return <FieldImage field={field} onUpdate={onUpdate} error={error} />;
 			default:
 				return null;
 		}
@@ -77,6 +80,7 @@ export const FieldItem: React.FC<Props> = ({
 							<SelectItem value="date">Tanggal</SelectItem>
 							<SelectItem value="multi_select">Pilihan Ganda</SelectItem>
 							<SelectItem value="single_select">Pilihan Tunggal</SelectItem>
+							<SelectItem value="image">File</SelectItem>
 						</SelectContent>
 					</Select>
 				</div>
@@ -91,7 +95,9 @@ export const FieldItem: React.FC<Props> = ({
 					<Switch
 						id={`required-${field.order}`}
 						checked={field.required}
-						onCheckedChange={(checked) => onUpdate({ required: checked === true })}
+						onCheckedChange={(checked) =>
+							onUpdate({ required: checked === true })
+						}
 					/>
 					<Label
 						htmlFor={`required-${field.order}`}

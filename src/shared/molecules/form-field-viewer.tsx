@@ -1,5 +1,22 @@
 import { useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
+import {
+	ImageIcon,
+	Loader2,
+	CheckCircle2,
+	XCircle,
+	Trash2,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { uploadFileApi } from "@/lib/file-service";
+import { handleApi } from "@/lib/handle-api";
+import { notifyError } from "@/lib/toast-helper";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
 
 export type AnswerValue = string | string[] | number | File | null;
 
@@ -30,6 +47,13 @@ export default function FormFieldViewer({
 	index,
 }: Props) {
 	const [localValue, setLocalValue] = useState<AnswerValue>(answer);
+	const [uploadState, setUploadState] = useState<
+		"idle" | "uploading" | "success" | "error"
+	>("idle");
+	const [uploadProgress, setUploadProgress] = useState(0);
+	const [selectedFileName, setSelectedFileName] = useState("");
+	const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+	const [isDragging, setIsDragging] = useState(false);
 
 	useEffect(() => {
 		setLocalValue(answer);
@@ -287,34 +311,231 @@ export default function FormFieldViewer({
 					</div>
 				);
 
-			case "file":
+			case "image": {
+				const hasFile =
+					uploadState !== "idle" ||
+					(typeof localValue === "string" && localValue);
+
+				const handleFileUpload = async (file: File) => {
+					setSelectedFileName(file.name);
+					setUploadState("uploading");
+					setUploadProgress(15);
+
+					const timer = setInterval(() => {
+						setUploadProgress((p) =>
+							p < 90 ? p + Math.floor(Math.random() * 15) : p,
+						);
+					}, 400);
+
+					const { error, data } = await handleApi(() => uploadFileApi(file));
+
+					clearInterval(timer);
+					setUploadProgress(100);
+
+					if (error || !data) {
+						setTimeout(() => setUploadState("error"), 300);
+						notifyError(
+							"Gagal mengunggah",
+							"Gagal mengunggah gambar. Silakan coba lagi.",
+						);
+					} else {
+						setTimeout(() => {
+							setUploadState("success");
+							handleValueChange(data.data.url);
+						}, 300);
+					}
+				};
+
 				return (
 					<div className="flex items-center gap-2 px-3 py-2.5 rounded-md border border-border/60 bg-muted/30 text-sm">
-						{typeof localValue === "string" && localValue ?
-							<a
-								href={localValue}
-								target="_blank"
-								rel="noopener noreferrer"
-								className="flex items-center gap-2 text-primary hover:underline font-medium">
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									className="h-4 w-4 shrink-0"
-									viewBox="0 0 20 20"
-									fill="currentColor">
-									<path
-										fillRule="evenodd"
-										d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"
-										clipRule="evenodd"
-									/>
-								</svg>
-								Lihat File
-							</a>
-						:	<span className="text-muted-foreground italic">
-								Tidak ada file
-							</span>
+						{hasFile ?
+							<div className="flex items-center gap-3 w-full p-2">
+								{/* 1. KIRI: Ikon Gambar */}
+								<div className="p-2.5 rounded-lg bg-primary/10 text-primary shrink-0">
+									<ImageIcon className="w-5 h-5" />
+								</div>
+
+								{/* 2. TENGAH: Nama File, Status Spinner & Progress Bar */}
+								<div className="flex-1 min-w-0 flex flex-col justify-center gap-1.5">
+									{/* Baris Atas Area Tengah: Teks & Spinner */}
+									<div className="flex items-center justify-between">
+										<div className="text-sm font-medium text-foreground truncate">
+											{/* Tampilkan nama file saat uploading agar layout tidak kempes */}
+											{uploadState === "uploading" ?
+												<span className="text-muted-foreground">
+													{selectedFileName || "Mengunggah..."}
+												</span>
+											: (
+												uploadState === "success" ||
+												(uploadState === "idle" &&
+													typeof localValue === "string" &&
+													localValue)
+											) ?
+												<>
+													<button
+														type="button"
+														onClick={() => setIsPreviewOpen(true)}
+														className="text-sm text-primary hover:underline font-medium inline-flex items-center cursor-pointer">
+														Lihat File Gambar
+													</button>
+
+													<Dialog
+														open={isPreviewOpen}
+														onOpenChange={setIsPreviewOpen}>
+														<DialogContent className="max-w-3xl p-1 overflow-hidden border-none bg-transparent shadow-none flex items-center justify-center">
+															<DialogHeader className="sr-only">
+																<DialogTitle>Preview Gambar</DialogTitle>
+															</DialogHeader>
+															<div className="relative w-full h-full flex items-center justify-center">
+																<img
+																	src={localValue as string}
+																	alt="Preview"
+																	className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl transition-transform"
+																/>
+															</div>
+														</DialogContent>
+													</Dialog>
+												</>
+											:	null}
+										</div>
+
+										{/* Ikon Status */}
+										<div className="shrink-0 flex items-center gap-2 ml-3">
+											{uploadState === "uploading" && (
+												<Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+											)}
+											{uploadState === "success" && (
+												<CheckCircle2 className="w-4 h-4 text-green-500" />
+											)}
+											{uploadState === "error" && (
+												<XCircle className="w-4 h-4 text-red-500" />
+											)}
+											{uploadState === "idle" &&
+												typeof localValue === "string" &&
+												localValue && (
+													<CheckCircle2 className="w-4 h-4 text-green-500" />
+												)}
+										</div>
+									</div>
+
+									{/* Baris Bawah Area Tengah: Progress bar */}
+									{uploadState === "uploading" && (
+										<div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+											<div
+												className="h-full bg-primary transition-all duration-300 ease-out"
+												style={{ width: `${uploadProgress}%` }}
+											/>
+										</div>
+									)}
+
+									{uploadState === "error" && (
+										<p className="text-[11px] text-red-500 font-medium leading-none">
+											Gagal mengunggah gambar
+										</p>
+									)}
+								</div>
+
+								{/* 3. KANAN: Tombol Hapus (Akan muncul saat idle/success/error) */}
+								{!readOnly &&
+									(uploadState === "idle" ||
+										uploadState === "success" ||
+										uploadState === "error") && (
+										<div className="shrink-0 ml-2 border-l pl-3 border-border/50">
+											<Button
+												variant="ghost"
+												size="icon"
+												onClick={() => {
+													handleValueChange(null);
+													setUploadState("idle");
+													setSelectedFileName("");
+													setUploadProgress(0);
+												}}
+												className="text-red-500 hover:text-red-600 hover:bg-red-50 h-8 w-8">
+												<Trash2 className="w-4 h-4" />
+											</Button>
+										</div>
+									)}
+							</div>
+						:	<div className="space-y-1.5 w-full">
+								<div 
+									className={[
+										"flex flex-col items-center justify-center gap-2 p-5 w-full rounded-xl border-2 border-dashed transition-all relative overflow-hidden",
+										isDragging 
+											? "border-primary bg-primary/5 scale-[0.99] shadow-sm" 
+											: "border-muted bg-muted/5 hover:bg-muted/10"
+									].join(" ")}
+									onDragOver={(e) => {
+										if (readOnly) return;
+										e.preventDefault();
+										setIsDragging(true);
+									}}
+									onDragLeave={(e) => {
+										if (readOnly) return;
+										e.preventDefault();
+										setIsDragging(false);
+									}}
+									onDrop={async (e) => {
+										if (readOnly) return;
+										e.preventDefault();
+										setIsDragging(false);
+										
+										const file = e.dataTransfer.files?.[0];
+										if (!file) return;
+										
+										const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+										if (!validTypes.includes(file.type)) {
+											notifyError("Tipe File Tidak Valid", "Harap unggah file berformat JPG, JPEG, atau PNG.");
+											return;
+										}
+										
+										if (file.size > 5 * 1024 * 1024) {
+											notifyError("File Terlalu Besar", "Ukuran file maksimal adalah 5MB.");
+											return;
+										}
+
+										await handleFileUpload(file);
+									}}
+								>
+									<div className={`p-2 rounded-xl transition-colors ${isDragging ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
+										<ImageIcon className="w-5 h-5" />
+									</div>
+									<span className={`text-xs font-medium tracking-wider text-center ${isDragging ? 'text-primary' : ''}`}>
+										{isDragging ? "Lepaskan gambar di sini..." : "Klik untuk unggah atau seret & letakkan"}
+									</span>
+									<span className="text-xs text-muted-foreground font-medium tracking-wider text-center">
+										JPG, JPEG, PNG (maksimal 5MB)
+									</span>
+									{!readOnly && (
+										<div className="mt-1 w-full flex justify-center">
+											<input
+												type="file"
+												accept="image/jpeg, image/png, image/jpg"
+												className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+												onChange={async (e) => {
+													const file = e.target.files?.[0];
+													if (file) {
+														const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+														if (!validTypes.includes(file.type)) {
+															notifyError("Tipe File Tidak Valid", "Harap unggah file berformat JPG, JPEG, atau PNG.");
+															return;
+														}
+														if (file.size > 5 * 1024 * 1024) {
+															notifyError("File Terlalu Besar", "Ukuran file maksimal adalah 5MB.");
+															return;
+														}
+														await handleFileUpload(file);
+													}
+												}}
+												disabled={readOnly}
+											/>
+										</div>
+									)}
+								</div>
+							</div>
 						}
 					</div>
 				);
+			}
 
 			default:
 				return (

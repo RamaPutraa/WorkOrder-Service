@@ -29,6 +29,8 @@ const FormCreatePage: React.FC = () => {
 				return "Pilihan Ganda";
 			case "single_select":
 				return "Pilihan Tunggal";
+			case "image":
+				return "File";
 		}
 	};
 	return (

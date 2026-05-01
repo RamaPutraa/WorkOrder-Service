@@ -106,14 +106,75 @@ export const useCompanyReportWo = () => {
 			});
 		}
 
-		setFormData(fieldMap);
 		setOriginalFormData(new Map(fieldMap));
+
+		const draftKey = id && cachedForm ? `wo-report-draft-${id}-${cachedForm._id}` : null;
+		if (draftKey) {
+			try {
+				const draftStr = localStorage.getItem(draftKey);
+				if (draftStr && canEdit) {
+					const draftParsed = JSON.parse(draftStr);
+					for (const [orderStr, value] of Object.entries(draftParsed)) {
+						const order = parseInt(orderStr, 10);
+						if (!isNaN(order)) {
+							const fieldDef = cachedForm.fields.find(
+								(f) => f.order === order,
+							);
+
+							// Abaikan draft null/kosong khusus untuk field gambar.
+							if (fieldDef?.type === "image" && !value) {
+								continue;
+							}
+
+							fieldMap.set(order, value as AnswerValue);
+						}
+					}
+				}
+			} catch (e) {
+				console.error("Failed to load report draft", e);
+			}
+		}
+
+		setFormData(fieldMap);
 
 		// Auto masuk mode edit jika belum pernah diisi (submissions kosong)
 		if (!latestSubmission) {
 			setIsEditMode(true);
 		}
-	}, [cachedReport, cachedForm]);
+	}, [cachedReport, cachedForm, id, canEdit]);
+
+	// Save to local storage whenever formData changes
+	useEffect(() => {
+		const draftKey = id && cachedForm ? `wo-report-draft-${id}-${cachedForm._id}` : null;
+		if (!canEdit || !cachedForm || formData.size === 0 || !draftKey) return;
+
+		let changed = false;
+		for (const [order, value] of formData.entries()) {
+			const originalValue = originalFormData.get(order);
+			if (JSON.stringify(value) !== JSON.stringify(originalValue)) {
+				changed = true;
+				break;
+			}
+		}
+
+		if (changed) {
+			const draftObj: Record<string, any> = {};
+			for (const [order, value] of formData.entries()) {
+				const fieldDef = cachedForm.fields.find((f) => f.order === order);
+				if (fieldDef?.type === "image") {
+					draftObj[order] = value;
+				}
+			}
+			
+			if (Object.keys(draftObj).length > 0) {
+				localStorage.setItem(draftKey, JSON.stringify(draftObj));
+			} else {
+				localStorage.removeItem(draftKey);
+			}
+		} else {
+			localStorage.removeItem(draftKey);
+		}
+	}, [formData, originalFormData, canEdit, cachedForm, id]);
 
 	// Listen to field changes
 	const handleFieldChange = (order: number, value: AnswerValue) => {
@@ -193,6 +254,8 @@ export const useCompanyReportWo = () => {
 					"Laporan tugas kerja telah diperbarui",
 				);
 				setIsEditMode(false);
+				const draftKey = id && cachedForm ? `wo-report-draft-${id}-${cachedForm._id}` : null;
+				if (draftKey) localStorage.removeItem(draftKey);
 
 				const { data: res } = await handleApi(() => getWorkOrderReport(id));
 				if (res?.data) {
@@ -249,7 +312,21 @@ export const useCompanyReportWo = () => {
 		}
 	};
 
+	const checkUnsavedForm = () => {
+		const draftKey = id && cachedForm ? `wo-report-draft-${id}-${cachedForm._id}` : null;
+		if (draftKey && localStorage.getItem(draftKey)) {
+			notifyError(
+				"Perubahan Belum Disimpan",
+				"Mohon simpan laporan kerja terlebih dahulu sebelum melanjutkan.",
+			);
+			return true;
+		}
+		return false;
+	};
+
 	const handleSendWorkReport = () => {
+		if (!cachedReport || !id) return;
+		if (checkUnsavedForm()) return;
 		if (!cachedReport || !id) return;
 
 		const formIdToSend =
