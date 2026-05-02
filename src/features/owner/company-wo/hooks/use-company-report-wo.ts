@@ -164,7 +164,10 @@ export const useCompanyReportWo = () => {
 						const { error, data } = await handleApi(() => uploadFileApi(value));
 						if (error || !data) {
 							setIsSaving(false);
-							notifyError("Gagal menyimpan", "Gagal mengunggah gambar. Silakan coba lagi.");
+							notifyError(
+								"Gagal menyimpan",
+								"Gagal mengunggah gambar. Silakan coba lagi.",
+							);
 							return;
 						}
 						// Replace File object with URL string in formData
@@ -235,8 +238,8 @@ export const useCompanyReportWo = () => {
 		switch (status.toLowerCase()) {
 			case "on_progress":
 				return {
-					bg: "bg-gray-100",
-					text: "text-gray-700",
+					bg: "bg-yellow-100",
+					text: "text-yellow-700",
 					label: "Sedang Dikerjakan",
 					icon: Clock,
 				};

@@ -18,7 +18,6 @@ import { EmptyData } from "@/shared/molecules/empty-data";
 import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
 import { notifySuccess } from "@/lib/toast-helper";
-import { Button } from "@/components/ui/button";
 
 /* ─── Types ─────────────────────────────────────────────────────────── */
 type CopiedMap = Record<string, boolean>;
@@ -238,79 +237,112 @@ const ViewMemberCodes = () => {
 												return (
 													<motion.div
 														key={item._id}
-														className="group flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50/70 transition-colors duration-150">
-														{/* Status dot */}
-														<div
-															className={`shrink-0 w-2.5 h-2.5 rounded-full ${item.isClaimed ? "bg-emerald-400" : "bg-slate-300"}`}
-														/>
-														{/* Code */}
-														<div className="flex-1 min-w-0 flex items-center gap-2">
-															<span className="font-mono text-sm font-semibold text-slate-800 tracking-wider">
-																{item.code}
-															</span>
-															<button
-																onClick={() => handleCopy(item._id, item.code)}
-																title="Salin kode"
-																className={`group-hover:opacity-100 transition-all duration-200 rounded-md p-1 ${
-																	isCopied ?
-																		"text-emerald-500 bg-emerald-50"
-																	:	"text-slate-400 hover:text-blue-600 hover:bg-blue-50"
-																}`}>
-																{isCopied ?
-																	<Check className="size-3.5" />
-																:	<Copy className="size-3.5" />}
-															</button>
-														</div>
-														{/* Claimed by */}
-														<div className="hidden md:flex flex-col items-end min-w-[160px] text-right">
-															{item.isClaimed ?
-																<>
-																	<span className="text-xs font-semibold text-slate-700 line-clamp-1">
-																		{item.claimedBy?.name ?? "—"}
-																	</span>
-																	<span className="text-[11px] text-slate-400 truncate max-w-[150px]">
-																		{item.claimedBy?.email ?? "-"}
-																	</span>
-																</>
-															:	<span className="text-xs text-slate-400 italic">
-																	Belum diklaim
+														className="group flex flex-col px-4 py-3 hover:bg-slate-50/70 transition-colors duration-150">
+
+														{/* ── Main row: always visible ── */}
+														<div className="flex items-center gap-3">
+															{/* Status dot */}
+															<div
+																className={`shrink-0 w-2 h-2 rounded-full ${item.isClaimed ? "bg-emerald-400" : "bg-slate-300"}`}
+															/>
+
+															{/* Code + copy */}
+															<div className="flex-1 min-w-0 flex items-center gap-1.5">
+																<span className="font-mono text-sm font-semibold text-slate-800 tracking-wider truncate">
+																	{item.code}
 																</span>
-															}
-														</div>
-														{/* Date */}
-														<div className="hidden sm:block text-xs text-slate-400 font-medium whitespace-nowrap min-w-[90px] text-right">
-															{formatDate(item.createdAt)}
-														</div>
-														{/* Status badge */}
-														<div className="shrink-0">
-															{item.isClaimed ?
-																<Badge className="bg-emerald-50 text-emerald-600 border-0 gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full">
-																	<CheckCircle2 className="size-3" />
-																	Diklaim
-																</Badge>
-															:	<Badge className="bg-primary/5 text-primary border-0 gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full">
-																	<Ticket className="size-3" />
-																	Tersedia
-																</Badge>
-															}
-														</div>
-														<div className="border-l border-muted-foreground/20 pl-3">
-															<button
-																onClick={() =>
-																	showDialog({
-																		title: "Hapus Kode Berlangganan",
-																		description: `Apakah Anda yakin ingin menghapus kode "${item.code}"?`,
-																		confirmText: "Hapus",
-																		cancelText: "Batal",
-																		onConfirm: async () => {
-																			await removeMembercode(item._id);
-																		},
-																	})
+																<button
+																	onClick={() => handleCopy(item._id, item.code)}
+																	title="Salin kode"
+																	className={`shrink-0 transition-all duration-200 rounded-md p-1 ${
+																		isCopied ?
+																			"text-emerald-500 bg-emerald-50"
+																		:	"text-slate-400 hover:text-blue-600 hover:bg-blue-50"
+																	}`}>
+																	{isCopied ?
+																		<Check className="size-3.5" />
+																	:	<Copy className="size-3.5" />}
+																</button>
+															</div>
+
+															{/* Desktop: claimed-by name */}
+															<div className="hidden md:flex flex-col items-end min-w-[150px] text-right">
+																{item.isClaimed ?
+																	<>
+																		<span className="text-xs font-semibold text-slate-700 line-clamp-1">
+																			{item.claimedBy?.name ?? "—"}
+																		</span>
+																		<span className="text-[11px] text-slate-400 truncate max-w-[140px]">
+																			{item.claimedBy?.email ?? "-"}
+																		</span>
+																	</>
+																:	<span className="text-xs text-slate-400 italic">
+																		Belum diklaim
+																	</span>
 																}
-																title="Hapus kode"
-																className={`group-hover:opacity-100 transition-all duration-200 rounded-md p-1 bg-red-50 text-red-600 hover:text-red-400 hover:bg-red-50`}>
-																<Trash2 className="size-3.5" />
-															</button>
+															</div>
+
+															{/* Desktop: date */}
+															<div className="hidden sm:block text-xs text-slate-400 font-medium whitespace-nowrap text-right min-w-[80px]">
+																{formatDate(item.createdAt)}
+															</div>
+
+															{/* Status badge — always visible */}
+															<div className="shrink-0">
+																{item.isClaimed ?
+																	<Badge className="bg-emerald-50 text-emerald-600 border-0 gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">
+																		<CheckCircle2 className="size-3" />
+																		<span className="hidden xs:inline">Diklaim</span>
+																	</Badge>
+																:	<Badge className="bg-primary/5 text-primary border-0 gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">
+																		<Ticket className="size-3" />
+																		<span className="hidden xs:inline">Tersedia</span>
+																	</Badge>
+																}
+															</div>
+
+															{/* Delete */}
+															<div className="shrink-0 border-l border-muted-foreground/20 pl-2.5">
+																<button
+																	onClick={() =>
+																		showDialog({
+																			title: "Hapus Kode Berlangganan",
+																			description: `Apakah Anda yakin ingin menghapus kode "${item.code}"?`,
+																			confirmText: "Hapus",
+																			cancelText: "Batal",
+																			onConfirm: async () => {
+																				await removeMembercode(item._id);
+																			},
+																		})
+																	}
+																	title="Hapus kode"
+																	className="transition-all duration-200 rounded-md p-1 bg-red-50 text-red-500 hover:text-red-700 hover:bg-red-100">
+																	<Trash2 className="size-3.5" />
+																</button>
+															</div>
+														</div>
+
+														{/* ── Mobile sub-row: claimed-by + date ── */}
+														<div className="flex items-center gap-2 mt-1.5 pl-5 sm:hidden">
+															<div className="flex-1 min-w-0">
+																{item.isClaimed ?
+																	<span className="text-xs text-slate-500 truncate">
+																		{item.claimedBy?.name ?? "—"}
+																		{item.claimedBy?.email ?
+																			<span className="text-slate-400 font-normal">
+																				{" "}
+																				· {item.claimedBy.email}
+																			</span>
+																		:	null}
+																	</span>
+																:	<span className="text-xs text-slate-400 italic">
+																		Belum diklaim
+																	</span>
+																}
+															</div>
+															<span className="shrink-0 text-[11px] text-slate-400">
+																{formatDate(item.createdAt)}
+															</span>
 														</div>
 													</motion.div>
 												);

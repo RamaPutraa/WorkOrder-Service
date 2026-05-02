@@ -6,7 +6,6 @@ import {
 	Building2,
 	ClipboardList,
 	ClipboardPenLine,
-	FileCheck,
 	FolderKanban,
 	GalleryVerticalEnd,
 	Home,
@@ -16,7 +15,6 @@ import {
 	MessageCircleQuestion,
 	MonitorCog,
 	Send,
-	Settings,
 	Ticket,
 } from "lucide-react";
 import {
@@ -143,11 +141,6 @@ const data = {
 			url: "/",
 			icon: MessageCircleQuestion,
 		},
-		{
-			name: "Pengaturan",
-			url: "#",
-			icon: Settings,
-		},
 	],
 	navInternalBusiness: [
 		{
@@ -156,34 +149,14 @@ const data = {
 			icon: ClipboardList,
 		},
 		{
-			title: "Permintaan Layanan",
-			url: "#",
+			title: "Daftar Permintaan",
+			url: "/dashboard/internal/business/services/request",
 			icon: Send,
-			items: [
-				{
-					title: "Daftar Permintaan ",
-					url: "/dashboard/internal/business/services/request",
-				},
-				{
-					title: "Riwayat Permintaan ",
-					url: "#",
-				},
-			],
 		},
 		{
-			title: "Perintah Kerja",
-			url: "#",
+			title: "Daftar Tugas Kerja",
+			url: "/dashboard/internal/workorders",
 			icon: ClipboardPenLine,
-			items: [
-				{
-					title: "Daftar Tugas Kerja",
-					url: "/dashboard/internal/workorders",
-				},
-				{
-					title: "Riwayat Tugas Kerja",
-					url: "#",
-				},
-			],
 		},
 	],
 	navStaffBusiness: [
@@ -193,39 +166,14 @@ const data = {
 			icon: Inbox,
 		},
 		{
-			title: "Konfirmasi Penugasan",
-			url: "/dashboard/staff/services-request/confirmation",
-			icon: FileCheck,
-		},
-		{
-			title: "Layanan Perusahaan",
-			url: "#",
+			title: "Daftar Layanan",
+			url: "/dashboard/staff/services",
 			icon: ClipboardList,
-			items: [
-				{
-					title: "Daftar Layanan",
-					url: "/dashboard/staff/services",
-				},
-				{
-					title: "Riwayat Permintaan",
-					url: "/dashboard/staff/services-request/history",
-				},
-			],
 		},
 		{
-			title: "Perintah Kerja",
-			url: "#",
+			title: "Tugas Kerja",
+			url: "/dashboard/internal/workorders",
 			icon: ClipboardPenLine,
-			items: [
-				{
-					title: "Tugas Kerja",
-					url: "/dashboard/internal/workorders",
-				},
-				{
-					title: "Riwayat Tugas Kerja",
-					url: "/dashboard/client/reports",
-				},
-			],
 		},
 	],
 };

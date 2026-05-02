@@ -249,7 +249,7 @@ const CompanyDetailWo = () => {
 										{(wo.status === "on_progress" ||
 											wo.status === "completed" ||
 											wo.status === "failed") && (
-											<div className="pt-8  w-full hidden md:block">
+											<div className="pt-8  w-full ">
 												<span className="mb-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center">
 													<Settings2 className="w-3.5 h-3.5 mr-1" />
 													Laporan Perintah Kerja:
@@ -330,29 +330,34 @@ const CompanyDetailWo = () => {
 									</div>
 								</div>
 								{/* siblings wo */}
-								<div className=" flex flex-col gap-3 my-7">
-									<span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center">
-										<Settings2 className="w-3.5 h-3.5 mr-1" />
-										Perintah Kerja Terkait :
-									</span>
-									<div className="flex flex-col gap-2">
-										{meta?.workOrderSiblings &&
-											meta.workOrderSiblings.length > 0 && (
-												<div className="">
-													<div className="space-y-2">
-														{meta.workOrderSiblings.map((sibling, index) => (
-															<SiblingCard
-																key={sibling._id}
-																sibling={sibling}
-																currentId={wo._id}
-																index={index + 1}
-															/>
-														))}
-													</div>
-												</div>
-											)}
-									</div>
-								</div>
+								{wo.meta?.workOrderSiblings &&
+									wo.meta?.workOrderSiblings.length > 1 && (
+										<div className=" flex flex-col gap-3 my-7">
+											<span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center">
+												<Settings2 className="w-3.5 h-3.5 mr-1" />
+												Perintah Kerja Terkait :
+											</span>
+											<div className="flex flex-col gap-2">
+												{meta?.workOrderSiblings &&
+													meta.workOrderSiblings.length > 0 && (
+														<div className="">
+															<div className="space-y-2">
+																{meta.workOrderSiblings.map(
+																	(sibling, index) => (
+																		<SiblingCard
+																			key={sibling._id}
+																			sibling={sibling}
+																			currentId={wo._id}
+																			index={index + 1}
+																		/>
+																	),
+																)}
+															</div>
+														</div>
+													)}
+											</div>
+										</div>
+									)}
 							</div>
 						</div>
 

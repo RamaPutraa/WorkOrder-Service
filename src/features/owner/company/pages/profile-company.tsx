@@ -3,24 +3,17 @@ import {
 	Building2,
 	MapPin,
 	Calendar,
-	Users,
-	UserCheck,
-	Crown,
 	XCircle,
 	RefreshCw,
 	Pencil,
-	Power,
-	Mail,
 	CheckCircle2,
+	Text,
 } from "lucide-react";
 import { useCompanyProfile, useUpdateCompany } from "../hooks/companyHooks";
 
 // Components
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -97,195 +90,144 @@ const ProfileCompany = () => {
 				onAddClick={() => setOpenEdit(true)}
 				addIcon={<Pencil className="w-3.5 h-3.5" />}
 			/>
-			<div className="pb-12 space-y-0">
-				{/* ── Header ───────────────────────────────────────────────────── */}
-				<div className="flex items-start justify-between pb-8">
-					<div className="flex items-center gap-4">
-						<div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shrink-0 shadow-sm">
-							<Building2 className="w-7 h-7 text-primary-foreground" />
+			<div className="pb-12 space-y-8">
+				{/* ── Header Area ───────────────────────────────────────────────────── */}
+				<div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 pb-6 border-b border-border/40">
+					<div className="flex items-start gap-5">
+						{/* Icon Container: Lebih soft dengan border tipis */}
+						<div className="w-16 h-16 rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-center shrink-0">
+							<Building2 className="w-8 h-8 text-primary stroke-[1.5]" />
 						</div>
-						<div>
-							<div className="flex items-center gap-2.5 mb-0.5">
-								<h1 className="text-xl font-semibold leading-tight">
+
+						<div className="space-y-1.5 mt-0.5">
+							<div className="flex items-center gap-3">
+								<h1 className="text-2xl font-bold tracking-tight text-foreground">
 									{company.name}
 								</h1>
+								{/* Modern Badge */}
 								<span
-									className={`inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+									className={`inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md ${
 										company.isActive ?
-											"text-emerald-700 bg-emerald-50 border border-emerald-200"
-										:	"text-red-600 bg-red-50 border border-red-200"
+											"text-emerald-700 bg-emerald-500/10 border border-emerald-500/20"
+										:	"text-destructive bg-destructive/10 border border-destructive/20"
 									}`}>
 									<span
-										className={`w-1.5 h-1.5 rounded-full ${company.isActive ? "bg-emerald-500" : "bg-red-500"}`}
+										className={`w-1.5 h-1.5 rounded-full ${
+											company.isActive ?
+												"bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
+											:	"bg-destructive"
+										}`}
 									/>
 									{company.isActive ? "Aktif" : "Non-Aktif"}
 								</span>
 							</div>
 							<p className="text-sm text-muted-foreground">
-								Profil &amp; pengaturan perusahaan
+								Profil & pengaturan utama perusahaan.
 							</p>
 						</div>
 					</div>
 				</div>
 
 				{/* ── Section: Informasi Umum ──────────────────────────────────── */}
-				<div>
-					<p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/70 mb-3">
+				<div className="space-y-3">
+					<h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
 						Informasi Umum
-					</p>
+					</h2>
 
-					<div className="space-y-0 divide-y divide-border/60">
-						{/* Deskripsi */}
-						<div className="py-4 flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-8">
-							<p className="text-sm text-muted-foreground w-32 shrink-0 pt-0.5">
-								Deskripsi
-							</p>
-							<p className="text-sm leading-relaxed">
-								{company.description || (
-									<span className="text-muted-foreground/50 italic">
-										Belum ada deskripsi.
-									</span>
-								)}
-							</p>
-						</div>
+					{/* Container Flat & Clean */}
+					<div className="bg-muted/10 border border-border/40 rounded-2xl overflow-hidden">
+						<div className="flex flex-col">
+							{/* Item: Deskripsi */}
+							<div className="flex flex-col sm:flex-row gap-2 sm:gap-6 p-5 border-b border-border/40">
+								<div className="sm:w-48 shrink-0">
+									<p className="text-sm font-medium text-muted-foreground">
+										Deskripsi
+									</p>
+								</div>
+								<div className="flex-1 flex items-center gap-2.5">
+									<Text className="w-4 h-4 text-muted-foreground/70 shrink-0" />
+									{company.description ?
+										<p className="text-sm text-foreground leading-relaxed">
+											{company.description}
+										</p>
+									:	<p className="text-sm text-muted-foreground/50 italic">
+											Belum ada deskripsi.
+										</p>
+									}
+								</div>
+							</div>
 
-						{/* Alamat */}
-						<div className="py-4 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-8">
-							<p className="text-sm text-muted-foreground w-32 shrink-0">
-								Alamat
-							</p>
-							<div className="flex items-center gap-2">
-								<MapPin className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-								<p className="text-sm">
-									{company.address || (
-										<span className="text-muted-foreground/50 italic">
+							{/* Item: Alamat */}
+							<div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 p-5 border-b border-border/40">
+								<div className="sm:w-48 shrink-0">
+									<p className="text-sm font-medium text-muted-foreground">
+										Alamat
+									</p>
+								</div>
+								<div className="flex-1 flex items-center gap-2.5">
+									<MapPin className="w-4 h-4 text-muted-foreground/70 shrink-0" />
+									{company.address ?
+										<p className="text-sm text-foreground">{company.address}</p>
+									:	<p className="text-sm text-muted-foreground/50 italic">
 											Belum diatur
-										</span>
-									)}
-								</p>
+										</p>
+									}
+								</div>
 							</div>
-						</div>
 
-						{/* Terdaftar sejak */}
-						<div className="py-4 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-8">
-							<p className="text-sm text-muted-foreground w-32 shrink-0">
-								Terdaftar
-							</p>
-							<div className="flex items-center gap-2">
-								<Calendar className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-								<p className="text-sm">{formatDate(company.createdAt)}</p>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<div className="py-6">
-					<Separator />
-				</div>
-
-				{/* ── Section: Tim ─────────────────────────────────────────────── */}
-				<div>
-					<p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/70 mb-3">
-						Tim Perusahaan
-					</p>
-
-					<div className="space-y-0 divide-y divide-border/60">
-						{/* Owner */}
-						<div className="py-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-8">
-							<p className="text-sm text-muted-foreground w-32 shrink-0">
-								Pemilik
-							</p>
-							<div className="flex items-center gap-3">
-								<Avatar className="h-8 w-8 border">
-									<AvatarFallback className="bg-amber-50 text-amber-700 text-xs font-semibold">
-										{company.owner?.name.slice(0, 2).toUpperCase()}
-									</AvatarFallback>
-								</Avatar>
-								<div>
-									<div className="flex items-center gap-1.5">
-										<p className="text-sm font-medium">{company.owner?.name}</p>
-										<Crown className="w-3 h-3 text-amber-500" />
-									</div>
-									<p className="text-xs text-muted-foreground flex items-center gap-1">
-										<Mail className="w-2.5 h-2.5" />
-										{company.owner?.email}
+							{/* Item: Terdaftar */}
+							<div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 p-5">
+								<div className="sm:w-48 shrink-0">
+									<p className="text-sm font-medium text-muted-foreground">
+										Terdaftar Sejak
+									</p>
+								</div>
+								<div className="flex-1 flex items-center gap-2.5">
+									<Calendar className="w-4 h-4 text-muted-foreground/70 shrink-0" />
+									<p className="text-sm text-foreground">
+										{formatDate(company.createdAt)}
 									</p>
 								</div>
 							</div>
 						</div>
-
-						{/* Jumlah Manager */}
-						<div className="py-4 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-8">
-							<p className="text-sm text-muted-foreground w-32 shrink-0">
-								Manager
-							</p>
-							<div className="flex items-center gap-2">
-								<UserCheck className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-								<p className="text-sm">
-									<span className="font-semibold">
-										{company.managers?.length ?? 0}
-									</span>
-									<span className="text-muted-foreground ml-1">
-										orang terdaftar
-									</span>
-								</p>
-							</div>
-						</div>
-
-						{/* Jumlah Karyawan */}
-						<div className="py-4 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-8">
-							<p className="text-sm text-muted-foreground w-32 shrink-0">
-								Karyawan
-							</p>
-							<div className="flex items-center gap-2">
-								<Users className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-								<p className="text-sm">
-									<span className="font-semibold">
-										{company.staffs?.length ?? 0}
-									</span>
-									<span className="text-muted-foreground ml-1">
-										orang terdaftar
-									</span>
-								</p>
-							</div>
-						</div>
 					</div>
 				</div>
 
-				<div className="py-6">
-					<Separator />
-				</div>
+				{/* ── Section: Status / Pengaturan ───────────────────────────────────────────── */}
+				<div className="space-y-3">
+					<h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+						Pengaturan Sistem
+					</h2>
 
-				{/* ── Section: Status ───────────────────────────────────────────── */}
-				<div className="bg-card rounded-xl p-6 shadow-sm">
-					<p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/70 mb-3">
-						Pengaturan
-					</p>
-
-					<div className="py-4 flex items-start justify-between gap-6">
-						<div className="space-y-1">
-							<div className="flex items-center gap-2">
-								<Power className="w-3.5 h-3.5 text-muted-foreground" />
-								<p className="text-sm font-medium">Status Aktif</p>
-							</div>
-							<p className="text-xs text-muted-foreground leading-relaxed pl-5">
-								{company.isActive ?
-									"Perusahaan aktif dan dapat menerima pekerjaan."
-								:	"Semua operasi pekerjaan terhenti sementara."}
-							</p>
-							{company.isActive && (
-								<p className="text-xs text-emerald-600 flex items-center gap-1 pl-5 pt-0.5">
-									<CheckCircle2 className="w-3 h-3" />
-									Semua sistem berjalan normal
+					<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 p-5 border border-border/40 rounded-2xl bg-card transition-all hover:border-primary/20">
+						<div className="space-y-1.5">
+							<div className="">
+								<p className="text-sm font-bold text-foreground">
+									Status Operasional
 								</p>
-							)}
+								<p className="text-sm text-muted-foreground leading-relaxed">
+									{company.isActive ?
+										"Perusahaan aktif dan dapat menerima penugasan pekerjaan."
+									:	"Semua operasi pekerjaan terhenti sementara."}
+								</p>
+								{company.isActive && (
+									<p className="text-xs font-medium text-emerald-600 flex items-center gap-1.5 mt-1.5">
+										<CheckCircle2 className="w-3.5 h-3.5" />
+										Sistem berjalan normal
+									</p>
+								)}
+							</div>
 						</div>
-						<Switch
-							checked={company.isActive}
-							disabled={updating}
-							onCheckedChange={() => setOpenToggleConfirm(true)}
-							className="mt-0.5 data-[state=checked]:bg-emerald-600 shrink-0"
-						/>
+
+						{/* Toggle Switch */}
+						<div className="pl-10 sm:pl-0 shrink-0">
+							<Switch
+								checked={company.isActive}
+								disabled={updating}
+								onCheckedChange={() => setOpenToggleConfirm(true)}
+								className="data-[state=checked]:bg-emerald-600"
+							/>
+						</div>
 					</div>
 				</div>
 
@@ -300,7 +242,7 @@ const ProfileCompany = () => {
 				<AlertDialog
 					open={openToggleConfirm}
 					onOpenChange={setOpenToggleConfirm}>
-					<AlertDialogContent>
+					<AlertDialogContent className="rounded-2xl">
 						<AlertDialogHeader>
 							<AlertDialogTitle>
 								{company.isActive ?
@@ -315,15 +257,17 @@ const ProfileCompany = () => {
 							</AlertDialogDescription>
 						</AlertDialogHeader>
 						<AlertDialogFooter>
-							<AlertDialogCancel disabled={updating}>Batal</AlertDialogCancel>
+							<AlertDialogCancel disabled={updating} className="rounded-xl">
+								Batal
+							</AlertDialogCancel>
 							<AlertDialogAction
 								disabled={updating}
 								onClick={handleToggleActive}
-								className={
+								className={`rounded-xl ${
 									company.isActive ?
 										"bg-destructive hover:bg-destructive/90 text-white"
 									:	"bg-emerald-600 hover:bg-emerald-700 text-white"
-								}>
+								}`}>
 								{updating ?
 									"Memproses..."
 								: company.isActive ?

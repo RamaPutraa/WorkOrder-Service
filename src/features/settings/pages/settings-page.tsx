@@ -42,6 +42,7 @@ export default function SettingsPage() {
 			<PageHeader
 				title="Pengaturan"
 				subtitle="Kelola preferensi dan konfigurasi akun Anda."
+				backPath={true}
 			/>
 
 			<div className="max-w-2xl space-y-4">

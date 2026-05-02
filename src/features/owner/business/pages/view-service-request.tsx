@@ -191,7 +191,7 @@ const ViewServiceRequest = () => {
 											</p>
 										</div>
 										{/* card content 2 */}
-										<div className="px-6 py-2  flex flex-col justify-end">
+										<div className="px-6 pb-5 flex flex-col justify-end">
 											{/* Info Row (Client & Date) */}
 											<div className="flex flex-wrap items-center gap-x-4 text-sm text-muted-foreground">
 												<div className="flex items-center gap-1.5">
@@ -216,19 +216,7 @@ const ViewServiceRequest = () => {
 											</div>
 											{/* Divider */}
 										</div>
-										{item.serviceRequestStatus === "approved" && (
-											<div className="px-6 py-4 mt-auto flex flex-col justify-end border-t border-slate-200/70">
-												{/* Info Row (Client & Date) */}
-												<div className="flex flex-wrap items-center gap-x-4 text-xs text-muted-foreground">
-													<div className="flex items-center gap-1.5">
-														Catatan :
-														<span className="truncate max-w-[120px] italic sm:max-w-none">
-															Layanan sudah bisa diproses ke tahap selanjutnya.
-														</span>
-													</div>
-												</div>
-											</div>
-										)}
+
 										{/* card footer */}
 										{item.serviceRequestStatus === "received" && (
 											<div className="px-5 sm:px-6 py-4 mt-auto border-t border-slate-200/70">

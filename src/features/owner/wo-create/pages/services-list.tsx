@@ -123,7 +123,7 @@ const WoServicesList: React.FC = () => {
 											`/dashboard/internal/wo-create/services/detail/${service._id}`,
 										)
 									}
-									className="group gap-2 flex flex-col h-full bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden hover:cursor-pointer p-5">
+									className="px-5 py-4 group gap-2 flex flex-col  bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden hover:cursor-pointer ">
 									<div className="space-y-4">
 										{/* Top row */}
 										<div className="flex items-start justify-between gap-4">
@@ -133,7 +133,7 @@ const WoServicesList: React.FC = () => {
 													<ClipboardList className="w-6 h-6" />
 												</div>
 												{/* Title */}
-												<h3 className="text-base font-bold text-slate-900 leading-snug line-clamp-2 min-h-[2.5rem] flex items-center">
+												<h3 className="text-base font-bold text-slate-900 line-clamp-1">
 													{service.title || "Untitled"}
 												</h3>
 											</div>
@@ -156,7 +156,7 @@ const WoServicesList: React.FC = () => {
 									</div>
 
 									<div className="grid grid-cols-1 text-xs  border-t border-slate-200/70 p-0">
-										<div className="flex items-center justify-between text-xs text-slate-400 py-3">
+										<div className="flex items-center justify-between text-xs text-slate-400 pt-3">
 											{/* Badge akses */}
 											<span>
 												<Badge variant="outline">

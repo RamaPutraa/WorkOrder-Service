@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { SectionLoading } from "@/shared/atoms";
 import PageHeader from "@/shared/atoms/header-content";
 import { EmptyData } from "@/shared/molecules/empty-data";
@@ -12,7 +12,6 @@ import {
 	CheckCircle2,
 	Pencil,
 	Save,
-	X,
 	Settings2,
 	Send,
 	User,
@@ -165,95 +164,133 @@ const CompanyReportWo = () => {
 								</div>
 							</div>
 
-							{/* Approve / Reject buttons — hanya untuk reviewer & laporan sudah terkirim */}
+							{/* Diperbarui terakhir */}
+							<div className="flex items-center gap-3 lg:border-l lg:pl-6 xl:border-l xl:pl-6 border-gray-100">
+								<div className="p-2 rounded-lg bg-primary/5 text-primary shrink-0">
+									<Calendar className="w-4 h-4" />
+								</div>
+								<div className="min-w-0">
+									<p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest truncate">
+										Terakhir Diperbarui
+									</p>
+									<div className="text-sm font-bold text-gray-900">
+										{reportData?.updatedAt ?
+											new Date(reportData.updatedAt).toLocaleDateString(
+												"id-ID",
+												{
+													day: "2-digit",
+													month: "long",
+													year: "numeric",
+												},
+											)
+										:	"Belum ada perubahan"}
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 
 					{/* Form Editor Card */}
-					<Card className="border shadow-sm rounded-xl">
-						<CardHeader className="pb-4 border-b border-border/50">
-							<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-								<div className="flex items-center gap-4">
-									<div className="shrink-0 p-3 rounded-xl bg-primary/10 text-primary">
-										<Settings2 className="w-5 h-5" />
+					<div className="border shadow-sm rounded-2xl overflow-hidden">
+						<div className="p-6 pb-2">
+							<div className="flex flex-col sm:flex-row sm:items-start justify-between gap-5">
+								{/* Title & Icon Area */}
+								<div className="flex items-start gap-4">
+									<div className="shrink-0 p-2.5 rounded-lg bg-primary/5 text-primary mt-0.5">
+										<Settings2 className="w-5 h-5 stroke-[1.5]" />
 									</div>
-									<div>
-										<h2 className="text-md font-bold text-foreground leading-tight">
+									<div className="space-y-1">
+										<h2 className="text-lg font-semibold tracking-tight text-foreground">
 											{formObject?.title || "Formulir Laporan"}
 										</h2>
-										<p className="text-sm text-muted-foreground mt-0.5">
+										<p className="text-sm text-muted-foreground leading-relaxed">
 											{formObject?.description ||
 												"Isi rincian hasil pekerjaan di lapangan."}
 										</p>
 									</div>
 								</div>
 
-								{/* Edit & Kirim hanya untuk staff (bukan manager/owner) */}
+								{/* Action Buttons */}
 								{canEdit && (
-									<div className="flex items-center gap-2 self-end sm:self-auto">
-										<div className="border-r border-slate-200 pr-2">
+									<div className="flex items-center gap-2 self-start bg-muted/30 p-1.5 rounded-xl border border-border/50">
+										{!isEditMode ?
+											// Tombol Edit Mode
 											<Button
+												variant="ghost"
 												onClick={() => setIsEditMode(true)}
-												disabled={isEditMode}
-												className="bg-yellow-400 hover:bg-yellow-500 text-white rounded-xl h-9 px-3 text-sm shadow-sm transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
+												className="h-8 px-3 text-xs font-medium rounded-lg text-foreground hover:bg-background hover:shadow-sm transition-all hover:cursor-pointer"
 												title="Edit Laporan">
-												<Pencil className="w-4 h-4" />
+												<Pencil className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
+												Edit Form
 											</Button>
-										</div>
-
-										<div className="flex items-center gap-2">
-											<Button
-												onClick={handleCancel}
-												disabled={isSaving || !isEditMode}
-												className="bg-white border hover:bg-muted/20 text-black rounded-xl h-9 px-3 text-sm shadow-sm transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer">
-												<X className="w-4 h-4 sm:mr-1.5" />
-												<span className="hidden sm:inline">Batal</span>
-											</Button>
-											<Button
-												onClick={handleSave}
-												disabled={isSaving || !isEditMode || !hasChanges()}
-												className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl h-9 px-3 text-sm shadow-sm transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer">
-												<Save className="w-4 h-4 sm:mr-1.5" />
-												<span className="hidden sm:inline">
-													{isSaving ? "Simpan..." : "Simpan Laporan"}
-												</span>
-												<span className="sm:hidden">
-													{isSaving ? "..." : "Simpan"}
-												</span>
-											</Button>
-										</div>
+										:	<>
+												<Button
+													variant="ghost"
+													onClick={handleCancel}
+													disabled={isSaving}
+													className="h-8 px-3 text-xs font-medium rounded-lg text-muted-foreground hover:text-foreground hover:bg-background transition-all hover:cursor-pointer">
+													Batal
+												</Button>
+												<Button
+													onClick={handleSave}
+													disabled={isSaving || !hasChanges()}
+													className="h-8 px-4 text-xs font-semibold rounded-lg shadow-none transition-all hover:cursor-pointer">
+													{isSaving ?
+														<span className="flex items-center gap-2">
+															<div className="w-3.5 h-3.5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+															Menyimpan...
+														</span>
+													:	<span className="flex items-center gap-1.5">
+															<Save className="w-3.5 h-3.5" />
+															Simpan
+														</span>
+													}
+												</Button>
+											</>
+										}
 									</div>
 								)}
 							</div>
-						</CardHeader>
-						<CardContent className="space-y-4 pt-6">
+						</div>
+
+						{/* Content Area */}
+						<div className="p-6 pt-4">
 							{!formObject ?
-								<EmptyData />
-							:	<div className="space-y-4">
+								<div className="py-8 bg-muted/20 rounded-xl border border-dashed border-border/50">
+									<EmptyData />
+								</div>
+							:	<div className="space-y-6">
 									{formObject.fields && formObject.fields.length > 0 ?
-										[...formObject.fields]
-											.sort((a, b) => a.order - b.order)
-											.map((field, idx) => {
-												const answer = formData.get(field.order) ?? null;
-												return (
-													<div key={field.order}>
-														<FormFieldViewer
-															field={field}
-															answer={answer}
-															index={idx + 1}
-															readOnly={!isEditMode || isReviewer}
-															onChange={(value) =>
-																handleFieldChange(field.order, value)
-															}
-														/>
-													</div>
-												);
-											})
-									:	<EmptyData />}
+										<div className="flex flex-col gap-6">
+											{[...formObject.fields]
+												.sort((a, b) => a.order - b.order)
+												.map((field, idx) => {
+													const answer = formData.get(field.order) ?? null;
+													return (
+														<div
+															key={field.order}
+															className={`transition-all duration-300 ${isEditMode ? "p-4 rounded-xl bg-muted/10 border border-border/40 hover:border-primary/20" : ""}`}>
+															<FormFieldViewer
+																field={field}
+																answer={answer}
+																index={idx + 1}
+																readOnly={!isEditMode || isReviewer}
+																onChange={(value) =>
+																	handleFieldChange(field.order, value)
+																}
+															/>
+														</div>
+													);
+												})}
+										</div>
+									:	<div className="py-8 bg-muted/20 rounded-xl border border-dashed border-border/50">
+											<EmptyData />
+										</div>
+									}
 								</div>
 							}
-						</CardContent>
-					</Card>
+						</div>
+					</div>
 				</div>
 			)}
 		</div>
