@@ -152,7 +152,7 @@ export function NavActions() {
 	};
 
 	return (
-		<div className="flex items-center gap-2 text-sm mr-7">
+		<div className="flex items-center gap-2 text-sm mr-1">
 			<Popover open={isOpen} onOpenChange={handleOpenChange}>
 				<PopoverTrigger asChild>
 					<div className="flex items-center gap-2 border border-primary/30 rounded-full px-3 py-1.5 hover:cursor-pointer hover:bg-muted transition-all">
@@ -229,7 +229,7 @@ export function NavActions() {
 											<div
 												key={notif._id}
 												onClick={() => handleNotificationClick(notif)}
-												className={`group relative flex items-start gap-3 p-3 rounded-lg hover:bg-muted/60 transition-colors cursor-pointer ${
+												className={`group relative flex items-start gap-3 p-3  rounded-lg hover:bg-muted/60 transition-colors cursor-pointer ${
 													!notif.isRead ? "bg-primary/5" : "bg-transparent"
 												}`}>
 												{/* Unread dot */}
