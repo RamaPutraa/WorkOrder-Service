@@ -221,10 +221,22 @@ export const useCreateService = () => {
 			return;
 		}
 
+		(window as any).__isSubmittingSuccess = true;
 		notifySuccess("Layanan berhasil disimpan");
 		serviceStore.clearCache();
 		navigate(-1);
 	};
+
+	// === Dirty Check Logic ===
+	const isDirty = useMemo(() => {
+		return (
+			title !== "" ||
+			description !== "" ||
+			accessType !== "" ||
+			intakeFormId !== "" ||
+			workOrdersConfig.length > 0
+		);
+	}, [title, description, accessType, intakeFormId, workOrdersConfig]);
 
 	// === Fetch List Services (dengan cache 5 menit) ===
 	const fecthServices = async () => {
@@ -363,6 +375,7 @@ export const useCreateService = () => {
 		loading,
 		error,
 		creating,
+		isDirty,
 		title,
 		description,
 		accessType,

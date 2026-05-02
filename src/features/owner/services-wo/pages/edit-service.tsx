@@ -7,12 +7,14 @@ import { CardServiceRequestConfig } from "../components/create/service-request-c
 import { CardWorkOrdersConfig } from "../components/create/work-orders-config";
 import PageHeader from "@/shared/atoms/header-content";
 import { Save } from "lucide-react";
+import { ConfirmLeaveDialog } from "@/shared/molecules/confirm-leave-dialog";
 
 const EditService: React.FC = () => {
 	const {
 		// UI states
 		updating: creating,
 		loading,
+		isDirty,
 
 		// Base Form
 		title,
@@ -210,6 +212,7 @@ const EditService: React.FC = () => {
 					<AnimatePresence mode="wait">{renderContent()}</AnimatePresence>
 				</main>
 			</div>
+			<ConfirmLeaveDialog isDirty={isDirty} />
 		</div>
 	);
 };

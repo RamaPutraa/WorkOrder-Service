@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
 
@@ -303,15 +303,61 @@ export const useEditService = () => {
 			serviceStore.setDetailService(id, updatedService);
 		}
 
+		(window as any).__isSubmittingSuccess = true;
 		notifySuccess("Layanan berhasil diupdate");
 		navigate(-1);
 	};
+
+	// === Dirty Check Logic ===
+	const isDirty = useMemo(() => {
+		if (!detailService) return false;
+
+		const initialIntakeFormId =
+			detailService.serviceRequestConfig?.intakeForm?._id || "";
+		const initialReviewFormId =
+			detailService.serviceRequestConfig?.reviewForm?._id || "";
+		const initialApprovalType =
+			detailService.serviceRequestConfig?.serviceRequestApprovalAccessType ||
+			"auto";
+		const initialReviewNeed =
+			detailService.serviceRequestConfig?.reviewNeed || false;
+
+		// Deep comparison for workOrdersConfig could be complex, simple length check + first element for now or just skip if too complex
+		// For now let's check basic fields
+		const isBaseChanged =
+			title !== detailService.title ||
+			description !== detailService.description ||
+			accessType !== (detailService.accessType as unknown as string);
+
+		const isConfigChanged =
+			intakeFormId !== initialIntakeFormId ||
+			reviewFormId !== initialReviewFormId ||
+			serviceRequestApprovalType !== initialApprovalType ||
+			reviewNeed !== initialReviewNeed;
+
+		// Basic check for workOrdersConfig length
+		const isWorkOrdersChanged =
+			workOrdersConfig.length !== (detailService.workOrdersConfig?.length || 0);
+
+		return isBaseChanged || isConfigChanged || isWorkOrdersChanged;
+	}, [
+		detailService,
+		title,
+		description,
+		accessType,
+		intakeFormId,
+		reviewFormId,
+		serviceRequestApprovalType,
+		reviewNeed,
+		workOrdersConfig,
+	]);
 
 	return {
 		// === STATE ===
 		loading,
 		error,
 		updating,
+		isDirty,
 		title,
 		description,
 		accessType,

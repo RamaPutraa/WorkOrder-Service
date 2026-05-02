@@ -6,12 +6,14 @@ import { CardServiceInfo } from "../components/create/service-info";
 import { CardServiceRequestConfig } from "../components/create/service-request-config";
 import { CardWorkOrdersConfig } from "../components/create/work-orders-config";
 import PageHeader from "@/shared/atoms/header-content";
+import { ConfirmLeaveDialog } from "@/shared/molecules/confirm-leave-dialog";
 
 const CreateService: React.FC = () => {
 	const {
 		// UI states
 		creating,
 		loading,
+		isDirty,
 
 		// Base Form
 		title,
@@ -208,6 +210,7 @@ const CreateService: React.FC = () => {
 					<AnimatePresence mode="wait">{renderContent()}</AnimatePresence>
 				</main>
 			</div>
+			<ConfirmLeaveDialog isDirty={isDirty} />
 		</div>
 	);
 };
