@@ -62,10 +62,6 @@ const data = {
 			icon: MonitorCog,
 			items: [
 				{
-					title: "Template",
-					url: "/dashboard/internal/services",
-				},
-				{
 					title: "Kelola Formulir",
 					url: "/dashboard/internal/forms",
 				},

@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DataTable } from "@/components/ui/data-table";
 import { type ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
+import { CreateServiceModal } from "../components/create-service-modal";
 
 const serviceTypeLabel = (type: any) => {
 	const strType = String(type).toLowerCase();
@@ -44,9 +45,22 @@ const ViewService: React.FC = () => {
 		return sessionStorage.getItem("serviceViewMode") || "card";
 	});
 
+	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
 	const handleViewChange = (value: string) => {
 		setViewMode(value);
 		sessionStorage.setItem("serviceViewMode", value);
+	};
+
+	const handleSelectBlank = () => {
+		setIsCreateModalOpen(false);
+		navigate("/dashboard/internal/services/create");
+	};
+
+	const handleSelectTemplate = () => {
+		setIsCreateModalOpen(false);
+		// TODO: navigate ke halaman pilih template
+		navigate("/dashboard/internal/services/create?from=template");
 	};
 
 	const columns: ColumnDef<any>[] = useMemo(
@@ -177,9 +191,16 @@ const ViewService: React.FC = () => {
 			<PageHeader
 				title="List Data Layanan"
 				subtitle="Berikut merupakan list layanan yang dimiliki oleh perusahaan."
-				onAddClick={() => navigate("/dashboard/internal/services/create")}
+				onAddClick={() => setIsCreateModalOpen(true)}
 				addLabel="Tambah Layanan"
 				backPath={true}
+			/>
+
+			<CreateServiceModal
+				open={isCreateModalOpen}
+				onOpenChange={setIsCreateModalOpen}
+				onSelectBlank={handleSelectBlank}
+				onSelectTemplate={handleSelectTemplate}
 			/>
 
 			<Tabs
