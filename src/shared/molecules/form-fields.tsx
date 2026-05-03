@@ -8,6 +8,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { Control, FieldValues } from "react-hook-form";
+import { PasswordInput } from "../atoms/password-input";
 
 type Props<T extends FieldValues> = {
 	fields: FieldConfig[];
@@ -29,15 +30,19 @@ export default function FormFields<T extends FieldValues>({
 						<FormItem>
 							<FormLabel>{field.label}</FormLabel>
 							<FormControl>
-								{field.type === "textarea" ? (
+								{field.type === "textarea" ?
 									<Textarea {...inputField} placeholder={field.placeholder} />
-								) : (
-									<Input
+								: field.type === "password" ?
+									<PasswordInput
+										{...inputField}
+										placeholder={field.placeholder}
+									/>
+								:	<Input
 										{...inputField}
 										type={field.type}
 										placeholder={field.placeholder}
 									/>
-								)}
+								}
 							</FormControl>
 							<FormMessage />
 						</FormItem>
