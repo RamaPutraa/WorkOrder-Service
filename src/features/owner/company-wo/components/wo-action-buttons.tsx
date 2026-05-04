@@ -121,7 +121,7 @@ export const WoActionButtons = ({
 			)}
 
 			{/* START BUTTON */}
-			{currentStatus === "approved" && (
+			{currentStatus === "approved" && userAssigned && (
 				<Button
 					className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
 					onClick={onStart}
@@ -143,24 +143,25 @@ export const WoActionButtons = ({
 			)}
 
 			{/* IN-PROGRESS ACTIONS (Complete, Fail, Report) */}
-			{["on_progress", "completed", "failed"].includes(currentStatus) && (
-				<>
-					<Button
-						className="bg-red-600 hover:bg-red-700 w-full md:w-auto text-white rounded-xl h-11 shadow-sm shadow-red-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
-						onClick={onFail}
-						disabled={activeAction !== null || !canFail}>
-						<XCircle className="h-4 w-4" />
-						Gagal
-					</Button>
-					<Button
-						className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
-						onClick={onComplete}
-						disabled={activeAction !== null || !canComplete}>
-						<CircleCheckBig className="h-4 w-4" />
-						Selesaikan
-					</Button>
-				</>
-			)}
+			{["on_progress", "completed", "failed"].includes(currentStatus) &&
+				(isOwner || isManager) && (
+					<>
+						<Button
+							className="bg-red-600 hover:bg-red-700 w-full md:w-auto text-white rounded-xl h-11 shadow-sm shadow-red-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
+							onClick={onFail}
+							disabled={activeAction !== null || !canFail}>
+							<XCircle className="h-4 w-4" />
+							Gagal
+						</Button>
+						<Button
+							className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
+							onClick={onComplete}
+							disabled={activeAction !== null || !canComplete}>
+							<CircleCheckBig className="h-4 w-4" />
+							Selesaikan
+						</Button>
+					</>
+				)}
 		</>
 	);
 };

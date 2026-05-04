@@ -239,7 +239,7 @@ export const useCompanyReportWo = () => {
 			case "on_progress":
 				return {
 					bg: "bg-yellow-100",
-					text: "text-yellow-700",
+					text: "text-yellow-500",
 					label: "Sedang Dikerjakan",
 					icon: Clock,
 				};

@@ -249,12 +249,18 @@ const CompanyDetailWo = () => {
 										{(wo.status === "on_progress" ||
 											wo.status === "completed" ||
 											wo.status === "failed") && (
-											<div className="pt-8  w-full ">
-												<span className="mb-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center">
-													<Settings2 className="w-3.5 h-3.5 mr-1" />
-													Laporan Perintah Kerja:
-												</span>
-												<WoAlertsReport wo={wo} workReport={workReport} />
+											<div className="pt-8 w-full">
+												<div className="rounded-xl border border-blue-200 px-5 py-4">
+													<div className="flex items-center gap-2 mb-3">
+														<div className="p-1.5 rounded-md bg-primary/5 text-primary">
+															<FileText className="w-3.5 h-3.5" />
+														</div>
+														<span className="text-xs font-semibold text-primary uppercase tracking-wide">
+															Laporan Pengerjaan Perintah Kerja
+														</span>
+													</div>
+													<WoAlertsReport wo={wo} workReport={workReport} />
+												</div>
 											</div>
 										)}
 									</div>
