@@ -60,8 +60,6 @@ export const usePublicServices = () => {
 		return () => window.removeEventListener("scroll", handleScroll);
 	}, []);
 
-
-
 	// handle input form - now using field order instead of field label
 	const handleChange = (
 		formId: string,
@@ -120,13 +118,17 @@ export const usePublicServices = () => {
 		// 1. Upload pending files first
 		for (const form of data) {
 			const formVals = formValues[form._id] || {};
-			
+
 			// Validate mandatory fields for this form
 			const missingFields: string[] = [];
-			form.fields?.forEach(field => {
+			form.fields?.forEach((field) => {
 				if (field.required) {
 					const value = formVals[field.order];
-					const isEmpty = value === null || value === undefined || value === "" || (Array.isArray(value) && value.length === 0);
+					const isEmpty =
+						value === null ||
+						value === undefined ||
+						value === "" ||
+						(Array.isArray(value) && value.length === 0);
 					if (isEmpty) {
 						missingFields.push(field.label || `Field #${field.order}`);
 					}
@@ -135,16 +137,24 @@ export const usePublicServices = () => {
 
 			if (missingFields.length > 0) {
 				setSubmitting(false);
-				notifyError("Validasi Gagal", `Harap isi field wajib pada ${form.title}: ${missingFields.join(", ")}`);
+				notifyError(
+					"Validasi Gagal",
+					`Harap isi field wajib pada ${form.title}: ${missingFields.join(", ")}`,
+				);
 				return;
 			}
 
 			for (const [orderStr, value] of Object.entries(formVals)) {
 				if (value instanceof File) {
-					const { error, data: uploadData } = await handleApi(() => uploadFileApi(value));
+					const { error, data: uploadData } = await handleApi(() =>
+						uploadFileApi(value),
+					);
 					if (error || !uploadData) {
 						setSubmitting(false);
-						notifyError("Gagal mengajukan", "Gagal mengunggah gambar. Silakan coba lagi.");
+						notifyError(
+							"Gagal mengajukan",
+							"Gagal mengunggah gambar. Silakan coba lagi.",
+						);
 						return;
 					}
 					// Replace File object with URL string

@@ -9,7 +9,7 @@ export const getSrHistory = async () => {
 
 export const getSrById = async (id: string) => {
 	const response = await ApiClient.get<RequesterSRDetailResponse>(
-		`/service-request/${id}`,
+		`/service-requests/${id}`,
 	);
 	return response.data;
 };

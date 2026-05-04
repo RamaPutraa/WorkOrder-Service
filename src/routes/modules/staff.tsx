@@ -2,10 +2,7 @@ import { lazy } from "react";
 import { type RouteObject } from "react-router-dom";
 
 const DashboardStaff = lazy(() => import("@/features/staff/dahsboard-staff"));
-const SrConfirmation = lazy(
-	() =>
-		import("@/features/staff/service-request-confirmation/pages/sr-confirmation"),
-);
+
 const ListServices = lazy(
 	() => import("@/features/staff/service-request/pages/list-services"),
 );
@@ -27,10 +24,7 @@ export const staffRoutes: RouteObject[] = [
 		path: "",
 		element: <DashboardStaff />,
 	},
-	{
-		path: "services-request/confirmation",
-		element: <SrConfirmation />,
-	},
+
 	{
 		path: "services",
 		element: <ListServices />,

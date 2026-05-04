@@ -28,12 +28,11 @@ export const useServices = () => {
 
 		const { data: res, error } = await handleApi(() => getServicesWoApi());
 
-		setLoading(false);
-
 		if (error) {
 			console.error(error);
 			setError(error.message);
 			notifyError("Gagal memuat data", error.message);
+			setLoading(false);
 			return;
 		}
 
@@ -43,6 +42,7 @@ export const useServices = () => {
 			notifyError("Gagal memuat data. Respon tidak valid.");
 			console.error("Response:", res);
 		}
+		setLoading(false);
 	};
 
 	const fetchSrIntakeFormStaffById = async (id: string) => {
@@ -53,12 +53,11 @@ export const useServices = () => {
 			getSrIntakeFormStaffById(id),
 		);
 
-		setLoading(false);
-
 		if (error) {
 			console.error(error);
 			setError(error.message);
 			notifyError("Gagal memuat data", error.message);
+			setLoading(false);
 			return;
 		}
 
@@ -68,6 +67,7 @@ export const useServices = () => {
 			notifyError("Gagal memuat data. Respon tidak valid.");
 			console.error("Response:", res);
 		}
+		setLoading(false);
 	};
 
 	useEffect(() => {
@@ -160,7 +160,7 @@ export const useServices = () => {
 		if (res?.data) {
 			notifySuccess("Layanan berhasil diajukan!");
 			console.log("Response:", res.data);
-			navigate("/dashboard/staff/services/request");
+			navigate("/dashboard/staff/services-request/history");
 		} else {
 			notifyError("Gagal mengajukan layanan. Respon tidak valid.");
 			console.error("Response:", res);
@@ -168,8 +168,11 @@ export const useServices = () => {
 	};
 
 	useEffect(() => {
-		fetchServices();
-		if (id) fetchSrIntakeFormStaffById(id);
+		if (id) {
+			fetchSrIntakeFormStaffById(id);
+		} else {
+			fetchServices();
+		}
 	}, [id]);
 
 	return {

@@ -8,7 +8,7 @@ import { EmptyData } from "@/shared/molecules/empty-data";
 import { Badge } from "@/components/ui/badge";
 
 const ListServices = () => {
-	const { services, loading, error, fetchServices } = useServices();
+	const { services, loading, error } = useServices();
 	const navigate = useNavigate();
 
 	const serviceTypeLabel = (type: any) => {

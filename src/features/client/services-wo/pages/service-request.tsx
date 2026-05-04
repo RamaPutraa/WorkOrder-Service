@@ -27,7 +27,7 @@ export default function RequestServicePage() {
 		<>
 			<PageHeader
 				title="Layanan Perusahaan"
-				subtitle="Berikut merupakan layanan yang dimiliki oleh perusahaan."
+				subtitle="Berikut merupakan formulir layanan yang perlu diisi untuk melakukan pemesanan layanan."
 				backPath={true}
 				addIcon={<CheckCircle2 className="size-6" />}
 				addLabel="Pesan Layanan"

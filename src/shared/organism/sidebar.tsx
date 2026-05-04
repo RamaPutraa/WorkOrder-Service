@@ -6,7 +6,6 @@ import {
 	Building2,
 	ClipboardList,
 	ClipboardPenLine,
-	FileCheck,
 	FolderKanban,
 	GalleryVerticalEnd,
 	Home,
@@ -166,11 +165,7 @@ const data = {
 			url: "/dashboard/unassigned/invitations-history",
 			icon: Inbox,
 		},
-		{
-			title: "Konfirmasi Penugasan",
-			url: "/dashboard/staff/services-request/confirmation",
-			icon: FileCheck,
-		},
+
 		{
 			title: "Layanan Perusahaan",
 			url: "#",
@@ -187,19 +182,9 @@ const data = {
 			],
 		},
 		{
-			title: "Perintah Kerja",
-			url: "#",
+			title: "Daftar Tugas Kerja",
+			url: "/dashboard/internal/workorders",
 			icon: ClipboardPenLine,
-			items: [
-				{
-					title: "Tugas Kerja",
-					url: "/dashboard/internal/workorders",
-				},
-				{
-					title: "Riwayat Tugas Kerja",
-					url: "/dashboard/client/reports",
-				},
-			],
 		},
 	],
 };
