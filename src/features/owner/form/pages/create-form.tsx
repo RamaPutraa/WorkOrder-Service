@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronRight, Plus, Loader2, Save, LayoutList } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import PageHeader from "@/shared/atoms/header-content";
+import { HintDialog } from "@/shared/molecules/hint-dialog";
 
 const FormCreatePage: React.FC = () => {
 	const formRef = useRef<FormBuilderRef>(null);
@@ -56,8 +57,37 @@ const FormCreatePage: React.FC = () => {
 				{/* Action Sidebar — full width mobile, sticky sidebar desktop */}
 				<div className="w-full lg:w-72 lg:sticky lg:top-6 lg:self-start">
 					<Card className="border border-slate-200/80 shadow-sm rounded-2xl overflow-hidden">
+						{/* Hint / Help Section */}
+						<div className="px-5">
+							<HintDialog
+								triggerSubtitle="Pahami jenis formulir"
+								dialogTitle="Pahami Jenis Formulir"
+								dialogSubtitle="Setiap jenis formulir memiliki peran penting dalam alur kerja sistem."
+								items={[
+									{
+										title: "Perintah Kerja",
+										desc: "Formulir instruksi tugas khusus untuk staf lapangan atau operasional.",
+									},
+									{
+										title: "Laporan Perintah Kerja",
+										desc: "Digunakan staf untuk melaporkan hasil pekerjaan dan mengunggah bukti.",
+									},
+									{
+										title: "Pelanggan",
+										desc: "Formulir pendaftaran layanan yang akan diisi langsung oleh klien Anda.",
+									},
+									{
+										title: "Ulasan",
+										desc: "Kumpulkan feedback dan rating dari pelanggan setelah layanan selesai.",
+									},
+								]}
+							/>
+						</div>
+
+						<div className="h-px bg-slate-100 " />
+
 						{/* Actions Section */}
-						<div className="p-5 space-y-3 bg-gradient-to-br from-background to-muted/30">
+						<div className="px-5 space-y-3 bg-gradient-to-br from-background to-muted/30">
 							<p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
 								Aksi
 							</p>

@@ -7,6 +7,7 @@ import { CardServiceRequestConfig } from "../components/create/service-request-c
 import { CardWorkOrdersConfig } from "../components/create/work-orders-config";
 import PageHeader from "@/shared/atoms/header-content";
 import { ConfirmLeaveDialog } from "@/shared/molecules/confirm-leave-dialog";
+import { HintDialog } from "@/shared/molecules/hint-dialog";
 
 const CreateService: React.FC = () => {
 	const {
@@ -202,6 +203,29 @@ const CreateService: React.FC = () => {
 								</button>
 							);
 						})}
+
+						<div className="pt-2">
+							<div className="h-px bg-slate-100 mb-4" />
+							<HintDialog
+								triggerSubtitle="Panduan buat layanan"
+								dialogTitle="Konfigurasi Layanan"
+								dialogSubtitle="Ikuti 3 langkah utama untuk membangun alur kerja layanan Anda."
+								items={[
+									{
+										title: "Informasi Layanan",
+										desc: "Tentukan identitas layanan, deskripsi, serta siapa saja yang memiliki akses untuk memesan layanan ini.",
+									},
+									{
+										title: "Konfigurasi Permintaan",
+										desc: "Pilih formulir yang harus diisi klien dan tentukan apakah permintaan butuh persetujuan manual atau otomatis.",
+									},
+									{
+										title: "Konfigurasi Perintah Kerja",
+										desc: "Atur tim pelaksana, formulir tugas, hingga formulir laporan yang harus dilengkapi oleh staf di lapangan.",
+									},
+								]}
+							/>
+						</div>
 					</nav>
 				</aside>
 

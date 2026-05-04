@@ -64,7 +64,7 @@ const CreatePosition: React.FC = () => {
 
 			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 				{/* Left — Context Panel */}
-				<Card className="lg:col-span-1 border shadow-sm rounded-2xl bg-muted/30">
+				<Card className="lg:col-span-1 border shadow-sm rounded-2xl ">
 					<CardContent className="p-6 flex flex-col gap-5">
 						<div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10">
 							<Building2 className="w-7 h-7 text-primary" />
@@ -147,7 +147,7 @@ const CreatePosition: React.FC = () => {
 								<div className="flex justify-end pt-2">
 									<Button
 										type="submit"
-										className="gap-2 min-w-[140px] h-10 rounded-lg font-medium shadow-sm hover:shadow-md transition-all duration-200"
+										className="gap-2 w-full md:w-auto text-white h-11 rounded-xl font-medium shadow-sm shadow-blue-200 transition-all duration-200 hover:cursor-pointer"
 										disabled={loading}>
 										{loading ?
 											<>

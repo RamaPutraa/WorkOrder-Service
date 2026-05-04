@@ -16,8 +16,12 @@ import { accountRoutes } from "./modules/account";
 
 // Shared Lazy Components
 const ErrorPage = lazy(() => import("@/shared/errors/templates/error-page"));
-const NotFoundPage = lazy(() => import("@/shared/errors/templates/not-found-page"));
-const DashboardManager = lazy(() => import("@/features/manager/dashboard-manager"));
+const NotFoundPage = lazy(
+	() => import("@/shared/errors/templates/not-found-page"),
+);
+const DashboardManager = lazy(
+	() => import("@/features/manager/dashboard-manager"),
+);
 
 /**
  * Loading wrapper for lazy-loaded routes
@@ -27,7 +31,7 @@ const SuspenseLayout = ({ children }: { children: React.ReactNode }) => (
 		{children}
 	</Suspense>
 );
-
+// TODO: error page dan maintenance page
 const router = createBrowserRouter([
 	// ── Internal Dashboard (Owner, Manager, Staff Company) ──
 	{
@@ -37,7 +41,11 @@ const router = createBrowserRouter([
 				allowedRoles={["owner_company", "manager_company", "staff_company"]}
 			/>
 		),
-		errorElement: <SuspenseLayout><ErrorPage /></SuspenseLayout>,
+		errorElement: (
+			<SuspenseLayout>
+				<ErrorPage />
+			</SuspenseLayout>
+		),
 		children: [
 			{
 				element: (
@@ -47,7 +55,17 @@ const router = createBrowserRouter([
 				),
 				children: [
 					{
-						element: <SuspenseLayout><ProtectedRoute allowedRoles={["owner_company", "manager_company", "staff_company"]} /></SuspenseLayout>,
+						element: (
+							<SuspenseLayout>
+								<ProtectedRoute
+									allowedRoles={[
+										"owner_company",
+										"manager_company",
+										"staff_company",
+									]}
+								/>
+							</SuspenseLayout>
+						),
 						children: internalRoutes,
 					},
 				],
@@ -69,7 +87,11 @@ const router = createBrowserRouter([
 				children: [
 					{
 						path: "",
-						element: <SuspenseLayout><DashboardManager /></SuspenseLayout>,
+						element: (
+							<SuspenseLayout>
+								<DashboardManager />
+							</SuspenseLayout>
+						),
 					},
 				],
 			},
@@ -80,7 +102,11 @@ const router = createBrowserRouter([
 	{
 		path: "/dashboard/staff",
 		element: <ProtectedRoute allowedRoles={["staff_company"]} />,
-		errorElement: <SuspenseLayout><ErrorPage /></SuspenseLayout>,
+		errorElement: (
+			<SuspenseLayout>
+				<ErrorPage />
+			</SuspenseLayout>
+		),
 		children: [
 			{
 				element: (
@@ -90,7 +116,11 @@ const router = createBrowserRouter([
 				),
 				children: [
 					{
-						element: <SuspenseLayout><ProtectedRoute allowedRoles={["staff_company"]} /></SuspenseLayout>,
+						element: (
+							<SuspenseLayout>
+								<ProtectedRoute allowedRoles={["staff_company"]} />
+							</SuspenseLayout>
+						),
 						children: staffRoutes,
 					},
 				],
@@ -104,7 +134,11 @@ const router = createBrowserRouter([
 		element: (
 			<ProtectedRoute allowedRoles={["staff_unassigned", "staff_company"]} />
 		),
-		errorElement: <SuspenseLayout><ErrorPage /></SuspenseLayout>,
+		errorElement: (
+			<SuspenseLayout>
+				<ErrorPage />
+			</SuspenseLayout>
+		),
 		children: [
 			{
 				element: (
@@ -114,7 +148,13 @@ const router = createBrowserRouter([
 				),
 				children: [
 					{
-						element: <SuspenseLayout><ProtectedRoute allowedRoles={["staff_unassigned", "staff_company"]} /></SuspenseLayout>,
+						element: (
+							<SuspenseLayout>
+								<ProtectedRoute
+									allowedRoles={["staff_unassigned", "staff_company"]}
+								/>
+							</SuspenseLayout>
+						),
 						children: unassignedRoutes,
 					},
 				],
@@ -135,7 +175,11 @@ const router = createBrowserRouter([
 				),
 				children: [
 					{
-						element: <SuspenseLayout><ProtectedRoute allowedRoles={["client"]} /></SuspenseLayout>,
+						element: (
+							<SuspenseLayout>
+								<ProtectedRoute allowedRoles={["client"]} />
+							</SuspenseLayout>
+						),
 						children: clientRoutes,
 					},
 				],
@@ -155,7 +199,11 @@ const router = createBrowserRouter([
 				),
 				children: [
 					{
-						element: <SuspenseLayout><GuestRoute /></SuspenseLayout>,
+						element: (
+							<SuspenseLayout>
+								<GuestRoute />
+							</SuspenseLayout>
+						),
 						children: authRoutes,
 					},
 				],
@@ -172,7 +220,11 @@ const router = createBrowserRouter([
 		),
 		children: [
 			{
-				element: <SuspenseLayout><PublicLayout /></SuspenseLayout>,
+				element: (
+					<SuspenseLayout>
+						<PublicLayout />
+					</SuspenseLayout>
+				),
 				children: publicRoutes,
 			},
 		],
@@ -192,7 +244,11 @@ const router = createBrowserRouter([
 				]}
 			/>
 		),
-		errorElement: <SuspenseLayout><ErrorPage /></SuspenseLayout>,
+		errorElement: (
+			<SuspenseLayout>
+				<ErrorPage />
+			</SuspenseLayout>
+		),
 		children: [
 			{
 				element: (
@@ -203,7 +259,19 @@ const router = createBrowserRouter([
 				children: [
 					{
 						path: "",
-						element: <SuspenseLayout><ProtectedRoute allowedRoles={["owner_company", "manager_company", "staff_company", "staff_unassigned", "client"]} /></SuspenseLayout>,
+						element: (
+							<SuspenseLayout>
+								<ProtectedRoute
+									allowedRoles={[
+										"owner_company",
+										"manager_company",
+										"staff_company",
+										"staff_unassigned",
+										"client",
+									]}
+								/>
+							</SuspenseLayout>
+						),
 						children: accountRoutes,
 					},
 				],
@@ -214,7 +282,11 @@ const router = createBrowserRouter([
 	// ── Fallback ──
 	{
 		path: "*",
-		element: <SuspenseLayout><NotFoundPage /></SuspenseLayout>,
+		element: (
+			<SuspenseLayout>
+				<NotFoundPage />
+			</SuspenseLayout>
+		),
 	},
 ]);
 

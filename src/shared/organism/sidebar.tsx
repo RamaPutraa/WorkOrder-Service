@@ -12,7 +12,6 @@ import {
 	IdCard,
 	Inbox,
 	LayoutDashboard,
-	MessageCircleQuestion,
 	MonitorCog,
 	Send,
 	Ticket,
@@ -35,7 +34,6 @@ import {
 	SidebarRail,
 } from "@/components/ui/sidebar";
 import { NavBusiness } from "../molecules/nav-business";
-import { NavHelp } from "../molecules/nav-help";
 import useAuth from "@/features/auth/hooks/useAuth";
 import { NavInternalBusiness } from "../molecules/nav-internal-business";
 import { NavStaffBusiness } from "../molecules/nav-menu-staff";
@@ -135,13 +133,7 @@ const data = {
 			icon: LayoutDashboard,
 		},
 	],
-	navHelp: [
-		{
-			name: "Bantuan",
-			url: "/",
-			icon: MessageCircleQuestion,
-		},
-	],
+
 	navInternalBusiness: [
 		{
 			title: "Daftar Layanan",
@@ -245,7 +237,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				{user && ["client"].includes(user.role) && (
 					<NavBusiness items={data.navBusiness} />
 				)}
-				<NavHelp help={data.navHelp} />
 			</SidebarContent>
 			<SidebarFooter>
 				<NavUser />

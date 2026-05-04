@@ -1,12 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-	Dialog,
-	DialogContent,
-	DialogTitle,
-	DialogDescription,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
 	Form,
 	FormControl,
@@ -145,26 +140,27 @@ const InviteEmployeeDialog = ({
 				}}
 			/>
 			<Dialog open={open} onOpenChange={handleOpenChange}>
-				<DialogContent className="sm:max-w-[460px] p-0 overflow-hidden rounded-2xl">
-					{/* Header */}
-					<div className="bg-gradient-to-br from-blue-600 to-blue-500 px-6 pt-6 pb-5">
-						<div className="flex items-center gap-3 mb-1">
-							<div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
-								<Send className="w-4 h-4 text-white" />
+				<DialogContent className="sm:max-w-[480px] p-0 overflow-hidden rounded-3xl border-none shadow-2xl">
+					{/* Header - Premium Style */}
+					<div className="bg-gradient-to-b from-primary to-primary/70 p-4 text-white relative">
+						<div className="relative z-10 flex flex-col gap-1">
+							<div className="flex items-center gap-3 text-white text-md">
+								<div className="p-2 rounded-xl bg-white/20 backdrop-blur-sm shadow-xl">
+									<Send className="w-5 h-5" />
+								</div>
+								<div>
+									<span className="font-bold">Undang Pegawai</span>
+									<div className="text-white/80 text-[12px] font-medium">
+										Kirim undangan akses ke sistem untuk tim operasional Anda.
+									</div>
+								</div>
 							</div>
-							<DialogTitle className="text-white text-lg font-semibold">
-								Undang Pegawai
-							</DialogTitle>
 						</div>
-						<DialogDescription className="text-blue-100 text-sm pl-12">
-							Tambahkan satu atau lebih pegawai untuk diundang sekaligus
-						</DialogDescription>
 					</div>
 
-					{/* Form */}
+					{/* Form Body - Restored Original Content Layout */}
 					<Form {...form}>
 						<form onSubmit={form.handleSubmit(onSubmit)}>
-							{/* Scrollable invite list */}
 							<div className="px-6 pt-5 space-y-4 max-h-[55vh] overflow-y-auto">
 								{fields.map((field, index) => (
 									<div
@@ -331,30 +327,27 @@ const InviteEmployeeDialog = ({
 								</button>
 							</div>
 
-							{/* Footer actions */}
-							<div className="px-6 py-4 border-t border-gray-100 flex justify-between items-center">
-								<span className="text-xs text-gray-400">
-									{fields.length} pegawai akan diundang
-								</span>
-								<div className="flex gap-2">
+							{/* Footer Actions */}
+							<div className="px-6 pb-6 pt-4 bg-white border-t border-slate-50 mt-4">
+								<div className="flex flex-row gap-3 w-full">
 									<Button
 										type="button"
-										variant="ghost"
-										size="sm"
+										variant="outline"
 										onClick={() => handleOpenChange(false)}
 										disabled={loading}
-										className="text-gray-500">
+										className="flex-1 h-11 rounded-xl border-slate-200 hover:bg-slate-50 transition-all font-semibold m-0 text-slate-600 hover:cursor-pointer">
 										Batal
 									</Button>
 									<Button
 										type="submit"
-										size="sm"
 										disabled={loading}
-										className="gap-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4">
+										className="flex-1 h-11 rounded-xl shadow-sm hover:shadow-md transition-all font-semibold bg-primary hover:bg-primary/90 m-0 hover:cursor-pointer">
 										{loading ?
-											<LoaderCircle className="w-3.5 h-3.5 animate-spin" />
-										:	<Send className="w-3.5 h-3.5" />}
-										{loading ? "Mengirim..." : "Kirim Undangan"}
+											<LoaderCircle className="w-4 h-4 animate-spin" />
+										:	<Send className="w-4 h-4" />}
+										{loading ?
+											"Mengirim..."
+										:	`Undang ${fields.length} Pegawai`}
 									</Button>
 								</div>
 							</div>
