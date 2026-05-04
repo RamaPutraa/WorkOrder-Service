@@ -6,6 +6,7 @@ import {
 	Building2,
 	ClipboardList,
 	ClipboardPenLine,
+	FileCheck,
 	FolderKanban,
 	GalleryVerticalEnd,
 	Home,
@@ -61,6 +62,10 @@ const data = {
 			url: "#",
 			icon: MonitorCog,
 			items: [
+				{
+					title: "Template",
+					url: "/dashboard/internal/services/create/company-type",
+				},
 				{
 					title: "Kelola Formulir",
 					url: "/dashboard/internal/forms",
@@ -145,14 +150,14 @@ const data = {
 			icon: ClipboardList,
 		},
 		{
-			title: "Daftar Permintaan",
+			title: "Daftar Permintaan ",
 			url: "/dashboard/internal/business/services/request",
 			icon: Send,
 		},
 		{
 			title: "Daftar Tugas Kerja",
 			url: "/dashboard/internal/workorders",
-			icon: ClipboardPenLine,
+			icon: ClipboardList,
 		},
 	],
 	navStaffBusiness: [
@@ -162,14 +167,39 @@ const data = {
 			icon: Inbox,
 		},
 		{
-			title: "Daftar Layanan",
-			url: "/dashboard/staff/services",
-			icon: ClipboardList,
+			title: "Konfirmasi Penugasan",
+			url: "/dashboard/staff/services-request/confirmation",
+			icon: FileCheck,
 		},
 		{
-			title: "Tugas Kerja",
-			url: "/dashboard/internal/workorders",
+			title: "Layanan Perusahaan",
+			url: "#",
+			icon: ClipboardList,
+			items: [
+				{
+					title: "Daftar Layanan",
+					url: "/dashboard/staff/services",
+				},
+				{
+					title: "Riwayat Permintaan",
+					url: "/dashboard/staff/services-request/history",
+				},
+			],
+		},
+		{
+			title: "Perintah Kerja",
+			url: "#",
 			icon: ClipboardPenLine,
+			items: [
+				{
+					title: "Tugas Kerja",
+					url: "/dashboard/internal/workorders",
+				},
+				{
+					title: "Riwayat Tugas Kerja",
+					url: "/dashboard/client/reports",
+				},
+			],
 		},
 	],
 };

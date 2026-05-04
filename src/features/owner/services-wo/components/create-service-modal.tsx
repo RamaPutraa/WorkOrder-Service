@@ -91,7 +91,7 @@ export const CreateServiceModal = ({
 							</div>
 						</div>
 
-						<div className="flex-1 min-w-0 pr-20">
+						<div className="flex-1 min-w-0 ">
 							<p className="font-semibold text-slate-800 text-sm group-hover:text-indigo-700 transition-colors">
 								Gunakan Template
 							</p>

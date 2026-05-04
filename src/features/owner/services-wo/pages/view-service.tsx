@@ -59,8 +59,7 @@ const ViewService: React.FC = () => {
 
 	const handleSelectTemplate = () => {
 		setIsCreateModalOpen(false);
-		// TODO: navigate ke halaman pilih template
-		navigate("/dashboard/internal/services/create?from=template");
+		navigate("/dashboard/internal/services/create/company-type");
 	};
 
 	const columns: ColumnDef<any>[] = useMemo(
