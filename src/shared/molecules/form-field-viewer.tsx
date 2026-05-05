@@ -16,6 +16,8 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 export type AnswerValue = string | string[] | number | File | null;
 
@@ -65,88 +67,87 @@ export default function FormFieldViewer({
 		onChange?.(newValue);
 	};
 
-	// ── Shared input class ──────────────────────────────────────────────────────
-	const inputCls = [
-		"flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm",
-		"transition-colors placeholder:text-muted-foreground/50",
-		"focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-		readOnly ?
-			"bg-muted/40 cursor-not-allowed text-muted-foreground select-none pointer-events-none"
-		:	"",
-	]
-		.filter(Boolean)
-		.join(" ");
-
 	const renderField = () => {
 		switch (field.type) {
 			case "text":
 				if (readOnly && !localValue && !field.placeholder) return null;
 				return (
-					<input
-						type={field.type}
+					<Input
+						type="text"
 						value={(localValue as string) ?? ""}
 						onChange={(e) => handleValueChange(e.target.value)}
 						placeholder={field.placeholder || undefined}
 						readOnly={readOnly}
 						disabled={readOnly}
-						className={inputCls}
+						className="bg-background"
 					/>
 				);
 
 			case "number":
-				const hideNumberInput =
-					readOnly && localValue == null && !field.placeholder;
-
 				return (
-					<div className="space-y-3">
-						{!hideNumberInput && (
-							<input
+					<div className="mb-4 flex flex-col gap-1.5 w-full">
+						{/* 1. Main Input Field (Tetap jadi fokus utama) */}
+						<Input
 								type="number"
 								value={localValue !== null ? String(localValue) : ""}
+								onKeyDown={(e) => {
+									const isControlKey = [
+										"Backspace",
+										"Tab",
+										"Delete",
+										"Enter",
+										"Escape",
+										"ArrowLeft",
+										"ArrowRight",
+										"Home",
+										"End",
+									].includes(e.key);
+
+									const isModifierKey = e.ctrlKey || e.metaKey;
+									const isNumberOrDecimal = /^[0-9.]$/.test(e.key);
+
+									if (!isControlKey && !isModifierKey && !isNumberOrDecimal) {
+										e.preventDefault();
+									}
+								}}
 								onChange={(e) => {
-									const v =
-										e.target.value === "" ? null : Number(e.target.value);
-									handleValueChange(v);
+									const val = e.target.value;
+									handleValueChange(val === "" ? null : Number(val));
 								}}
 								min={field.min ?? undefined}
 								max={field.max ?? undefined}
-								placeholder={field.placeholder || undefined}
+								placeholder={field.placeholder || "Masukkan angka..."}
 								readOnly={readOnly}
 								disabled={readOnly}
-								className={inputCls}
+								className="w-full bg-background"
 							/>
-						)}
 
-						{/* Min/max hints using input tags as requested */}
+						{/* 2. Min/Max Information Text (Kecil, rapi, dan tidak menyerupai form) */}
 						{(field.min != null || field.max != null) && (
-							<div className="flex items-center gap-4">
+							<div className="flex items-center gap-2 px-2 py-2 bg-muted/30 border border-border/60 rounded-lg w-fit">
 								{field.min != null && (
-									<div className="flex items-center gap-2 w-full">
-										<span className="text-xs font-medium text-muted-foreground">
-											Min
+									<span className="text-[11px] text-muted-foreground">
+										Min:{" "}
+										<span className="font-medium text-foreground/80">
+											{field.min}
 										</span>
-										<input
-											type="number"
-											value={field.min}
-											disabled
-											readOnly
-											className="h-8 w-full px-2 rounded-md border border-input bg-muted/50 text-xs text-muted-foreground cursor-not-allowed"
-										/>
-									</div>
+									</span>
 								)}
+
+								{/* Pemisah titik bullet jika Min dan Max keduanya ada */}
+								{field.min != null && field.max != null && (
+									<span className="text-[10px] text-muted-foreground/40">
+										●
+									</span>
+								)}
+
 								{field.max != null && (
-									<div className="flex items-center gap-2 w-full">
-										<span className="text-xs font-medium text-muted-foreground">
-											Maks
+									<span className="text-[11px] text-muted-foreground">
+										Maks:{" "}
+										<span className="font-medium text-foreground/80">
+											{field.max}
 										</span>
-										<input
-											type="number"
-											value={field.max}
-											disabled
-											readOnly
-											className="h-8 w-full px-2 rounded-md border border-input bg-muted/50 text-xs text-muted-foreground cursor-not-allowed"
-										/>
-									</div>
+									</span>
 								)}
 							</div>
 						)}
@@ -156,27 +157,27 @@ export default function FormFieldViewer({
 			case "textarea":
 				if (readOnly && !localValue && !field.placeholder) return null;
 				return (
-					<textarea
+					<Textarea
 						value={(localValue as string) ?? ""}
 						onChange={(e) => handleValueChange(e.target.value)}
 						placeholder={field.placeholder || undefined}
 						readOnly={readOnly}
 						disabled={readOnly}
 						rows={4}
-						className={`${inputCls} min-h-[96px] ${readOnly ? "resize-none" : "resize-y"}`}
+						className={`min-h-[96px] bg-background ${readOnly ? "resize-none" : "resize-y"}`}
 					/>
 				);
 
 			case "date":
 				if (readOnly && !localValue && !field.placeholder) return null;
 				return (
-					<input
+					<Input
 						type="date"
 						value={(localValue as string) ?? ""}
 						onChange={(e) => handleValueChange(e.target.value)}
 						readOnly={readOnly}
 						disabled={readOnly}
-						className={inputCls}
+						className="bg-background"
 					/>
 				);
 
