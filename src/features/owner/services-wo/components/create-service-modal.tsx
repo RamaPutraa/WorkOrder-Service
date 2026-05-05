@@ -1,12 +1,6 @@
 import { motion } from "framer-motion";
 import { ClipboardList, FileText, ArrowRight, Zap } from "lucide-react";
-import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-	DialogDescription,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 interface CreateServiceModalProps {
 	open: boolean;
@@ -25,13 +19,9 @@ export const CreateServiceModal = ({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-[560px] p-0 overflow-hidden rounded-2xl border border-slate-200/80 shadow-xl">
 				{/* Header Gradient */}
-				<div className="relative bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 px-8 pt-8 pb-10">
-					{/* Decorative circles */}
-					<div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4 pointer-events-none" />
-					<div className="absolute bottom-0 left-4 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 pointer-events-none" />
-
+				<div className="relative bg-gradient-to-b from-primary to-primary/70 px-8 pt-8 pb-10">
 					<div className="relative z-10">
-						<div className="flex items-center gap-2.5 mb-3">
+						<div className="flex items-center gap-2.5 ">
 							<div className="p-2 bg-white/15 rounded-lg">
 								<ClipboardList className="w-5 h-5 text-white" />
 							</div>
@@ -39,12 +29,6 @@ export const CreateServiceModal = ({
 								Buat Layanan Baru
 							</DialogTitle>
 						</div>
-						<DialogHeader>
-							<DialogDescription className="text-blue-100 text-sm leading-relaxed">
-								Pilih cara Anda ingin memulai. Buat dari awal atau hemat waktu
-								dengan template yang sudah tersedia.
-							</DialogDescription>
-						</DialogHeader>
 					</div>
 				</div>
 
