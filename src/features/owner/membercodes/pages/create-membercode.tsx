@@ -55,7 +55,7 @@ const CreateMembercode: React.FC = () => {
 
 			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 				{/* Left — Context Panel */}
-				<Card className="lg:col-span-1 border shadow-sm rounded-2xl bg-muted/30 h-max">
+				<Card className="lg:col-span-1 border shadow-sm rounded-2xl h-max">
 					<CardContent className="p-6 flex flex-col gap-5">
 						<div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10">
 							<Ticket className="w-7 h-7 text-primary" />
@@ -65,8 +65,8 @@ const CreateMembercode: React.FC = () => {
 							<p className="text-sm text-muted-foreground leading-relaxed">
 								Pembuatan massal akan meng-generate serangkaian kode
 								berlangganan unik dengan awalan (prefix) yang Anda tentukan.
-								Kode-kode ini belum aktif/terklaim hingga didistribusikan
-								ke klien tujuan.
+								Kode-kode ini belum aktif/terklaim hingga didistribusikan ke
+								klien tujuan.
 							</p>
 						</div>
 
@@ -92,7 +92,10 @@ const CreateMembercode: React.FC = () => {
 							<form
 								className="space-y-6"
 								onSubmit={form.handleSubmit(onSubmit as any)}>
-								<FormFields fields={membercodeFields} control={form.control as any} />
+								<FormFields
+									fields={membercodeFields}
+									control={form.control as any}
+								/>
 
 								<Separator />
 

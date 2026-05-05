@@ -1,22 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ClipboardList, Loader2, Info, Send } from "lucide-react";
+import { ClipboardList, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog";
 import { SectionLoading } from "@/shared/atoms";
 import { EmptyData } from "@/shared/molecules/empty-data";
 import { GenericFilter } from "@/shared/molecules/generic-filter";
 import PageHeader from "@/shared/atoms/header-content";
 import { useWoCreate } from "../hooks/useWoCreate";
+import ConfirmCreateWoDialog from "../components/confirm-wo-create-dialog";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -57,11 +50,6 @@ const WoServicesList: React.FC = () => {
 	useEffect(() => {
 		void fetchServices();
 	}, []);
-
-	// const handleCreateWoClick = (service: Service) => {
-	// 	setSelectedService(service);
-	// 	setConfirmOpen(true);
-	// };
 
 	const handleConfirmCreate = async () => {
 		if (!selectedService) return;
@@ -192,63 +180,13 @@ const WoServicesList: React.FC = () => {
 			</div>
 
 			{/* ─── Confirmation Dialog ─── */}
-			<Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-				<DialogContent className="max-w-md">
-					<DialogHeader>
-						<div className="flex items-center gap-3 mb-1">
-							<div className="p-2.5 rounded-xl bg-primary/10 text-primary shrink-0">
-								<Send className="size-5" />
-							</div>
-							<DialogTitle className="text-base leading-snug">
-								Konfirmasi Buat Perintah Kerja
-							</DialogTitle>
-						</div>
-						<DialogDescription className="text-sm leading-relaxed">
-							Anda akan membuat perintah kerja untuk layanan{" "}
-							<span className="font-semibold text-foreground">
-								&quot;{selectedService?.title}&quot;
-							</span>
-							. Tindakan ini akan langsung membuat work order baru berdasarkan
-							layanan tersebut.
-						</DialogDescription>
-					</DialogHeader>
-
-					{/* Info box */}
-					<div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-blue-50 border border-blue-100 text-blue-700 text-xs leading-relaxed">
-						<Info className="size-4 shrink-0 mt-0.5" />
-						<p>
-							Pastikan konfigurasi layanan sudah sesuai sebelum membuat perintah
-							kerja. Perintah kerja yang dibuat akan langsung masuk ke daftar
-							work order aktif.
-						</p>
-					</div>
-
-					<DialogFooter className="gap-2 ">
-						<Button
-							variant="outline"
-							onClick={handleCancelCreate}
-							disabled={creatingWo}
-							className="rounded-lg hover:cursor-pointer">
-							Batal
-						</Button>
-						<Button
-							onClick={handleConfirmCreate}
-							disabled={creatingWo}
-							className="rounded-lg hover:cursor-pointer">
-							{creatingWo ?
-								<>
-									<Loader2 className="size-4 animate-spin" />
-									Membuat...
-								</>
-							:	<>
-									<Send className="size-4" />
-									Ya, Buat Sekarang
-								</>
-							}
-						</Button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
+			<ConfirmCreateWoDialog
+				isOpen={confirmOpen}
+				onClose={handleCancelCreate}
+				onConfirm={handleConfirmCreate}
+				loading={creatingWo}
+				serviceTitle={selectedService?.title}
+			/>
 		</>
 	);
 };

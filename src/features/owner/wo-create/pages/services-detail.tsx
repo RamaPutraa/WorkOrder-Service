@@ -6,8 +6,6 @@ import {
 	ClipboardCheck,
 	FileText,
 	Globe,
-	Info,
-	Loader2,
 	Lock,
 	ScrollText,
 	Send,
@@ -16,16 +14,15 @@ import {
 	XCircle,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
 	Dialog,
 	DialogContent,
 	DialogDescription,
-	DialogFooter,
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import ConfirmCreateWoDialog from "../components/confirm-wo-create-dialog";
 import { SectionLoading, TextLoading } from "@/shared/atoms/loading-state";
 import PageHeader from "@/shared/atoms/header-content";
 import { EmptyData } from "@/shared/molecules/empty-data";
@@ -578,62 +575,13 @@ const WoServicesDetail: React.FC = () => {
 			}
 
 			{/* ─── Confirmation Dialog "Buat Perintah Kerja" ─── */}
-			<Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-				<DialogContent className="max-w-md">
-					<DialogHeader>
-						<div className="flex items-center gap-3 mb-1">
-							<div className="p-2.5 rounded-xl bg-primary/10 text-primary shrink-0">
-								<Send className="size-5" />
-							</div>
-							<DialogTitle className="text-base leading-snug">
-								Konfirmasi Buat Perintah Kerja
-							</DialogTitle>
-						</div>
-						<DialogDescription className="text-sm leading-relaxed">
-							Anda akan membuat perintah kerja berdasarkan layanan{" "}
-							<span className="font-semibold text-foreground">
-								&quot;{detailService?.title}&quot;
-							</span>
-							. Setelah dibuat, perintah kerja akan langsung masuk ke daftar
-							work order aktif perusahaan Anda.
-						</DialogDescription>
-					</DialogHeader>
-
-					{/* Info box */}
-					<div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-blue-50 border border-blue-100 text-blue-700 text-xs leading-relaxed">
-						<Info className="size-4 shrink-0 mt-0.5" />
-						<p>
-							Apakah Anda sudah memastikan seluruh konfigurasi layanan ini sudah
-							sesuai? Tindakan ini tidak dapat dibatalkan secara otomatis.
-						</p>
-					</div>
-
-					<DialogFooter className="gap-2 ">
-						<Button
-							variant="outline"
-							onClick={() => setConfirmOpen(false)}
-							disabled={creatingWo}
-							className="rounded-lg hover:cursor-pointer">
-							Batal
-						</Button>
-						<Button
-							onClick={handleConfirmCreate}
-							disabled={creatingWo}
-							className="rounded-lg hover:cursor-pointer">
-							{creatingWo ?
-								<>
-									<Loader2 className="size-4 animate-spin" />
-									Membuat...
-								</>
-							:	<>
-									<Send className="size-4" />
-									Ya, Buat Sekarang
-								</>
-							}
-						</Button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
+			<ConfirmCreateWoDialog
+				isOpen={confirmOpen}
+				onClose={() => setConfirmOpen(false)}
+				onConfirm={handleConfirmCreate}
+				loading={creatingWo}
+				serviceTitle={detailService?.title}
+			/>
 		</>
 	);
 };

@@ -13,9 +13,6 @@ const ClientCompanyServices = lazy(
 const PublicServicePage = lazy(
 	() => import("@/features/client/services-wo/pages/service-request"),
 );
-const ServicesList = lazy(
-	() => import("@/features/client/services-wo/pages/services-list"),
-);
 const ServiceSubmitPage = lazy(
 	() => import("@/features/client/services-wo/pages/services-submit"),
 );
@@ -39,10 +36,6 @@ export const clientRoutes: RouteObject[] = [
 	{
 		path: "company/services/:id/intake-forms",
 		element: <PublicServicePage />,
-	},
-	{
-		path: "services/",
-		element: <ServicesList />,
 	},
 	{
 		path: "submissions",
