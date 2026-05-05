@@ -51,7 +51,7 @@ const data = {
 	navSetup: [
 		{
 			title: "Kelola FAQ",
-			url: "",
+			url: "/dashboard/internal/faqs",
 			icon: FolderKanban,
 		},
 		{

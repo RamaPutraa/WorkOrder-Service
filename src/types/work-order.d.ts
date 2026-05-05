@@ -48,7 +48,6 @@ type WorkOrder = {
 	cancelledAt: string | null;
 	rejectedAt: string | null;
 	unprocessableAt: string | null;
-
 	completedAt: string | null;
 	failedAt: string | null;
 	draftedAt: string | null;

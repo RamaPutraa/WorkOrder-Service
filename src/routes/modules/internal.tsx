@@ -72,6 +72,9 @@ const WoServicesList = lazy(
 const WoServicesDetail = lazy(
 	() => import("@/features/owner/wo-create/pages/services-detail"),
 );
+const ViewFaq = lazy(
+	() => import("@/features/owner/faqs/pages/view-faq"),
+);
 
 export const internalRoutes: RouteObject[] = [
 	{
@@ -157,6 +160,10 @@ export const internalRoutes: RouteObject[] = [
 	{
 		path: "membercodes/create",
 		element: <CreateMembercode />,
+	},
+	{
+		path: "faqs",
+		element: <ViewFaq />,
 	},
 	{
 		path: "wo-create/services",

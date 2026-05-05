@@ -11,6 +11,12 @@ export const toggleActiveFaqApi = async (isActive: boolean) => {
 	return response.data;
 };
 
+// get all FAQ items
+export const getFaqListApi = async () => {
+	const response = await apiClient.get<FaqListResponse>("/faq/docs");
+	return response.data;
+};
+
 // upload text FAQ
 export const uploadFaqTextApi = async (data: FaqTextRequest) => {
 	const response = await apiClient.post<FaqTextResponse>(
@@ -35,5 +41,11 @@ export const uploadFaqPdfApi = async (data: FaqFileRequest) => {
 			},
 		},
 	);
+	return response.data;
+};
+
+// delete FAQ item by id
+export const deleteFaqApi = async (id: number) => {
+	const response = await apiClient.delete<FaqDeleteResponse>(`/faq/docs/${id}`);
 	return response.data;
 };

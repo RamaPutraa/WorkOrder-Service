@@ -1,6 +1,20 @@
 // is active faq
 type isActiveFaqResponse = ApiResponse<Company>;
 
+// Unified FAQ item (TEXT or PDF)
+type FaqItem = {
+	id: number;
+	title: string;
+	content: string;
+	type: "TEXT" | "PDF";
+	file_url?: string | null;
+	nime_type?: string | null;
+	size?: number | null;
+	created_at: string;
+};
+
+type FaqListResponse = ApiResponse<FaqItem[]>;
+
 // upload text
 type FaqText = {
 	id: number;
@@ -35,3 +49,6 @@ type FaqFileRequest = {
 	title: string;
 	file: File;
 };
+
+// delete FAQ
+type FaqDeleteResponse = ApiResponse<null>;
