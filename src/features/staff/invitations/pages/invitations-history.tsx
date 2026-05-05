@@ -1,17 +1,18 @@
 import { DataTable } from "@/components/ui/data-table";
 import { getInvitationColumns } from "../components/invitation-columns";
 import { useInvitations } from "../hooks/invitations";
-import { ChevronLeft } from "lucide-react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import { Badge } from "@/components/ui/badge";
 import StaffConfirmPage from "../components/staff-confirm";
 import { SectionLoading } from "@/shared/atoms";
+import PageHeader from "@/shared/atoms/header-content";
+import { Mail } from "lucide-react";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { TextLoading } from "@/shared/atoms/loading-state";
 
 const STATUS_SUMMARY = [
-	{ label: "Menunggu", key: "pending", variant: "outline" as const },
-	{ label: "Kadaluarsa", key: "expired", variant: "destructive" as const },
+	{ label: "Total Undangan", icon: Mail, key: "all" },
+	{ label: "Menunggu", icon: Mail, key: "pending" },
+	{ label: "Kadaluarsa", icon: Mail, key: "expired" },
 ];
 
 const InvitationsHistory = () => {
@@ -24,7 +25,7 @@ const InvitationsHistory = () => {
 		handleReject,
 		actionLoadingId,
 	} = useInvitations();
-	const navigate = useNavigate();
+	const [globalFilter, setGlobalFilter] = useState("");
 
 	const columns = getInvitationColumns({
 		onAccept: handleAccept,
@@ -53,56 +54,84 @@ const InvitationsHistory = () => {
 	}
 
 	return (
-		<>
+		<div className="space-y-6 pb-8">
 			{/* Header */}
-			<div className="flex items-center gap-4 mb-8">
-				<Button
-					onClick={() => navigate(-1)}
-					className="bg-primary hover:bg-primary/90 h-full shrink-0">
-					<ChevronLeft className="size-6" />
-				</Button>
-				<div className="flex-1">
-					<h1 className="text-2xl font-bold">Riwayat Undangan</h1>
-					<p className="text-muted-foreground text-sm mt-0.5">
-						Total {history.length} undangan diterima
-					</p>
-				</div>
-			</div>
-			{/* Table */}
-			<Card>
-				<CardHeader>
-					<h2 className="text-lg font-semibold">Daftar Riwayat Undangan</h2>
-				</CardHeader>
-				<CardContent>
-					{/* Status summary chips */}
-					{/* {!loading && history.length > 0 && ( */}
-					{history.length > 0 && (
-						<div className="flex flex-wrap gap-2 mb-5">
-							{STATUS_SUMMARY.map(({ label, key, variant }) => {
-								const count = history.filter((h) => h.status === key).length;
-								return (
-									<div
-										key={key}
-										className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border bg-white text-sm text-muted-foreground">
-										<Badge variant={variant} className="text-xs px-1.5">
-											{count}
-										</Badge>
-										{label}
-									</div>
-								);
-							})}
+			<PageHeader
+				title="Riwayat Undangan"
+				subtitle={
+					loading ?
+						<div className="flex items-center gap-1.5">
+							Daftar undangan - Total{" "}
+							<TextLoading variant="dots" message="" className="w-40" />
 						</div>
-					)}
+					:	`Daftar undangan - Total ${history.length} undangan`
+				}
+				backPath={true}
+			/>
+
+			{/* Summary Cards */}
+			{!loading && history.length > 0 && (
+				<div className="grid gap-3 grid-cols-2 lg:grid-cols-3">
+					{STATUS_SUMMARY.map(({ label, icon: Icon, key }) => {
+						const count =
+							key === "all" ?
+								history.length
+							:	history.filter((h) => h.status === key).length;
+						return (
+							<div
+								key={String(key)}
+								className="bg-muted/30 rounded-xl border p-1.5 transition-all hover:bg-muted/50">
+								<div className="flex items-center justify-between py-2 px-3">
+									<p className="text-muted-foreground text-xs sm:text-sm font-medium">
+										{label}
+									</p>
+									<Icon size={16} className="text-muted-foreground" />
+								</div>
+								<div className="pt-6 sm:pt-8 px-3 pb-3 mt-1 rounded-lg border bg-white shadow-sm">
+									<p className="text-2xl sm:text-3xl font-bold text-foreground">
+										{count}
+									</p>
+								</div>
+							</div>
+						);
+					})}
+				</div>
+			)}
+
+			{/* Table Container */}
+			<div className="bg-muted/20 rounded-xl shadow-sm border overflow-hidden">
+				{/* Table Header */}
+				<div className="px-5 py-5 border-b bg-muted/20">
+					<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+						<div>
+							<h2 className="text-lg font-semibold text-foreground">
+								Daftar Riwayat Undangan
+							</h2>
+							<p className="text-sm text-muted-foreground mt-1">
+								Lihat dan kelola undangan yang Anda terima
+							</p>
+						</div>
+						<div className="w-full sm:w-auto">
+							<Input
+								placeholder="Cari nama perusahaan..."
+								value={globalFilter}
+								onChange={(e) => setGlobalFilter(e.target.value)}
+								className="w-full sm:w-[300px] bg-white transition-shadow focus-visible:shadow-sm"
+							/>
+						</div>
+					</div>
+				</div>
+				<div className="p-0 sm:p-2">
 					<DataTable
 						columns={columns}
 						data={history}
-						searchKey="company"
+						searchValue={globalFilter}
 						loading={loading}
 						loadingMessage="Memuat riwayat undangan..."
 					/>
-				</CardContent>
-			</Card>
-		</>
+				</div>
+			</div>
+		</div>
 	);
 };
 

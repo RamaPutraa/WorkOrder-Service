@@ -9,12 +9,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import useAuth from "@/features/auth/hooks/useAuth";
 import { useDialogStore } from "@/store/dialogStore";
-import { useNavigate } from "react-router-dom";
+import { LogOutIcon } from "lucide-react";
 
 const AvatarDropdown = () => {
 	const { user, logout } = useAuth();
 	const { showDialog } = useDialogStore();
-	const navigate = useNavigate();
 	return (
 		<div>
 			<DropdownMenu>
@@ -29,14 +28,8 @@ const AvatarDropdown = () => {
 					</div>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end" className="w-48">
-					<DropdownMenuLabel>My Account</DropdownMenuLabel>
-					<DropdownMenuSeparator />
-					<DropdownMenuItem onClick={() => navigate("/dashboard/account")}>
-						Profile
-					</DropdownMenuItem>
-					<DropdownMenuItem onClick={() => console.log("Settings clicked")}>
-						Settings
-					</DropdownMenuItem>
+					<DropdownMenuLabel>{user?.name || "User"}</DropdownMenuLabel>
+
 					<DropdownMenuSeparator />
 					<DropdownMenuItem
 						onClick={() =>
@@ -48,6 +41,7 @@ const AvatarDropdown = () => {
 								onConfirm: logout,
 							})
 						}>
+						<LogOutIcon />
 						Logout
 					</DropdownMenuItem>
 				</DropdownMenuContent>

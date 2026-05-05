@@ -7,12 +7,6 @@ type NavbarProps = {
 	showMenu?: boolean;
 };
 
-const navLinks = [
-	{ label: "Beranda", href: "/" },
-	{ label: "Tentang", href: "/about" },
-	{ label: "Kontak", href: "/contact" },
-];
-
 const Navbar = ({ showMenu = false }: NavbarProps) => {
 	const { user } = useAuth();
 	const [scrolled, setScrolled] = useState(false);
@@ -41,20 +35,6 @@ const Navbar = ({ showMenu = false }: NavbarProps) => {
 						WorkOrder
 					</span>
 				</a>
-
-				{/* Desktop Nav */}
-				{showMenu && (
-					<nav className="hidden md:flex items-center gap-1">
-						{navLinks.map((link) => (
-							<a
-								key={link.href}
-								href={link.href}
-								className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200">
-								{link.label}
-							</a>
-						))}
-					</nav>
-				)}
 
 				{/* Right Actions */}
 				<div className="flex items-center gap-3">
@@ -91,15 +71,6 @@ const Navbar = ({ showMenu = false }: NavbarProps) => {
 			{/* Mobile Menu */}
 			{showMenu && mobileOpen && (
 				<div className="md:hidden border-t border-blue-100 bg-white/95 backdrop-blur-md px-6 py-4 space-y-1">
-					{navLinks.map((link) => (
-						<a
-							key={link.href}
-							href={link.href}
-							className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-							onClick={() => setMobileOpen(false)}>
-							{link.label}
-						</a>
-					))}
 					{!user && (
 						<div className="pt-3 border-t border-blue-100 mt-3 flex flex-col gap-2">
 							<a

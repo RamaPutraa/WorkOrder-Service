@@ -23,7 +23,6 @@ type SubmissionObject = {
 type InboxSR = {
 	_id: string;
 	code: string;
-	// TODO: bisa revisi statusnya
 	serviceRequestStatus:
 		| "received"
 		| "cancelled"

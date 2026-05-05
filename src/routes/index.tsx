@@ -1,5 +1,5 @@
 import { Suspense, lazy } from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import { AppLayout, PublicLayout, RootLayout } from "@/shared/templates";
 import { SectionLoading } from "@/shared/atoms/loading-state";
 
@@ -222,7 +222,7 @@ const router = createBrowserRouter([
 			{
 				element: (
 					<SuspenseLayout>
-						<PublicLayout />
+						<Outlet />
 					</SuspenseLayout>
 				),
 				children: publicRoutes,
