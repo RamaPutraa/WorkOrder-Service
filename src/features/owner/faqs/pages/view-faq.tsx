@@ -139,9 +139,10 @@ const CompactToggle = ({
 	const handleToggle = (checked: boolean) => {
 		showDialog({
 			title: checked ? "Aktifkan FAQ Publik?" : "Nonaktifkan FAQ Publik?",
-			description: checked
-				? "FAQ akan dapat dilihat oleh semua pengguna publik setelah diaktifkan."
-				: "FAQ tidak akan terlihat oleh pengguna publik setelah dinonaktifkan.",
+			description:
+				checked ?
+					"FAQ akan dapat dilihat oleh semua pengguna publik setelah diaktifkan."
+				:	"FAQ tidak akan terlihat oleh pengguna publik setelah dinonaktifkan.",
 			confirmText: checked ? "Aktifkan" : "Nonaktifkan",
 			cancelText: "Batal",
 			onConfirm: () => onToggle(checked),
@@ -309,6 +310,7 @@ const ViewFaq = () => {
 			<PageHeader
 				title="Kelola FAQ"
 				subtitle="Kelola pertanyaan umum dan dokumen referensi untuk publik"
+				backPath={true}
 				actionButtons={
 					<div className="flex items-center gap-3 w-full md:w-auto">
 						{/* Toggle aktif — compact, pojok kiri area action */}
