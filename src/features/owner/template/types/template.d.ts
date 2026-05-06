@@ -3,7 +3,7 @@ type CompanyType = {
 	_id: string;
 	companyTypeName: string;
 };
-type GetAllCompanyTypeResponse = ApiResponse<CompanyType>;
+type GetAllCompanyTypeResponse = ApiResponse<CompanyType[]>;
 
 // get service template
 type ServiceTemplate = {
@@ -11,7 +11,7 @@ type ServiceTemplate = {
 	title: string;
 	description: string;
 };
-type GetAllServiceTemplateResponse = ApiResponse<ServiceTemplate>;
+type GetAllServiceTemplateResponse = ApiResponse<ServiceTemplate[]>;
 
 // get service template preview
 type ServiceTemplatePreview = {
@@ -25,7 +25,5 @@ type ServiceTemplatePreviewResponse = ApiResponse<ServiceTemplatePreview>;
 type CreateServiceByTemplate = {
 	serviceTemplateIds: string[];
 };
-// request body
-type CreateServiceByTemplateRequest = ApiResponse<CreateServiceByTemplate>;
 // response
 type CreateServiceByTemplateResponse = ApiResponse<ServiceSummaryObject[]>;

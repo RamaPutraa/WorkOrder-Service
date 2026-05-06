@@ -1,5 +1,4 @@
 import CompanyTypeView from "@/features/owner/template/pages/company-type-view";
-import ServicesTypePreview from "@/features/owner/template/pages/services-type-preview";
 import ServicesTypeView from "@/features/owner/template/pages/services-type-view";
 import { lazy } from "react";
 import { type RouteObject } from "react-router-dom";
@@ -180,9 +179,5 @@ export const internalRoutes: RouteObject[] = [
 	{
 		path: "services/create/services-type",
 		element: <ServicesTypeView />,
-	},
-	{
-		path: "services/create/service-type/preview",
-		element: <ServicesTypePreview />,
 	},
 ];

@@ -19,14 +19,14 @@ export const getServiceTemplateApi = async (id: string) => {
 //  get service template preview
 export const getServiceTemplatePreviewApi = async (id: string) => {
 	const response = await apiClient.get<ServiceTemplatePreviewResponse>(
-		`/template/service/${id}`,
+		`/template/services/${id}`,
 	);
 	return response.data;
 };
 
 // generate service by template
 export const generateServiceByTemplateApi = async (
-	data: CreateServiceByTemplateRequest,
+	data: CreateServiceByTemplate,
 ) => {
 	const response = await apiClient.post<CreateServiceByTemplateResponse>(
 		"/template/services/generate-service-by-template",
