@@ -131,13 +131,13 @@ const ServicesTypeView = () => {
 														)}
 													</div>
 													<div
-														className={`shrink-0 p-3 rounded-xl transition-colors duration-200
+														className={`shrink-0 p-3 rounded-xl transition-colors duration-200 hidden md:block
 															${isSelected ? "bg-primary/10 text-primary" : "bg-primary/5 text-primary"}`}>
 														<FileText className="w-5 h-5" />
 													</div>
 													<div className="flex-1 space-y-1 min-w-0">
 														<h3
-															className={`text-sm font-semibold leading-snug line-clamp-1 transition-colors
+															className={`text-sm font-semibold leading-snug  transition-colors
 																${isSelected ? "text-primary" : "text-slate-900 group-hover:text-primary"}`}>
 															{tmpl.title}
 														</h3>
