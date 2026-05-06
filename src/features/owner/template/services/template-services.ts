@@ -29,7 +29,7 @@ export const generateServiceByTemplateApi = async (
 	data: CreateServiceByTemplate,
 ) => {
 	const response = await apiClient.post<CreateServiceByTemplateResponse>(
-		"/template/services/generate-service-by-template",
+		"/template/services/generate",
 		data,
 	);
 	return response.data;

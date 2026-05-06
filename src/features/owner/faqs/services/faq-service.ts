@@ -49,3 +49,9 @@ export const deleteFaqApi = async (id: number) => {
 	const response = await apiClient.delete<FaqDeleteResponse>(`/faq/docs/${id}`);
 	return response.data;
 };
+
+// ask AI
+export const askAiApi = async (data: AIRequest) => {
+	const response = await apiClient.post<AIResponse>("/faq/ask", data);
+	return response.data;
+};

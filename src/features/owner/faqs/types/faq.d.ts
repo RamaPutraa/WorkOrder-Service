@@ -52,3 +52,14 @@ type FaqFileRequest = {
 
 // delete FAQ
 type FaqDeleteResponse = ApiResponse<null>;
+
+// ask AI
+type AIContent = {
+	answer: string;
+};
+type AIResponse = ApiResponse<AIContent>;
+
+type AIRequest = {
+	companyId: string;
+	question: string;
+};
