@@ -150,7 +150,7 @@ const CompactToggle = ({
 	};
 
 	return (
-		<div className="flex items-center gap-3 px-3 py-2 bg-white border border-slate-100 rounded-xl shadow-sm">
+		<div className="flex items-center gap-3 px-3 py-2.5 bg-white border border-slate-100 rounded-xl shadow-sm">
 			<Label
 				htmlFor="faq-active-switch"
 				className={`text-xs font-bold transition-colors duration-200 ${
@@ -394,9 +394,8 @@ const ViewFaq = () => {
 										{filteredItems.length > 0 ?
 											<motion.div
 												key={`grid-${filter}`}
-												initial={{ opacity: 0 }}
-												animate={{ opacity: 1 }}
-												exit={{ opacity: 0 }}
+												initial={{ opacity: 0, y: 20 }}
+												animate={{ opacity: 1, y: 0 }}
 												className="grid grid-cols-1 md:grid-cols-2 gap-4">
 												{filteredItems.map((item, idx) => (
 													<FaqItemCard
@@ -411,6 +410,8 @@ const ViewFaq = () => {
 												key="empty-filter"
 												initial={{ opacity: 0 }}
 												animate={{ opacity: 1 }}
+												exit={{ opacity: 0 }}
+												transition={{ duration: 0.3 }}
 												className="flex flex-col items-center py-16 text-center">
 												<div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mb-3">
 													<FolderKanban className="w-7 h-7 text-slate-400" />

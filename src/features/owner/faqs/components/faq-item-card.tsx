@@ -25,7 +25,7 @@ const formatSize = (bytes?: number | null) => {
 	return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
-export function FaqItemCard({ item, onDelete, index }: FaqItemCardProps) {
+export function FaqItemCard({ item, onDelete }: FaqItemCardProps) {
 	const { showDialog } = useDialogStore();
 	const isPdf = item.type === "PDF";
 
@@ -41,9 +41,8 @@ export function FaqItemCard({ item, onDelete, index }: FaqItemCardProps) {
 
 	return (
 		<motion.div
-			initial={{ opacity: 0, y: 12 }}
-			animate={{ opacity: 1, y: 0 }}
-			transition={{ duration: 0.25, delay: index * 0.05 }}
+			whileHover={{ scale: 1.02, y: -4 }}
+			transition={{ duration: 0.2, ease: "easeOut" }}
 			className="group bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md hover:border-slate-200 transition-all duration-200 overflow-hidden">
 			<div className="p-5">
 				{/* Header row */}
@@ -59,7 +58,7 @@ export function FaqItemCard({ item, onDelete, index }: FaqItemCardProps) {
 					{/* Title + badges */}
 					<div className="flex-1 min-w-0">
 						<div className="flex items-center gap-2 flex-wrap">
-							<h3 className="text-sm font-bold text-slate-800 truncate max-w-[280px]">
+							<h3 className="text-sm font-bold text-slate-800 truncate ">
 								{item.title}
 							</h3>
 							<Badge
