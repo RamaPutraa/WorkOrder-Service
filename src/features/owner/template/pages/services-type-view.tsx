@@ -7,6 +7,7 @@ import { useGenerateTemplate } from "../hooks/use-generate-template";
 import { SectionLoading } from "@/shared/atoms";
 import { Button } from "@/components/ui/button";
 import { TemplatePreviewDialog } from "../components/template-preview-dialog";
+import ErrorPage from "@/shared/errors/templates/error-page";
 
 const ServicesTypeView = () => {
 	const {
@@ -25,11 +26,7 @@ const ServicesTypeView = () => {
 	);
 
 	if (error) {
-		return (
-			<div className="container py-8 text-center">
-				<p className="text-red-500">{error}</p>
-			</div>
-		);
+		return <ErrorPage />;
 	}
 
 	return (

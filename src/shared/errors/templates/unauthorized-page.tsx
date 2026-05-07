@@ -6,7 +6,7 @@ export default function UnauthorizedPage() {
 	const navigate = useNavigate();
 
 	return (
-		<div className="flex min-h-screen flex-col items-center justify-center bg-muted/30 px-4">
+		<div className="flex min-h-screen flex-col items-center justify-center px-4">
 			<div className="w-full max-w-md text-center space-y-6">
 				{/* Code */}
 				<p className="text-8xl font-bold tracking-tight text-slate-200 select-none">
