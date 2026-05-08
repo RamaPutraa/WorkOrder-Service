@@ -1,4 +1,4 @@
-import { FileText, Trash2, ExternalLink, Calendar } from "lucide-react";
+import { FileText, Trash2, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { useDialogStore } from "@/store/dialogStore";
@@ -6,6 +6,7 @@ import { useDialogStore } from "@/store/dialogStore";
 interface FaqItemCardProps {
 	item: FaqItem;
 	onDelete: (id: number) => Promise<void>;
+	onViewText?: (item: FaqItem) => void;
 	index: number;
 }
 
@@ -25,11 +26,12 @@ const formatSize = (bytes?: number | null) => {
 	return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
-export function FaqItemCard({ item, onDelete }: FaqItemCardProps) {
+export function FaqItemCard({ item, onDelete, onViewText }: FaqItemCardProps) {
 	const { showDialog } = useDialogStore();
 	const isPdf = item.type === "PDF";
 
-	const handleDelete = () => {
+	const handleDelete = (e: React.MouseEvent) => {
+		e.stopPropagation();
 		showDialog({
 			title: "Hapus Item FAQ",
 			description: `Apakah Anda yakin ingin menghapus "${item.title}"? Tindakan ini tidak dapat dibatalkan.`,
@@ -39,11 +41,20 @@ export function FaqItemCard({ item, onDelete }: FaqItemCardProps) {
 		});
 	};
 
+	const handleClickCard = () => {
+		if (isPdf && item.file_url) {
+			window.open(item.file_url, "_blank", "noopener,noreferrer");
+		} else if (!isPdf && onViewText) {
+			onViewText(item);
+		}
+	};
+
 	return (
 		<motion.div
+			onClick={handleClickCard}
 			whileHover={{ scale: 1.02, y: -4 }}
 			transition={{ duration: 0.2, ease: "easeOut" }}
-			className="group bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md hover:border-slate-200 transition-all duration-200 overflow-hidden">
+			className="group bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md hover:border-slate-200 transition-all duration-200 overflow-hidden cursor-pointer">
 			<div className="p-5">
 				{/* Header row */}
 				<div className="flex items-start gap-3">
@@ -87,17 +98,6 @@ export function FaqItemCard({ item, onDelete }: FaqItemCardProps) {
 
 					{/* Actions */}
 					<div className="flex items-center gap-1.5 shrink-0">
-						{isPdf && item.file_url && (
-							<a
-								href={item.file_url}
-								target="_blank"
-								rel="noopener noreferrer"
-								id={`faq-view-pdf-${item.id}`}
-								title="Buka PDF"
-								className="p-2 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-150">
-								<ExternalLink className="w-4 h-4" />
-							</a>
-						)}
 						<button
 							id={`faq-delete-${item.id}`}
 							onClick={handleDelete}

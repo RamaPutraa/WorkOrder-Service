@@ -20,7 +20,7 @@ const useAuth = () => {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const { setAuth, logout, user, token, isAuthenticated } = useAuthStore();
-	const { profile, setProfile } = useProfileStore();
+	const { setProfile } = useProfileStore();
 
 	// 🔹 fungsi login
 	const login = async (data: LoginRequest) => {

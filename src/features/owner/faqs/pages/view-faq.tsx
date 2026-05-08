@@ -17,6 +17,14 @@ import { SectionLoading } from "@/shared/atoms/loading-state";
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
+import {
+	Sheet,
+	SheetContent,
+	SheetHeader,
+	SheetTitle,
+	SheetDescription,
+} from "@/components/ui/sheet";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 /* ─── Stat Card ──────────────────────────────────────────────────────────── */
 
@@ -128,6 +136,7 @@ const ViewFaq = () => {
 	} = useFaq();
 
 	const [showDialog, setShowDialog] = useState(false);
+	const [selectedTextItem, setSelectedTextItem] = useState<FaqItem | null>(null);
 	const [filter, setFilter] = useState<FilterType>("all");
 	const navigate = useNavigate();
 
@@ -270,6 +279,7 @@ const ViewFaq = () => {
 														key={item.id}
 														item={item}
 														onDelete={handleDelete}
+														onViewText={(selected) => setSelectedTextItem(selected)}
 														index={idx}
 													/>
 												))}
@@ -325,6 +335,27 @@ const ViewFaq = () => {
 				onSubmitPdf={handleAddPdf}
 				submitting={submitting}
 			/>
+
+			{/* ── Text Drawer ── */}
+			<Sheet
+				open={selectedTextItem !== null}
+				onOpenChange={(open) => !open && setSelectedTextItem(null)}>
+				<SheetContent className="w-full sm:max-w-md bg-white border-l border-slate-100 shadow-2xl p-0 flex flex-col">
+					<SheetHeader className="p-6 border-b border-slate-100 shrink-0 text-left">
+						<SheetTitle className="text-xl font-bold leading-tight">
+							{selectedTextItem?.title}
+						</SheetTitle>
+						<SheetDescription className="text-sm text-slate-500">
+							Detail Konten Teks FAQ
+						</SheetDescription>
+					</SheetHeader>
+					<ScrollArea className="flex-1 p-6">
+						<div className="prose prose-sm max-w-none text-slate-700 whitespace-pre-wrap leading-relaxed">
+							{selectedTextItem?.content}
+						</div>
+					</ScrollArea>
+				</SheetContent>
+			</Sheet>
 		</div>
 	);
 };
