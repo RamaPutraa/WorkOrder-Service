@@ -12,25 +12,32 @@ import type {
 	ChatMessage,
 	FAQData,
 } from "./faq-chatbot.types";
-import { MOCK_FAQS, MOCK_AI_RESPONSE } from "./faq-chatbot.mock";
+import { askAiApi } from "@/features/owner/faqs/services/faq-service";
+import { isAxiosError } from "axios";
+import { useFaqChatStore } from "@/store/faqChatStore";
 
 export function FaqChatbot({
 	title = "FAQ & Bantuan",
-	faqs = MOCK_FAQS,
+	companyId,
+	faqs = [],
 	// role = "client",
 }: FaqChatbotProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [inputValue, setInputValue] = useState("");
 	const [isTyping, setIsTyping] = useState(false);
-	const [messages, setMessages] = useState<ChatMessage[]>([
-		{
-			id: "init-1",
-			sender: "ai",
-			text: `Halo! Saya asisten virtual sistem. Ada yang bisa saya bantu terkait ${title}?`,
-			isButtonList: true,
-			buttons: faqs,
-		},
-	]);
+	
+	const { chatHistory, addMessage } = useFaqChatStore();
+
+	const initialMessage: ChatMessage = {
+		id: "init-1",
+		sender: "ai",
+		text: `Halo! Saya asisten virtual sistem. Ada yang bisa saya bantu terkait ${title}?`,
+		isButtonList: true,
+		buttons: faqs,
+	};
+
+	// Fallback to initial message if no history for this company
+	const messages = (companyId && chatHistory[companyId]) ? chatHistory[companyId] : [initialMessage];
 
 	const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -41,8 +48,8 @@ export function FaqChatbot({
 		}
 	}, [messages, isTyping, isOpen]);
 
-	const handleSendMessage = (text: string) => {
-		if (!text.trim()) return;
+	const handleSendMessage = async (text: string) => {
+		if (!text.trim() || !companyId) return;
 
 		// Add user message
 		const userMsg: ChatMessage = {
@@ -50,21 +57,40 @@ export function FaqChatbot({
 			sender: "user",
 			text: text,
 		};
-		setMessages((prev) => [...prev, userMsg]);
+		addMessage(companyId, userMsg);
 		setInputValue("");
 		setIsTyping(true);
 
-		// Simulate AI delay
-		setTimeout(() => {
-			setIsTyping(false);
-			const aiResponseText = MOCK_AI_RESPONSE(text);
+		try {
+			const response = await askAiApi({
+				companyId,
+				question: text,
+			});
+
 			const aiMsg: ChatMessage = {
 				id: (Date.now() + 1).toString(),
 				sender: "ai",
-				text: aiResponseText,
+				text: response.data?.answer || "Maaf, tidak ada jawaban dari sistem.",
 			};
-			setMessages((prev) => [...prev, aiMsg]);
-		}, 1200);
+			addMessage(companyId, aiMsg);
+		} catch (error: unknown) {
+			let errorMsg =
+				"Maaf, terjadi kesalahan saat menghubungi asisten virtual.";
+			if (isAxiosError(error)) {
+				errorMsg = error.response?.data?.message || error.message || errorMsg;
+			} else if (error instanceof Error) {
+				errorMsg = error.message;
+			}
+
+			const aiMsg: ChatMessage = {
+				id: (Date.now() + 1).toString(),
+				sender: "ai",
+				text: errorMsg,
+			};
+			addMessage(companyId, aiMsg);
+		} finally {
+			setIsTyping(false);
+		}
 	};
 
 	const handleFaqClick = (faq: FAQData) => {
@@ -126,7 +152,7 @@ export function FaqChatbot({
 														msg.sender === "user" ? "items-end" : "items-start"
 													}`}>
 													<div
-														className={`p-3 rounded-2xl text-sm ${
+														className={`p-3 rounded-2xl text-sm whitespace-pre-wrap ${
 															msg.sender === "user" ?
 																"bg-primary text-primary-foreground rounded-tr-sm"
 															:	"bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-foreground rounded-tl-sm shadow-sm"

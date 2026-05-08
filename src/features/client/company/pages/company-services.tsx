@@ -337,7 +337,7 @@ const ClientCompanyServices = () => {
 				onSuccess={fetchCompanyServices}
 			/>
 
-			<FaqChatbot title={company?.name || ""} />
+			<FaqChatbot title={company?.name || ""} companyId={company?._id || ""} />
 		</>
 	);
 };

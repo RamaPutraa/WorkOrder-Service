@@ -17,6 +17,8 @@ export interface FaqChatbotProps {
    * Title displayed in the chat header (e.g. company name)
    */
   title?: string;
+
+  companyId: string;
   
   /**
    * List of FAQs to be displayed initially

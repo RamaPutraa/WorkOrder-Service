@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { logoutApi } from "@/features/auth/services/authService";
 import { unregisterFcmTokenApi } from "@/features/notifications/services/notification-service";
 import { useNotificationStore } from "./notificationStore";
+import { useFaqChatStore } from "./faqChatStore";
 
 type AuthState = {
 	token: string | null;
@@ -72,6 +73,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 			localStorage.removeItem("user");
 			localStorage.removeItem("profile-storage");
 			localStorage.removeItem("notification-storage");
+			useFaqChatStore.getState().clearChatHistory();
 			set({ token: null, user: null, isAuthenticated: false });
 		}
 	},

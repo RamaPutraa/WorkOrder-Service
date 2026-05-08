@@ -8,8 +8,10 @@ import {
 	Pencil,
 	CheckCircle2,
 	Text,
+	MessageCircleIcon,
 } from "lucide-react";
 import { useCompanyProfile, useUpdateCompany } from "../hooks/companyHooks";
+import { useFaq } from "../../faqs/hooks/useFaq";
 
 // Components
 import { Button } from "@/components/ui/button";
@@ -32,8 +34,15 @@ const ProfileCompany = () => {
 	const { company, loading, error, refetch } = useCompanyProfile();
 	const { updateCompany, loading: updating } = useUpdateCompany(refetch);
 
+	const {
+		isActive: isFaqActive,
+		handleToggleActive: handleFaqToggle,
+		submitting: faqSubmitting,
+	} = useFaq();
+
 	const [openEdit, setOpenEdit] = useState(false);
 	const [openToggleConfirm, setOpenToggleConfirm] = useState(false);
+	const [openFaqToggleConfirm, setOpenFaqToggleConfirm] = useState(false);
 
 	if (loading) return <SectionLoading message="Memuat profil perusahaan.." />;
 
@@ -78,6 +87,11 @@ const ProfileCompany = () => {
 			isActive: !company.isActive,
 		});
 		setOpenToggleConfirm(false);
+	};
+
+	const handleToggleFaqActive = async () => {
+		await handleFaqToggle(!isFaqActive);
+		setOpenFaqToggleConfirm(false);
 	};
 
 	return (
@@ -229,6 +243,38 @@ const ProfileCompany = () => {
 							/>
 						</div>
 					</div>
+
+					{/* ── FAQ Publik Toggle ── */}
+					<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 p-5 border border-border/40 rounded-2xl bg-card transition-all hover:border-primary/20">
+						<div className="space-y-1.5">
+							<div className="">
+								<p className="text-sm font-bold text-foreground">
+									Status FAQ Publik
+								</p>
+								<p className="text-sm text-muted-foreground leading-relaxed">
+									{isFaqActive ?
+										"FAQ saat ini aktif dan dapat dilihat oleh pengguna publik di halaman utama."
+									:	"FAQ saat ini disembunyikan dari pengguna publik."}
+								</p>
+								{isFaqActive && (
+									<p className="text-xs font-medium text-emerald-600 flex items-center gap-1.5 mt-1.5">
+										<MessageCircleIcon className="w-3.5 h-3.5" />
+										Publik dapat melihat FAQ
+									</p>
+								)}
+							</div>
+						</div>
+
+						{/* Toggle Switch */}
+						<div className="pl-10 sm:pl-0 shrink-0">
+							<Switch
+								checked={isFaqActive}
+								disabled={faqSubmitting}
+								onCheckedChange={() => setOpenFaqToggleConfirm(true)}
+								className="data-[state=checked]:bg-emerald-600"
+							/>
+						</div>
+					</div>
 				</div>
 
 				{/* ── Dialogs ─────────────────────────────────────────────────── */}
@@ -271,6 +317,45 @@ const ProfileCompany = () => {
 								{updating ?
 									"Memproses..."
 								: company.isActive ?
+									"Ya, Nonaktifkan"
+								:	"Ya, Aktifkan"}
+							</AlertDialogAction>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialog>
+
+				<AlertDialog
+					open={openFaqToggleConfirm}
+					onOpenChange={setOpenFaqToggleConfirm}>
+					<AlertDialogContent className="rounded-2xl">
+						<AlertDialogHeader>
+							<AlertDialogTitle>
+								{isFaqActive ?
+									"Nonaktifkan FAQ Publik?"
+								:	"Aktifkan FAQ Publik?"}
+							</AlertDialogTitle>
+							<AlertDialogDescription className="leading-relaxed">
+								{isFaqActive ?
+									"FAQ akan disembunyikan dari halaman publik dan tidak dapat diakses oleh umum."
+								:	"FAQ akan ditampilkan di halaman publik dan dapat dibaca oleh semua orang."
+								}
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+						<AlertDialogFooter>
+							<AlertDialogCancel disabled={faqSubmitting} className="rounded-xl">
+								Batal
+							</AlertDialogCancel>
+							<AlertDialogAction
+								disabled={faqSubmitting}
+								onClick={handleToggleFaqActive}
+								className={`rounded-xl ${
+									isFaqActive ?
+										"bg-destructive hover:bg-destructive/90 text-white"
+									:	"bg-emerald-600 hover:bg-emerald-700 text-white"
+								}`}>
+								{faqSubmitting ?
+									"Memproses..."
+								: isFaqActive ?
 									"Ya, Nonaktifkan"
 								:	"Ya, Aktifkan"}
 							</AlertDialogAction>

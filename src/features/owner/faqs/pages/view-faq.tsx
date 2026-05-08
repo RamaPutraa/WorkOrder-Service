@@ -1,74 +1,22 @@
 import React, { useEffect, useState } from "react";
 import PageHeader from "@/shared/atoms/header-content";
-import { FolderKanban, Plus, FileText, Hash, File } from "lucide-react";
+import {
+	FolderKanban,
+	Plus,
+	FileText,
+	Hash,
+	File,
+	MessageCircleIcon,
+	Settings,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { useFaq } from "../hooks/useFaq";
 import { AddFaqDialog } from "../components/faq-add-dialogs";
 import { FaqItemCard } from "../components/faq-item-card";
 import { SectionLoading } from "@/shared/atoms/loading-state";
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { useDialogStore } from "@/store/dialogStore";
-
-/* ─── Mock Data ──────────────────────────────────────────────────────────── */
-
-const MOCK_FAQ_ITEMS: FaqItem[] = [
-	{
-		id: 1,
-		title: "Bagaimana cara mendaftar sebagai klien?",
-		content:
-			"Untuk mendaftar sebagai klien, Anda perlu mengunjungi halaman registrasi dan mengisi formulir pendaftaran dengan data diri yang valid. Setelah itu, Anda akan menerima email verifikasi untuk mengaktifkan akun Anda.",
-		type: "TEXT",
-		file_url: null,
-		nime_type: null,
-		size: null,
-		created_at: "2026-05-01T08:00:00Z",
-	},
-	{
-		id: 2,
-		title: "Panduan Penggunaan Layanan Work Order",
-		content: "",
-		type: "PDF",
-		file_url: "https://example.com/panduan-workorder.pdf",
-		nime_type: "application/pdf",
-		size: 2048576,
-		created_at: "2026-05-02T10:30:00Z",
-	},
-	{
-		id: 3,
-		title: "Apa saja layanan yang tersedia?",
-		content:
-			"Kami menyediakan berbagai layanan seperti pemeliharaan fasilitas, perbaikan peralatan, dan layanan kebersihan. Setiap layanan memiliki konfigurasi Work Order yang berbeda sesuai kebutuhan perusahaan.",
-		type: "TEXT",
-		file_url: null,
-		nime_type: null,
-		size: null,
-		created_at: "2026-05-03T09:15:00Z",
-	},
-	{
-		id: 4,
-		title: "SOP Keselamatan Kerja.pdf",
-		content: "",
-		type: "PDF",
-		file_url: "https://example.com/sop-keselamatan.pdf",
-		nime_type: "application/pdf",
-		size: 512000,
-		created_at: "2026-05-04T14:00:00Z",
-	},
-	{
-		id: 5,
-		title: "Berapa lama proses persetujuan Work Order?",
-		content:
-			"Proses persetujuan Work Order bergantung pada konfigurasi layanan. Jika approval diatur ke 'auto', Work Order langsung disetujui. Jika diatur ke 'manager', proses persetujuan membutuhkan waktu 1–2 hari kerja.",
-		type: "TEXT",
-		file_url: null,
-		nime_type: null,
-		size: null,
-		created_at: "2026-05-05T11:00:00Z",
-	},
-];
+import { useNavigate } from "react-router-dom";
 
 /* ─── Stat Card ──────────────────────────────────────────────────────────── */
 
@@ -121,54 +69,6 @@ const StatCard = ({ icon, label, value, color }: StatCardProps) => {
 	);
 };
 
-/* ─── Compact Toggle ─────────────────────────────────────────────────────── */
-
-interface CompactToggleProps {
-	isActive: boolean;
-	submitting: boolean;
-	onToggle: (val: boolean) => void;
-}
-
-const CompactToggle = ({
-	isActive,
-	submitting,
-	onToggle,
-}: CompactToggleProps) => {
-	const { showDialog } = useDialogStore();
-
-	const handleToggle = (checked: boolean) => {
-		showDialog({
-			title: checked ? "Aktifkan FAQ Publik?" : "Nonaktifkan FAQ Publik?",
-			description:
-				checked ?
-					"FAQ akan dapat dilihat oleh semua pengguna publik setelah diaktifkan."
-				:	"FAQ tidak akan terlihat oleh pengguna publik setelah dinonaktifkan.",
-			confirmText: checked ? "Aktifkan" : "Nonaktifkan",
-			cancelText: "Batal",
-			onConfirm: () => onToggle(checked),
-		});
-	};
-
-	return (
-		<div className="flex items-center gap-3 px-3 py-2.5 bg-white border border-slate-100 rounded-xl shadow-sm">
-			<Label
-				htmlFor="faq-active-switch"
-				className={`text-xs font-bold transition-colors duration-200 ${
-					isActive ? "text-emerald-600" : "text-slate-500"
-				}`}>
-				{isActive ? "FAQ Aktif" : "FAQ Nonaktif"}
-			</Label>
-			<Switch
-				id="faq-active-switch"
-				checked={isActive}
-				onCheckedChange={handleToggle}
-				disabled={submitting}
-				className="data-[state=checked]:bg-emerald-500"
-			/>
-		</div>
-	);
-};
-
 /* ─── Filter Tabs ────────────────────────────────────────────────────────── */
 
 type FilterType = "all" | "TEXT" | "PDF";
@@ -215,45 +115,24 @@ const FilterTabs = ({ active, onChange, counts }: FilterTabsProps) => {
 
 /* ─── Main Page ──────────────────────────────────────────────────────────── */
 
-// NOTE: Set ke `true` untuk memakai mock data, ganti ke `false` saat endpoint sudah siap
-const USE_MOCK = true;
-
 const ViewFaq = () => {
 	const {
-		faqItems: apiFaqItems,
-		isActive: apiIsActive,
+		faqItems,
 		loading,
 		submitting,
 		error,
 		fetchFaqList,
-		handleToggleActive: apiToggle,
 		handleAddText,
 		handleAddPdf,
-		handleDelete: apiDelete,
+		handleDelete,
 	} = useFaq();
-
-	// ── Mock state ──
-	const [mockItems, setMockItems] = useState<FaqItem[]>(MOCK_FAQ_ITEMS);
-	const [mockIsActive, setMockIsActive] = useState(true);
-
-	const faqItems = USE_MOCK ? mockItems : apiFaqItems;
-	const isActive = USE_MOCK ? mockIsActive : apiIsActive;
-
-	const handleToggleActive =
-		USE_MOCK ? (val: boolean) => setMockIsActive(val) : apiToggle;
-
-	const handleDelete =
-		USE_MOCK ?
-			async (id: number) => {
-				setMockItems((prev) => prev.filter((item) => item.id !== id));
-			}
-		:	apiDelete;
 
 	const [showDialog, setShowDialog] = useState(false);
 	const [filter, setFilter] = useState<FilterType>("all");
+	const navigate = useNavigate();
 
 	useEffect(() => {
-		if (!USE_MOCK) void fetchFaqList();
+		void fetchFaqList();
 	}, [fetchFaqList]);
 
 	const textItems = faqItems.filter((i) => i.type === "TEXT");
@@ -261,45 +140,41 @@ const ViewFaq = () => {
 	const filteredItems =
 		filter === "all" ? faqItems : faqItems.filter((i) => i.type === filter);
 
-	// ── Mock submit handlers ──
-	const handleAddTextMock = async (data: FaqTextRequest): Promise<boolean> => {
-		setMockItems((prev) => [
-			{
-				id: Date.now(),
-				title: data.title,
-				content: data.content,
-				type: "TEXT",
-				file_url: null,
-				nime_type: null,
-				size: null,
-				created_at: new Date().toISOString(),
-			},
-			...prev,
-		]);
-		return true;
-	};
-
-	const handleAddPdfMock = async (data: FaqFileRequest): Promise<boolean> => {
-		setMockItems((prev) => [
-			{
-				id: Date.now(),
-				title: data.title,
-				content: "",
-				type: "PDF",
-				file_url: URL.createObjectURL(data.file),
-				nime_type: "application/pdf",
-				size: data.file.size,
-				created_at: new Date().toISOString(),
-			},
-			...prev,
-		]);
-		return true;
-	};
-
-	if (!USE_MOCK && error) {
+	if (error) {
 		return (
-			<div className="container py-8 px-10">
-				<p className="text-red-500">{error}</p>
+			// min-h-[75vh] memastikan konten berada di tengah layar secara vertikal
+			<div className="w-full min-h-[75vh] flex flex-col items-center justify-center p-6 animate-in fade-in zoom-in-95 duration-500">
+				{/* ── Ikon Dekoratif ───────────────────────────────────────── */}
+				<div className="relative mb-8">
+					{/* Efek cahaya berpendar (Glow) di belakang ikon */}
+					<div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
+
+					{/* Kotak Ikon Squircle */}
+					<div className="relative w-18 h-18 bg-primary/5 border border-border shadow-sm rounded-xl flex items-center justify-center transform transition-transform hover:scale-105  duration-300">
+						<MessageCircleIcon
+							className="w-8 h-8 text-primary"
+							strokeWidth={1.5}
+						/>
+					</div>
+				</div>
+
+				{/* ── Teks Arahan ──────────────────────────────────────────── */}
+				<h2 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight mb-3 text-center">
+					Fitur FAQ Belum Aktif
+				</h2>
+				<p className="text-sm sm:text-base text-muted-foreground max-w-md text-center leading-relaxed mb-8">
+					{error}
+				</p>
+
+				{/* ── Tombol Aksi (Untuk Navigasi Nanti) ───────────────────── */}
+				<Button
+					onClick={() => {
+						navigate("/dashboard/internal/company");
+					}}
+					className="rounded-xl shadow-sm px-6 h-11 text-sm font-semibold transition-transform active:scale-95 hover:cursor-pointer">
+					<Settings className="w-4 h-4 mr-2" />
+					Buka Profil Perusahaan
+				</Button>
 			</div>
 		);
 	}
@@ -313,13 +188,6 @@ const ViewFaq = () => {
 				backPath={true}
 				actionButtons={
 					<div className="flex items-center gap-3 w-full md:w-auto">
-						{/* Toggle aktif — compact, pojok kiri area action */}
-						<CompactToggle
-							isActive={isActive}
-							submitting={USE_MOCK ? false : submitting}
-							onToggle={handleToggleActive}
-						/>
-
 						{/* Satu tombol tambah */}
 						<Button
 							id="btn-add-faq"
@@ -334,7 +202,7 @@ const ViewFaq = () => {
 
 			<div className="pb-10 space-y-6">
 				<AnimatePresence mode="wait">
-					{!USE_MOCK && loading ?
+					{loading ?
 						<motion.div
 							key="loading"
 							initial={{ opacity: 0 }}
@@ -430,8 +298,8 @@ const ViewFaq = () => {
 							:	/* ── Empty State ── */
 								<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
 									<div className="flex flex-col items-center py-20 text-center gap-4">
-										<div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-50 to-rose-50 border border-slate-100 flex items-center justify-center">
-											<FolderKanban className="w-8 h-8 text-slate-400" />
+										<div className="w-16 h-16 rounded-2xl shadow-sm bg-primary/5 border border-border flex items-center justify-center">
+											<FolderKanban className="w-8 h-8 text-primary" />
 										</div>
 										<div>
 											<p className="text-base font-bold text-slate-700">
@@ -441,12 +309,6 @@ const ViewFaq = () => {
 												Mulai dengan menambahkan konten teks atau dokumen PDF.
 											</p>
 										</div>
-										<Button
-											onClick={() => setShowDialog(true)}
-											className="h-10 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-sm hover:cursor-pointer transition-all active:scale-95 flex items-center gap-2">
-											<Plus className="w-4 h-4" />
-											Tambah FAQ
-										</Button>
 									</div>
 								</motion.div>
 							}
@@ -459,9 +321,9 @@ const ViewFaq = () => {
 			<AddFaqDialog
 				open={showDialog}
 				onClose={() => setShowDialog(false)}
-				onSubmitText={USE_MOCK ? handleAddTextMock : handleAddText}
-				onSubmitPdf={USE_MOCK ? handleAddPdfMock : handleAddPdf}
-				submitting={USE_MOCK ? false : submitting}
+				onSubmitText={handleAddText}
+				onSubmitPdf={handleAddPdf}
+				submitting={submitting}
 			/>
 		</div>
 	);

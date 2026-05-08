@@ -58,7 +58,7 @@ export const useFaq = () => {
 					content: res.data.content,
 					type: "TEXT",
 					file_url: null,
-					nime_type: null,
+					mime_type: null,
 					size: null,
 					created_at: res.data.created_at,
 				};
@@ -86,7 +86,7 @@ export const useFaq = () => {
 					content: res.data.content,
 					type: "PDF",
 					file_url: res.data.file_url,
-					nime_type: res.data.nime_type,
+					mime_type: res.data.mime_type,
 					size: res.data.size,
 					created_at: res.data.created_at,
 				};
