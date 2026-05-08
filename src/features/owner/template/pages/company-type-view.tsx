@@ -6,7 +6,6 @@ import { FileCog } from "lucide-react";
 import { useCompanyType } from "../hooks/use-company-type";
 import { SectionLoading } from "@/shared/atoms";
 import { EmptyData } from "@/shared/molecules/empty-data";
-import ErrorPage from "@/shared/errors/templates/error-page";
 
 const CompanyTypeView = () => {
 	const navigate = useNavigate();
@@ -23,7 +22,7 @@ const CompanyTypeView = () => {
 	};
 
 	if (error) {
-		return <ErrorPage />;
+		return <EmptyData />;
 	}
 
 	return (

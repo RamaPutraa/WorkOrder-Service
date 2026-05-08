@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { SectionLoading } from "@/shared/atoms";
 import PageHeader from "@/shared/atoms/header-content";
 import { EmptyData } from "@/shared/molecules/empty-data";
@@ -19,7 +18,6 @@ import {
 
 const CompanyReportWo = () => {
 	const {
-		navigate,
 		reportData,
 		formObject,
 		loading,
@@ -85,22 +83,7 @@ const CompanyReportWo = () => {
 
 			{loading && <SectionLoading message="Memuat laporan..." />}
 
-			{error && !loading && (
-				<Card className="p-8 border-red-200 bg-red-50">
-					<div className="flex flex-col items-center gap-3 text-center">
-						<XCircle className="w-12 h-12 text-red-500" />
-						<div>
-							<h3 className="font-semibold text-red-900">
-								Gagal Memuat Laporan
-							</h3>
-							<p className="text-sm text-red-700 mt-1">{error}</p>
-						</div>
-						<Button onClick={() => navigate(-1)} variant="outline" size="sm">
-							Kembali
-						</Button>
-					</div>
-				</Card>
-			)}
+			{error && !loading && <EmptyData />}
 
 			{!loading && !error && reportData && (
 				<div className="space-y-6">

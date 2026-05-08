@@ -7,6 +7,7 @@ import PageHeader from "@/shared/atoms/header-content";
 import { TextLoading } from "@/shared/atoms/loading-state";
 import { Input } from "@/components/ui/input";
 import { Clock, CheckCircle, XCircle, Timer } from "lucide-react";
+import { EmptyData } from "@/shared/molecules/empty-data";
 
 const STATUS_SUMMARY = [
 	{ label: "Menunggu", icon: Timer, key: "pending" },
@@ -42,13 +43,7 @@ const HistoryStaffInvitations = () => {
 	}, [fetchHistory]);
 
 	if (error) {
-		return (
-			<div className="p-6">
-				<div className="bg-red-50 border border-red-200 rounded-lg p-4">
-					<p className="text-red-600">Error: {error}</p>
-				</div>
-			</div>
-		);
+		return <EmptyData />;
 	}
 
 	return (

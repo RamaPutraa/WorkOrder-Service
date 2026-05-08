@@ -9,6 +9,7 @@ import PageHeader from "@/shared/atoms/header-content";
 import { useDialogStore } from "@/store/dialogStore";
 import { TextLoading } from "@/shared/atoms/loading-state";
 import { Users } from "lucide-react";
+import ErrorPage from "@/shared/errors/templates/error-page";
 
 const PositionView = () => {
 	const { fetchPositions, positions, loading, error, removePosition } =
@@ -62,13 +63,7 @@ const PositionView = () => {
 	}, []);
 
 	if (error) {
-		return (
-			<div className="p-6">
-				<div className="bg-red-50 border border-red-200 rounded-lg p-4">
-					<p className="text-red-600">Error: {error}</p>
-				</div>
-			</div>
-		);
+		return <ErrorPage />;
 	}
 
 	return (

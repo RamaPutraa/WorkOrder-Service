@@ -24,11 +24,7 @@ const ViewServiceRequest = () => {
 	const { showDialog } = useDialogStore();
 
 	if (error) {
-		return (
-			<div className="container py-8 px-10">
-				<p className="text-red-500">{error}</p>
-			</div>
-		);
+		return <EmptyData />;
 	}
 
 	const getStatusBadge = (status?: string) => {

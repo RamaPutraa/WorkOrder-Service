@@ -3,8 +3,6 @@ import {
 	Building2,
 	MapPin,
 	Calendar,
-	XCircle,
-	RefreshCw,
 	Pencil,
 	CheckCircle2,
 	Text,
@@ -14,7 +12,6 @@ import { useCompanyProfile, useUpdateCompany } from "../hooks/companyHooks";
 import { useFaq } from "../../faqs/hooks/useFaq";
 
 // Components
-import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import {
 	AlertDialog,
@@ -29,6 +26,7 @@ import {
 import { SectionLoading } from "@/shared/atoms";
 import EditCompanyDialog from "../components/edit-company-dialog";
 import PageHeader from "@/shared/atoms/header-content";
+import { EmptyData } from "@/shared/molecules/empty-data";
 
 const ProfileCompany = () => {
 	const { company, loading, error, refetch } = useCompanyProfile();
@@ -47,25 +45,7 @@ const ProfileCompany = () => {
 	if (loading) return <SectionLoading message="Memuat profil perusahaan.." />;
 
 	if (error) {
-		return (
-			<div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
-				<div className="w-14 h-14 rounded-2xl bg-destructive/10 flex items-center justify-center">
-					<XCircle className="w-7 h-7 text-destructive" />
-				</div>
-				<div>
-					<p className="font-semibold text-base">Gagal Memuat Data</p>
-					<p className="text-sm text-muted-foreground mt-1">{error}</p>
-				</div>
-				<Button
-					variant="outline"
-					onClick={refetch}
-					size="sm"
-					className="gap-2 mt-1">
-					<RefreshCw className="w-3.5 h-3.5" />
-					Coba Lagi
-				</Button>
-			</div>
-		);
+		return <EmptyData />;
 	}
 
 	if (!company) return null;
@@ -342,7 +322,9 @@ const ProfileCompany = () => {
 							</AlertDialogDescription>
 						</AlertDialogHeader>
 						<AlertDialogFooter>
-							<AlertDialogCancel disabled={faqSubmitting} className="rounded-xl">
+							<AlertDialogCancel
+								disabled={faqSubmitting}
+								className="rounded-xl">
 								Batal
 							</AlertDialogCancel>
 							<AlertDialogAction

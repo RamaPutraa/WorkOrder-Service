@@ -7,6 +7,7 @@ import PageHeader from "@/shared/atoms/header-content";
 import { TextLoading } from "@/shared/atoms/loading-state";
 import { Input } from "@/components/ui/input";
 import { ShieldUser, User, Users } from "lucide-react";
+import { EmptyData } from "@/shared/molecules/empty-data";
 
 const ViewStaff = () => {
 	const { employees, loading, error, fetchEmployees } = useStaff();
@@ -21,13 +22,7 @@ const ViewStaff = () => {
 	}, [fetchEmployees]);
 
 	if (error) {
-		return (
-			<div className="p-6">
-				<div className="bg-red-50 border border-red-200 rounded-lg p-4">
-					<p className="text-red-600">Error: {error}</p>
-				</div>
-			</div>
-		);
+		return <EmptyData />;
 	}
 
 	const ROLE_SUMMARY = [

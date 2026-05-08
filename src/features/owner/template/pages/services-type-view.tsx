@@ -7,7 +7,7 @@ import { useGenerateTemplate } from "../hooks/use-generate-template";
 import { SectionLoading } from "@/shared/atoms";
 import { Button } from "@/components/ui/button";
 import { TemplatePreviewDialog } from "../components/template-preview-dialog";
-import ErrorPage from "@/shared/errors/templates/error-page";
+import { EmptyData } from "@/shared/molecules/empty-data";
 
 const ServicesTypeView = () => {
 	const {
@@ -26,7 +26,7 @@ const ServicesTypeView = () => {
 	);
 
 	if (error) {
-		return <ErrorPage />;
+		return <EmptyData />;
 	}
 
 	return (

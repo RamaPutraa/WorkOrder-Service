@@ -124,11 +124,7 @@ const ViewMemberCodes = () => {
 
 	/* ── Error state ── */
 	if (error) {
-		return (
-			<div className="container py-8 px-10">
-				<p className="text-red-500">{error}</p>
-			</div>
-		);
+		return <EmptyData />;
 	}
 
 	/* ── Stagger animation helpers ── */
@@ -238,7 +234,6 @@ const ViewMemberCodes = () => {
 													<motion.div
 														key={item._id}
 														className="group flex flex-col px-4 py-3 hover:bg-slate-50/70 transition-colors duration-150">
-
 														{/* ── Main row: always visible ── */}
 														<div className="flex items-center gap-3">
 															{/* Status dot */}
@@ -252,7 +247,9 @@ const ViewMemberCodes = () => {
 																	{item.code}
 																</span>
 																<button
-																	onClick={() => handleCopy(item._id, item.code)}
+																	onClick={() =>
+																		handleCopy(item._id, item.code)
+																	}
 																	title="Salin kode"
 																	className={`shrink-0 transition-all duration-200 rounded-md p-1 ${
 																		isCopied ?
@@ -292,11 +289,15 @@ const ViewMemberCodes = () => {
 																{item.isClaimed ?
 																	<Badge className="bg-emerald-50 text-emerald-600 border-0 gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">
 																		<CheckCircle2 className="size-3" />
-																		<span className="hidden xs:inline">Diklaim</span>
+																		<span className="hidden xs:inline">
+																			Diklaim
+																		</span>
 																	</Badge>
 																:	<Badge className="bg-primary/5 text-primary border-0 gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">
 																		<Ticket className="size-3" />
-																		<span className="hidden xs:inline">Tersedia</span>
+																		<span className="hidden xs:inline">
+																			Tersedia
+																		</span>
 																	</Badge>
 																}
 															</div>
