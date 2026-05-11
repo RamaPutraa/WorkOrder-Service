@@ -54,8 +54,11 @@ export const HintDialog: React.FC<HintDialogProps> = ({
 					</div>
 				</div>
 			</DialogTrigger>
-			<DialogContent className="sm:max-w-[440px] rounded-3xl border-none p-0 overflow-hidden shadow-2xl">
-				<div className="bg-gradient-to-b from-primary to-primary/70 p-6 text-white relative">
+
+			{/* 1. Tambahkan max-h-[85vh], flex, dan flex-col di DialogContent */}
+			<DialogContent className="sm:max-w-[440px] max-h-[85vh] flex flex-col rounded-3xl border-none p-0 overflow-hidden shadow-2xl">
+				{/* 2. Tambahkan shrink-0 pada Header agar tidak ikut menyusut saat di-scroll */}
+				<div className="shrink-0 bg-gradient-to-b from-primary to-primary/70 p-6 text-white relative">
 					<DialogHeader className="relative z-10">
 						<DialogTitle className="flex items-center gap-3 text-white text-xl">
 							<div className="p-2 rounded-xl bg-white/20 backdrop-blur-sm shadow-xl">
@@ -68,7 +71,9 @@ export const HintDialog: React.FC<HintDialogProps> = ({
 						</DialogDescription>
 					</DialogHeader>
 				</div>
-				<div className="p-6 bg-white space-y-4">
+
+				{/* 3. Tambahkan flex-1 dan overflow-y-auto pada kontainer item */}
+				<div className="flex-1 overflow-y-auto p-6 bg-white space-y-4">
 					{items.map((item, i) => (
 						<motion.div
 							key={i}

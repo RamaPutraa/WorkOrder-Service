@@ -7,6 +7,7 @@ import {
 	CheckCircle2,
 	XCircle,
 	Trash2,
+	Calendar as CalendarIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { notifyError } from "@/lib/toast-helper";
@@ -18,6 +19,15 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
 
 export type AnswerValue = string | string[] | number | File | null;
 
@@ -171,14 +181,38 @@ export default function FormFieldViewer({
 			case "date":
 				if (readOnly && !localValue && !field.placeholder) return null;
 				return (
-					<Input
-						type="date"
-						value={(localValue as string) ?? ""}
-						onChange={(e) => handleValueChange(e.target.value)}
-						readOnly={readOnly}
-						disabled={readOnly}
-						className="bg-background"
-					/>
+					<Popover>
+						<PopoverTrigger asChild>
+							<Button
+								type="button"
+								variant={"outline"}
+								disabled={readOnly}
+								className={cn(
+									"w-full justify-start text-left font-normal bg-background h-10 px-3 py-2",
+									!localValue && "text-muted-foreground",
+								)}>
+								<CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+								{localValue ?
+									format(new Date(localValue as string), "PPP", { locale: id })
+								:	<span>{field.placeholder || "Pilih tanggal"}</span>}
+							</Button>
+						</PopoverTrigger>
+						<PopoverContent className="w-auto p-0" align="start">
+							<Calendar
+								mode="single"
+								selected={localValue ? new Date(localValue as string) : undefined}
+								onSelect={(date) => {
+									if (date) {
+										handleValueChange(format(date, "yyyy-MM-dd"));
+									} else {
+										handleValueChange(null);
+									}
+								}}
+								initialFocus
+								locale={id}
+							/>
+						</PopoverContent>
+					</Popover>
 				);
 
 			case "single_select":

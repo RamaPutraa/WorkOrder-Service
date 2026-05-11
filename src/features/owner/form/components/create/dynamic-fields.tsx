@@ -54,7 +54,7 @@ export const DynamicFields: React.FC<Props> = ({
 			) {
 				newErrors[i] = "Minimal harus ada 1 opsi jawaban";
 			} else if (
-				(f.type === "text" || f.type === "textarea") &&
+				(f.type === "text" || f.type === "textarea" || f.type === "date") &&
 				!f.placeholder?.trim()
 			) {
 				newErrors[i] = "Placeholder wajib diisi";

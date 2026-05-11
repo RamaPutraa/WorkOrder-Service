@@ -14,6 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { Trash2 } from "lucide-react";
 import { FieldText } from "../field-type/field-text";
 import { FieldNumber } from "../field-type/field-number";
+import { FieldDate } from "../field-type/field-date";
 import FieldImage from "../field-type/field-image";
 
 type Props = {
@@ -38,8 +39,9 @@ export const FieldItem: React.FC<Props> = ({
 				return <FieldNumber field={field} onUpdate={onUpdate} error={error} />;
 			case "multi_select":
 			case "single_select":
-			case "date":
 				return <FieldOption field={field} onUpdate={onUpdate} error={error} />;
+			case "date":
+				return <FieldDate field={field} onUpdate={onUpdate} error={error} />;
 			case "image":
 				return <FieldImage field={field} onUpdate={onUpdate} error={error} />;
 			default:
