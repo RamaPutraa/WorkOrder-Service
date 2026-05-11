@@ -20,7 +20,7 @@ const NotFoundPage = lazy(
 	() => import("@/shared/errors/templates/not-found-page"),
 );
 const DashboardManager = lazy(
-	() => import("@/features/manager/dashboard-manager"),
+	() => import("@/features/dashboard/pages/dashboard-manager"),
 );
 
 /**

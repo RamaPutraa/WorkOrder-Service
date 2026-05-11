@@ -2,7 +2,7 @@ import { lazy } from "react";
 import { type RouteObject } from "react-router-dom";
 
 const DashboardClient = lazy(
-	() => import("@/features/client/dashboard/pages/dashboard-client"),
+	() => import("@/features/dashboard/pages/dashboard-client"),
 );
 const CompanyList = lazy(
 	() => import("@/features/client/company/pages/company-list"),

@@ -37,6 +37,7 @@ import { NavBusiness } from "../molecules/nav-business";
 import useAuth from "@/features/auth/hooks/useAuth";
 import { NavInternalBusiness } from "../molecules/nav-internal-business";
 import { NavStaffBusiness } from "../molecules/nav-menu-staff";
+import { redirectToRoleDashboard } from "@/lib/auth-helpers";
 
 // This is sample data.
 const data = {
@@ -129,7 +130,7 @@ const data = {
 		},
 		{
 			name: "Dashboard",
-			url: "/dashboard/client",
+			url: "/dashboard/internal",
 			icon: LayoutDashboard,
 		},
 	],
@@ -209,6 +210,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
 	const isSimpleRole = user?.role === "owner_company";
 
+	const roleDashboardUrl = user ? redirectToRoleDashboard(user.role) : "/";
+	const currentNavMenu = [
+		{
+			name: "Home",
+			url: "/",
+			icon: Home,
+		},
+		{
+			name: "Dashboard",
+			url: roleDashboardUrl,
+			icon: LayoutDashboard,
+		},
+	];
+
 	return (
 		<Sidebar collapsible="icon" {...props}>
 			<SidebarHeader>
@@ -217,7 +232,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				:	<TeamManagement teams={data.teams} />}
 			</SidebarHeader>
 			<SidebarContent>
-				<NavMenu menu={data.navMenu} />
+				<NavMenu menu={currentNavMenu} />
 				{user && ["owner_company"].includes(user.role) && (
 					<>
 						<NavSetup items={data.navSetup} />

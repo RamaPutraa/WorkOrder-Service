@@ -1,11 +1,12 @@
 import CompanyTypeView from "@/features/owner/template/pages/company-type-view";
 import ServicesTypeView from "@/features/owner/template/pages/services-type-view";
 import { lazy } from "react";
-import { type RouteObject } from "react-router-dom";
+import { type RouteObject, Navigate } from "react-router-dom";
+import useAuth from "@/features/auth/hooks/useAuth";
 
 // Lazy Load Pages
 const DashboardOwner = lazy(
-	() => import("@/features/owner/dashboard/pages/dahsboard-owner"),
+	() => import("@/features/dashboard/pages/dashboard-owner"),
 );
 const FormPage = lazy(() => import("@/features/owner/form/pages/view-form"));
 const CreateFormPage = lazy(
@@ -71,14 +72,19 @@ const WoServicesList = lazy(
 const WoServicesDetail = lazy(
 	() => import("@/features/owner/wo-create/pages/services-detail"),
 );
-const ViewFaq = lazy(
-	() => import("@/features/owner/faqs/pages/view-faq"),
-);
+const ViewFaq = lazy(() => import("@/features/owner/faqs/pages/view-faq"));
+
+const InternalIndex = () => {
+	const { user } = useAuth();
+	if (user?.role === "manager_company") return <Navigate to="/dashboard/manager" replace />;
+	if (user?.role === "staff_company") return <Navigate to="/dashboard/staff" replace />;
+	return <DashboardOwner />;
+};
 
 export const internalRoutes: RouteObject[] = [
 	{
 		path: "",
-		element: <DashboardOwner />,
+		element: <InternalIndex />,
 	},
 	{
 		path: "forms",

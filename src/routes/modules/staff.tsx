@@ -1,7 +1,9 @@
 import { lazy } from "react";
 import { type RouteObject } from "react-router-dom";
 
-const DashboardStaff = lazy(() => import("@/features/staff/dahsboard-staff"));
+const DashboardStaff = lazy(
+	() => import("@/features/dashboard/pages/dashboard-staff"),
+);
 
 const ListServices = lazy(
 	() => import("@/features/staff/service-request/pages/list-services"),
