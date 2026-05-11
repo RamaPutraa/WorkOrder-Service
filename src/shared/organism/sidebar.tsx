@@ -105,21 +105,10 @@ const data = {
 			url: "/dashboard/client/companies",
 			icon: Building2,
 		},
-
 		{
-			title: "Permintaan Layanan",
-			url: "#",
+			title: "Riwayat Permintaan",
+			url: "/dashboard/client/submissions",
 			icon: Send,
-			items: [
-				{
-					title: "Riwayat Permintaan",
-					url: "/dashboard/client/submissions",
-				},
-				{
-					title: "Pelaporan",
-					url: "/dashboard/client/reports",
-				},
-			],
 		},
 	],
 	navMenu: [
@@ -149,7 +138,7 @@ const data = {
 		{
 			title: "Daftar Tugas Kerja",
 			url: "/dashboard/internal/workorders",
-			icon: ClipboardList,
+			icon: ClipboardPenLine,
 		},
 	],
 	navStaffBusiness: [
