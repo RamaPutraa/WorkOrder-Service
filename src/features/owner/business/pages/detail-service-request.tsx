@@ -73,7 +73,7 @@ const STATUS_CONFIG: Record<SrStatus, { label: string; className: string }> = {
 	},
 	closed: {
 		label: "Ditutup",
-		className: "bg-zinc-100 text-zinc-600 border-zinc-200",
+		className: "bg-purple-100 text-purple-600 border-purple-200",
 	},
 };
 

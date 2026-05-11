@@ -91,7 +91,7 @@ const STATUS_CONFIG: Record<SrStatus, { label: string; className: string }> = {
 	},
 	closed: {
 		label: "Ditutup",
-		className: "bg-zinc-100 text-zinc-600 border-zinc-200",
+		className: "bg-purple-100 text-purple-600 border-purple-200",
 	},
 };
 
@@ -183,8 +183,6 @@ const ServiceDetailSubmit = () => {
 	const srStatus = detail?.serviceRequestStatus;
 	const canFillReview = srStatus === "completed" && !detail?.reviewSubmission;
 
-
-
 	// ── Handlers ──
 	const handleReviewFieldChange = (order: number, value: AnswerValue) => {
 		setReviewFormData((prev) => {
@@ -211,7 +209,10 @@ const ServiceDetailSubmit = () => {
 				const { error, data } = await handleApi(() => uploadFileApi(value));
 				if (error || !data) {
 					setIsSubmittingReview(false);
-					notifyError("Gagal mengirim ulasan", "Gagal mengunggah gambar. Silakan coba lagi.");
+					notifyError(
+						"Gagal mengirim ulasan",
+						"Gagal mengunggah gambar. Silakan coba lagi.",
+					);
 					return;
 				}
 				// Replace File object with URL string
@@ -231,7 +232,11 @@ const ServiceDetailSubmit = () => {
 		detail.reviewForm?.fields?.forEach((field) => {
 			if (field.required) {
 				const value = reviewFormData.get(field.order);
-				const isEmpty = value === null || value === undefined || value === "" || (Array.isArray(value) && value.length === 0);
+				const isEmpty =
+					value === null ||
+					value === undefined ||
+					value === "" ||
+					(Array.isArray(value) && value.length === 0);
 				if (isEmpty) {
 					missingFields.push(field.label || `Field #${field.order}`);
 				}
@@ -240,7 +245,10 @@ const ServiceDetailSubmit = () => {
 
 		if (missingFields.length > 0) {
 			setIsSubmittingReview(false);
-			notifyError("Validasi Gagal", `Harap isi field wajib: ${missingFields.join(", ")}`);
+			notifyError(
+				"Validasi Gagal",
+				`Harap isi field wajib: ${missingFields.join(", ")}`,
+			);
 			return;
 		}
 
@@ -489,69 +497,67 @@ const ServiceDetailSubmit = () => {
 							const isSubmitted = submission && submission.status !== "draft";
 
 							return (
-									<AccordionItem
-										key={itemId}
-										value={itemId}
-										className="border border-border/60 rounded-xl overflow-hidden bg-card shadow-sm data-[state=open]:border-primary/20 transition-all duration-200">
-										<AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/40 transition-colors cursor-pointer [&[data-state=open]]:bg-muted/20">
-											<div className="flex items-center gap-4 flex-1 text-left">
-												{/* Icon */}
-												<div
-													className={`shrink-0 p-2 rounded-lg transition-colors ${
-														isSubmitted ?
-															"bg-emerald-50 text-emerald-600"
-														: isReviewItem && canFillReview ?
-															"bg-blue-50 text-blue-600"
-														:	"bg-amber-50 text-amber-600"
-													}`}>
-													{isSubmitted ?
-														<CheckCircle2 className="w-4 h-4" />
-													:	<Timer className="w-4 h-4" />}
-												</div>
-
-												{/* Info */}
-												<div className="flex-1 min-w-0">
-													<div className="flex flex-wrap items-center gap-2">
-														<span className="font-semibold text-sm tracking-tight line-clamp-1">
-															{form?.title}
-														</span>
-														<Badge
-															variant="secondary"
-															className="text-[10px] h-4 px-1.5 font-medium rounded hidden md:block">
-															{label}
-														</Badge>
-													</div>
-													{form?.description && (
-														<p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
-															{form.description}
-														</p>
-													)}
-												</div>
-
-												{/* Status pill */}
-												<div
-													className={`hidden sm:flex shrink-0 items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ${
-														isSubmitted ?
-															"bg-emerald-50 text-emerald-700"
-														: isReviewItem && canFillReview ?
-															"bg-blue-50 text-blue-700"
-														:	"bg-amber-50 text-amber-700"
-													}`}>
-													<div
-														className={`w-1.5 h-1.5 rounded-full ${
-															isSubmitted ? "bg-emerald-500"
-															: isReviewItem && canFillReview ? "bg-blue-500"
-															: "bg-amber-400"
-														}`}
-													/>
-													{isSubmitted ?
-														"Disubmit"
+								<AccordionItem
+									key={itemId}
+									value={itemId}
+									className="border border-border/60 rounded-xl overflow-hidden bg-card shadow-sm data-[state=open]:border-primary/20 transition-all duration-200">
+									<AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/40 transition-colors cursor-pointer [&[data-state=open]]:bg-muted/20">
+										<div className="flex items-center gap-4 flex-1 text-left">
+											{/* Icon */}
+											<div
+												className={`shrink-0 p-2 rounded-lg transition-colors ${
+													isSubmitted ? "bg-emerald-50 text-emerald-600"
 													: isReviewItem && canFillReview ?
-														"Siap Diisi"
-													:	"Menunggu"}
-												</div>
+														"bg-blue-50 text-blue-600"
+													:	"bg-amber-50 text-amber-600"
+												}`}>
+												{isSubmitted ?
+													<CheckCircle2 className="w-4 h-4" />
+												:	<Timer className="w-4 h-4" />}
 											</div>
-										</AccordionTrigger>
+
+											{/* Info */}
+											<div className="flex-1 min-w-0">
+												<div className="flex flex-wrap items-center gap-2">
+													<span className="font-semibold text-sm tracking-tight line-clamp-1">
+														{form?.title}
+													</span>
+													<Badge
+														variant="secondary"
+														className="text-[10px] h-4 px-1.5 font-medium rounded hidden md:block">
+														{label}
+													</Badge>
+												</div>
+												{form?.description && (
+													<p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+														{form.description}
+													</p>
+												)}
+											</div>
+
+											{/* Status pill */}
+											<div
+												className={`hidden sm:flex shrink-0 items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ${
+													isSubmitted ? "bg-emerald-50 text-emerald-700"
+													: isReviewItem && canFillReview ?
+														"bg-blue-50 text-blue-700"
+													:	"bg-amber-50 text-amber-700"
+												}`}>
+												<div
+													className={`w-1.5 h-1.5 rounded-full ${
+														isSubmitted ? "bg-emerald-500"
+														: isReviewItem && canFillReview ? "bg-blue-500"
+														: "bg-amber-400"
+													}`}
+												/>
+												{isSubmitted ?
+													"Disubmit"
+												: isReviewItem && canFillReview ?
+													"Siap Diisi"
+												:	"Menunggu"}
+											</div>
+										</div>
+									</AccordionTrigger>
 
 									<AccordionContent className="px-5 lg:px-6 pb-5">
 										{form?.fields && form.fields.length > 0 ?

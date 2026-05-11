@@ -29,6 +29,7 @@ export const SrStatusStepper = ({ sr }: SrStatusStepperProps) => {
 	const status: string = sr.serviceRequestStatus;
 	const isCancelled = status === "cancelled";
 	const isPartialCompleted = status === "partial_completed";
+	const isClosed = status === "closed";
 
 	const defaultSteps = [
 		{
@@ -132,6 +133,7 @@ export const SrStatusStepper = ({ sr }: SrStatusStepperProps) => {
 				if (isActive)
 					barColor =
 						isCancelled ? "bg-red-400"
+						: isClosed ? "bg-purple-500"
 						: isPartialStep ? "bg-amber-400"
 						: "bg-primary";
 				else if (isErrorStep) barColor = "bg-destructive";
@@ -141,6 +143,7 @@ export const SrStatusStepper = ({ sr }: SrStatusStepperProps) => {
 				if (isActive)
 					dotColor =
 						isCancelled ? "bg-red-400"
+						: isClosed ? "bg-purple-500"
 						: isPartialStep ? "bg-amber-400"
 						: "bg-primary";
 				else if (isErrorStep) dotColor = "bg-destructive";
@@ -150,6 +153,7 @@ export const SrStatusStepper = ({ sr }: SrStatusStepperProps) => {
 				if (isActive)
 					labelColor =
 						isCancelled ? "text-red-400"
+						: isClosed ? "text-purple-600"
 						: isPartialStep ? "text-amber-500"
 						: "text-primary";
 				else if (isErrorStep) labelColor = "text-destructive";

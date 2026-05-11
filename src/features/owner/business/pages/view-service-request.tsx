@@ -56,7 +56,7 @@ const ViewServiceRequest = () => {
 					</span>
 				</div>
 			);
-		if (s === "completed" || s === "closed")
+		if (s === "completed")
 			return (
 				<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-emerald-600 ">
 					<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -89,6 +89,15 @@ const ViewServiceRequest = () => {
 					<span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
 					<span className="text-[10px] font-bold uppercase tracking-wider">
 						Tidak Dapat Dikerjakan
+					</span>
+				</div>
+			);
+		if (s === "closed")
+			return (
+				<div className="flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full  text-purple-600 ">
+					<span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
+					<span className="text-[10px] font-bold uppercase tracking-wider">
+						Ditutup
 					</span>
 				</div>
 			);
