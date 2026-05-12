@@ -103,7 +103,7 @@ export const useCompanyDetailWo = () => {
 	// ─── Action Handlers ─────────────────────────────────────────────────────────
 	// Semua action yang mengubah status/meta menggunakan refreshBackground()
 	// karena server perlu menghitung ulang meta.workOrderCapabilities.
-	// TODO: work report dan submit intake belum isi
+
 	const checkUnsavedForm = () => {
 		if (isFormDirty) {
 			notifyError(

@@ -13,12 +13,12 @@ import {
 	FileText,
 	CheckCircle2,
 	Timer,
-	Save,
 	Send,
 	Info,
 	Calendar,
 	User,
 	Tag,
+	Loader,
 } from "lucide-react";
 import FormFieldViewer, {
 	type AnswerValue,
@@ -262,7 +262,6 @@ const ServiceDetailSubmit = () => {
 			return;
 		}
 
-		// TODO:ini beda dari yg lain, next cek
 		const submissionPayload: RequesterSubmitRequest = {
 			submission: {
 				formId: reviewFormId,
@@ -662,7 +661,7 @@ const ServiceDetailSubmit = () => {
 							className="rounded-lg gap-2 hover:cursor-pointer">
 							{isSubmittingReview ?
 								<>
-									<Save className="size-4 animate-spin" />
+									<Loader className="size-4 animate-spin" />
 									Mengirim...
 								</>
 							:	<>
