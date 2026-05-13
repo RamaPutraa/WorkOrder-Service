@@ -188,12 +188,13 @@ const ProfileCompany = () => {
 				</div>
 
 				{/* ── Section: Status / Pengaturan ───────────────────────────────────────────── */}
+
 				<div className="space-y-3">
 					<h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-						Pengaturan Sistem
+						Pengaturan Operasional Perusahaan
 					</h2>
 
-					<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 p-5 border border-border/40 rounded-2xl bg-card transition-all hover:border-primary/20">
+					<div className="shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-6 p-5 border border-border/40 rounded-2xl bg-card transition-all hover:border-primary/20">
 						<div className="space-y-1.5">
 							<div className="">
 								<p className="text-sm font-bold text-foreground">
@@ -225,7 +226,7 @@ const ProfileCompany = () => {
 					</div>
 
 					{/* ── FAQ Publik Toggle ── */}
-					<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 p-5 border border-border/40 rounded-2xl bg-card transition-all hover:border-primary/20">
+					<div className="shadow-sm  flex flex-col sm:flex-row sm:items-center justify-between gap-6 p-5 border border-border/40 rounded-2xl bg-card transition-all hover:border-primary/20">
 						<div className="space-y-1.5">
 							<div className="">
 								<p className="text-sm font-bold text-foreground">
@@ -255,6 +256,47 @@ const ProfileCompany = () => {
 							/>
 						</div>
 					</div>
+				</div>
+
+				{/* Konfigruasi connect external services */}
+				<div className="space-y-3">
+					<h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+						Integrasi Antar Sistem
+					</h2>
+
+					<div className="shadow-sm  flex flex-col sm:flex-row sm:items-center justify-between gap-6 p-5 border border-border/40 rounded-2xl bg-card transition-all hover:border-primary/20">
+						<div className="space-y-1.5">
+							<div className="">
+								<p className="text-sm font-bold text-foreground">
+									Aktifkan Integrasi
+								</p>
+								<p className="text-sm text-muted-foreground leading-relaxed">
+									{company.isActive ?
+										"Perusahaan ini mendukung fitur integrasi antar sistem"
+									:	"Integrasi sistem tidak aktif."}
+								</p>
+								{company.isActive && (
+									<p className="text-xs font-medium text-emerald-600 flex items-center gap-1.5 mt-1.5">
+										<CheckCircle2 className="w-3.5 h-3.5" />
+										Sistem integrasi aktif
+									</p>
+								)}
+							</div>
+						</div>
+
+						{/* Toggle Switch */}
+						<div className="pl-10 sm:pl-0 shrink-0">
+							<Switch
+								checked={company.isActive}
+								disabled={updating}
+								onCheckedChange={() => setOpenToggleConfirm(true)}
+								className="data-[state=checked]:bg-emerald-600"
+							/>
+						</div>
+					</div>
+
+					{/* ── form input integrasi ── */}
+					<div className="shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-6 p-5 border border-border/40 rounded-2xl bg-card transition-all hover:border-primary/20"></div>
 				</div>
 
 				{/* ── Dialogs ─────────────────────────────────────────────────── */}

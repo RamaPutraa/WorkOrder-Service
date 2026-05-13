@@ -108,10 +108,16 @@ const InviteEmployeeDialog = ({
 			...data,
 			invites: data.invites.map((inv) => {
 				const { positionId, ...rest } = inv;
+				// If positionId is empty string, send as undefined/omit
+				const cleanPositionId =
+					positionId?.trim() === "" ? undefined : positionId;
+
 				if (inv.role === "staff_company") {
-					return { ...rest, positionId };
+					return { ...rest, positionId: cleanPositionId };
 				}
-				return rest;
+
+				// For manager, include positionId only if it's selected
+				return { ...rest, positionId: cleanPositionId };
 			}),
 		};
 		invite(payload as any);
@@ -240,15 +246,20 @@ const InviteEmployeeDialog = ({
 										/>
 
 										{/* Posisi — Combobox */}
-										{form.watch(`invites.${index}.role`) ===
-											"staff_company" && (
+										{form.watch(`invites.${index}.role`) !== "" && (
 											<FormField
 												control={form.control}
 												name={`invites.${index}.positionId`}
 												render={({ field }) => (
 													<FormItem>
 														<FormLabel className="text-xs font-medium text-gray-500">
-															Posisi
+															Posisi{" "}
+															{form.watch(`invites.${index}.role`) ===
+																"manager_company" && (
+																<span className="text-[10px] text-gray-400 font-normal italic">
+																	(Opsional)
+																</span>
+															)}
 														</FormLabel>
 														<Popover
 															open={positionOpen[index]}

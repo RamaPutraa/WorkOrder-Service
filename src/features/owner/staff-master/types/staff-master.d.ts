@@ -82,7 +82,7 @@ type InvitationEmployee = {
 type InviteSingleItem = {
 	email: string;
 	role: string;
-	positionId: string;
+	positionId?: string;
 };
 
 type InvitationEmployeeRequest = {
