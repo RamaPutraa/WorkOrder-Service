@@ -36,6 +36,10 @@ const CreateService: React.FC = () => {
 		setServiceRequestApprovalType,
 		reviewNeed,
 		setReviewNeed,
+		draftingWorkOrderType,
+		setDraftingWorkOrderType,
+		showReportToRequester,
+		setShowReportToRequester,
 
 		// Work Orders Config
 		workOrdersConfig,
@@ -101,6 +105,8 @@ const CreateService: React.FC = () => {
 							selectedStatus={selectedStatus}
 							setSelectedStatus={setSelectedStatus}
 							statuses={statuses}
+							draftingWorkOrderType={draftingWorkOrderType}
+							setDraftingWorkOrderType={setDraftingWorkOrderType}
 						/>
 					</motion.div>
 				);
@@ -124,6 +130,9 @@ const CreateService: React.FC = () => {
 							setServiceRequestApprovalType={setServiceRequestApprovalType}
 							reviewNeed={reviewNeed}
 							setReviewNeed={setReviewNeed}
+							showReportToRequester={showReportToRequester}
+							setShowReportToRequester={setShowReportToRequester}
+							draftingWorkOrderType={draftingWorkOrderType}
 						/>
 					</motion.div>
 				);
@@ -144,6 +153,7 @@ const CreateService: React.FC = () => {
 							addWorkOrderConfig={addWorkOrderConfig}
 							removeWorkOrderConfig={removeWorkOrderConfig}
 							updateWorkOrderConfig={updateWorkOrderConfig}
+							draftingWorkOrderType={draftingWorkOrderType}
 						/>
 					</motion.div>
 				);

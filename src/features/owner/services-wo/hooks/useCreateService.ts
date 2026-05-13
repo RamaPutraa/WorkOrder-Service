@@ -80,6 +80,10 @@ export const useCreateService = () => {
 		"auto" | "manager"
 	>("auto");
 	const [reviewNeed, setReviewNeed] = useState<boolean>(false);
+	const [draftingWorkOrderType, setDraftingWorkOrderType] =
+		useState<draftingWorkOrderType>("auto");
+	const [showReportToRequester, setShowReportToRequester] =
+		useState<boolean>(false);
 
 	// === workOrdersConfig[] ===
 	const [workOrdersConfig, setWorkOrdersConfig] = useState<
@@ -169,35 +173,46 @@ export const useCreateService = () => {
 			setCreating(false);
 			return;
 		}
-		const incompleteWO = workOrdersConfig.some(
-			(c) => !c.positionId || !c.workOrderFormId || !c.workReportFormId,
-		);
+		const incompleteWO = workOrdersConfig.some((c) => {
+			const isAuto = draftingWorkOrderType === "auto";
+			if (isAuto) {
+				return !c.positionId || !c.workReportFormId;
+			}
+			return !c.positionId || !c.workOrderFormId || !c.workReportFormId;
+		});
 		if (incompleteWO) {
 			notifyError("Gagal menyimpan", "Lengkapi semua konfigurasi work order");
 			setCreating(false);
 			return;
 		}
 
+		const isAuto = draftingWorkOrderType === "auto";
+		
 		const payload: CreateServiceRequest = {
 			title,
 			description,
 			accessType: accessType as unknown as serviceAccessType,
 			isActive: selectedStatus?.value === "true",
+			drafting_work_order_type: draftingWorkOrderType,
+			show_report_to_requester: showReportToRequester,
 			serviceRequestConfig: {
 				intakeFormId,
 				reviewFormId,
-				serviceRequestApprovalAccessType:
-					serviceRequestApprovalType as unknown as serviceRequestApprovalAccessType,
+				serviceRequestApprovalAccessType: isAuto ?
+						"auto"
+					:	(serviceRequestApprovalType as unknown as serviceRequestApprovalAccessType),
 				reviewNeed,
 			},
 			workOrdersConfig: workOrdersConfig.map((c) => ({
 				positionId: c.positionId,
-				workOrderFormId: c.workOrderFormId,
+				workOrderFormId: isAuto ? "" : c.workOrderFormId,
 				workReportFormId: c.workReportFormId,
-				workOrderApprovalAccessType:
-					c.workOrderApprovalType as unknown as workOrderApprovalAccessType,
-				workReportApprovalAccessType:
-					c.workReportApprovalType as unknown as workReportApprovalAccessType,
+				workOrderApprovalAccessType: isAuto ?
+						"auto"
+					:	(c.workOrderApprovalType as unknown as workOrderApprovalAccessType),
+				workReportApprovalAccessType: isAuto ?
+						"auto"
+					:	(c.workReportApprovalType as unknown as workReportApprovalAccessType),
 				minStaff: c.minStaff,
 				maxStaff: c.maxStaff,
 			})),
@@ -234,9 +249,18 @@ export const useCreateService = () => {
 			description !== "" ||
 			accessType !== "" ||
 			intakeFormId !== "" ||
+			draftingWorkOrderType !== "auto" ||
 			workOrdersConfig.length > 0
 		);
-	}, [title, description, accessType, intakeFormId, workOrdersConfig]);
+	}, [
+		title,
+		description,
+		accessType,
+		intakeFormId,
+		draftingWorkOrderType,
+		showReportToRequester,
+		workOrdersConfig,
+	]);
 
 	// === Fetch List Services (dengan cache 5 menit) ===
 	const fecthServices = async () => {
@@ -389,6 +413,8 @@ export const useCreateService = () => {
 		reviewFormId,
 		serviceRequestApprovalType,
 		reviewNeed,
+		draftingWorkOrderType,
+		showReportToRequester,
 		// work orders
 		workOrdersConfig,
 		// list / detail
@@ -407,6 +433,8 @@ export const useCreateService = () => {
 		setReviewFormId,
 		setServiceRequestApprovalType,
 		setReviewNeed,
+		setDraftingWorkOrderType,
+		setShowReportToRequester,
 		setDetailService,
 
 		// === HANDLERS ===

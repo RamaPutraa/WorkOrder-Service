@@ -20,6 +20,8 @@ type CardServiceInfoProps = {
 	setDescription: (val: string) => void;
 	setAccessType: (val: string) => void;
 	setSelectedStatus: (val: Status | null) => void;
+	draftingWorkOrderType: draftingWorkOrderType;
+	setDraftingWorkOrderType: (val: draftingWorkOrderType) => void;
 	isEditMode?: boolean;
 };
 
@@ -54,6 +56,8 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 	setDescription,
 	setAccessType,
 	setSelectedStatus,
+	draftingWorkOrderType,
+	setDraftingWorkOrderType,
 	isEditMode = false,
 }) => {
 	const isActive = selectedStatus?.value === "true";
@@ -141,24 +145,76 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 
 				{/* Status */}
 				{!isEditMode && (
-				<div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-slate-50/50">
-					<div className="space-y-0.5">
-						<p className="text-sm font-medium text-slate-700">Status Layanan</p>
-						<p className="text-xs text-slate-500">
-							{isActive ?
-								"Layanan aktif dan tersedia"
-							:	"Layanan dinonaktifkan"}
+					<div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-slate-50/50">
+						<div className="space-y-0.5">
+							<p className="text-sm font-medium text-slate-700">
+								Status Layanan
+							</p>
+							<p className="text-xs text-slate-500">
+								{isActive ?
+									"Layanan aktif dan tersedia"
+								:	"Layanan dinonaktifkan"}
+							</p>
+						</div>
+						<Switch
+							checked={isActive}
+							onCheckedChange={(checked) => {
+								const match = statuses.find((s) => s.value === String(checked));
+								setSelectedStatus(match ?? null);
+							}}
+						/>
+					</div>
+				)}
+
+				{/* Drafting Mode */}
+				<div className="space-y-3">
+					<div className="flex items-center gap-2">
+						<p className="text-sm font-medium text-slate-700">
+							Tipe Pengerjaan Layanan
 						</p>
 					</div>
-					<Switch
-						checked={isActive}
-						onCheckedChange={(checked) => {
-							const match = statuses.find((s) => s.value === String(checked));
-							setSelectedStatus(match ?? null);
-						}}
-					/>
+					<p className="text-xs text-slate-500 mb-3">
+						Tentukan apakah instruksi kerja langsung diterbitkan atau disimpan
+						sebagai draf terlebih dahulu.
+					</p>
+					<div className="grid grid-cols-2 gap-3">
+						{(
+							[
+								{
+									value: "auto",
+									label: "Otomatis",
+									desc: "Langsung diterbitkan",
+								},
+								{
+									value: "manual",
+									label: "Manual (Perlu dikonfigurasi)",
+									desc: "Disimpan sebagai draf",
+								},
+							] as const
+						).map((opt) => {
+							const isSelected = draftingWorkOrderType === opt.value;
+							return (
+								<button
+									key={opt.value}
+									type="button"
+									onClick={() => setDraftingWorkOrderType(opt.value)}
+									className={`flex flex-col items-start gap-1 p-4 rounded-xl border-2 text-left transition-all duration-200 ${
+										isSelected ?
+											"border-primary bg-primary/5 shadow-sm"
+										:	"border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+									}`}>
+									<span
+										className={`text-sm font-semibold ${
+											isSelected ? "text-primary" : "text-slate-700"
+										}`}>
+										{opt.label}
+									</span>
+									<span className="text-xs text-slate-500">{opt.desc}</span>
+								</button>
+							);
+						})}
+					</div>
 				</div>
-				)}
 			</div>
 		</div>
 	);

@@ -36,6 +36,10 @@ const EditService: React.FC = () => {
 		setServiceRequestApprovalType,
 		reviewNeed,
 		setReviewNeed,
+		draftingWorkOrderType,
+		setDraftingWorkOrderType,
+		showReportToRequester,
+		setShowReportToRequester,
 
 		// Work Orders Config
 		workOrdersConfig,
@@ -102,6 +106,8 @@ const EditService: React.FC = () => {
 							setSelectedStatus={setSelectedStatus}
 							statuses={statuses}
 							isEditMode={true}
+							draftingWorkOrderType={draftingWorkOrderType}
+							setDraftingWorkOrderType={setDraftingWorkOrderType}
 						/>
 					</motion.div>
 				);
@@ -125,6 +131,9 @@ const EditService: React.FC = () => {
 							setServiceRequestApprovalType={setServiceRequestApprovalType}
 							reviewNeed={reviewNeed}
 							setReviewNeed={setReviewNeed}
+							showReportToRequester={showReportToRequester}
+							setShowReportToRequester={setShowReportToRequester}
+							draftingWorkOrderType={draftingWorkOrderType}
 						/>
 					</motion.div>
 				);
@@ -145,6 +154,7 @@ const EditService: React.FC = () => {
 							addWorkOrderConfig={addWorkOrderConfig}
 							removeWorkOrderConfig={removeWorkOrderConfig}
 							updateWorkOrderConfig={updateWorkOrderConfig}
+							draftingWorkOrderType={draftingWorkOrderType}
 						/>
 					</motion.div>
 				);

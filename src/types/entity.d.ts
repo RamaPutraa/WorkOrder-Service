@@ -81,6 +81,9 @@ type workOrderApprovalAccessType = "auto" | "staff_pic";
 
 type workReportApprovalAccessType = "auto" | "manager";
 
+type draftingWorkOrderType = "auto" | "manual";
+
+// TODO: updated (not review yet)
 type Service = {
 	_id: string;
 	serviceKey: string;
@@ -89,6 +92,8 @@ type Service = {
 	description: string;
 	accessType: serviceAccessType;
 	isActive: boolean;
+	drafting_work_order_type: draftingWorkOrderType;
+	show_report_to_requester: boolean;
 	serviceRequestConfig: {
 		intakeForm: Form;
 		reviewForm: Form;
@@ -98,7 +103,7 @@ type Service = {
 
 	workOrdersConfig: {
 		_id: string;
-		workOrderForm: Form;
+		workOrderForm: Form | null;
 		workReportForm: Form;
 		positionsOnDuty: Position;
 		workOrderApprovalAccessType: workOrderApprovalAccessType;

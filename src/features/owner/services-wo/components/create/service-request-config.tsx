@@ -21,11 +21,14 @@ type CardServiceRequestConfigProps = {
 	reviewFormId: string;
 	serviceRequestApprovalType: "auto" | "manager";
 	reviewNeed: boolean;
+	showReportToRequester: boolean;
+	draftingWorkOrderType: draftingWorkOrderType;
 
 	setIntakeFormId: (val: string) => void;
 	setReviewFormId: (val: string) => void;
 	setServiceRequestApprovalType: (val: "auto" | "manager") => void;
 	setReviewNeed: (val: boolean) => void;
+	setShowReportToRequester: (val: boolean) => void;
 };
 
 export const CardServiceRequestConfig: React.FC<
@@ -37,10 +40,13 @@ export const CardServiceRequestConfig: React.FC<
 	reviewFormId,
 	serviceRequestApprovalType,
 	reviewNeed,
+	showReportToRequester,
+	draftingWorkOrderType,
 	setIntakeFormId,
 	setReviewFormId,
 	setServiceRequestApprovalType,
 	setReviewNeed,
+	setShowReportToRequester,
 }) => {
 	const [intakeSearch, setIntakeSearch] = useState("");
 	const [reviewSearch, setReviewSearch] = useState("");
@@ -270,7 +276,8 @@ export const CardServiceRequestConfig: React.FC<
 						</div>
 
 						{/* Approval Type */}
-						<div className="space-y-2">
+						{draftingWorkOrderType !== "auto" && (
+							<div className="space-y-2">
 							<Label className="text-sm font-medium text-slate-700">
 								Tipe Persetujuan Permintaan
 							</Label>
@@ -313,6 +320,7 @@ export const CardServiceRequestConfig: React.FC<
 								})}
 							</div>
 						</div>
+						)}
 
 						{/* Review Need toggle */}
 						<div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-slate-50/50">
@@ -325,6 +333,23 @@ export const CardServiceRequestConfig: React.FC<
 								</p>
 							</div>
 							<Switch checked={reviewNeed} onCheckedChange={setReviewNeed} />
+						</div>
+
+						{/* Show Report to Requester toggle */}
+						<div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-slate-50/50">
+							<div className="space-y-0.5">
+								<p className="text-sm font-medium text-slate-700">
+									Tampilkan Laporan ke Klien
+								</p>
+								<p className="text-xs text-slate-500">
+									Apakah klien dapat melihat laporan pengerjaan yang dibuat oleh
+									staf?
+								</p>
+							</div>
+							<Switch
+								checked={showReportToRequester}
+								onCheckedChange={setShowReportToRequester}
+							/>
 						</div>
 					</>
 				}

@@ -413,6 +413,25 @@ const DetailService = () => {
 											}
 										</div>
 									</div>
+
+									{/* Drafting Mode */}
+									<div className="rounded-xl border bg-muted/20 px-4 py-3 space-y-1 hover:bg-muted/40 transition-colors">
+										<p className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground ">
+											Tipe Drafting
+										</p>
+										<div className="flex items-center gap-1.5">
+											{detailService.drafting_work_order_type === "manual" ?
+												<>
+													<CheckCircle2 className="size-4 text-emerald-500 shrink-0" />
+													<p className="text-sm font-medium">Manual (Draft)</p>
+												</>
+											:	<>
+													<CheckCircle2 className="size-4 text-blue-500 shrink-0" />
+													<p className="text-sm font-medium">Otomatis</p>
+												</>
+											}
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -466,6 +485,30 @@ const DetailService = () => {
 								:	<div className="rounded-xl border border-dashed p-4 flex items-center justify-center text-sm text-muted-foreground italic bg-muted/10 h-full min-h-[100px]">
 										Formulir ulasan tidak tersedia.
 									</div>
+								}
+							</div>
+						</div>
+						
+						{/* Report Visibility Config */}
+						<div className="rounded-xl border bg-slate-50/50 p-4 flex items-center justify-between">
+							<div className="space-y-1">
+								<p className="text-sm font-semibold text-slate-900">
+									Visibilitas Laporan ke Klien
+								</p>
+								<p className="text-xs text-slate-500">
+									Klien dapat melihat laporan pengerjaan yang dibuat oleh staf.
+								</p>
+							</div>
+							<div className="flex items-center gap-2">
+								{detailService.show_report_to_requester ?
+									<Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-50 shadow-none">
+										Terlihat oleh Klien
+									</Badge>
+								:	<Badge
+										variant="secondary"
+										className="bg-slate-100 text-slate-600 border-slate-200 shadow-none">
+										Tersembunyi
+									</Badge>
 								}
 							</div>
 						</div>

@@ -74,6 +74,10 @@ export const useEditService = () => {
 		"auto" | "manager"
 	>("auto");
 	const [reviewNeed, setReviewNeed] = useState<boolean>(false);
+	const [draftingWorkOrderType, setDraftingWorkOrderType] =
+		useState<draftingWorkOrderType>("auto");
+	const [showReportToRequester, setShowReportToRequester] =
+		useState<boolean>(false);
 
 	// === workOrdersConfig[] ===
 	const [workOrdersConfig, setWorkOrdersConfig] = useState<
@@ -142,6 +146,8 @@ export const useEditService = () => {
 		setIsActive(
 			service.isActive === true || service.isActive === ("true" as any),
 		);
+		setDraftingWorkOrderType(service.drafting_work_order_type || "auto");
+		setShowReportToRequester(service.show_report_to_requester || false);
 
 		if (service.serviceRequestConfig) {
 			setIntakeFormId(service.serviceRequestConfig.intakeForm?._id || "");
@@ -245,35 +251,46 @@ export const useEditService = () => {
 			setUpdating(false);
 			return;
 		}
-		const incompleteWO = workOrdersConfig.some(
-			(c) => !c.positionId || !c.workOrderFormId || !c.workReportFormId,
-		);
+		const incompleteWO = workOrdersConfig.some((c) => {
+			const isAuto = draftingWorkOrderType === "auto";
+			if (isAuto) {
+				return !c.positionId || !c.workReportFormId;
+			}
+			return !c.positionId || !c.workOrderFormId || !c.workReportFormId;
+		});
 		if (incompleteWO) {
 			notifyError("Gagal mengupdate", "Lengkapi semua konfigurasi work order");
 			setUpdating(false);
 			return;
 		}
 
+		const isAuto = draftingWorkOrderType === "auto";
+
 		const payload: CreateServiceRequest = {
 			title,
 			description,
 			accessType: accessType as unknown as serviceAccessType,
 			isActive: Boolean(isActive), // Ensure strict boolean type
+			drafting_work_order_type: draftingWorkOrderType,
+			show_report_to_requester: showReportToRequester,
 			serviceRequestConfig: {
 				intakeFormId,
 				reviewFormId,
-				serviceRequestApprovalAccessType:
-					serviceRequestApprovalType as unknown as serviceRequestApprovalAccessType,
+				serviceRequestApprovalAccessType: isAuto
+					? "auto"
+					: (serviceRequestApprovalType as unknown as serviceRequestApprovalAccessType),
 				reviewNeed,
 			},
 			workOrdersConfig: workOrdersConfig.map((c) => ({
 				positionId: c.positionId,
-				workOrderFormId: c.workOrderFormId,
+				workOrderFormId: isAuto ? "" : c.workOrderFormId,
 				workReportFormId: c.workReportFormId,
-				workOrderApprovalAccessType:
-					c.workOrderApprovalType as unknown as workOrderApprovalAccessType,
-				workReportApprovalAccessType:
-					c.workReportApprovalType as unknown as workReportApprovalAccessType,
+				workOrderApprovalAccessType: isAuto
+					? "auto"
+					: (c.workOrderApprovalType as unknown as workOrderApprovalAccessType),
+				workReportApprovalAccessType: isAuto
+					? "auto"
+					: (c.workReportApprovalType as unknown as workReportApprovalAccessType),
 				minStaff: c.minStaff,
 				maxStaff: c.maxStaff,
 			})),
@@ -333,7 +350,9 @@ export const useEditService = () => {
 			intakeFormId !== initialIntakeFormId ||
 			reviewFormId !== initialReviewFormId ||
 			serviceRequestApprovalType !== initialApprovalType ||
-			reviewNeed !== initialReviewNeed;
+			reviewNeed !== initialReviewNeed ||
+			draftingWorkOrderType !== (detailService.drafting_work_order_type || "auto") ||
+			showReportToRequester !== (detailService.show_report_to_requester || false);
 
 		// Basic check for workOrdersConfig length
 		const isWorkOrdersChanged =
@@ -349,6 +368,8 @@ export const useEditService = () => {
 		reviewFormId,
 		serviceRequestApprovalType,
 		reviewNeed,
+		draftingWorkOrderType,
+		showReportToRequester,
 		workOrdersConfig,
 	]);
 
@@ -371,6 +392,8 @@ export const useEditService = () => {
 		reviewFormId,
 		serviceRequestApprovalType,
 		reviewNeed,
+		draftingWorkOrderType,
+		showReportToRequester,
 		// work orders
 		workOrdersConfig,
 		detailService,
@@ -385,6 +408,8 @@ export const useEditService = () => {
 		setReviewFormId,
 		setServiceRequestApprovalType,
 		setReviewNeed,
+		setDraftingWorkOrderType,
+		setShowReportToRequester,
 		setDetailService,
 
 		// === HANDLERS ===

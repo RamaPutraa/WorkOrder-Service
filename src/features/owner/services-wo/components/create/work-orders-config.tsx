@@ -37,6 +37,7 @@ const WorkOrderRowCard = ({
 	positions,
 	removeWorkOrderConfig,
 	updateWorkOrderConfig,
+	draftingWorkOrderType,
 }: {
 	item: WorkOrderConfigItem;
 	index: number;
@@ -48,6 +49,7 @@ const WorkOrderRowCard = ({
 		field: keyof WorkOrderConfigItem,
 		value: string | number,
 	) => void;
+	draftingWorkOrderType: draftingWorkOrderType;
 }) => {
 	const [woFormSearch, setWoFormSearch] = useState("");
 	const [wrFormSearch, setWrFormSearch] = useState("");
@@ -208,135 +210,138 @@ const WorkOrderRowCard = ({
 				</div>
 
 				{/* Work Order Phase */}
-				<div className="space-y-5 p-4 rounded-xl bg-slate-50 border border-slate-100/80">
-					{/* Formulir Work Order */}
-					<div className="space-y-3">
-						<div>
-							<Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-								Formulir Work Order <span className="text-red-500">*</span>
-							</Label>
-						</div>
-						<div className="flex flex-wrap gap-1.5 pb-1">
-							{formTypeOptions.map((opt) => (
-								<button
-									key={opt.value}
-									type="button"
-									onClick={() => setWoTypeFilter(opt.value)}
-									className={`px-3 py-1 text-[10px] font-semibold rounded-full border transition-all duration-200 ${
-										woTypeFilter === opt.value ?
-											"bg-primary border-primary text-white"
-										:	"bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50"
-									}`}>
-									{opt.label}
-								</button>
-							))}
-						</div>
-						<div className="relative">
-							<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-							<Input
-								placeholder="Cari nama formulir..."
-								value={woFormSearch}
-								onChange={(e) => setWoFormSearch(e.target.value)}
-								className="pl-9 h-8 bg-white rounded-xl"
-							/>
-						</div>
-						<div className="max-h-[320px] overflow-y-auto p-5 space-y-3 border border-slate-200 rounded-md bg-white">
-							<div className="grid grid-cols-1 gap-2 2xl:grid-cols-3">
-								{filteredWoForms.length === 0 ?
-									<div className="text-sm text-slate-500 text-center py-8 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-										<EmptyData />
-									</div>
-								:	filteredWoForms.map((f) => {
-										const isSelected = item.workOrderFormId === f._id;
-										return (
-											<button
-												key={f._id}
-												type="button"
-												onClick={() =>
-													updateWorkOrderConfig(
-														index,
-														"workOrderFormId",
-														isSelected ? "" : f._id,
-													)
-												}
-												className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex flex-col gap-2 ${
-													isSelected ?
-														"border-primary bg-primary/5 shadow-sm"
-													:	"border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
-												}`}>
-												<div className="flex items-center justify-between w-full">
-													<div className="flex items-start gap-4">
-														<div className="shrink-0 p-3 bg-primary/5 text-primary rounded-xl">
-															<ScrollText className="w-5 h-5" />
-														</div>
-														<div className="flex-1 space-y-1">
-															<h3 className="text-sm font-semibold text-slate-900 leading-snug line-clamp-1">
-																{f.title || "Untitled Form"}
-															</h3>
-															<p className="text-xs text-slate-500 leading-relaxed line-clamp-1">
-																{f.description || "No description available."}
-															</p>
-														</div>
-													</div>
-												</div>
-											</button>
-										);
-									})
-								}
+				{draftingWorkOrderType !== "auto" && (
+					<div className="space-y-5 p-4 rounded-xl bg-slate-50 border border-slate-100/80">
+						{/* Formulir Work Order */}
+						<div className="space-y-3">
+							<div>
+								<Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+									Formulir Work Order <span className="text-red-500">*</span>
+								</Label>
 							</div>
-						</div>
-					</div>
-
-					{/* Persetujuan Penugasan */}
-					<div className="space-y-4">
-						<Label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-							Persetujuan Penugasan
-						</Label>
-						<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-							{(
-								[
-									{
-										value: "auto",
-										label: "Otomatis",
-										desc: "Disetujui tanpa tindakan",
-									},
-									{
-										value: "staff_pic",
-										label: "Staff PIC",
-										desc: "Perlu konfirmasi staf",
-									},
-								] as const
-							).map((opt) => {
-								const isSelected = item.workOrderApprovalType === opt.value;
-								return (
+							<div className="flex flex-wrap gap-1.5 pb-1">
+								{formTypeOptions.map((opt) => (
 									<button
 										key={opt.value}
 										type="button"
-										onClick={() =>
-											updateWorkOrderConfig(
-												index,
-												"workOrderApprovalType",
-												opt.value,
-											)
-										}
-										className={`flex flex-col items-start gap-1 p-4 rounded-xl border-2 text-left transition-all duration-200 ${
-											isSelected ?
-												"border-primary bg-primary/5 shadow-sm"
-											:	"border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+										onClick={() => setWoTypeFilter(opt.value)}
+										className={`px-3 py-1 text-[10px] font-semibold rounded-full border transition-all duration-200 ${
+											woTypeFilter === opt.value ?
+												"bg-primary border-primary text-white"
+											:	"bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50"
 										}`}>
-										<span
-											className={`text-sm font-semibold ${
-												isSelected ? "text-primary" : "text-slate-700"
-											}`}>
-											{opt.label}
-										</span>
-										<span className="text-xs text-slate-500">{opt.desc}</span>
+										{opt.label}
 									</button>
-								);
-							})}
+								))}
+							</div>
+							<div className="relative">
+								<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+								<Input
+									placeholder="Cari nama formulir..."
+									value={woFormSearch}
+									onChange={(e) => setWoFormSearch(e.target.value)}
+									className="pl-9 h-8 bg-white rounded-xl"
+								/>
+							</div>
+							<div className="max-h-[320px] overflow-y-auto p-5 space-y-3 border border-slate-200 rounded-md bg-white">
+								<div className="grid grid-cols-1 gap-2 2xl:grid-cols-3">
+									{filteredWoForms.length === 0 ?
+										<div className="text-sm text-slate-500 text-center py-8 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+											<EmptyData />
+										</div>
+									:	filteredWoForms.map((f) => {
+											const isSelected = item.workOrderFormId === f._id;
+											return (
+												<button
+													key={f._id}
+													type="button"
+													onClick={() =>
+														updateWorkOrderConfig(
+															index,
+															"workOrderFormId",
+															isSelected ? "" : f._id,
+														)
+													}
+													className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex flex-col gap-2 ${
+														isSelected ?
+															"border-primary bg-primary/5 shadow-sm"
+														:	"border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+													}`}>
+													<div className="flex items-center justify-between w-full">
+														<div className="flex items-start gap-4">
+															<div className="shrink-0 p-3 bg-primary/5 text-primary rounded-xl">
+																<ScrollText className="w-5 h-5" />
+															</div>
+															<div className="flex-1 space-y-1">
+																<h3 className="text-sm font-semibold text-slate-900 leading-snug line-clamp-1">
+																	{f.title || "Untitled Form"}
+																</h3>
+																<p className="text-xs text-slate-500 leading-relaxed line-clamp-1">
+																	{f.description ||
+																		"No description available."}
+																</p>
+															</div>
+														</div>
+													</div>
+												</button>
+											);
+										})
+									}
+								</div>
+							</div>
+						</div>
+
+						{/* Persetujuan Penugasan */}
+						<div className="space-y-4">
+							<Label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+								Persetujuan Penugasan
+							</Label>
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+								{(
+									[
+										{
+											value: "auto",
+											label: "Otomatis",
+											desc: "Disetujui tanpa tindakan",
+										},
+										{
+											value: "staff_pic",
+											label: "Staff PIC",
+											desc: "Perlu konfirmasi staf",
+										},
+									] as const
+								).map((opt) => {
+									const isSelected = item.workOrderApprovalType === opt.value;
+									return (
+										<button
+											key={opt.value}
+											type="button"
+											onClick={() =>
+												updateWorkOrderConfig(
+													index,
+													"workOrderApprovalType",
+													opt.value,
+												)
+											}
+											className={`flex flex-col items-start gap-1 p-4 rounded-xl border-2 text-left transition-all duration-200 ${
+												isSelected ?
+													"border-primary bg-primary/5 shadow-sm"
+												:	"border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+											}`}>
+											<span
+												className={`text-sm font-semibold ${
+													isSelected ? "text-primary" : "text-slate-700"
+												}`}>
+												{opt.label}
+											</span>
+											<span className="text-xs text-slate-500">{opt.desc}</span>
+										</button>
+									);
+								})}
+							</div>
 						</div>
 					</div>
-				</div>
+				)}
 
 				{/* Work Report Phase */}
 				<div className="space-y-5 p-4 rounded-xl bg-slate-50 border border-slate-100/80">
@@ -405,7 +410,8 @@ const WorkOrderRowCard = ({
 																{f.title || "Untitled Form"}
 															</h3>
 															<p className="text-xs text-slate-500 leading-relaxed line-clamp-1">
-																{f.description || "No description available."}
+																{f.description ||
+																	"No description available."}
 															</p>
 														</div>
 													</div>
@@ -419,54 +425,56 @@ const WorkOrderRowCard = ({
 					</div>
 
 					{/* Persetujuan Pelaporan */}
-					<div className="space-y-4">
-						<Label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-							Persetujuan Pelaporan
-						</Label>
-						<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-							{(
-								[
-									{
-										value: "auto",
-										label: "Otomatis",
-										desc: "Disetujui tanpa tindakan",
-									},
-									{
-										value: "manager",
-										label: "Manager",
-										desc: "Perlu telaah manajer",
-									},
-								] as const
-							).map((opt) => {
-								const isSelected = item.workReportApprovalType === opt.value;
-								return (
-									<button
-										key={opt.value}
-										type="button"
-										onClick={() =>
-											updateWorkOrderConfig(
-												index,
-												"workReportApprovalType",
-												opt.value,
-											)
-										}
-										className={`flex flex-col items-start gap-1 p-4 rounded-xl border-2 text-left transition-all duration-200 ${
-											isSelected ?
-												"border-primary bg-primary/5 shadow-sm"
-											:	"border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
-										}`}>
-										<span
-											className={`text-sm font-semibold ${
-												isSelected ? "text-primary" : "text-slate-700"
+					{draftingWorkOrderType !== "auto" && (
+						<div className="space-y-4">
+							<Label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+								Persetujuan Pelaporan
+							</Label>
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+								{(
+									[
+										{
+											value: "auto",
+											label: "Otomatis",
+											desc: "Disetujui tanpa tindakan",
+										},
+										{
+											value: "manager",
+											label: "Manager",
+											desc: "Perlu telaah manajer",
+										},
+									] as const
+								).map((opt) => {
+									const isSelected = item.workReportApprovalType === opt.value;
+									return (
+										<button
+											key={opt.value}
+											type="button"
+											onClick={() =>
+												updateWorkOrderConfig(
+													index,
+													"workReportApprovalType",
+													opt.value,
+												)
+											}
+											className={`flex flex-col items-start gap-1 p-4 rounded-xl border-2 text-left transition-all duration-200 ${
+												isSelected ?
+													"border-primary bg-primary/5 shadow-sm"
+												:	"border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
 											}`}>
-											{opt.label}
-										</span>
-										<span className="text-xs text-slate-500">{opt.desc}</span>
-									</button>
-								);
-							})}
+											<span
+												className={`text-sm font-semibold ${
+													isSelected ? "text-primary" : "text-slate-700"
+												}`}>
+												{opt.label}
+											</span>
+											<span className="text-xs text-slate-500">{opt.desc}</span>
+										</button>
+									);
+								})}
+							</div>
 						</div>
-					</div>
+					)}
 				</div>
 			</div>
 		</div>
@@ -485,6 +493,7 @@ type CardWorkOrdersConfigProps = {
 		field: keyof WorkOrderConfigItem,
 		value: string | number,
 	) => void;
+	draftingWorkOrderType: draftingWorkOrderType;
 };
 
 export const CardWorkOrdersConfig: React.FC<CardWorkOrdersConfigProps> = ({
@@ -495,6 +504,7 @@ export const CardWorkOrdersConfig: React.FC<CardWorkOrdersConfigProps> = ({
 	addWorkOrderConfig,
 	removeWorkOrderConfig,
 	updateWorkOrderConfig,
+	draftingWorkOrderType,
 }) => {
 	return (
 		<div className="h-full overflow-y-auto">
@@ -552,6 +562,7 @@ export const CardWorkOrdersConfig: React.FC<CardWorkOrdersConfigProps> = ({
 								positions={positions}
 								removeWorkOrderConfig={removeWorkOrderConfig}
 								updateWorkOrderConfig={updateWorkOrderConfig}
+								draftingWorkOrderType={draftingWorkOrderType}
 							/>
 						))}
 
