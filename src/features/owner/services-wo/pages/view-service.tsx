@@ -13,6 +13,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { type ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { CreateServiceModal } from "../components/create-service-modal";
+import useAuth from "@/features/auth/hooks/useAuth";
 
 const serviceTypeLabel = (type: any) => {
 	const strType = String(type).toLowerCase();
@@ -33,6 +34,7 @@ const serviceTypeLabel = (type: any) => {
 
 const ViewService: React.FC = () => {
 	const navigate = useNavigate();
+	const { user } = useAuth();
 	const { loading, error, fecthServices, filteredData, filterConfig } =
 		useCreateService();
 
@@ -50,6 +52,14 @@ const ViewService: React.FC = () => {
 	const handleViewChange = (value: string) => {
 		setViewMode(value);
 		sessionStorage.setItem("serviceViewMode", value);
+	};
+
+	const handleAddClick = () => {
+		if (user?.role === "manager_company") {
+			navigate("/dashboard/internal/services/create");
+		} else {
+			setIsCreateModalOpen(true);
+		}
 	};
 
 	const handleSelectBlank = () => {
@@ -186,7 +196,7 @@ const ViewService: React.FC = () => {
 			<PageHeader
 				title="List Data Layanan"
 				subtitle="Berikut merupakan list layanan yang dimiliki oleh perusahaan."
-				onAddClick={() => setIsCreateModalOpen(true)}
+				onAddClick={handleAddClick}
 				addLabel="Tambah Layanan"
 				backPath={true}
 			/>

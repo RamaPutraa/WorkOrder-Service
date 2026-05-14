@@ -187,7 +187,7 @@ export const useCreateService = () => {
 		}
 
 		const isAuto = draftingWorkOrderType === "auto";
-		
+
 		const payload: CreateServiceRequest = {
 			title,
 			description,
@@ -198,21 +198,24 @@ export const useCreateService = () => {
 			serviceRequestConfig: {
 				intakeFormId,
 				reviewFormId,
-				serviceRequestApprovalAccessType: isAuto ?
-						"auto"
-					:	(serviceRequestApprovalType as unknown as serviceRequestApprovalAccessType),
+				serviceRequestApprovalAccessType:
+					isAuto ? "auto" : (
+						(serviceRequestApprovalType as unknown as serviceRequestApprovalAccessType)
+					),
 				reviewNeed,
 			},
 			workOrdersConfig: workOrdersConfig.map((c) => ({
 				positionId: c.positionId,
 				workOrderFormId: isAuto ? "" : c.workOrderFormId,
 				workReportFormId: c.workReportFormId,
-				workOrderApprovalAccessType: isAuto ?
-						"auto"
-					:	(c.workOrderApprovalType as unknown as workOrderApprovalAccessType),
-				workReportApprovalAccessType: isAuto ?
-						"auto"
-					:	(c.workReportApprovalType as unknown as workReportApprovalAccessType),
+				workOrderApprovalAccessType:
+					isAuto ? "auto" : (
+						(c.workOrderApprovalType as unknown as workOrderApprovalAccessType)
+					),
+				workReportApprovalAccessType:
+					isAuto ? "auto" : (
+						(c.workReportApprovalType as unknown as workReportApprovalAccessType)
+					),
 				minStaff: c.minStaff,
 				maxStaff: c.maxStaff,
 			})),

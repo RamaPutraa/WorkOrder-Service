@@ -276,21 +276,24 @@ export const useEditService = () => {
 			serviceRequestConfig: {
 				intakeFormId,
 				reviewFormId,
-				serviceRequestApprovalAccessType: isAuto
-					? "auto"
-					: (serviceRequestApprovalType as unknown as serviceRequestApprovalAccessType),
+				serviceRequestApprovalAccessType:
+					isAuto ? "auto" : (
+						(serviceRequestApprovalType as unknown as serviceRequestApprovalAccessType)
+					),
 				reviewNeed,
 			},
 			workOrdersConfig: workOrdersConfig.map((c) => ({
 				positionId: c.positionId,
 				workOrderFormId: isAuto ? "" : c.workOrderFormId,
 				workReportFormId: c.workReportFormId,
-				workOrderApprovalAccessType: isAuto
-					? "auto"
-					: (c.workOrderApprovalType as unknown as workOrderApprovalAccessType),
-				workReportApprovalAccessType: isAuto
-					? "auto"
-					: (c.workReportApprovalType as unknown as workReportApprovalAccessType),
+				workOrderApprovalAccessType:
+					isAuto ? "auto" : (
+						(c.workOrderApprovalType as unknown as workOrderApprovalAccessType)
+					),
+				workReportApprovalAccessType:
+					isAuto ? "auto" : (
+						(c.workReportApprovalType as unknown as workReportApprovalAccessType)
+					),
 				minStaff: c.minStaff,
 				maxStaff: c.maxStaff,
 			})),
@@ -351,8 +354,10 @@ export const useEditService = () => {
 			reviewFormId !== initialReviewFormId ||
 			serviceRequestApprovalType !== initialApprovalType ||
 			reviewNeed !== initialReviewNeed ||
-			draftingWorkOrderType !== (detailService.drafting_work_order_type || "auto") ||
-			showReportToRequester !== (detailService.show_report_to_requester || false);
+			draftingWorkOrderType !==
+				(detailService.drafting_work_order_type || "auto") ||
+			showReportToRequester !==
+				(detailService.show_report_to_requester || false);
 
 		// Basic check for workOrdersConfig length
 		const isWorkOrdersChanged =

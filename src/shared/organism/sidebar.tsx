@@ -229,7 +229,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 					</>
 				)}
 				{user && ["manager_company"].includes(user.role) && (
-					<NavInternalBusiness items={data.navInternalBusiness} />
+					<>
+						<NavSetup
+							items={data.navSetup
+								.filter((nav) => nav.title === "Tugas Kerja")
+								.map((nav) => ({
+									...nav,
+									items: nav.items?.filter((item) =>
+										["Kelola Formulir", "Kelola Layanan"].includes(item.title),
+									),
+								}))}
+						/>
+						<NavInternalBusiness items={data.navInternalBusiness} />
+					</>
 				)}
 				{user && ["staff_company"].includes(user.role) && (
 					<NavStaffBusiness items={data.navStaffBusiness} />
