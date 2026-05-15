@@ -31,6 +31,7 @@ export type WorkOrderConfigItem = {
 	workReportApprovalType: "auto" | "manager";
 	minStaff: number;
 	maxStaff: number;
+	show_report_to_requester: boolean;
 };
 
 export const useCreateService = () => {
@@ -82,8 +83,6 @@ export const useCreateService = () => {
 	const [reviewNeed, setReviewNeed] = useState<boolean>(false);
 	const [draftingWorkOrderType, setDraftingWorkOrderType] =
 		useState<draftingWorkOrderType>("auto");
-	const [showReportToRequester, setShowReportToRequester] =
-		useState<boolean>(false);
 
 	// === workOrdersConfig[] ===
 	const [workOrdersConfig, setWorkOrdersConfig] = useState<
@@ -101,6 +100,7 @@ export const useCreateService = () => {
 				workReportApprovalType: "auto",
 				minStaff: 1,
 				maxStaff: 1,
+				show_report_to_requester: false,
 			},
 		]);
 	};
@@ -112,7 +112,7 @@ export const useCreateService = () => {
 	const updateWorkOrderConfig = (
 		index: number,
 		field: keyof WorkOrderConfigItem,
-		value: string | number,
+		value: string | number | boolean,
 	) => {
 		setWorkOrdersConfig((prev) =>
 			prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)),
@@ -194,7 +194,6 @@ export const useCreateService = () => {
 			accessType: accessType as unknown as serviceAccessType,
 			isActive: selectedStatus?.value === "true",
 			drafting_work_order_type: draftingWorkOrderType,
-			show_report_to_requester: showReportToRequester,
 			serviceRequestConfig: {
 				intakeFormId,
 				reviewFormId,
@@ -218,6 +217,7 @@ export const useCreateService = () => {
 					),
 				minStaff: c.minStaff,
 				maxStaff: c.maxStaff,
+				show_report_to_requester: c.show_report_to_requester,
 			})),
 		};
 
@@ -252,18 +252,17 @@ export const useCreateService = () => {
 			description !== "" ||
 			accessType !== "" ||
 			intakeFormId !== "" ||
-			draftingWorkOrderType !== "auto" ||
-			workOrdersConfig.length > 0
-		);
-	}, [
-		title,
-		description,
-		accessType,
-		intakeFormId,
-		draftingWorkOrderType,
-		showReportToRequester,
-		workOrdersConfig,
-	]);
+		draftingWorkOrderType !== "auto" ||
+		workOrdersConfig.length > 0
+	);
+}, [
+	title,
+	description,
+	accessType,
+	intakeFormId,
+	draftingWorkOrderType,
+	workOrdersConfig,
+]);
 
 	// === Fetch List Services (dengan cache 5 menit) ===
 	const fecthServices = async () => {
@@ -417,7 +416,6 @@ export const useCreateService = () => {
 		serviceRequestApprovalType,
 		reviewNeed,
 		draftingWorkOrderType,
-		showReportToRequester,
 		// work orders
 		workOrdersConfig,
 		// list / detail
@@ -437,7 +435,6 @@ export const useCreateService = () => {
 		setServiceRequestApprovalType,
 		setReviewNeed,
 		setDraftingWorkOrderType,
-		setShowReportToRequester,
 		setDetailService,
 
 		// === HANDLERS ===

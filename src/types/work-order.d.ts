@@ -106,6 +106,7 @@ type WorkReport = {
 	reportForm: string;
 	workReportApprovalAccessType: "auto" | "manager";
 	status: "on_progress" | "submitted" | "rejected" | "approved";
+	show_report_to_requester: boolean;
 	approvedBy: User | null;
 	submissions: SubmissionObject[];
 	createdAt: string;

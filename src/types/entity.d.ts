@@ -93,7 +93,6 @@ type Service = {
 	accessType: serviceAccessType;
 	isActive: boolean;
 	drafting_work_order_type: draftingWorkOrderType;
-	show_report_to_requester: boolean;
 	serviceRequestConfig: {
 		intakeForm: Form;
 		reviewForm: Form;
@@ -110,6 +109,7 @@ type Service = {
 		workReportApprovalAccessType: workReportApprovalAccessType;
 		minStaff: number;
 		maxStaff: number;
+		show_report_to_requester: boolean;
 	}[];
 	createdAt: string;
 	updatedAt: string;

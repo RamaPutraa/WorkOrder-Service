@@ -21,14 +21,12 @@ type CardServiceRequestConfigProps = {
 	reviewFormId: string;
 	serviceRequestApprovalType: "auto" | "manager";
 	reviewNeed: boolean;
-	showReportToRequester: boolean;
 	draftingWorkOrderType: draftingWorkOrderType;
 
 	setIntakeFormId: (val: string) => void;
 	setReviewFormId: (val: string) => void;
 	setServiceRequestApprovalType: (val: "auto" | "manager") => void;
 	setReviewNeed: (val: boolean) => void;
-	setShowReportToRequester: (val: boolean) => void;
 };
 
 export const CardServiceRequestConfig: React.FC<
@@ -40,13 +38,11 @@ export const CardServiceRequestConfig: React.FC<
 	reviewFormId,
 	serviceRequestApprovalType,
 	reviewNeed,
-	showReportToRequester,
 	draftingWorkOrderType,
 	setIntakeFormId,
 	setReviewFormId,
 	setServiceRequestApprovalType,
 	setReviewNeed,
-	setShowReportToRequester,
 }) => {
 	const [intakeSearch, setIntakeSearch] = useState("");
 	const [reviewSearch, setReviewSearch] = useState("");
@@ -148,40 +144,38 @@ export const CardServiceRequestConfig: React.FC<
 									:	filteredIntakeForms.map((f) => {
 											const isSelected = intakeFormId === f._id;
 											return (
-												<>
-													<button
-														key={f._id}
-														type="button"
-														onClick={() =>
-															setIntakeFormId(isSelected ? "" : f._id)
-														}
-														className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex flex-col gap-2 ${
-															isSelected ?
-																"border-primary bg-primary/5 shadow-sm"
-															:	"border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
-														}`}>
-														<div className="flex items-center justify-between w-full">
-															<div className="flex items-start gap-4">
-																{/* Icon */}
-																<div className="shrink-0 p-3 bg-primary/5 text-primary rounded-xl">
-																	<ScrollText className="w-5 h-5" />
-																</div>
+												<button
+													key={f._id}
+													type="button"
+													onClick={() =>
+														setIntakeFormId(isSelected ? "" : f._id)
+													}
+													className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex flex-col gap-2 ${
+														isSelected ?
+															"border-primary bg-primary/5 shadow-sm"
+														:	"border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+													}`}>
+													<div className="flex items-center justify-between w-full">
+														<div className="flex items-start gap-4">
+															{/* Icon */}
+															<div className="shrink-0 p-3 bg-primary/5 text-primary rounded-xl">
+																<ScrollText className="w-5 h-5" />
+															</div>
 
-																{/* Text Content */}
-																<div className="flex-1 space-y-1">
-																	<h3 className="text-sm font-semibold text-slate-900 leading-snug line-clamp-1">
-																		{f.title || "Untitled Form"}
-																	</h3>
+															{/* Text Content */}
+															<div className="flex-1 space-y-1">
+																<h3 className="text-sm font-semibold text-slate-900 leading-snug line-clamp-1">
+																	{f.title || "Untitled Form"}
+																</h3>
 
-																	<p className="text-xs text-slate-500 leading-relaxed line-clamp-1">
-																		{f.description ||
-																			"No description available."}
-																	</p>
-																</div>
+																<p className="text-xs text-slate-500 leading-relaxed line-clamp-1">
+																	{f.description ||
+																		"No description available."}
+																</p>
 															</div>
 														</div>
-													</button>
-												</>
+													</div>
+												</button>
 											);
 										})
 									}
@@ -234,40 +228,38 @@ export const CardServiceRequestConfig: React.FC<
 									:	filteredReviewForms.map((f) => {
 											const isSelected = reviewFormId === f._id;
 											return (
-												<>
-													<button
-														key={f._id}
-														type="button"
-														onClick={() =>
-															setReviewFormId(isSelected ? "" : f._id)
-														}
-														className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex flex-col gap-2 ${
-															isSelected ?
-																"border-primary bg-primary/5 shadow-sm"
-															:	"border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
-														}`}>
-														<div className="flex items-center justify-between w-full">
-															<div className="flex items-start gap-4">
-																{/* Icon */}
-																<div className="shrink-0 p-3 bg-primary/5 text-primary rounded-xl">
-																	<ScrollText className="w-5 h-5" />
-																</div>
+												<button
+													key={f._id}
+													type="button"
+													onClick={() =>
+														setReviewFormId(isSelected ? "" : f._id)
+													}
+													className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex flex-col gap-2 ${
+														isSelected ?
+															"border-primary bg-primary/5 shadow-sm"
+														:	"border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+													}`}>
+													<div className="flex items-center justify-between w-full">
+														<div className="flex items-start gap-4">
+															{/* Icon */}
+															<div className="shrink-0 p-3 bg-primary/5 text-primary rounded-xl">
+																<ScrollText className="w-5 h-5" />
+															</div>
 
-																{/* Text Content */}
-																<div className="flex-1 space-y-1">
-																	<h3 className="text-sm font-semibold text-slate-900 leading-snug line-clamp-1">
-																		{f.title || "Untitled Form"}
-																	</h3>
+															{/* Text Content */}
+															<div className="flex-1 space-y-1">
+																<h3 className="text-sm font-semibold text-slate-900 leading-snug line-clamp-1">
+																	{f.title || "Untitled Form"}
+																</h3>
 
-																	<p className="text-xs text-slate-500 leading-relaxed line-clamp-1">
-																		{f.description ||
-																			"No description available."}
-																	</p>
-																</div>
+																<p className="text-xs text-slate-500 leading-relaxed line-clamp-1">
+																	{f.description ||
+																		"No description available."}
+																</p>
 															</div>
 														</div>
-													</button>
-												</>
+													</div>
+												</button>
 											);
 										})
 									}
@@ -333,23 +325,6 @@ export const CardServiceRequestConfig: React.FC<
 								</p>
 							</div>
 							<Switch checked={reviewNeed} onCheckedChange={setReviewNeed} />
-						</div>
-
-						{/* Show Report to Requester toggle */}
-						<div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-slate-50/50">
-							<div className="space-y-0.5">
-								<p className="text-sm font-medium text-slate-700">
-									Tampilkan Laporan ke Klien
-								</p>
-								<p className="text-xs text-slate-500">
-									Apakah klien dapat melihat laporan pengerjaan yang dibuat oleh
-									staf?
-								</p>
-							</div>
-							<Switch
-								checked={showReportToRequester}
-								onCheckedChange={setShowReportToRequester}
-							/>
 						</div>
 					</>
 				}

@@ -38,8 +38,6 @@ const CreateService: React.FC = () => {
 		setReviewNeed,
 		draftingWorkOrderType,
 		setDraftingWorkOrderType,
-		showReportToRequester,
-		setShowReportToRequester,
 
 		// Work Orders Config
 		workOrdersConfig,
@@ -130,8 +128,6 @@ const CreateService: React.FC = () => {
 							setServiceRequestApprovalType={setServiceRequestApprovalType}
 							reviewNeed={reviewNeed}
 							setReviewNeed={setReviewNeed}
-							showReportToRequester={showReportToRequester}
-							setShowReportToRequester={setShowReportToRequester}
 							draftingWorkOrderType={draftingWorkOrderType}
 						/>
 					</motion.div>

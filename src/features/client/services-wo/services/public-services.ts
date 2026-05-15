@@ -32,6 +32,13 @@ export const getDetailClientServiceRequestApi = async (id: string) => {
 	return response.data;
 };
 
+export const getClientWorkReport = async (id: string) => {
+	const response = await apiClient.get<RequesterWorkReportResponse>(
+		`/service-request/${id}/report`,
+	);
+	return response.data;
+};
+
 export const submitReviewApi = async (
 	id: string,
 	data: RequesterSubmitRequest,

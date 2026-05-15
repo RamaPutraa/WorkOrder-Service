@@ -28,6 +28,7 @@ export type WorkOrderConfigItem = {
 	workReportApprovalType: "auto" | "manager";
 	minStaff: number;
 	maxStaff: number;
+	show_report_to_requester: boolean;
 };
 
 export const useEditService = () => {
@@ -76,8 +77,6 @@ export const useEditService = () => {
 	const [reviewNeed, setReviewNeed] = useState<boolean>(false);
 	const [draftingWorkOrderType, setDraftingWorkOrderType] =
 		useState<draftingWorkOrderType>("auto");
-	const [showReportToRequester, setShowReportToRequester] =
-		useState<boolean>(false);
 
 	// === workOrdersConfig[] ===
 	const [workOrdersConfig, setWorkOrdersConfig] = useState<
@@ -95,6 +94,7 @@ export const useEditService = () => {
 				workReportApprovalType: "auto",
 				minStaff: 1,
 				maxStaff: 1,
+				show_report_to_requester: false,
 			},
 		]);
 	};
@@ -106,7 +106,7 @@ export const useEditService = () => {
 	const updateWorkOrderConfig = (
 		index: number,
 		field: keyof WorkOrderConfigItem,
-		value: string | number,
+		value: string | number | boolean,
 	) => {
 		setWorkOrdersConfig((prev) =>
 			prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)),
@@ -147,7 +147,6 @@ export const useEditService = () => {
 			service.isActive === true || service.isActive === ("true" as any),
 		);
 		setDraftingWorkOrderType(service.drafting_work_order_type || "auto");
-		setShowReportToRequester(service.show_report_to_requester || false);
 
 		if (service.serviceRequestConfig) {
 			setIntakeFormId(service.serviceRequestConfig.intakeForm?._id || "");
@@ -173,6 +172,7 @@ export const useEditService = () => {
 						| "manager",
 					minStaff: c.minStaff,
 					maxStaff: c.maxStaff,
+					show_report_to_requester: c.show_report_to_requester || false,
 				})),
 			);
 		}
@@ -272,7 +272,6 @@ export const useEditService = () => {
 			accessType: accessType as unknown as serviceAccessType,
 			isActive: Boolean(isActive), // Ensure strict boolean type
 			drafting_work_order_type: draftingWorkOrderType,
-			show_report_to_requester: showReportToRequester,
 			serviceRequestConfig: {
 				intakeFormId,
 				reviewFormId,
@@ -296,6 +295,7 @@ export const useEditService = () => {
 					),
 				minStaff: c.minStaff,
 				maxStaff: c.maxStaff,
+				show_report_to_requester: c.show_report_to_requester,
 			})),
 		};
 
@@ -355,9 +355,7 @@ export const useEditService = () => {
 			serviceRequestApprovalType !== initialApprovalType ||
 			reviewNeed !== initialReviewNeed ||
 			draftingWorkOrderType !==
-				(detailService.drafting_work_order_type || "auto") ||
-			showReportToRequester !==
-				(detailService.show_report_to_requester || false);
+				(detailService.drafting_work_order_type || "auto");
 
 		// Basic check for workOrdersConfig length
 		const isWorkOrdersChanged =
@@ -374,7 +372,6 @@ export const useEditService = () => {
 		serviceRequestApprovalType,
 		reviewNeed,
 		draftingWorkOrderType,
-		showReportToRequester,
 		workOrdersConfig,
 	]);
 
@@ -398,7 +395,6 @@ export const useEditService = () => {
 		serviceRequestApprovalType,
 		reviewNeed,
 		draftingWorkOrderType,
-		showReportToRequester,
 		// work orders
 		workOrdersConfig,
 		detailService,
@@ -414,7 +410,6 @@ export const useEditService = () => {
 		setServiceRequestApprovalType,
 		setReviewNeed,
 		setDraftingWorkOrderType,
-		setShowReportToRequester,
 		setDetailService,
 
 		// === HANDLERS ===

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 import {
 	Popover,
@@ -47,7 +48,7 @@ const WorkOrderRowCard = ({
 	updateWorkOrderConfig: (
 		index: number,
 		field: keyof WorkOrderConfigItem,
-		value: string | number,
+		value: string | number | boolean,
 	) => void;
 	draftingWorkOrderType: draftingWorkOrderType;
 }) => {
@@ -475,6 +476,24 @@ const WorkOrderRowCard = ({
 							</div>
 						</div>
 					)}
+
+					{/* Show Report to Requester toggle */}
+					<div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-white shadow-sm mt-4">
+						<div className="space-y-0.5">
+							<p className="text-sm font-medium text-slate-700">
+								Tampilkan Laporan ke Klien
+							</p>
+							<p className="text-xs text-slate-500">
+								Klien dapat melihat laporan pengerjaan pada tahap ini.
+							</p>
+						</div>
+						<Switch
+							checked={item.show_report_to_requester}
+							onCheckedChange={(val) =>
+								updateWorkOrderConfig(index, "show_report_to_requester", val)
+							}
+						/>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -491,7 +510,7 @@ type CardWorkOrdersConfigProps = {
 	updateWorkOrderConfig: (
 		index: number,
 		field: keyof WorkOrderConfigItem,
-		value: string | number,
+		value: string | number | boolean,
 	) => void;
 	draftingWorkOrderType: draftingWorkOrderType;
 };
