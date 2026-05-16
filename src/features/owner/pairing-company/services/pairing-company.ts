@@ -15,6 +15,7 @@ export const updateCompanyIntegration = async (data: IntegrationConfig) => {
 	return response.data;
 };
 
+// TODO : show ini di ui belum
 export const getAllMembership = async () => {
 	const response = await apiClient.get<getAllMembershipResponse>("/membership");
 	return response.data;

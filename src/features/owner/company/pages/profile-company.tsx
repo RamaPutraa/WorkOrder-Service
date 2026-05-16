@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
 	Building2,
 	MapPin,
@@ -7,12 +7,23 @@ import {
 	CheckCircle2,
 	Text,
 	MessageCircleIcon,
+	Link2,
+	KeyRound,
+	ShieldCheck,
+	ChevronDown,
+	ChevronUp,
+	Save,
+	Loader2,
 } from "lucide-react";
 import { useCompanyProfile, useUpdateCompany } from "../hooks/companyHooks";
 import { useFaq } from "../../faqs/hooks/useFaq";
+import { useIntegrationConfig } from "../../pairing-company/hooks/useIntegrationConfig";
 
 // Components
 import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -38,9 +49,49 @@ const ProfileCompany = () => {
 		submitting: faqSubmitting,
 	} = useFaq();
 
+	const {
+		config,
+		loading: configLoading,
+		submitting: configSubmitting,
+		handleUpdate: updateIntegration,
+	} = useIntegrationConfig();
+
+	// Local form state untuk edit konfigurasi integrasi
+	const [integrationForm, setIntegrationForm] = useState<IntegrationConfig>({
+		external_login_url: "",
+		external_verify_url: "",
+		external_check_membership_url: "",
+		secret_key: "",
+		is_integration_active: false,
+	});
+	const [showIntegrationForm, setShowIntegrationForm] = useState(false);
+	const [isDirty, setIsDirty] = useState(false);
+
+	// Sync form saat config berhasil di-load
+	useEffect(() => {
+		if (config) {
+			setIntegrationForm(config);
+			setIsDirty(false);
+		}
+	}, [config]);
+
+	const handleFormChange = (field: keyof IntegrationConfig, value: string) => {
+		setIntegrationForm((prev) => ({ ...prev, [field]: value }));
+		setIsDirty(true);
+	};
+
+	const handleSaveIntegration = async () => {
+		const success = await updateIntegration(integrationForm);
+		if (success) {
+			setIsDirty(false);
+		}
+	};
+
 	const [openEdit, setOpenEdit] = useState(false);
 	const [openToggleConfirm, setOpenToggleConfirm] = useState(false);
 	const [openFaqToggleConfirm, setOpenFaqToggleConfirm] = useState(false);
+	const [openIntegrationToggleConfirm, setOpenIntegrationToggleConfirm] =
+		useState(false);
 
 	if (loading) return <SectionLoading message="Memuat profil perusahaan.." />;
 
@@ -73,6 +124,17 @@ const ProfileCompany = () => {
 		await handleFaqToggle(!isFaqActive);
 		setOpenFaqToggleConfirm(false);
 	};
+
+	const handleConfirmToggleIntegration = async () => {
+		const newValue = !integrationForm.is_integration_active;
+		await updateIntegration({
+			...integrationForm,
+			is_integration_active: newValue,
+		});
+		setOpenIntegrationToggleConfirm(false);
+	};
+
+	const isIntegrationActive = integrationForm.is_integration_active;
 
 	return (
 		<>
@@ -116,7 +178,7 @@ const ProfileCompany = () => {
 								</span>
 							</div>
 							<p className="text-sm text-muted-foreground">
-								Profil & pengaturan utama perusahaan.
+								Profil &amp; pengaturan utama perusahaan.
 							</p>
 						</div>
 					</div>
@@ -258,45 +320,206 @@ const ProfileCompany = () => {
 					</div>
 				</div>
 
-				{/* Konfigruasi connect external services */}
+				{/* ── Section: Integrasi Antar Sistem ─────────────────────────── */}
 				<div className="space-y-3">
 					<h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
 						Integrasi Antar Sistem
 					</h2>
 
-					<div className="shadow-sm  flex flex-col sm:flex-row sm:items-center justify-between gap-6 p-5 border border-border/40 rounded-2xl bg-card transition-all hover:border-primary/20">
+					{/* Toggle Integrasi Aktif */}
+					<div className="shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-6 p-5 border border-border/40 rounded-2xl bg-card transition-all hover:border-primary/20">
 						<div className="space-y-1.5">
-							<div className="">
-								<p className="text-sm font-bold text-foreground">
-									Aktifkan Integrasi
+							<p className="text-sm font-bold text-foreground">
+								Aktifkan Integrasi
+							</p>
+							<p className="text-sm text-muted-foreground leading-relaxed">
+								Hubungkan sisitem internal perusahaan anda dengan platform kami
+								agar pelanggan dapat mengaitkan akun mereka dan memperoleh akses
+								ke layanan khusus pelanggan secara otomatis
+							</p>
+							{isIntegrationActive && (
+								<p className="text-xs font-medium text-emerald-600 flex items-center gap-1.5 mt-1.5">
+									<CheckCircle2 className="w-3.5 h-3.5" />
+									Sistem integrasi aktif
 								</p>
-								<p className="text-sm text-muted-foreground leading-relaxed">
-									{company.isActive ?
-										"Perusahaan ini mendukung fitur integrasi antar sistem"
-									:	"Integrasi sistem tidak aktif."}
-								</p>
-								{company.isActive && (
-									<p className="text-xs font-medium text-emerald-600 flex items-center gap-1.5 mt-1.5">
-										<CheckCircle2 className="w-3.5 h-3.5" />
-										Sistem integrasi aktif
-									</p>
-								)}
-							</div>
+							)}
 						</div>
 
-						{/* Toggle Switch */}
 						<div className="pl-10 sm:pl-0 shrink-0">
-							<Switch
-								checked={company.isActive}
-								disabled={updating}
-								onCheckedChange={() => setOpenToggleConfirm(true)}
-								className="data-[state=checked]:bg-emerald-600"
-							/>
+							{configLoading ?
+								<Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+							:	<Switch
+									checked={isIntegrationActive}
+									disabled={configSubmitting}
+									onCheckedChange={() => setOpenIntegrationToggleConfirm(true)}
+									className="data-[state=checked]:bg-emerald-600"
+								/>
+							}
 						</div>
 					</div>
 
-					{/* ── form input integrasi ── */}
-					<div className="shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-6 p-5 border border-border/40 rounded-2xl bg-card transition-all hover:border-primary/20"></div>
+					{/* Konfigurasi URL & Secret Key */}
+					<div className="border border-border/40 rounded-2xl bg-card overflow-hidden shadow-sm">
+						{/* Header accordion */}
+						<button
+							type="button"
+							onClick={() => setShowIntegrationForm((prev) => !prev)}
+							className="w-full flex items-center justify-between p-5 text-left hover:bg-muted/20 transition-colors">
+							<div className="flex items-center gap-3">
+								<div className="w-8 h-8 rounded-lg bg-primary/5 border border-primary/10 flex items-center justify-center">
+									<Link2 className="w-4 h-4 text-primary" />
+								</div>
+								<div>
+									<p className="text-sm font-bold text-foreground">
+										Konfigurasi URL & Kunci Integrasi
+									</p>
+									<p className="text-xs text-muted-foreground mt-0.5">
+										Atur endpoint dan kunci rahasia untuk koneksi sistem
+										eksternal
+									</p>
+								</div>
+							</div>
+							{showIntegrationForm ?
+								<ChevronUp className="w-4 h-4 text-muted-foreground shrink-0" />
+							:	<ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />
+							}
+						</button>
+
+						{/* Form collapse */}
+						{showIntegrationForm && (
+							<div className="border-t border-border/40 p-5 space-y-5">
+								{configLoading ?
+									<div className="flex items-center justify-center py-8">
+										<Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+										<span className="ml-2 text-sm text-muted-foreground">
+											Memuat konfigurasi...
+										</span>
+									</div>
+								:	<>
+										{/* External Login URL */}
+										<div className="space-y-2">
+											<Label
+												htmlFor="external_login_url"
+												className="text-sm font-medium flex items-center gap-2">
+												<Link2 className="w-3.5 h-3.5 text-muted-foreground" />
+												URL Login Eksternal
+											</Label>
+											<Input
+												id="external_login_url"
+												placeholder="Contoh: https://external-service.com/api/login"
+												value={integrationForm.external_login_url}
+												onChange={(e) =>
+													handleFormChange("external_login_url", e.target.value)
+												}
+												className="rounded-xl font-mono text-sm"
+											/>
+											<p className="text-sm text-muted-foreground">
+												URL halaman login sistem perusahaan yang akan digunakan
+												pelanggan saat menghubungkan akun mereka
+											</p>
+										</div>
+
+										{/* External Verify URL */}
+										<div className="space-y-2">
+											<Label
+												htmlFor="external_verify_url"
+												className="text-sm font-medium flex items-center gap-2">
+												<ShieldCheck className="w-3.5 h-3.5 text-muted-foreground" />
+												URL Verifikasi Token
+											</Label>
+											<Input
+												id="external_verify_url"
+												placeholder="Contoh: https://external-service.com/api/verify"
+												value={integrationForm.external_verify_url}
+												onChange={(e) =>
+													handleFormChange(
+														"external_verify_url",
+														e.target.value,
+													)
+												}
+												className="rounded-xl font-mono text-sm"
+											/>
+											<p className="text-sm text-muted-foreground">
+												URL yang digunakan sistem kami untuk memverifikasi akun
+												pelanggan pada sistem perusahaan anda
+											</p>
+										</div>
+
+										{/* External Check Membership URL */}
+										<div className="space-y-2">
+											<Label
+												htmlFor="external_check_membership_url"
+												className="text-sm font-medium flex items-center gap-2">
+												<Link2 className="w-3.5 h-3.5 text-muted-foreground" />
+												URL Cek Keanggotaan
+											</Label>
+											<Input
+												id="external_check_membership_url"
+												placeholder="Contoh: https://external-service.com/api/membership"
+												value={integrationForm.external_check_membership_url}
+												onChange={(e) =>
+													handleFormChange(
+														"external_check_membership_url",
+														e.target.value,
+													)
+												}
+												className="rounded-xl font-mono text-sm"
+											/>
+											<p className="text-sm text-muted-foreground">
+												URL yang digunakan untuk memeriksa status membership
+												atau keanggotaan pelanggan pada sistem perusahaan anda
+											</p>
+										</div>
+
+										{/* Secret Key */}
+										<div className="space-y-2">
+											<Label
+												htmlFor="secret_key"
+												className="text-sm font-medium flex items-center gap-2">
+												<KeyRound className="w-3.5 h-3.5 text-muted-foreground" />
+												Secret Key
+											</Label>
+											<Input
+												id="secret_key"
+												type="password"
+												placeholder="••••••••••••••••"
+												value={integrationForm.secret_key}
+												onChange={(e) =>
+													handleFormChange("secret_key", e.target.value)
+												}
+												className="rounded-xl font-mono text-sm"
+											/>
+											<p className="text-sm text-muted-foreground">
+												Kunci rahasia yang digunakan untuk mengamankan
+												komunikasi antara sistem perusahaan anda dan platform
+												kami
+											</p>
+										</div>
+
+										{/* Save Button */}
+										<div className="flex justify-end pt-2">
+											<Button
+												onClick={handleSaveIntegration}
+												disabled={configSubmitting || !isDirty}
+												size="sm"
+												className="rounded-xl gap-2 py-5 hover:cursor-pointer">
+												{configSubmitting ?
+													<>
+														<Loader2 className="w-3.5 h-3.5 animate-spin" />
+														Menyimpan...
+													</>
+												:	<>
+														<Save className="w-3.5 h-3.5" />
+														Simpan Konfigurasi
+													</>
+												}
+											</Button>
+										</div>
+									</>
+								}
+							</div>
+						)}
+					</div>
 				</div>
 
 				{/* ── Dialogs ─────────────────────────────────────────────────── */}
@@ -380,6 +603,48 @@ const ProfileCompany = () => {
 								{faqSubmitting ?
 									"Memproses..."
 								: isFaqActive ?
+									"Ya, Nonaktifkan"
+								:	"Ya, Aktifkan"}
+							</AlertDialogAction>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialog>
+
+				{/* ── Dialog: Konfirmasi Toggle Integrasi ── */}
+				<AlertDialog
+					open={openIntegrationToggleConfirm}
+					onOpenChange={setOpenIntegrationToggleConfirm}>
+					<AlertDialogContent className="rounded-2xl">
+						<AlertDialogHeader>
+							<AlertDialogTitle>
+								{isIntegrationActive ?
+									"Nonaktifkan Integrasi Sistem?"
+								:	"Aktifkan Integrasi Sistem?"}
+							</AlertDialogTitle>
+							<AlertDialogDescription className="leading-relaxed">
+								{isIntegrationActive ?
+									"Integrasi akan dinonaktifkan. Fitur pairing dan koneksi ke sistem eksternal akan terhenti."
+								:	"Integrasi akan diaktifkan. Sistem ini akan terhubung dengan layanan eksternal sesuai konfigurasi yang telah diatur."
+								}
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+						<AlertDialogFooter>
+							<AlertDialogCancel
+								disabled={configSubmitting}
+								className="rounded-xl">
+								Batal
+							</AlertDialogCancel>
+							<AlertDialogAction
+								disabled={configSubmitting}
+								onClick={handleConfirmToggleIntegration}
+								className={`rounded-xl ${
+									isIntegrationActive ?
+										"bg-destructive hover:bg-destructive/90 text-white"
+									:	"bg-emerald-600 hover:bg-emerald-700 text-white"
+								}`}>
+								{configSubmitting ?
+									"Memproses..."
+								: isIntegrationActive ?
 									"Ya, Nonaktifkan"
 								:	"Ya, Aktifkan"}
 							</AlertDialogAction>

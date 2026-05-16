@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,15 +14,14 @@ import { GenericFilter } from "@/shared/molecules/generic-filter";
 import { EmptyData } from "@/shared/molecules/empty-data";
 import { SectionLoading } from "@/shared/atoms";
 import PageHeader from "@/shared/atoms/header-content";
-import ClaimMembershipDialog from "@/features/client/memberships/components/claim-membership-dialog";
 import { FaqChatbot } from "@/shared/organism/faq-chatbot";
+import { usePairingAccount } from "@/features/client/pairing-account/hooks/use-pairing-account";
 
 const ClientCompanyServices = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
-	const [claimDialogOpen, setClaimDialogOpen] = useState(false);
+	const { isPairing, localPaired, initiatePairing } = usePairingAccount();
 	const {
-		fetchCompanyServices,
 		filteredServices,
 		filterConfigServices,
 		companies,
@@ -32,8 +30,17 @@ const ClientCompanyServices = () => {
 		error,
 	} = useClientCompany();
 
+	// Visual status: if it was already subscribed or newly paired in this session
+	const isPaired = isSubscribed || localPaired;
+
 	// Cari data company yang sesuai dengan id dari URL
 	const company = companies.find((c) => c._id === id);
+
+	const handlePairing = () => {
+		if (company?._id) {
+			initiatePairing(company._id);
+		}
+	};
 
 	const serviceTypeLabel = (type: any) => {
 		switch (type) {
@@ -128,10 +135,10 @@ const ClientCompanyServices = () => {
 										<div className="w-px h-10 bg-slate-100" />
 										<div>
 											<p className="text-2xl font-bold text-slate-800">
-												{isSubscribed ? "Aktif" : "—"}
+												{isPaired ? "Terhubung" : "Belum"}
 											</p>
 											<p className="text-xs text-slate-500 mt-0.5">
-												Status Langganan
+												Status Integrasi
 											</p>
 										</div>
 									</div>
@@ -140,31 +147,31 @@ const ClientCompanyServices = () => {
 								{/* Right panel — Subscription CTA */}
 								<div
 									className={`relative overflow-hidden rounded-2xl shadow-sm p-6 flex flex-col justify-between gap-4 transition-all ${
-										isSubscribed ?
+										isPaired ?
 											"bg-gradient-to-br from-[#BF953F] via-[#FCF6BA] via-[55%] to-[#B38728]"
 										:	"bg-gradient-to-br from-primary to-blue-700"
 									}`}>
 									{/* Decorative: Ubah warna lingkaran samar agar sesuai dengan background */}
 									<div
-										className={`absolute -top-8 -right-8 w-32 h-32 rounded-full pointer-events-none ${isSubscribed ? "bg-black/5" : "bg-white/10"}`}
+										className={`absolute -top-8 -right-8 w-32 h-32 rounded-full pointer-events-none ${isPaired ? "bg-black/5" : "bg-white/10"}`}
 									/>
 									<div
-										className={`absolute -bottom-4 -left-4 w-20 h-20 rounded-full pointer-events-none ${isSubscribed ? "bg-black/5" : "bg-white/5"}`}
+										className={`absolute -bottom-4 -left-4 w-20 h-20 rounded-full pointer-events-none ${isPaired ? "bg-black/5" : "bg-white/5"}`}
 									/>
 
 									<div className="relative">
 										<div className="flex gap-2 items-center">
 											{/* Ikon */}
-											{isSubscribed ?
+											{isPaired ?
 												<CheckCircle2 className="w-8 h-8 text-white/80 drop-shadow-xl" />
 											:	<XCircle className="w-8 h-8 text-white/80" />}
 
 											{/* Judul Teks */}
 											<p
-												className={`font-semibold text-base leading-snug mb-1 ${isSubscribed ? "text-white/80" : "text-white"}`}>
-												{isSubscribed ?
-													"Anda sudah berlangganan"
-												:	"Belum berlangganan?"}
+												className={`font-semibold text-base leading-snug mb-1 ${isPaired ? "text-white/80" : "text-white"}`}>
+												{isPaired ?
+													"Akun Anda telah terhubung"
+												:	`Belum terhubung dengan sistem ${company?.name}?`}
 											</p>
 										</div>
 
@@ -172,28 +179,27 @@ const ClientCompanyServices = () => {
 										<p
 											className={`text-sm leading-relaxed mt-5 ${isSubscribed ? "text-yellow-950/80" : "text-white/75"}`}>
 											{isSubscribed ?
-												"Anda memiliki akses penuh ke semua layanan eksklusif yang tersedia. Silahkan pilih layanan yang Anda butuhkan."
-											:	"Berlangganan untuk mendapatkan akses ke seluruh layanan eksklusif perusahaan."
+												"Anda memiliki akses penuh ke layanan eksklusif kami berkat integrasi akun."
+											:	"Hubungkan akun Anda untuk mendapatkan pengalaman integrasi yang lebih baik dan akses layanan khusus."
 											}
 										</p>
 									</div>
 
 									<div className="relative flex flex-col gap-2">
 										{isSubscribed ?
-											/* Button Mode VIP (Gold Background) */
 											<Button
 												size="sm"
 												disabled
 												className="w-full bg-yellow-950/10 hover:bg-yellow-950/10 text-yellow-950 border border-yellow-950/20 cursor-not-allowed opacity-100 shadow-none">
 												<CheckCircle2 className="w-4 h-4 mr-2" />
-												Sudah Berlangganan
+												Sudah Terhubung
 											</Button>
-										:	/* Button Mode Biasa (Blue Background) */
-											<Button
+										:	<Button
 												size="sm"
-												onClick={() => setClaimDialogOpen(true)}
+												disabled={isPairing}
+												onClick={handlePairing}
 												className="w-full bg-white text-primary font-semibold hover:bg-white/90 shadow-md">
-												Mulai Berlangganan
+												{isPairing ? "Memproses..." : "Mulai Hubungkan Akun"}
 											</Button>
 										}
 
@@ -330,12 +336,7 @@ const ClientCompanyServices = () => {
 				}
 			</div>
 
-			{/* Claim Membership Dialog */}
-			<ClaimMembershipDialog
-				open={claimDialogOpen}
-				onOpenChange={setClaimDialogOpen}
-				onSuccess={fetchCompanyServices}
-			/>
+			{/* Faq Chatbot */}
 
 			<FaqChatbot title={company?.name || ""} companyId={company?._id || ""} />
 		</>

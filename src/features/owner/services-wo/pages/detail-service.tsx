@@ -488,7 +488,7 @@ const DetailService = () => {
 								}
 							</div>
 						</div>
-						
+
 						{/* Report Visibility Config */}
 						<div className="rounded-xl border bg-slate-50/50 p-4 flex items-center justify-between">
 							<div className="space-y-1">
@@ -500,7 +500,10 @@ const DetailService = () => {
 								</p>
 							</div>
 							<div className="flex items-center gap-2">
-								{detailService.show_report_to_requester ?
+								{(
+									detailService.workOrdersConfig?.[0]
+										.show_report_to_requester === true
+								) ?
 									<Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-50 shadow-none">
 										Terlihat oleh Klien
 									</Badge>

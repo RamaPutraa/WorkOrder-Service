@@ -19,6 +19,9 @@ const ServiceSubmitPage = lazy(
 const ServiceDetailSubmit = lazy(
 	() => import("@/features/client/services-wo/pages/services-detail-submit"),
 );
+const PairingCallback = lazy(
+	() => import("@/features/client/pairing-account/pages/pairing-callback")
+);
 
 export const clientRoutes: RouteObject[] = [
 	{
@@ -44,5 +47,9 @@ export const clientRoutes: RouteObject[] = [
 	{
 		path: "submissions/:id",
 		element: <ServiceDetailSubmit />,
+	},
+	{
+		path: "pairing/callback",
+		element: <PairingCallback />,
 	},
 ];
