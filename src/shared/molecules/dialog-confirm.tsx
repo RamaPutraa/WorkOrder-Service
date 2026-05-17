@@ -26,11 +26,11 @@ export default function ConfirmDialog() {
 		<AlertDialog open={isOpen} onOpenChange={closeDialog}>
 			<AlertDialogContent className="sm:max-w-[420px] p-0 overflow-hidden rounded-3xl border-none shadow-2xl">
 				{/* Gradient Header - Matching HintDialog style */}
-				<div className="bg-gradient-to-b from-primary to-primary/70 p-4 text-white relative">
+				<div className="px-6 py-4 border-b border-border/70 text-dark relative">
 					<AlertDialogHeader className="relative z-10">
-						<AlertDialogTitle className="flex items-center gap-3 text-white text-md">
-							<div className="p-2 rounded-xl bg-white/20 backdrop-blur-sm shadow-xl">
-								<AlertTriangle className="w-6 h-6" />
+						<AlertDialogTitle className="flex items-center gap-3 text-dark text-md">
+							<div className="p-2 rounded-xl bg-primary/5 border border-primary/10">
+								<AlertTriangle className="w-6 h-6 text-primary" />
 							</div>
 							<span>{title}</span>
 						</AlertDialogTitle>

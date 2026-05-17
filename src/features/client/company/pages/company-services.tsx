@@ -18,10 +18,18 @@ import PageHeader from "@/shared/atoms/header-content";
 import { FaqChatbot } from "@/shared/organism/faq-chatbot";
 import { usePairingAccount } from "@/features/client/pairing-account/hooks/use-pairing-account";
 import { getPairedAccountInCompany } from "@/features/client/pairing-account/services/pairing-account";
+import { useDialogStore } from "@/store/dialogStore";
 const ClientCompanyServices = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
-	const { isPairing, localPaired, initiatePairing } = usePairingAccount();
+	const { showDialog } = useDialogStore();
+	const {
+		isPairing,
+		isDetaching,
+		localPaired,
+		initiatePairing,
+		detachAccount,
+	} = usePairingAccount();
 	const {
 		filteredServices,
 		filterConfigServices,
@@ -33,9 +41,10 @@ const ClientCompanyServices = () => {
 
 	const [externalAccount, setExternalAccount] =
 		useState<ExternalAccount | null>(null);
+	const [localUnsubscribed, setLocalUnsubscribed] = useState(false);
 
 	// Visual status: if it was already subscribed or newly paired in this session
-	const isPaired = isSubscribed || localPaired;
+	const isPaired = (isSubscribed && !localUnsubscribed) || localPaired;
 
 	useEffect(() => {
 		if (isPaired && id) {
@@ -46,8 +55,16 @@ const ClientCompanyServices = () => {
 					}
 				})
 				.catch(console.error);
+		} else {
+			setExternalAccount(null);
 		}
 	}, [isPaired, id]);
+
+	useEffect(() => {
+		if (localPaired) {
+			setLocalUnsubscribed(false);
+		}
+	}, [localPaired]);
 
 	// Cari data company yang sesuai dengan id dari URL
 	const company = companies.find((c) => c._id === id);
@@ -55,6 +72,21 @@ const ClientCompanyServices = () => {
 	const handlePairing = () => {
 		if (company?._id) {
 			initiatePairing(company._id);
+		}
+	};
+
+	const handleDetach = () => {
+		if (company?._id) {
+			showDialog({
+				title: "Putuskan Hubungan Akun",
+				description: `Apakah Anda yakin ingin memutuskan hubungan akun dengan ${company.name}? Anda akan kehilangan akses ke layanan premium terintegrasi.`,
+				confirmText: "Ya, Putuskan",
+				cancelText: "Batal",
+				onConfirm: async () => {
+					await detachAccount(company._id);
+					setLocalUnsubscribed(true);
+				},
+			});
 		}
 	};
 
@@ -160,85 +192,132 @@ const ClientCompanyServices = () => {
 									</div>
 								</div>
 
-								{/* Right panel — Subscription CTA */}
-								<div
-									className={`relative overflow-hidden rounded-2xl shadow-sm p-6 flex flex-col justify-between gap-4 transition-all ${
-										isPaired ?
-											"bg-gradient-to-br from-[#BF953F] via-[#FCF6BA] via-[55%] to-[#B38728]"
-										:	"bg-gradient-to-br from-primary to-blue-700"
-									}`}>
-									{/* Decorative: Ubah warna lingkaran samar agar sesuai dengan background */}
-									<div
-										className={`absolute -top-8 -right-8 w-32 h-32 rounded-full pointer-events-none ${isPaired ? "bg-black/5" : "bg-white/10"}`}
-									/>
-									<div
-										className={`absolute -bottom-4 -left-4 w-20 h-20 rounded-full pointer-events-none ${isPaired ? "bg-black/5" : "bg-white/5"}`}
-									/>
+								{/* Right panel — Paired Account Card */}
+								<AnimatePresence mode="wait">
+									<motion.div
+										key={isPaired ? "paired" : "unpaired"}
+										initial={{ opacity: 0, scale: 0.97 }}
+										animate={{ opacity: 1, scale: 1 }}
+										exit={{ opacity: 0, scale: 0.97 }}
+										transition={{ duration: 0.25, ease: "easeOut" }}
+										className={`rounded-2xl p-[1.5px] ${
+											isPaired ?
+												"bg-gradient-to-br from-[#C9A84C] via-[#F5E27A] to-[#A97C2F]"
+											:	"bg-slate-200"
+										}`}>
+										<div
+											className={`rounded-[calc(1rem-1.5px)] p-5 flex flex-col gap-4 h-full ${
+												isPaired ? "bg-[#FEFBF0]" : "bg-white"
+											}`}>
+											{/* Header */}
+											<div className="flex items-start justify-between gap-3">
+												<div className="flex items-center gap-2.5">
+													<div
+														className={`p-2 rounded-xl ${
+															isPaired ?
+																"bg-gradient-to-br from-[#C9A84C] to-[#A97C2F] text-white shadow-sm"
+															:	"bg-slate-100 text-slate-400"
+														}`}>
+														{isPaired ?
+															<CheckCircle2 className="w-5 h-5" />
+														:	<XCircle className="w-5 h-5" />}
+													</div>
+													<div>
+														<p
+															className={`text-sm font-semibold leading-tight ${
+																isPaired ? "text-[#7A5C1E]" : "text-slate-800"
+															}`}>
+															{isPaired ? "Akun Terhubung" : "Belum Terhubung"}
+														</p>
+														<p
+															className={`text-xs mt-0.5 ${isPaired ? "text-[#B8963E]/70" : "text-slate-400"}`}>
+															{isPaired ?
+																"Langganan Premium Aktif"
+															:	"Integrasi Sistem"}
+														</p>
+													</div>
+												</div>
+												{/* Status pill */}
+												<span
+													className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+														isPaired ?
+															"bg-gradient-to-r from-[#C9A84C] to-[#F5E27A] text-[#5C3D0E] shadow-sm"
+														:	"bg-slate-100 text-slate-500"
+													}`}>
+													<span
+														className={`w-1.5 h-1.5 rounded-full ${
+															isPaired ? "bg-[#7A5C1E]" : "bg-slate-400"
+														}`}
+													/>
+													{isPaired ? "Premium" : "Tidak Aktif"}
+												</span>
+											</div>
 
-									<div className="relative">
-										<div className="flex gap-2 items-center">
-											{/* Ikon */}
-											{isPaired ?
-												<CheckCircle2 className="w-8 h-8 text-yellow-950 drop-shadow-xl" />
-											:	<XCircle className="w-8 h-8 text-white/80" />}
+											{/* Divider gold */}
+											{isPaired && (
+												<div className="h-px bg-gradient-to-r from-[#C9A84C]/40 via-[#F5E27A]/60 to-[#C9A84C]/40" />
+											)}
 
-											{/* Judul Teks */}
-											<p
-												className={`font-semibold text-base leading-snug mb-1 ${isPaired ? "text-yellow-950" : "text-white"}`}>
+											{/* Body */}
+											{isPaired && externalAccount ?
+												<div className="bg-white/70 border border-[#E8D48B]/60 rounded-xl px-4 py-3 space-y-0.5">
+													<p className="text-xs font-semibold uppercase tracking-widest text-[#B8963E]/80">
+														✦ Terhubung sebagai
+													</p>
+													<p className="text-sm font-bold text-[#7A5C1E]">
+														{externalAccount.external_customer_name}
+													</p>
+													<p className="text-xs text-[#A97C2F]/70">
+														{externalAccount.external_customer_email}
+													</p>
+												</div>
+											:	<p
+													className={`text-sm leading-relaxed ${isPaired ? "text-[#7A5C1E]/80" : "text-slate-500"}`}>
+													{isPaired ?
+														"Anda memiliki akses penuh ke layanan eksklusif berkat integrasi akun premium."
+													:	`Hubungkan akun Anda ke sistem ${company?.name ?? "perusahaan"} untuk akses layanan lebih lengkap.`
+													}
+												</p>
+											}
+
+											{/* Actions */}
+											<div className="flex flex-col gap-2">
 												{isPaired ?
-													"Akun Anda telah terhubung"
-												:	`Belum terhubung dengan sistem ${company?.name}?`}
-											</p>
-										</div>
-
-										{/* Paragraf Teks */}
-										{isPaired && externalAccount ?
-											<div className="mt-4 space-y-1 text-sm text-yellow-950/80 bg-white/20 p-3 rounded-lg backdrop-blur-sm border border-white/30">
-												<p className="font-medium text-yellow-950">
-													Terhubung sebagai:
-												</p>
-												<p className="font-semibold">
-													{externalAccount.external_customer_name}
-												</p>
-												<p className="text-xs opacity-80">
-													{externalAccount.external_customer_email}
+													<>
+														<Button
+															size="sm"
+															disabled
+															className="w-full cursor-not-allowed opacity-100 bg-gradient-to-r from-[#C9A84C] via-[#F0D060] to-[#A97C2F] text-[#3D2200] font-semibold shadow-md hover:opacity-90 border-0">
+															<CheckCircle2 className="w-4 h-4 mr-2" />
+															Sudah Terhubung
+														</Button>
+														<Button
+															size="sm"
+															variant="ghost"
+															disabled={isDetaching}
+															onClick={handleDetach}
+															className="w-full text-[#A97C2F]/70 hover:text-red-600 hover:bg-red-50 border border-[#E8D48B]/50 hover:border-red-100">
+															{isDetaching ?
+																"Memproses..."
+															:	"Putuskan Hubungan"}
+														</Button>
+													</>
+												:	<Button
+														size="sm"
+														disabled={isPairing}
+														onClick={handlePairing}
+														className="w-full">
+														{isPairing ? "Menghubungkan..." : "Hubungkan Akun"}
+													</Button>
+												}
+												<p
+													className={`text-center text-xs ${isPaired ? "text-[#B8963E]/60" : "text-slate-400"}`}>
+													Hubungi perusahaan untuk informasi lebih lanjut
 												</p>
 											</div>
-										:	<p
-												className={`text-sm leading-relaxed mt-5 ${isSubscribed ? "text-yellow-950/80" : "text-white/75"}`}>
-												{isSubscribed ?
-													"Anda memiliki akses penuh ke layanan eksklusif kami berkat integrasi akun."
-												:	"Hubungkan akun Anda untuk mendapatkan pengalaman integrasi yang lebih baik dan akses layanan khusus."
-												}
-											</p>
-										}
-									</div>
-
-									<div className="relative flex flex-col gap-2">
-										{isSubscribed ?
-											<Button
-												size="sm"
-												disabled
-												className="w-full bg-yellow-950/10 hover:bg-yellow-950/10 text-yellow-950 border border-yellow-950/20 cursor-not-allowed opacity-100 shadow-none">
-												<CheckCircle2 className="w-4 h-4 mr-2" />
-												Sudah Terhubung
-											</Button>
-										:	<Button
-												size="sm"
-												disabled={isPairing}
-												onClick={handlePairing}
-												className="w-full bg-white text-primary font-semibold hover:bg-white/90 shadow-md">
-												{isPairing ? "Memproses..." : "Mulai Hubungkan Akun"}
-											</Button>
-										}
-
-										{!isSubscribed && (
-											<p className="text-yellow-950 text-xs text-center mt-1">
-												Hubungi perusahaan untuk informasi lebih lanjut
-											</p>
-										)}
-									</div>
-								</div>
+										</div>
+									</motion.div>
+								</AnimatePresence>
 							</motion.div>
 						)}
 
@@ -295,33 +374,9 @@ const ClientCompanyServices = () => {
 													</div>
 
 													{/* Description full (clamped) */}
-													<div className="text-sm pt-2 text-slate-500 leading-relaxed line-clamp-3 min-h-[3.75rem] text-justify">
+													<div className="text-sm pt-2 text-slate-500 leading-relaxed line-clamp-3 min-h-[3.75rem]">
 														{service.description ||
-															"Tidak ada deskripsi tersedia untuk layanan ini."}{" "}
-														Lorem ipsum dolor sit amet consectetur adipisicing
-														elit. Magni corporis beatae minima labore similique
-														totam facilis officiis omnis officia incidunt
-														voluptatum dolorem, voluptatibus nulla ratione alias
-														eius nemo, eligendi fuga! Dolorum omnis,
-														consequuntur neque inventore nemo ullam, sunt
-														architecto quae iste hic illum itaque libero dolor?
-														Dolorum deserunt, modi quaerat magnam magni
-														inventore? Rerum accusamus sint maxime placeat
-														sapiente quidem. Repudiandae, vel error,
-														reprehenderit consequuntur neque repellendus, iure
-														temporibus nisi iusto laboriosam debitis blanditiis.
-														Accusantium temporibus ipsam est. Architecto
-														obcaecati culpa reprehenderit. Modi praesentium
-														incidunt cum temporibus animi molestias rerum.
-														Corrupti, minus saepe culpa nam alias repudiandae
-														sunt aliquam explicabo error nihil mollitia veniam
-														cum voluptate qui, recusandae, fugiat facilis animi
-														harum dicta maiores deserunt veritatis dolore at.
-														Harum, laudantium. Laboriosam veritatis quis
-														voluptas, dignissimos ut provident dicta molestias
-														quasi totam incidunt odit in doloribus repudiandae
-														amet enim, sequi repellat quos eos hic molestiae
-														earum aliquid iure excepturi? Pariatur, odio.
+															"Tidak ada deskripsi tersedia untuk layanan ini."}
 													</div>
 												</div>
 

@@ -1,5 +1,5 @@
 type StartPairingRequest = {
-	platform: "web";
+	redirect_base_url: string;
 	company_id: string;
 };
 

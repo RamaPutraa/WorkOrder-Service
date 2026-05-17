@@ -1,9 +1,16 @@
 import { useState, useEffect } from "react";
-import { startPairing, completePairing } from "../services/pairing-account";
+import {
+	startPairing,
+	completePairing,
+	detachPairedAccount,
+} from "../services/pairing-account";
+import { notifyError, notifySuccess } from "@/lib/toast-helper";
+import { handleApi } from "@/lib/handle-api";
 
 export const usePairingAccount = () => {
 	const [isPairing, setIsPairing] = useState(false);
 	const [localPaired, setLocalPaired] = useState(false);
+	const [isDetaching, setIsDetaching] = useState(false);
 
 	useEffect(() => {
 		const handleMessage = async (event: MessageEvent) => {
@@ -16,25 +23,28 @@ export const usePairingAccount = () => {
 				if (error) {
 					console.error("Pairing error:", error);
 					setIsPairing(false);
-					// TODO: Tampilkan toast/notifikasi error jika perlu
+					notifyError(`Proses gagal: ${error}`);
 					return;
 				}
 
 				if (code && state && company_id) {
-					try {
-						const response = await completePairing({
+					const { data: res, error: apiError } = await handleApi(() =>
+						completePairing({
 							code,
 							state,
 							company_id,
-						});
-						if (response) {
-							setLocalPaired(true);
-						}
-					} catch (err) {
-						console.error("Failed to complete pairing", err);
-					} finally {
-						setIsPairing(false);
+						}),
+					);
+
+					if (apiError) {
+						console.error("Failed to complete pairing", apiError);
+						notifyError(`Gagal terhubung : ${apiError.message}`);
+					} else if (res) {
+						setLocalPaired(true);
+						notifySuccess("Akun berhasil terhubung!");
 					}
+
+					setIsPairing(false);
 				}
 			}
 		};
@@ -50,28 +60,49 @@ export const usePairingAccount = () => {
 		// Buka tab baru kosong dulu untuk mencegah popup blocker
 		const popup = window.open("", "_blank");
 
-		try {
-			const response = await startPairing({
-				platform: "web",
+		const { data: res, error } = await handleApi(() =>
+			startPairing({
+				redirect_base_url: import.meta.env.VITE_CALLBACK_URL,
 				company_id: companyId,
-			});
-			
-			if (response.data?.redirect_url && popup) {
-				popup.location.href = response.data.redirect_url;
-			} else if (popup) {
-				popup.close();
-				setIsPairing(false);
-			}
-		} catch (err) {
-			console.error("Failed to start pairing", err);
+			}),
+		);
+
+		if (error) {
+			console.error("Failed to start pairing", error);
 			if (popup) popup.close();
-			setIsPairing(false);
+		} else if (res && res.data?.redirect_url && popup) {
+			popup.location.href = res.data.redirect_url;
+		} else if (popup) {
+			popup.close();
 		}
+
+		setIsPairing(false);
+	};
+
+	const detachAccount = async (companyId: string) => {
+		if (!companyId) return;
+		setIsDetaching(true);
+
+		const { data: res, error } = await handleApi(() =>
+			detachPairedAccount(companyId),
+		);
+
+		if (error) {
+			console.error("Failed to detach account", error);
+			notifyError(`Gagal memutus akun : ${error.message}`);
+		} else if (res) {
+			setLocalPaired(false);
+			notifySuccess("Akun berhasil diputus!");
+		}
+
+		setIsDetaching(false);
 	};
 
 	return {
 		isPairing,
+		isDetaching,
 		localPaired,
 		initiatePairing,
+		detachAccount,
 	};
 };
