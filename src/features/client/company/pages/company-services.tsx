@@ -1,4 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
@@ -16,7 +17,7 @@ import { SectionLoading } from "@/shared/atoms";
 import PageHeader from "@/shared/atoms/header-content";
 import { FaqChatbot } from "@/shared/organism/faq-chatbot";
 import { usePairingAccount } from "@/features/client/pairing-account/hooks/use-pairing-account";
-
+import { getPairedAccountInCompany } from "@/features/client/pairing-account/services/pairing-account";
 const ClientCompanyServices = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
@@ -30,8 +31,23 @@ const ClientCompanyServices = () => {
 		error,
 	} = useClientCompany();
 
+	const [externalAccount, setExternalAccount] =
+		useState<ExternalAccount | null>(null);
+
 	// Visual status: if it was already subscribed or newly paired in this session
 	const isPaired = isSubscribed || localPaired;
+
+	useEffect(() => {
+		if (isPaired && id) {
+			getPairedAccountInCompany(id)
+				.then((res) => {
+					if (res.data) {
+						setExternalAccount(res.data);
+					}
+				})
+				.catch(console.error);
+		}
+	}, [isPaired, id]);
 
 	// Cari data company yang sesuai dengan id dari URL
 	const company = companies.find((c) => c._id === id);
@@ -163,12 +179,12 @@ const ClientCompanyServices = () => {
 										<div className="flex gap-2 items-center">
 											{/* Ikon */}
 											{isPaired ?
-												<CheckCircle2 className="w-8 h-8 text-white/80 drop-shadow-xl" />
+												<CheckCircle2 className="w-8 h-8 text-yellow-950 drop-shadow-xl" />
 											:	<XCircle className="w-8 h-8 text-white/80" />}
 
 											{/* Judul Teks */}
 											<p
-												className={`font-semibold text-base leading-snug mb-1 ${isPaired ? "text-white/80" : "text-white"}`}>
+												className={`font-semibold text-base leading-snug mb-1 ${isPaired ? "text-yellow-950" : "text-white"}`}>
 												{isPaired ?
 													"Akun Anda telah terhubung"
 												:	`Belum terhubung dengan sistem ${company?.name}?`}
@@ -176,13 +192,26 @@ const ClientCompanyServices = () => {
 										</div>
 
 										{/* Paragraf Teks */}
-										<p
-											className={`text-sm leading-relaxed mt-5 ${isSubscribed ? "text-yellow-950/80" : "text-white/75"}`}>
-											{isSubscribed ?
-												"Anda memiliki akses penuh ke layanan eksklusif kami berkat integrasi akun."
-											:	"Hubungkan akun Anda untuk mendapatkan pengalaman integrasi yang lebih baik dan akses layanan khusus."
-											}
-										</p>
+										{isPaired && externalAccount ?
+											<div className="mt-4 space-y-1 text-sm text-yellow-950/80 bg-white/20 p-3 rounded-lg backdrop-blur-sm border border-white/30">
+												<p className="font-medium text-yellow-950">
+													Terhubung sebagai:
+												</p>
+												<p className="font-semibold">
+													{externalAccount.external_customer_name}
+												</p>
+												<p className="text-xs opacity-80">
+													{externalAccount.external_customer_email}
+												</p>
+											</div>
+										:	<p
+												className={`text-sm leading-relaxed mt-5 ${isSubscribed ? "text-yellow-950/80" : "text-white/75"}`}>
+												{isSubscribed ?
+													"Anda memiliki akses penuh ke layanan eksklusif kami berkat integrasi akun."
+												:	"Hubungkan akun Anda untuk mendapatkan pengalaman integrasi yang lebih baik dan akses layanan khusus."
+												}
+											</p>
+										}
 									</div>
 
 									<div className="relative flex flex-col gap-2">
@@ -204,7 +233,7 @@ const ClientCompanyServices = () => {
 										}
 
 										{!isSubscribed && (
-											<p className="text-white/60 text-xs text-center mt-1">
+											<p className="text-yellow-950 text-xs text-center mt-1">
 												Hubungi perusahaan untuk informasi lebih lanjut
 											</p>
 										)}

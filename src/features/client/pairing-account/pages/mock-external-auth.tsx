@@ -7,16 +7,25 @@ export default function MockExternalAuth() {
 
 	const state = searchParams.get("state");
 	const companyId = searchParams.get("company_id");
+	const redirectUri = searchParams.get("redirect_uri") || "/dashboard/client/pairing/callback";
 
 	const handleAuthorize = (allow: boolean) => {
 		setIsLoading(true);
 		setTimeout(() => {
-			if (allow) {
-				// Redirect back to our callback page with a success code
-				window.location.href = `/dashboard/client/pairing/callback?code=mock_success_code&state=${state}&company_id=${companyId}`;
-			} else {
-				// Redirect back with an error code
-				window.location.href = `/dashboard/client/pairing/callback?error=access_denied&state=${state}&company_id=${companyId}`;
+			try {
+				const url = new URL(redirectUri, window.location.origin);
+				if (allow) {
+					url.searchParams.set("code", "mock_success_code");
+				} else {
+					url.searchParams.set("error", "access_denied");
+				}
+				if (state) url.searchParams.set("state", state);
+				if (companyId) url.searchParams.set("company_id", companyId);
+				
+				window.location.href = url.toString();
+			} catch (e) {
+				console.error("Invalid redirect URI");
+				window.location.href = "/";
 			}
 		}, 1500);
 	};
