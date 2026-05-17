@@ -30,9 +30,9 @@ export const usePairingAccount = () => {
 				if (code && state && company_id) {
 					const { data: res, error: apiError } = await handleApi(() =>
 						completePairing({
+							company_id,
 							code,
 							state,
-							company_id,
 						}),
 					);
 
@@ -79,12 +79,12 @@ export const usePairingAccount = () => {
 		setIsPairing(false);
 	};
 
-	const detachAccount = async (companyId: string) => {
-		if (!companyId) return;
+	const detachAccount = async (id: string) => {
+		if (!id) return;
 		setIsDetaching(true);
 
 		const { data: res, error } = await handleApi(() =>
-			detachPairedAccount(companyId),
+			detachPairedAccount(id),
 		);
 
 		if (error) {

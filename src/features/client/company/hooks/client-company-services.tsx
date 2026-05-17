@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import {
 	getAllCompanyApi,
+	getCompanyDetailByClientApi,
 	getCompanyServiceAPi,
 } from "../services/companyClientService";
 import { notifyError } from "@/lib/toast-helper";
@@ -16,6 +17,7 @@ const useClientCompanyServices = () => {
 	const [services, setServices] = useState<GetServiceByClient[]>([]);
 	const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
 	const [companies, setCompanies] = useState<Company[]>([]);
+	const [companyDetail, setCompanyDetail] = useState<CompanyDetailClient>();
 
 	const fetchCompanyServices = async () => {
 		if (!id) {
@@ -35,7 +37,6 @@ const useClientCompanyServices = () => {
 			notifyError("Gagal memuat data", error.message);
 		} else {
 			setServices(res?.data?.services || []);
-			setIsSubscribed(res?.data?.isSubscribed || false);
 		}
 
 		setLoadingServices(false);
@@ -57,9 +58,34 @@ const useClientCompanyServices = () => {
 		setLoadingCompanies(false);
 	};
 
+	const fetchCompanyDetail = async () => {
+		if (!id) {
+			notifyError("Gagal memuat data", "ID perusahaan tidak ditemukan");
+			setLoadingCompanies(false);
+			return;
+		}
+		setLoadingCompanies(true);
+		setError(null);
+
+		const { data: res, error } = await handleApi(() =>
+			getCompanyDetailByClientApi(id),
+		);
+
+		if (error) {
+			setError(error.message);
+			notifyError("Gagal memuat data", error.message);
+		} else {
+			setCompanyDetail(res?.data);
+			setIsSubscribed(res?.meta.isSubscribed || false);
+		}
+
+		setLoadingCompanies(false);
+	};
+
 	useEffect(() => {
 		if (id) {
 			void fetchCompanyServices();
+			void fetchCompanyDetail();
 		} else {
 			setLoadingServices(false);
 		}
@@ -117,9 +143,11 @@ const useClientCompanyServices = () => {
 	return {
 		fetchCompanyServices,
 		fetchCompanies,
+		fetchCompanyDetail,
 		services,
 		isSubscribed,
 		companies,
+		companyDetail,
 		loading,
 		error,
 		filteredCompanies,

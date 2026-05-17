@@ -60,7 +60,7 @@ const ProfileCompany = () => {
 	const [integrationForm, setIntegrationForm] = useState<IntegrationConfig>({
 		external_login_url: "",
 		external_verify_url: "",
-		external_check_membership_url: "",
+		external_check_memberships_url: "",
 		secret_key: "",
 		is_integration_active: false,
 	});
@@ -70,7 +70,14 @@ const ProfileCompany = () => {
 	// Sync form saat config berhasil di-load
 	useEffect(() => {
 		if (config) {
-			setIntegrationForm(config);
+			setIntegrationForm({
+				external_login_url: config.external_login_url || "",
+				external_verify_url: config.external_verify_url || "",
+				external_check_memberships_url:
+					config.external_check_memberships_url || "",
+				secret_key: config.secret_key || "",
+				is_integration_active: config.is_integration_active || false,
+			});
 			setIsDirty(false);
 		}
 	}, [config]);
@@ -456,10 +463,10 @@ const ProfileCompany = () => {
 											<Input
 												id="external_check_membership_url"
 												placeholder="Contoh: https://external-service.com/api/membership"
-												value={integrationForm.external_check_membership_url}
+												value={integrationForm.external_check_memberships_url}
 												onChange={(e) =>
 													handleFormChange(
-														"external_check_membership_url",
+														"external_check_memberships_url",
 														e.target.value,
 													)
 												}

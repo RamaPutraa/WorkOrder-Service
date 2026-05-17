@@ -1,7 +1,6 @@
 import apiClient from "@/lib/api";
 
 export const startPairing = async (data: StartPairingRequest) => {
-	// REAL IMPLEMENTATION
 	const response = await apiClient.post<getStartPairingResponse>(
 		"/customer-pairing/start",
 		data,

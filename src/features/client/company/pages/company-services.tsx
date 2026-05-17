@@ -33,7 +33,7 @@ const ClientCompanyServices = () => {
 	const {
 		filteredServices,
 		filterConfigServices,
-		companies,
+		companyDetail: company,
 		isSubscribed,
 		loading,
 		error,
@@ -66,8 +66,6 @@ const ClientCompanyServices = () => {
 		}
 	}, [localPaired]);
 
-	// Cari data company yang sesuai dengan id dari URL
-	const company = companies.find((c) => c._id === id);
 
 	const handlePairing = () => {
 		if (company?._id) {
@@ -76,14 +74,14 @@ const ClientCompanyServices = () => {
 	};
 
 	const handleDetach = () => {
-		if (company?._id) {
+		if (externalAccount?._id && company) {
 			showDialog({
 				title: "Putuskan Hubungan Akun",
 				description: `Apakah Anda yakin ingin memutuskan hubungan akun dengan ${company.name}? Anda akan kehilangan akses ke layanan premium terintegrasi.`,
 				confirmText: "Ya, Putuskan",
 				cancelText: "Batal",
 				onConfirm: async () => {
-					await detachAccount(company._id);
+					await detachAccount(externalAccount._id);
 					setLocalUnsubscribed(true);
 				},
 			});
