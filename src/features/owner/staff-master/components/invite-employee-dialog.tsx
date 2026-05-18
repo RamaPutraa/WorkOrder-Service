@@ -49,13 +49,13 @@ import {
 	type InviteEmployeeFormValues,
 } from "../schemas/staff-schema";
 import { ConfirmLeaveDialog } from "@/shared/molecules/confirm-leave-dialog";
+import { useProfileStore } from "@/store/profileStore";
+import { FieldDescription } from "@/components/ui/field";
 
 const ROLE_OPTIONS = [
 	{ value: "manager_company", label: "Manager Perusahaan" },
 	{ value: "staff_company", label: "Staff Perusahaan" },
 ];
-
-const EMPTY_INVITE = { email: "", role: "", positionId: "" };
 
 interface InviteEmployeeDialogProps {
 	open: boolean;
@@ -70,6 +70,16 @@ const InviteEmployeeDialog = ({
 }: InviteEmployeeDialogProps) => {
 	const [positionOpen, setPositionOpen] = useState<Record<number, boolean>>({});
 	const [showConfirmClose, setShowConfirmClose] = useState(false);
+	const { profile } = useProfileStore();
+
+	const isManager = profile?.role === "manager_company";
+	const managerPositionId = profile?.position?._id || "";
+
+	const defaultInviteItem = {
+		email: "",
+		role: isManager ? "staff_company" : "",
+		positionId: isManager && managerPositionId ? managerPositionId : "",
+	};
 
 	const handleSuccess = () => {
 		onOpenChange(false);
@@ -82,7 +92,7 @@ const InviteEmployeeDialog = ({
 	const form = useForm<InviteEmployeeFormValues>({
 		resolver: zodResolver(inviteEmployeeSchema),
 		defaultValues: {
-			invites: [EMPTY_INVITE],
+			invites: [defaultInviteItem],
 		},
 	});
 
@@ -94,11 +104,11 @@ const InviteEmployeeDialog = ({
 	useEffect(() => {
 		if (open) {
 			fetchPositions();
-			form.reset({ invites: [EMPTY_INVITE] });
+			form.reset({ invites: [defaultInviteItem] });
 			setPositionOpen({});
 			setShowConfirmClose(false);
 		}
-	}, [open]);
+	}, [open, profile]);
 
 	const togglePositionPopover = (index: number, val: boolean) =>
 		setPositionOpen((prev) => ({ ...prev, [index]: val }));
@@ -223,7 +233,8 @@ const InviteEmployeeDialog = ({
 													</FormLabel>
 													<Select
 														onValueChange={field.onChange}
-														value={field.value}>
+														value={field.value}
+														disabled={isManager}>
 														<FormControl>
 															<SelectTrigger className="w-full h-9 rounded-lg border-gray-200 bg-white text-sm">
 																<SelectValue placeholder="Pilih role..." />
@@ -239,6 +250,12 @@ const InviteEmployeeDialog = ({
 																</SelectItem>
 															))}
 														</SelectContent>
+														{isManager ?
+															<FieldDescription className="text-xs italic text-muted-foreground">
+																Manager perusahaan hanya dapat mengundang
+																pegawai
+															</FieldDescription>
+														:	null}
 													</Select>
 													<FormMessage className="text-xs" />
 												</FormItem>
@@ -271,6 +288,7 @@ const InviteEmployeeDialog = ({
 																	<Button
 																		variant="outline"
 																		role="combobox"
+																		disabled={isManager && !!managerPositionId}
 																		className={cn(
 																			"w-full h-9 justify-between rounded-lg border-gray-200 bg-white text-sm font-normal",
 																			!field.value && "text-gray-400",
@@ -319,6 +337,12 @@ const InviteEmployeeDialog = ({
 																	</CommandList>
 																</Command>
 															</PopoverContent>
+															{isManager && managerPositionId ?
+																<FieldDescription className="text-xs italic text-muted-foreground">
+																	Manager departemen hanya dapat mengundang
+																	pegawai dalam departemennya sendiri
+																</FieldDescription>
+															:	null}
 														</Popover>
 														<FormMessage className="text-xs" />
 													</FormItem>
@@ -331,7 +355,7 @@ const InviteEmployeeDialog = ({
 								{/* Add more */}
 								<button
 									type="button"
-									onClick={() => append(EMPTY_INVITE)}
+									onClick={() => append(defaultInviteItem)}
 									className="w-full flex items-center justify-center gap-2 mb-3 py-2.5 rounded-xl border border-dashed border-blue-200 text-blue-500 hover:bg-blue-50 hover:border-blue-300 text-sm font-medium transition-colors">
 									<Plus className="w-4 h-4" />
 									Tambah Pegawai

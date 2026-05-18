@@ -232,13 +232,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 					<>
 						<NavSetup
 							items={data.navSetup
-								.filter((nav) => nav.title === "Tugas Kerja")
-								.map((nav) => ({
-									...nav,
-									items: nav.items?.filter((item) =>
-										["Kelola Formulir", "Kelola Layanan"].includes(item.title),
-									),
-								}))}
+								.filter((nav) => ["Tugas Kerja", "Kepegawaian"].includes(nav.title))
+								.map((nav) => {
+									if (nav.title === "Tugas Kerja") {
+										return {
+											...nav,
+											items: nav.items?.filter((item) =>
+												["Kelola Formulir", "Kelola Layanan"].includes(item.title),
+											),
+										};
+									}
+									if (nav.title === "Kepegawaian") {
+										return {
+											...nav,
+											items: nav.items?.filter((item) =>
+												item.title !== "Departemen",
+											),
+										};
+									}
+									return nav;
+								})}
 						/>
 						<NavInternalBusiness items={data.navInternalBusiness} />
 					</>

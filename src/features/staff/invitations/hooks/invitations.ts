@@ -7,6 +7,7 @@ import {
 import { handleApi } from "@/lib/handle-api";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
 import { useAuthStore } from "@/store/authStore";
+import { useProfileStore } from "@/store/profileStore";
 
 export const useInvitations = () => {
 	const [history, setHistory] = useState<InvitedHistory[]>([]);
@@ -15,6 +16,7 @@ export const useInvitations = () => {
 	const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
 	const [isAlreadyAccepted, setIsAlreadyAccepted] = useState(false);
 	const updateUser = useAuthStore((state) => state.updateUser);
+	const updateProfile = useProfileStore((state) => state.updateProfile);
 
 	useEffect(() => {
 		fetchHistory();
@@ -57,13 +59,15 @@ export const useInvitations = () => {
 
 		const invitation = history.find((h) => h._id === id);
 		if (invitation && invitation.role) {
-			updateUser({
+			const updatedData = {
 				role: invitation.role,
 				...(invitation.company && { company: invitation.company }),
 				...(invitation.position && {
 					position: invitation.position as Position,
 				}),
-			});
+			};
+			updateUser(updatedData);
+			updateProfile(updatedData);
 		}
 
 		fetchHistory();
