@@ -13,7 +13,7 @@ import {
 import useClientCompany from "../hooks/client-company-services";
 import { GenericFilter } from "@/shared/molecules/generic-filter";
 import { EmptyData } from "@/shared/molecules/empty-data";
-import { SectionLoading } from "@/shared/atoms";
+import { SectionLoading, FullPageLoading } from "@/shared/atoms";
 import PageHeader from "@/shared/atoms/header-content";
 import { FaqChatbot } from "@/shared/organism/faq-chatbot";
 import { usePairingAccount } from "@/features/client/pairing-account/hooks/use-pairing-account";
@@ -35,10 +35,12 @@ const ClientCompanyServices = () => {
 		filterConfigServices,
 		companyDetail: company,
 		isSubscribed,
+		isIntegrationActive,
 		loading,
 		error,
+		fetchCompanyServices,
+		fetchCompanyDetail,
 	} = useClientCompany();
-
 	const [externalAccount, setExternalAccount] =
 		useState<ExternalAccount | null>(null);
 	const [localUnsubscribed, setLocalUnsubscribed] = useState(false);
@@ -66,6 +68,12 @@ const ClientCompanyServices = () => {
 		}
 	}, [localPaired]);
 
+	useEffect(() => {
+		if (localPaired) {
+			void fetchCompanyServices();
+			void fetchCompanyDetail();
+		}
+	}, [localPaired, fetchCompanyServices, fetchCompanyDetail]);
 
 	const handlePairing = () => {
 		if (company?._id) {
@@ -83,6 +91,8 @@ const ClientCompanyServices = () => {
 				onConfirm: async () => {
 					await detachAccount(externalAccount._id);
 					setLocalUnsubscribed(true);
+					void fetchCompanyServices();
+					void fetchCompanyDetail();
 				},
 			});
 		}
@@ -101,23 +111,13 @@ const ClientCompanyServices = () => {
 		}
 	};
 
-	if (error)
-		return (
-			<div className="flex flex-col items-center justify-center py-16">
-				<div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md">
-					<p className="text-red-600 text-center">{error}</p>
-					<Button
-						variant="outline"
-						className="mt-4 w-full"
-						onClick={() => navigate(-1)}>
-						Kembali
-					</Button>
-				</div>
-			</div>
-		);
+	if (error) return <EmptyData />;
 
 	return (
 		<>
+			{isPairing && (
+				<FullPageLoading message="Menghubungkan akun... Silakan selesaikan proses otorisasi pada tab baru." />
+			)}
 			<div className="space-y-6">
 				{/* Page Header */}
 				<PageHeader
@@ -137,9 +137,10 @@ const ClientCompanyServices = () => {
 								initial={{ opacity: 0, y: -12 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ duration: 0.35, ease: "easeOut" }}
-								className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+								className={`grid grid-cols-1 ${isIntegrationActive ? "lg:grid-cols-3" : ""} gap-4`}>
 								{/* Left panel — Company Profile */}
-								<div className="lg:col-span-2 relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm p-6 flex flex-col justify-between gap-6">
+								<div
+									className={`${isIntegrationActive ? "lg:col-span-2" : "col-span-full"} relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm p-6 flex flex-col justify-between gap-6`}>
 									{/* Decorative circle */}
 									<div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-primary/5 pointer-events-none" />
 									<div className="absolute -bottom-6 -left-6 w-24 h-24 rounded-full bg-blue-50 pointer-events-none" />
@@ -178,144 +179,227 @@ const ClientCompanyServices = () => {
 												Layanan Tersedia
 											</p>
 										</div>
-										<div className="w-px h-10 bg-slate-100" />
-										<div>
-											<p className="text-2xl font-bold text-slate-800">
-												{isPaired ? "Terhubung" : "Belum"}
-											</p>
-											<p className="text-xs text-slate-500 mt-0.5">
-												Status Integrasi
-											</p>
-										</div>
+										{isIntegrationActive && (
+											<>
+												<div className="w-px h-10 bg-slate-100" />
+												<div>
+													<p className="text-2xl font-bold text-slate-800">
+														{isPaired ? "Terhubung" : "Belum"}
+													</p>
+													<p className="text-xs text-slate-500 mt-0.5">
+														Status Integrasi
+													</p>
+												</div>
+											</>
+										)}
 									</div>
 								</div>
 
 								{/* Right panel — Paired Account Card */}
-								<AnimatePresence mode="wait">
-									<motion.div
-										key={isPaired ? "paired" : "unpaired"}
-										initial={{ opacity: 0, scale: 0.97 }}
-										animate={{ opacity: 1, scale: 1 }}
-										exit={{ opacity: 0, scale: 0.97 }}
-										transition={{ duration: 0.25, ease: "easeOut" }}
-										className={`rounded-2xl p-[1.5px] ${
-											isPaired ?
-												"bg-gradient-to-br from-[#C9A84C] via-[#F5E27A] to-[#A97C2F]"
-											:	"bg-slate-200"
-										}`}>
-										<div
-											className={`rounded-[calc(1rem-1.5px)] p-5 flex flex-col gap-4 h-full ${
-												isPaired ? "bg-[#FEFBF0]" : "bg-white"
+								{isIntegrationActive && (
+									<AnimatePresence mode="wait">
+										<motion.div
+											key={isPaired ? "paired" : "unpaired"}
+											initial={{ opacity: 0, scale: 0.97 }}
+											animate={{ opacity: 1, scale: 1 }}
+											exit={{ opacity: 0, scale: 0.97 }}
+											transition={{ duration: 0.25, ease: "easeOut" }}
+											className={`rounded-2xl p-[1.5px] ${
+												isPaired ?
+													isSubscribed ?
+														"bg-gradient-to-br from-[#C9A84C] via-[#F5E27A] to-[#A97C2F]"
+													:	"bg-gradient-to-br from-blue-500 via-sky-400 to-indigo-600 shadow-md"
+												:	"bg-slate-200"
 											}`}>
-											{/* Header */}
-											<div className="flex items-start justify-between gap-3">
-												<div className="flex items-center gap-2.5">
-													<div
-														className={`p-2 rounded-xl ${
-															isPaired ?
-																"bg-gradient-to-br from-[#C9A84C] to-[#A97C2F] text-white shadow-sm"
-															:	"bg-slate-100 text-slate-400"
-														}`}>
-														{isPaired ?
-															<CheckCircle2 className="w-5 h-5" />
-														:	<XCircle className="w-5 h-5" />}
-													</div>
-													<div>
-														<p
-															className={`text-sm font-semibold leading-tight ${
-																isPaired ? "text-[#7A5C1E]" : "text-slate-800"
+											<div
+												className={`rounded-[calc(1rem-1.5px)] p-5 flex flex-col gap-4 h-full ${
+													isPaired ?
+														isSubscribed ? "bg-[#FEFBF0]"
+														:	"bg-[#F0F7FF]"
+													:	"bg-white"
+												}`}>
+												{/* Header */}
+												<div className="flex items-start justify-between gap-3">
+													<div className="flex items-center gap-2.5">
+														<div
+															className={`p-2 rounded-xl ${
+																isPaired ?
+																	isSubscribed ?
+																		"bg-gradient-to-br from-[#C9A84C] to-[#A97C2F] text-white shadow-sm"
+																	:	"bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-sm"
+																:	"bg-slate-100 text-slate-400"
 															}`}>
-															{isPaired ? "Akun Terhubung" : "Belum Terhubung"}
-														</p>
-														<p
-															className={`text-xs mt-0.5 ${isPaired ? "text-[#B8963E]/70" : "text-slate-400"}`}>
 															{isPaired ?
-																"Langganan Premium Aktif"
-															:	"Integrasi Sistem"}
-														</p>
+																<CheckCircle2 className="w-5 h-5" />
+															:	<XCircle className="w-5 h-5" />}
+														</div>
+														<div>
+															<p
+																className={`text-sm font-semibold leading-tight ${
+																	isPaired ?
+																		isSubscribed ? "text-[#7A5C1E]"
+																		:	"text-blue-900"
+																	:	"text-slate-800"
+																}`}>
+																{isPaired ?
+																	"Akun Terhubung"
+																:	"Belum Terhubung"}
+															</p>
+															<p
+																className={`text-xs mt-0.5 ${
+																	isPaired ?
+																		isSubscribed ? "text-[#B8963E]/70"
+																		:	"text-blue-600/85"
+																	:	"text-slate-400"
+																}`}>
+																{isPaired ?
+																	isSubscribed ?
+																		"Langganan Premium Aktif"
+																	:	"Koneksi Standar Aktif"
+																:	"Integrasi Sistem"}
+															</p>
+														</div>
 													</div>
-												</div>
-												{/* Status pill */}
-												<span
-													className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
-														isPaired ?
-															"bg-gradient-to-r from-[#C9A84C] to-[#F5E27A] text-[#5C3D0E] shadow-sm"
-														:	"bg-slate-100 text-slate-500"
-													}`}>
+													{/* Status pill */}
 													<span
-														className={`w-1.5 h-1.5 rounded-full ${
-															isPaired ? "bg-[#7A5C1E]" : "bg-slate-400"
+														className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+															isPaired ?
+																isSubscribed ?
+																	"bg-gradient-to-r from-[#C9A84C] to-[#F5E27A] text-[#5C3D0E] shadow-sm"
+																:	"bg-gradient-to-r from-blue-500 to-sky-400 text-white shadow-sm"
+															:	"bg-slate-100 text-slate-500"
+														}`}>
+														<span
+															className={`w-1.5 h-1.5 rounded-full ${
+																isPaired ?
+																	isSubscribed ? "bg-[#7A5C1E]"
+																	:	"bg-white"
+																:	"bg-slate-400"
+															}`}
+														/>
+														{isPaired ?
+															isSubscribed ?
+																"Premium"
+															:	"Terhubung"
+														:	"Tidak Aktif"}
+													</span>
+												</div>
+
+												{/* Divider */}
+												{isPaired && (
+													<div
+														className={`h-px ${
+															isSubscribed ?
+																"bg-gradient-to-r from-[#C9A84C]/40 via-[#F5E27A]/60 to-[#C9A84C]/40"
+															:	"bg-gradient-to-r from-blue-500/20 via-sky-400/40 to-indigo-600/20"
 														}`}
 													/>
-													{isPaired ? "Premium" : "Tidak Aktif"}
-												</span>
-											</div>
+												)}
 
-											{/* Divider gold */}
-											{isPaired && (
-												<div className="h-px bg-gradient-to-r from-[#C9A84C]/40 via-[#F5E27A]/60 to-[#C9A84C]/40" />
-											)}
+												{/* Body */}
+												{isPaired && externalAccount ?
+													<div
+														className={`border rounded-xl px-4 py-3 space-y-0.5 ${
+															isSubscribed ?
+																"bg-white/70 border-[#E8D48B]/60"
+															:	"bg-white/70 border-blue-200"
+														}`}>
+														<p
+															className={`text-xs font-semibold uppercase tracking-widest ${
+																isSubscribed ? "text-[#B8963E]/80" : (
+																	"text-blue-600/80"
+																)
+															}`}>
+															✦ Terhubung sebagai
+														</p>
+														<p
+															className={`text-sm font-bold ${
+																isSubscribed ? "text-[#7A5C1E]" : (
+																	"text-blue-900"
+																)
+															}`}>
+															{externalAccount.external_customer_name}
+														</p>
+														<p
+															className={`text-xs ${
+																isSubscribed ? "text-[#A97C2F]/70" : (
+																	"text-blue-500"
+																)
+															}`}>
+															{externalAccount.external_customer_email}
+														</p>
+													</div>
+												:	<p
+														className={`text-sm leading-relaxed ${
+															isPaired ?
+																isSubscribed ? "text-[#7A5C1E]/80"
+																:	"text-blue-900/80"
+															:	"text-slate-500"
+														}`}>
+														{isPaired ?
+															isSubscribed ?
+																"Anda memiliki akses penuh ke layanan eksklusif berkat integrasi akun premium."
+															:	"Akun Anda terhubung dengan sistem eksternal secara sukses."
 
-											{/* Body */}
-											{isPaired && externalAccount ?
-												<div className="bg-white/70 border border-[#E8D48B]/60 rounded-xl px-4 py-3 space-y-0.5">
-													<p className="text-xs font-semibold uppercase tracking-widest text-[#B8963E]/80">
-														✦ Terhubung sebagai
+														:	`Hubungkan akun Anda ke sistem ${company?.name ?? "perusahaan"} untuk akses layanan lebih lengkap.`
+														}
 													</p>
-													<p className="text-sm font-bold text-[#7A5C1E]">
-														{externalAccount.external_customer_name}
-													</p>
-													<p className="text-xs text-[#A97C2F]/70">
-														{externalAccount.external_customer_email}
+												}
+
+												{/* Actions */}
+												<div className="flex flex-col gap-2">
+													{isPaired ?
+														<>
+															<Button
+																size="sm"
+																disabled
+																className={`w-full cursor-not-allowed opacity-100 border-0 font-semibold shadow-md ${
+																	isSubscribed ?
+																		"bg-gradient-to-r from-[#C9A84C] via-[#F0D060] to-[#A97C2F] text-[#3D2200] hover:opacity-90"
+																	:	"bg-gradient-to-r from-blue-500 to-indigo-600 text-white"
+																}`}>
+																<CheckCircle2 className="w-4 h-4 mr-2" />
+																Sudah Terhubung
+															</Button>
+															<Button
+																size="sm"
+																variant="ghost"
+																disabled={isDetaching}
+																onClick={handleDetach}
+																className={`w-full border hover:cursor-pointer ${
+																	isSubscribed ?
+																		"text-[#A97C2F]/70 hover:text-red-600 hover:bg-red-50 border-[#E8D48B]/50 hover:border-red-100"
+																	:	"text-blue-600 hover:text-red-600 hover:bg-red-50 border-blue-200 hover:border-red-100"
+																}`}>
+																{isDetaching ?
+																	"Memproses..."
+																:	"Putuskan Hubungan"}
+															</Button>
+														</>
+													:	<Button
+															size="sm"
+															disabled={isPairing}
+															onClick={handlePairing}
+															className="w-full hover: cursor-pointer">
+															{isPairing ?
+																"Menghubungkan..."
+															:	"Hubungkan Akun"}
+														</Button>
+													}
+													<p
+														className={`text-center text-xs ${
+															isPaired ?
+																isSubscribed ? "text-[#B8963E]/60"
+																:	"text-blue-500/60"
+															:	"text-slate-400"
+														}`}>
+														Hubungi perusahaan untuk informasi lebih lanjut
 													</p>
 												</div>
-											:	<p
-													className={`text-sm leading-relaxed ${isPaired ? "text-[#7A5C1E]/80" : "text-slate-500"}`}>
-													{isPaired ?
-														"Anda memiliki akses penuh ke layanan eksklusif berkat integrasi akun premium."
-													:	`Hubungkan akun Anda ke sistem ${company?.name ?? "perusahaan"} untuk akses layanan lebih lengkap.`
-													}
-												</p>
-											}
-
-											{/* Actions */}
-											<div className="flex flex-col gap-2">
-												{isPaired ?
-													<>
-														<Button
-															size="sm"
-															disabled
-															className="w-full cursor-not-allowed opacity-100 bg-gradient-to-r from-[#C9A84C] via-[#F0D060] to-[#A97C2F] text-[#3D2200] font-semibold shadow-md hover:opacity-90 border-0">
-															<CheckCircle2 className="w-4 h-4 mr-2" />
-															Sudah Terhubung
-														</Button>
-														<Button
-															size="sm"
-															variant="ghost"
-															disabled={isDetaching}
-															onClick={handleDetach}
-															className="w-full text-[#A97C2F]/70 hover:text-red-600 hover:bg-red-50 border border-[#E8D48B]/50 hover:border-red-100">
-															{isDetaching ?
-																"Memproses..."
-															:	"Putuskan Hubungan"}
-														</Button>
-													</>
-												:	<Button
-														size="sm"
-														disabled={isPairing}
-														onClick={handlePairing}
-														className="w-full">
-														{isPairing ? "Menghubungkan..." : "Hubungkan Akun"}
-													</Button>
-												}
-												<p
-													className={`text-center text-xs ${isPaired ? "text-[#B8963E]/60" : "text-slate-400"}`}>
-													Hubungi perusahaan untuk informasi lebih lanjut
-												</p>
 											</div>
-										</div>
-									</motion.div>
-								</AnimatePresence>
+										</motion.div>
+									</AnimatePresence>
+								)}
 							</motion.div>
 						)}
 

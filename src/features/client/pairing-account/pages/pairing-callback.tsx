@@ -8,14 +8,14 @@ export default function PairingCallback() {
 		const code = searchParams.get("code");
 		const state = searchParams.get("state");
 		const companyId = searchParams.get("company_id");
-		// const error = searchParams.get("error");
+		const error = searchParams.get("error");
 
 		// Kirim data kembali ke window parent (halaman utama)
 		if (window.opener) {
 			window.opener.postMessage(
 				{
 					type: "OAUTH_CALLBACK",
-					payload: { company_id: companyId, code, state },
+					payload: { company_id: companyId, code, state, error },
 				},
 				window.location.origin,
 			);

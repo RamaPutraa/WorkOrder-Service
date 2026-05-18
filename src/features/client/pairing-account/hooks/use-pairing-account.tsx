@@ -70,13 +70,21 @@ export const usePairingAccount = () => {
 		if (error) {
 			console.error("Failed to start pairing", error);
 			if (popup) popup.close();
+			setIsPairing(false);
 		} else if (res && res.data?.redirect_url && popup) {
 			popup.location.href = res.data.redirect_url;
-		} else if (popup) {
-			popup.close();
-		}
 
-		setIsPairing(false);
+			// Monitor if the popup is closed by the user manually or automatically
+			const timer = setInterval(() => {
+				if (popup.closed) {
+					clearInterval(timer);
+					setIsPairing(false);
+				}
+			}, 1000);
+		} else {
+			if (popup) popup.close();
+			setIsPairing(false);
+		}
 	};
 
 	const detachAccount = async (id: string) => {

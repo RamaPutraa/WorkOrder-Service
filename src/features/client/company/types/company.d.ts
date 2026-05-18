@@ -25,7 +25,6 @@ type GetServiceByClient = {
 	isActive: boolean;
 };
 type GetCompanyServiceByClient = {
-	isSubscribed: boolean;
 	services: GetServiceByClient[];
 };
-type GetCompanyServiceByClientResponse = ApiResponse<GetCompanyServiceByClient>;
+type GetCompanyServiceByClientResponse = ApiResponse<GetServiceByClient[]>;

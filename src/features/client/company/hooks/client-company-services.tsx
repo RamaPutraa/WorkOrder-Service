@@ -1,5 +1,5 @@
 import { handleApi } from "@/lib/handle-api";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import {
 	getAllCompanyApi,
@@ -16,10 +16,11 @@ const useClientCompanyServices = () => {
 	const [error, setError] = useState<string | null>(null);
 	const [services, setServices] = useState<GetServiceByClient[]>([]);
 	const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
+	const [isIntegrationActive, setIsIntegrationActive] = useState<boolean>(false);
 	const [companies, setCompanies] = useState<Company[]>([]);
 	const [companyDetail, setCompanyDetail] = useState<CompanyDetailClient>();
 
-	const fetchCompanyServices = async () => {
+	const fetchCompanyServices = useCallback(async () => {
 		if (!id) {
 			notifyError("Gagal memuat data", "ID perusahaan tidak ditemukan");
 			setLoadingServices(false);
@@ -36,13 +37,13 @@ const useClientCompanyServices = () => {
 			setError(error.message);
 			notifyError("Gagal memuat data", error.message);
 		} else {
-			setServices(res?.data?.services || []);
+			setServices(res?.data ?? []);
 		}
 
 		setLoadingServices(false);
-	};
+	}, [id]);
 
-	const fetchCompanies = async () => {
+	const fetchCompanies = useCallback(async () => {
 		setLoadingCompanies(true);
 		setError(null);
 
@@ -56,9 +57,9 @@ const useClientCompanyServices = () => {
 		}
 
 		setLoadingCompanies(false);
-	};
+	}, []);
 
-	const fetchCompanyDetail = async () => {
+	const fetchCompanyDetail = useCallback(async () => {
 		if (!id) {
 			notifyError("Gagal memuat data", "ID perusahaan tidak ditemukan");
 			setLoadingCompanies(false);
@@ -77,10 +78,11 @@ const useClientCompanyServices = () => {
 		} else {
 			setCompanyDetail(res?.data);
 			setIsSubscribed(res?.meta.isSubscribed || false);
+			setIsIntegrationActive(res?.meta.isIntegrationActive || false);
 		}
 
 		setLoadingCompanies(false);
-	};
+	}, [id]);
 
 	useEffect(() => {
 		if (id) {
@@ -88,9 +90,9 @@ const useClientCompanyServices = () => {
 			void fetchCompanyDetail();
 		} else {
 			setLoadingServices(false);
+			void fetchCompanies();
 		}
-		void fetchCompanies();
-	}, [id]);
+	}, [id, fetchCompanyServices, fetchCompanyDetail, fetchCompanies]);
 
 	const loading = loadingServices || loadingCompanies;
 
@@ -146,6 +148,7 @@ const useClientCompanyServices = () => {
 		fetchCompanyDetail,
 		services,
 		isSubscribed,
+		isIntegrationActive,
 		companies,
 		companyDetail,
 		loading,
