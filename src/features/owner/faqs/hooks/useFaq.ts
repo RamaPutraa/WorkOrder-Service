@@ -46,6 +46,7 @@ export const useFaq = () => {
 		}
 	}, []);
 
+	// TODO: DI PUBLIC TOMBOL FAQ JANGAN MUNCUL TERUS, CEK APAKAH isFaqActive
 	const handleAddText = useCallback(async (data: FaqTextRequest) => {
 		setSubmitting(true);
 		try {
@@ -118,6 +119,7 @@ export const useFaq = () => {
 	return {
 		faqItems,
 		isActive,
+		setIsActive,
 		loading,
 		submitting,
 		error,

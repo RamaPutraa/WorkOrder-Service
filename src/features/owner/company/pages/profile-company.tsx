@@ -46,6 +46,7 @@ const ProfileCompany = () => {
 
 	const {
 		isActive: isFaqActive,
+		setIsActive: setIsFaqActive,
 		handleToggleActive: handleFaqToggle,
 		submitting: faqSubmitting,
 	} = useFaq();
@@ -82,6 +83,13 @@ const ProfileCompany = () => {
 			setIsDirty(false);
 		}
 	}, [config]);
+
+	// Sync FAQ active status dari company profile
+	useEffect(() => {
+		if (company && typeof (company as any).isFaqActive === "boolean") {
+			setIsFaqActive((company as any).isFaqActive);
+		}
+	}, [company, setIsFaqActive]);
 
 	const handleFormChange = (field: keyof IntegrationConfig, value: string) => {
 		setIntegrationForm((prev) => ({ ...prev, [field]: value }));

@@ -614,27 +614,27 @@ const ServiceDetailSubmit = () => {
 								</div>
 								<div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/60 px-2.5 py-1 rounded-full border border-border/40">
 									<Eye className="w-3.5 h-3.5" />
-									<span>{workReport?.workReports?.length || 0} tahap</span>
+									<span>{workReport?.workReportForms?.length || 0} tahap</span>
 								</div>
 							</div>
 
 							{/* Stage Cards */}
 							<div className="space-y-3">
-								{workReport?.workReports?.map((report, idx) => {
-									const submission = report.submissions?.find(
-										(s) => s.formId === report.reportForm._id,
+								{workReport?.workReportForms?.map((form, idx) => {
+									const submission = workReport.submissions?.find(
+										(s) => s.formId === form._id,
 									);
 									return (
 										<WorkReportCard
-											key={report.workOrderId}
-											form={report.reportForm}
+											key={form._id}
+											form={form}
 											submission={submission}
 											index={idx}
 										/>
 									);
 								})}
-								{(!workReport?.workReports ||
-									workReport.workReports.length === 0) && (
+								{(!workReport?.workReportForms ||
+									workReport.workReportForms.length === 0) && (
 									<div className="py-6 text-center text-sm text-muted-foreground border border-dashed border-border/60 rounded-xl">
 										Belum ada laporan pengerjaan yang dibagikan.
 									</div>
@@ -642,16 +642,21 @@ const ServiceDetailSubmit = () => {
 							</div>
 
 							{/* Summary footer */}
-							{workReport?.workReports &&
-								workReport.workReports.length > 0 &&
+							{workReport?.workReportForms &&
+								workReport.workReportForms.length > 0 &&
 								(() => {
-									const approvedCount = workReport.workReports.filter((r) =>
-										r.submissions?.some((s) => s.status === "approved"),
+									const submissions = workReport.submissions ?? [];
+									const approvedCount = workReport.workReportForms.filter((f) =>
+										submissions.some(
+											(s) => s.formId === f._id && s.status === "approved",
+										),
 									).length;
-									const submittedCount = workReport.workReports.filter((r) =>
-										r.submissions?.some((s) => s.status === "submitted"),
+									const submittedCount = workReport.workReportForms.filter((f) =>
+										submissions.some(
+											(s) => s.formId === f._id && s.status === "submitted",
+										),
 									).length;
-									const totalReports = workReport.workReports.length;
+									const totalReports = workReport.workReportForms.length;
 									const inProgressCount =
 										totalReports - approvedCount - submittedCount;
 
@@ -677,6 +682,7 @@ const ServiceDetailSubmit = () => {
 						</div>
 					)}
 					{/* TODO: ini belum cek submission apakah yang sudah terbaru? */}
+					{/* FIXME: response daat report beda */}
 					{/* Accordion */}
 					<Accordion
 						type="multiple"
