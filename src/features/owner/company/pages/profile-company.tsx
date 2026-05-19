@@ -18,6 +18,7 @@ import {
 import { useCompanyProfile, useUpdateCompany } from "../hooks/companyHooks";
 import { useFaq } from "../../faqs/hooks/useFaq";
 import { useIntegrationConfig } from "../../pairing-company/hooks/useIntegrationConfig";
+import { notifyError } from "@/lib/toast-helper";
 
 // Components
 import { Switch } from "@/components/ui/switch";
@@ -134,6 +135,20 @@ const ProfileCompany = () => {
 
 	const handleConfirmToggleIntegration = async () => {
 		const newValue = !integrationForm.is_integration_active;
+		if (newValue) {
+			const isFormIncomplete =
+				!integrationForm.external_login_url?.trim() ||
+				!integrationForm.external_verify_url?.trim() ||
+				!integrationForm.external_check_memberships_url?.trim() ||
+				!integrationForm.secret_key?.trim();
+			if (isFormIncomplete) {
+				notifyError(
+					"Gagal mengaktifkan integrasi",
+					"Harap isi semua konfigurasi URL dan Secret Key terlebih dahulu."
+				);
+				return;
+			}
+		}
 		await updateIntegration({
 			...integrationForm,
 			is_integration_active: newValue,
@@ -358,7 +373,23 @@ const ProfileCompany = () => {
 							:	<Switch
 									checked={isIntegrationActive}
 									disabled={configSubmitting}
-									onCheckedChange={() => setOpenIntegrationToggleConfirm(true)}
+									onCheckedChange={() => {
+										if (!isIntegrationActive) {
+											const isFormIncomplete =
+												!integrationForm.external_login_url?.trim() ||
+												!integrationForm.external_verify_url?.trim() ||
+												!integrationForm.external_check_memberships_url?.trim() ||
+												!integrationForm.secret_key?.trim();
+											if (isFormIncomplete) {
+												notifyError(
+													"Gagal mengaktifkan integrasi",
+													"Harap isi semua konfigurasi URL dan Secret Key terlebih dahulu."
+												);
+												return;
+											}
+										}
+										setOpenIntegrationToggleConfirm(true);
+									}}
 									className="data-[state=checked]:bg-emerald-600"
 								/>
 							}
