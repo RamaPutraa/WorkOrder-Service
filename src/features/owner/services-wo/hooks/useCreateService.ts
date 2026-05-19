@@ -31,7 +31,7 @@ export type WorkOrderConfigItem = {
 	workReportApprovalType: "auto" | "manager";
 	minStaff: number;
 	maxStaff: number;
-	show_report_to_requester: boolean;
+	showReportToRequester: boolean;
 };
 
 export const useCreateService = () => {
@@ -100,7 +100,7 @@ export const useCreateService = () => {
 				workReportApprovalType: "auto",
 				minStaff: 1,
 				maxStaff: 1,
-				show_report_to_requester: false,
+				showReportToRequester: false,
 			},
 		]);
 	};
@@ -193,7 +193,7 @@ export const useCreateService = () => {
 			description,
 			accessType: accessType as unknown as serviceAccessType,
 			isActive: selectedStatus?.value === "true",
-			drafting_work_order_type: draftingWorkOrderType,
+			draftingWorkOrderType: draftingWorkOrderType,
 			serviceRequestConfig: {
 				intakeFormId,
 				reviewFormId,
@@ -205,7 +205,7 @@ export const useCreateService = () => {
 			},
 			workOrdersConfig: workOrdersConfig.map((c) => ({
 				positionId: c.positionId,
-				workOrderFormId: isAuto ? "" : c.workOrderFormId,
+				workOrderFormId: isAuto ? null : c.workOrderFormId,
 				workReportFormId: c.workReportFormId,
 				workOrderApprovalAccessType:
 					isAuto ? "auto" : (
@@ -217,7 +217,7 @@ export const useCreateService = () => {
 					),
 				minStaff: c.minStaff,
 				maxStaff: c.maxStaff,
-				show_report_to_requester: c.show_report_to_requester,
+				showReportToRequester: c.showReportToRequester,
 			})),
 		};
 
@@ -252,17 +252,17 @@ export const useCreateService = () => {
 			description !== "" ||
 			accessType !== "" ||
 			intakeFormId !== "" ||
-		draftingWorkOrderType !== "auto" ||
-		workOrdersConfig.length > 0
-	);
-}, [
-	title,
-	description,
-	accessType,
-	intakeFormId,
-	draftingWorkOrderType,
-	workOrdersConfig,
-]);
+			draftingWorkOrderType !== "auto" ||
+			workOrdersConfig.length > 0
+		);
+	}, [
+		title,
+		description,
+		accessType,
+		intakeFormId,
+		draftingWorkOrderType,
+		workOrdersConfig,
+	]);
 
 	// === Fetch List Services (dengan cache 5 menit) ===
 	const fecthServices = async () => {

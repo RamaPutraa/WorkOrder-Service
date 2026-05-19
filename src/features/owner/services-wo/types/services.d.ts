@@ -41,7 +41,7 @@ type CreateServiceRequest = {
 	accessType: serviceAccessType;
 	isActive: boolean;
 	// TODO: updated (not review yet)
-	drafting_work_order_type: draftingWorkOrderType;
+	draftingWorkOrderType: draftingWorkOrderType;
 	serviceRequestConfig: {
 		intakeFormId: string;
 		reviewFormId: string;
@@ -56,7 +56,7 @@ type CreateServiceRequest = {
 		workReportApprovalAccessType: workReportApprovalAccessType;
 		minStaff: number;
 		maxStaff: number;
-		show_report_to_requester: boolean;
+		showReportToRequester: boolean;
 	}[];
 };
 

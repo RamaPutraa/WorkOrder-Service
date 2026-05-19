@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { useProfileStore } from "@/store/profileStore";
 
 import {
 	Popover,
@@ -58,6 +59,26 @@ const WorkOrderRowCard = ({
 	const [wrTypeFilter, setWrTypeFilter] = useState("report");
 	const [posOpen, setPosOpen] = useState(false);
 
+	const { profile } = useProfileStore();
+	const isManager = profile?.role === "manager_company";
+	const managerPositionId = profile?.position?._id || "";
+
+	React.useEffect(() => {
+		if (
+			isManager &&
+			managerPositionId &&
+			item.positionId !== managerPositionId
+		) {
+			updateWorkOrderConfig(index, "positionId", managerPositionId);
+		}
+	}, [
+		isManager,
+		managerPositionId,
+		item.positionId,
+		index,
+		updateWorkOrderConfig,
+	]);
+
 	const formTypeOptions = [
 		{ label: "Semua", value: "all" },
 		{ label: "Pengajuan", value: "intake" },
@@ -71,7 +92,9 @@ const WorkOrderRowCard = ({
 			.toLowerCase()
 			.includes(woFormSearch.toLowerCase());
 		const matchesType = woTypeFilter === "all" || f.formType === woTypeFilter;
-		return matchesSearch && matchesType;
+		const matchesPosition =
+			!isManager || !managerPositionId || f.position?._id === managerPositionId;
+		return matchesSearch && matchesType && matchesPosition;
 	});
 
 	const filteredWrForms = forms.filter((f) => {
@@ -79,7 +102,9 @@ const WorkOrderRowCard = ({
 			.toLowerCase()
 			.includes(wrFormSearch.toLowerCase());
 		const matchesType = wrTypeFilter === "all" || f.formType === wrTypeFilter;
-		return matchesSearch && matchesType;
+		const matchesPosition =
+			!isManager || !managerPositionId || f.position?._id === managerPositionId;
+		return matchesSearch && matchesType && matchesPosition;
 	});
 
 	return (
@@ -111,12 +136,17 @@ const WorkOrderRowCard = ({
 						<Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
 							Posisi Bertugas <span className="text-red-500">*</span>
 						</Label>
-						<Popover open={posOpen} onOpenChange={setPosOpen}>
+						<Popover
+							open={posOpen}
+							onOpenChange={
+								isManager && !!managerPositionId ? undefined : setPosOpen
+							}>
 							<PopoverTrigger asChild>
 								<Button
 									variant="outline"
 									role="combobox"
 									aria-expanded={posOpen}
+									disabled={isManager && !!managerPositionId}
 									className="w-full h-10 justify-between bg-white font-normal hover:bg-white text-slate-700 border-slate-200">
 									<span className="truncate">
 										{item.positionId ?
@@ -162,6 +192,12 @@ const WorkOrderRowCard = ({
 								</Command>
 							</PopoverContent>
 						</Popover>
+						{isManager && managerPositionId ?
+							<p className="text-[11px] italic text-slate-400 mt-1">
+								Manager departemen hanya dapat membuat konfigurasi perintah
+								kerja untuk departemennya sendiri
+							</p>
+						:	null}
 					</div>
 
 					<div className="space-y-2">
@@ -278,8 +314,7 @@ const WorkOrderRowCard = ({
 																	{f.title || "Untitled Form"}
 																</h3>
 																<p className="text-xs text-slate-500 leading-relaxed line-clamp-1">
-																	{f.description ||
-																		"No description available."}
+																	{f.description || "No description available."}
 																</p>
 															</div>
 														</div>
@@ -411,8 +446,7 @@ const WorkOrderRowCard = ({
 																{f.title || "Untitled Form"}
 															</h3>
 															<p className="text-xs text-slate-500 leading-relaxed line-clamp-1">
-																{f.description ||
-																	"No description available."}
+																{f.description || "No description available."}
 															</p>
 														</div>
 													</div>
@@ -488,9 +522,9 @@ const WorkOrderRowCard = ({
 							</p>
 						</div>
 						<Switch
-							checked={item.show_report_to_requester}
+							checked={item.showReportToRequester}
 							onCheckedChange={(val) =>
-								updateWorkOrderConfig(index, "show_report_to_requester", val)
+								updateWorkOrderConfig(index, "showReportToRequester", val)
 							}
 						/>
 					</div>

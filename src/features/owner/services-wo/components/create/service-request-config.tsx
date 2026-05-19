@@ -3,6 +3,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { EmptyData } from "@/shared/molecules/empty-data";
+import { useProfileStore } from "@/store/profileStore";
 
 import {
 	ClipboardCheck,
@@ -49,6 +50,10 @@ export const CardServiceRequestConfig: React.FC<
 	const [intakeTypeFilter, setIntakeTypeFilter] = useState("intake");
 	const [reviewTypeFilter, setReviewTypeFilter] = useState("review");
 
+	const { profile } = useProfileStore();
+	const isManager = profile?.role === "manager_company";
+	const managerPositionId = profile?.position?._id || "";
+
 	const formTypeOptions = [
 		{ label: "Semua", value: "all" },
 		{ label: "Pengajuan", value: "intake" },
@@ -63,7 +68,9 @@ export const CardServiceRequestConfig: React.FC<
 			.includes(intakeSearch.toLowerCase());
 		const matchesType =
 			intakeTypeFilter === "all" || f.formType === intakeTypeFilter;
-		return matchesSearch && matchesType;
+		const matchesPosition =
+			!isManager || !managerPositionId || f.position?._id === managerPositionId;
+		return matchesSearch && matchesType && matchesPosition;
 	});
 
 	const filteredReviewForms = forms.filter((f) => {
@@ -72,7 +79,9 @@ export const CardServiceRequestConfig: React.FC<
 			.includes(reviewSearch.toLowerCase());
 		const matchesType =
 			reviewTypeFilter === "all" || f.formType === reviewTypeFilter;
-		return matchesSearch && matchesType;
+		const matchesPosition =
+			!isManager || !managerPositionId || f.position?._id === managerPositionId;
+		return matchesSearch && matchesType && matchesPosition;
 	});
 
 	return (

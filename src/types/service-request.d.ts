@@ -187,7 +187,11 @@ type RequesterSubmitResponse = ApiResponse<{
 
 // requester view report
 type RequesterWorkReport = {
-	workReportForms: Form[];
-	workOrderSubmissions: SubmissionObject[];
+	workReports: {
+		reportForm: Form;
+		showReportToRequester: boolean;
+		submissions: SubmissionObject[];
+		workOrderId: string;
+	}[];
 };
 type RequesterWorkReportResponse = ApiResponse<RequesterWorkReport>;

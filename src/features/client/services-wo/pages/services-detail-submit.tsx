@@ -5,6 +5,7 @@ import { handleApi } from "@/lib/handle-api";
 import {
 	getDetailClientServiceRequestApi,
 	submitReviewApi,
+	getClientWorkReport,
 } from "../services/public-services";
 import { uploadFileApi } from "@/lib/file-service";
 import { Card } from "@/components/ui/card";
@@ -129,145 +130,23 @@ const buildFieldMap = (
 	return map;
 };
 
-// ─── Mock Work Report Data ────────────────────────────────────────────────────
-// TODO: Ganti dengan data asli dari getClientWorkReport(id)
-const MOCK_WORK_REPORTS: WorkReport[] = [
-	{
-		_id: "wr-1",
-		workOrderId: "wo-1",
-		reportForm: "form-report-1",
-		workReportApprovalAccessType: "manager",
-		status: "approved",
-		show_report_to_requester: true,
-		approvedBy: {
-			_id: "user-1",
-			name: "Budi Santoso",
-			email: "budi@example.com",
-			role: "manager_company",
-			deletedAt: "",
-			createdAt: "2026-01-01T00:00:00Z",
-			updatedAt: "2026-01-01T00:00:00Z",
-			__v: 0,
-		},
-		submissions: [
-			{
-				_id: "sub-1",
-				ownerId: "owner-1",
-				formId: "form-report-1",
-				submissionType: "work_report",
-				status: "approved",
-				submittedBy: "user-staff-1",
-				createdAt: "2026-05-10T09:30:00Z",
-				updatedAt: "2026-05-10T09:30:00Z",
-				fieldsData: [
-					{
-						order: 1,
-						value:
-							"Instalasi kabel listrik selesai dilakukan di area lantai 1. Semua sambungan sudah diuji dan berfungsi normal.",
-					},
-					{
-						order: 2,
-						value:
-							"Tidak ada kendala berarti ditemukan selama proses pengerjaan.",
-					},
-				],
-			},
-		],
-		createdAt: "2026-05-10T08:00:00Z",
-		updatedAt: "2026-05-10T10:00:00Z",
-		deletedAt: null,
-	},
-	{
-		_id: "wr-2",
-		workOrderId: "wo-2",
-		reportForm: "form-report-2",
-		workReportApprovalAccessType: "manager",
-		status: "submitted",
-		show_report_to_requester: true,
-		approvedBy: null,
-		submissions: [
-			{
-				_id: "sub-2",
-				ownerId: "owner-1",
-				formId: "form-report-2",
-				submissionType: "work_report",
-				status: "submitted",
-				submittedBy: "user-staff-2",
-				createdAt: "2026-05-11T14:00:00Z",
-				updatedAt: "2026-05-11T14:00:00Z",
-				fieldsData: [
-					{
-						order: 1,
-						value:
-							"Semua titik instalasi berhasil lulus uji tegangan dan tidak ditemukan arus bocor.",
-					},
-					{
-						order: 2,
-						value:
-							"Diperlukan penggantian 2 stopkontak di ruang meeting dalam 1 minggu ke depan.",
-					},
-				],
-			},
-		],
-		createdAt: "2026-05-11T10:00:00Z",
-		updatedAt: "2026-05-11T14:00:00Z",
-		deletedAt: null,
-	},
-	{
-		_id: "wr-3",
-		workOrderId: "wo-3",
-		reportForm: "form-report-3",
-		workReportApprovalAccessType: "auto",
-		status: "on_progress",
-		show_report_to_requester: true,
-		approvedBy: null,
-		submissions: [],
-		createdAt: "2026-05-12T08:00:00Z",
-		updatedAt: null,
-		deletedAt: null,
-	},
-];
-
-const REPORT_STATUS_CONFIG = {
-	approved: {
-		label: "Disetujui",
-		className: "bg-emerald-50 text-emerald-700 border-emerald-200",
-		dotClass: "bg-emerald-500",
-		iconClass: "bg-emerald-100 text-emerald-600",
-	},
-	submitted: {
-		label: "Menunggu Persetujuan",
-		className: "bg-blue-50 text-blue-700 border-blue-200",
-		dotClass: "bg-blue-500",
-		iconClass: "bg-blue-100 text-blue-600",
-	},
-	on_progress: {
-		label: "Sedang Dikerjakan",
-		className: "bg-amber-50 text-amber-700 border-amber-200",
-		dotClass: "bg-amber-400",
-		iconClass: "bg-amber-100 text-amber-600",
-	},
-	rejected: {
-		label: "Ditolak",
-		className: "bg-red-50 text-red-700 border-red-200",
-		dotClass: "bg-red-500",
-		iconClass: "bg-red-100 text-red-600",
-	},
-} as const;
-
 // ─── Work Report Stage Card ───────────────────────────────────────────────────
 const WorkReportCard = ({
-	report,
+	form,
+	submission,
 	index,
 }: {
-	report: WorkReport;
+	form: Form;
+	submission?: SubmissionObject;
 	index: number;
 }) => {
-	const [open, setOpen] = useState(report.status === "approved");
-	const cfg = REPORT_STATUS_CONFIG[report.status];
-	const latestSubmission = report.submissions[report.submissions.length - 1];
-	const hasFields = latestSubmission && latestSubmission.fieldsData.length > 0;
-	const submittedAt = latestSubmission?.createdAt ?? null;
+	const status = submission?.status || "on_progress";
+	const [open, setOpen] = useState(
+		status === "approved" || status === "submitted",
+	);
+	const hasFields =
+		submission && submission.fieldsData && submission.fieldsData.length > 0;
+	const submittedAt = submission?.createdAt ?? null;
 
 	return (
 		<div className="border border-border/60 rounded-xl overflow-hidden bg-card shadow-sm transition-all duration-200 hover:shadow-md">
@@ -277,14 +156,9 @@ const WorkReportCard = ({
 				onClick={() => setOpen((v) => !v)}
 				className="w-full flex items-center justify-between gap-4 px-5 py-4 hover:bg-muted/30 transition-colors text-left">
 				<div className="flex items-center gap-3">
-					{/* Stage number */}
-					<div
-						className={`shrink-0 flex items-center justify-center w-8 h-8 rounded-lg ${cfg.iconClass}`}>
-						<span className="text-xs font-bold">{index + 1}</span>
-					</div>
 					<div className="min-w-0">
 						<p className="text-sm font-semibold text-foreground truncate">
-							Tahap {index + 1}
+							{form.title || `Tahap ${index + 1}`}
 						</p>
 						{submittedAt && (
 							<p className="text-xs text-muted-foreground mt-0.5">
@@ -298,12 +172,6 @@ const WorkReportCard = ({
 					</div>
 				</div>
 				<div className="flex items-center gap-3 shrink-0">
-					{/* Status pill */}
-					<span
-						className={`hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${cfg.className}`}>
-						<span className={`w-1.5 h-1.5 rounded-full ${cfg.dotClass}`} />
-						{cfg.label}
-					</span>
 					{hasFields && (
 						<ChevronDown
 							className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${
@@ -315,37 +183,29 @@ const WorkReportCard = ({
 			</button>
 
 			{/* Content */}
-			{open && hasFields && (
+			{open && hasFields && submission && (
 				<div className="px-5 pb-5 pt-1 border-t border-border/40 bg-muted/10">
-					{/* Approved by */}
-					{report.approvedBy && (
-						<div className="flex items-center gap-2 py-3 mb-3 border-b border-border/30">
-							<CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-							<p className="text-xs text-muted-foreground">
-								Disetujui oleh{" "}
-								<span className="font-semibold text-foreground">
-									{report.approvedBy.name}
-								</span>
-							</p>
-						</div>
-					)}
-
-					<div className="space-y-3 mt-3">
-						{latestSubmission.fieldsData.map((fd, idx) => (
-							<div key={idx} className="space-y-1">
-								<p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
-									Field {fd.order}
-								</p>
-								<p className="text-sm text-foreground/85 leading-relaxed bg-background border border-border/40 rounded-lg px-3 py-2.5">
-									{String(fd.value)}
-								</p>
-							</div>
-						))}
+					<div className="space-y-4 mt-3">
+						{[...form.fields]
+							.sort((a, b) => a.order - b.order)
+							.map((field) => {
+								const answer =
+									submission.fieldsData.find((fd) => fd.order === field.order)
+										?.value ?? null;
+								return (
+									<div key={field.order} className="pb-2">
+										<FormFieldViewer
+											field={field}
+											answer={answer as AnswerValue}
+											readOnly={true}
+										/>
+									</div>
+								);
+							})}
 					</div>
 				</div>
 			)}
 
-			{/* Empty state */}
 			{!hasFields && (
 				<div className="px-5 py-4 border-t border-border/40 bg-muted/10">
 					<div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -370,6 +230,11 @@ const ServiceDetailSubmit = () => {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
+	// Report state
+	const [workReport, setWorkReport] = useState<RequesterWorkReport | null>(
+		null,
+	);
+
 	// Review form state
 	const [reviewFormData, setReviewFormData] = useState<
 		Map<number, AnswerValue>
@@ -391,6 +256,11 @@ const ServiceDetailSubmit = () => {
 		const { data: res, error } = await handleApi(() =>
 			getDetailClientServiceRequestApi(id),
 		);
+
+		const { data: reportRes } = await handleApi(() => getClientWorkReport(id));
+		if (reportRes?.data) {
+			setWorkReport(reportRes.data);
+		}
 
 		setLoading(false);
 
@@ -744,53 +614,69 @@ const ServiceDetailSubmit = () => {
 								</div>
 								<div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/60 px-2.5 py-1 rounded-full border border-border/40">
 									<Eye className="w-3.5 h-3.5" />
-									<span>{MOCK_WORK_REPORTS.length} tahap</span>
+									<span>{workReport?.workReports?.length || 0} tahap</span>
 								</div>
 							</div>
 
 							{/* Stage Cards */}
 							<div className="space-y-3">
-								{MOCK_WORK_REPORTS.map((report, idx) => (
-									<WorkReportCard key={report._id} report={report} index={idx} />
-								))}
+								{workReport?.workReports?.map((report, idx) => {
+									const submission = report.submissions?.find(
+										(s) => s.formId === report.reportForm._id,
+									);
+									return (
+										<WorkReportCard
+											key={report.workOrderId}
+											form={report.reportForm}
+											submission={submission}
+											index={idx}
+										/>
+									);
+								})}
+								{(!workReport?.workReports ||
+									workReport.workReports.length === 0) && (
+									<div className="py-6 text-center text-sm text-muted-foreground border border-dashed border-border/60 rounded-xl">
+										Belum ada laporan pengerjaan yang dibagikan.
+									</div>
+								)}
 							</div>
 
 							{/* Summary footer */}
-							<div className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-border/40 text-xs text-muted-foreground">
-								<div className="flex items-center gap-3">
-									<span className="flex items-center gap-1.5">
-										<span className="w-2 h-2 rounded-full bg-emerald-400" />
-										{
-											MOCK_WORK_REPORTS.filter((r) => r.status === "approved")
-												.length
-										}{" "}
-										Disetujui
-									</span>
-									<span className="flex items-center gap-1.5">
-										<span className="w-2 h-2 rounded-full bg-blue-400" />
-										{
-											MOCK_WORK_REPORTS.filter((r) => r.status === "submitted")
-												.length
-										}{" "}
-										Menunggu
-									</span>
-									<span className="flex items-center gap-1.5">
-										<span className="w-2 h-2 rounded-full bg-amber-400" />
-										{
-											MOCK_WORK_REPORTS.filter(
-												(r) => r.status === "on_progress",
-											).length
-										}{" "}
-										Berlangsung
-									</span>
-								</div>
-								<span className="text-[10px] italic text-muted-foreground/60">
-									Data mock — akan diintegrasikan dengan API
-								</span>
-							</div>
+							{workReport?.workReports &&
+								workReport.workReports.length > 0 &&
+								(() => {
+									const approvedCount = workReport.workReports.filter((r) =>
+										r.submissions?.some((s) => s.status === "approved"),
+									).length;
+									const submittedCount = workReport.workReports.filter((r) =>
+										r.submissions?.some((s) => s.status === "submitted"),
+									).length;
+									const totalReports = workReport.workReports.length;
+									const inProgressCount =
+										totalReports - approvedCount - submittedCount;
+
+									return (
+										<div className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-border/40 text-xs text-muted-foreground">
+											<div className="flex flex-wrap items-center gap-3">
+												<span className="flex items-center gap-1.5">
+													<span className="w-2 h-2 rounded-full bg-emerald-400" />
+													{approvedCount} Disetujui
+												</span>
+												<span className="flex items-center gap-1.5">
+													<span className="w-2 h-2 rounded-full bg-blue-400" />
+													{submittedCount} Menunggu
+												</span>
+												<span className="flex items-center gap-1.5">
+													<span className="w-2 h-2 rounded-full bg-amber-400" />
+													{inProgressCount} Berlangsung
+												</span>
+											</div>
+										</div>
+									);
+								})()}
 						</div>
 					)}
-
+					{/* TODO: ini belum cek submission apakah yang sudah terbaru? */}
 					{/* Accordion */}
 					<Accordion
 						type="multiple"

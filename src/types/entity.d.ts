@@ -48,6 +48,7 @@ type Form = {
 	fields: Field[];
 	createdAt: string;
 	updatedAt: string;
+	position: Position | null;
 };
 
 // Companies
@@ -92,7 +93,7 @@ type Service = {
 	description: string;
 	accessType: serviceAccessType;
 	isActive: boolean;
-	drafting_work_order_type: draftingWorkOrderType;
+	draftingWorkOrderType: draftingWorkOrderType;
 	serviceRequestConfig: {
 		intakeForm: Form;
 		reviewForm: Form;
@@ -109,7 +110,7 @@ type Service = {
 		workReportApprovalAccessType: workReportApprovalAccessType;
 		minStaff: number;
 		maxStaff: number;
-		show_report_to_requester: boolean;
+		showReportToRequester: boolean;
 	}[];
 	createdAt: string;
 	updatedAt: string;

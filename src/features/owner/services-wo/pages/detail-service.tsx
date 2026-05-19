@@ -420,7 +420,7 @@ const DetailService = () => {
 											Tipe Drafting
 										</p>
 										<div className="flex items-center gap-1.5">
-											{detailService.drafting_work_order_type === "manual" ?
+											{detailService.draftingWorkOrderType === "manual" ?
 												<>
 													<CheckCircle2 className="size-4 text-emerald-500 shrink-0" />
 													<p className="text-sm font-medium">Manual (Draft)</p>
@@ -501,8 +501,8 @@ const DetailService = () => {
 							</div>
 							<div className="flex items-center gap-2">
 								{(
-									detailService.workOrdersConfig?.[0]
-										.show_report_to_requester === true
+									detailService.workOrdersConfig?.[0].showReportToRequester ===
+									true
 								) ?
 									<Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-50 shadow-none">
 										Terlihat oleh Klien
