@@ -7,7 +7,16 @@ export const SiblingCard = ({
 	currentId,
 	index,
 }: {
-	sibling: { _id: string; code: string; status: string };
+	sibling: {
+		_id: string;
+		code: string;
+		status: string;
+		position?: {
+			_id: string;
+			name: string;
+		};
+		serviceSummary?: ServiceSummaryObject;
+	};
 	currentId: string;
 	index: number;
 }) => {
@@ -26,12 +35,19 @@ export const SiblingCard = ({
 				:	"hover:bg-muted/50 hover:border-muted-foreground/30 cursor-pointer"
 			}`}>
 			<div className="flex items-center gap-2">
-				{index != null && (
-					<span className="flex items-center justify-center w-5 h-5 rounded-full bg-primary/10 text-primary text-[10px] font-bold shrink-0">
-						{index}
+				<div>
+					{index != null && (
+						<span className="flex items-center justify-center w-5 h-5 rounded-full bg-primary/10 text-primary text-[10px] font-bold shrink-0">
+							{index}
+						</span>
+					)}
+				</div>
+				<div>
+					<span className="text-sm font-medium">
+						{sibling.serviceSummary?.title}
 					</span>
-				)}
-				<span className="text-sm font-medium">{sibling.code}</span>
+					<p className="text-xs text-muted-foreground">{sibling.code}</p>
+				</div>
 				{isCurrent && (
 					<span className="text-[10px] px-1.5 py-0.5 rounded bg-primary text-primary-foreground font-semibold">
 						Sedang diakses

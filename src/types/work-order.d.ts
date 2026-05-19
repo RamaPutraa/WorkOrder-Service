@@ -10,6 +10,11 @@ type WorkOrderMeta = {
 		_id: string;
 		code: string;
 		status: string;
+		position?: {
+			_id: string;
+			name: string;
+		};
+		serviceSummary?: ServiceSummaryObject;
 	}[];
 };
 
