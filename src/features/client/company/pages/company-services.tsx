@@ -503,8 +503,12 @@ const ClientCompanyServices = () => {
 			</div>
 
 			{/* Faq Chatbot */}
-
-			<FaqChatbot title={company?.name || ""} companyId={company?._id || ""} />
+			{company?.isFaqActive === true && (
+				<FaqChatbot
+					title={company?.name || ""}
+					companyId={company?._id || ""}
+				/>
+			)}
 		</>
 	);
 };

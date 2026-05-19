@@ -11,6 +11,7 @@ type CompanyDetailClient = {
 	address: string;
 	description: string;
 	ownerId: string;
+	isFaqActive: boolean;
 	meta: MetaDetailCompany;
 };
 type GetCompanyDetailByClientResponse = ApiResponse<CompanyDetailClient>;
