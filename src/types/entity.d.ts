@@ -91,6 +91,7 @@ type Service = {
 	companyId: string;
 	title: string;
 	description: string;
+	price: number | null;
 	accessType: serviceAccessType;
 	isActive: boolean;
 	draftingWorkOrderType: draftingWorkOrderType;

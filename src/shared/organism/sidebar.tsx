@@ -72,6 +72,10 @@ const data = {
 					title: "Kelola Layanan",
 					url: "/dashboard/internal/services",
 				},
+				{
+					title: "Kelola Harga",
+					url: "/dashboard/internal/pricing"
+				}
 			],
 		},
 		{
@@ -218,7 +222,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			<SidebarHeader>
 				{!isSimpleRole ?
 					<WorkOrderLogo />
-				:	<TeamManagement teams={data.teams} />}
+					: <TeamManagement teams={data.teams} />}
 			</SidebarHeader>
 			<SidebarContent>
 				<NavMenu menu={currentNavMenu} />
@@ -238,7 +242,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 										return {
 											...nav,
 											items: nav.items?.filter((item) =>
-												["Kelola Formulir", "Kelola Layanan"].includes(item.title),
+												["Kelola Formulir", "Kelola Layanan", "Kelola Harga"].includes(item.title),
 											),
 										};
 									}

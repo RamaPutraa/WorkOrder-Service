@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ClipboardList, LayoutGrid, List, Eye } from "lucide-react";
+import { ClipboardList, LayoutGrid, List, Eye, DollarSign, Pencil } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SectionLoading } from "@/shared/atoms";
 import { useCreateService } from "../hooks/useCreateService";
@@ -14,13 +14,15 @@ import { type ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { CreateServiceModal } from "../components/create-service-modal";
 import useAuth from "@/features/auth/hooks/useAuth";
+import { EditPriceDialog } from "../../pricing/components/edit-price-dialog";
+import { usePricing } from "../../pricing/hooks/use-pricing";
 
 const serviceTypeLabel = (type: any) => {
 	const strType = String(type).toLowerCase();
 	switch (strType) {
 		case "internal":
 		case "2":
-			return "Internal";
+			return "Internal Perusahaan";
 		case "public":
 		case "0":
 			return "Publik";
@@ -31,6 +33,30 @@ const serviceTypeLabel = (type: any) => {
 			return strType;
 	}
 };
+
+const accessBadgeStyle = (type: any) => {
+	const strType = String(type).toLowerCase();
+	switch (strType) {
+		case "internal":
+		case "2":
+			return "bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-50";
+		case "public":
+		case "0":
+			return "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-50";
+		case "member_only":
+		case "1":
+			return "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-50";
+		default:
+			return "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-50";
+	}
+};
+
+const formatRupiah = (value: number) =>
+	new Intl.NumberFormat("id-ID", {
+		style: "currency",
+		currency: "IDR",
+		minimumFractionDigits: 0,
+	}).format(value);
 
 const ViewService: React.FC = () => {
 	const navigate = useNavigate();
@@ -48,6 +74,32 @@ const ViewService: React.FC = () => {
 	});
 
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+	// Price editing state
+	const { pricingList, createPricing, updatePricing, submitting: pricingSubmitting } = usePricing();
+	const [priceDialogOpen, setPriceDialogOpen] = useState(false);
+	const [selectedServiceForPrice, setSelectedServiceForPrice] = useState<any>(null);
+
+	const handleEditPrice = (e: React.MouseEvent, service: any) => {
+		e.stopPropagation();
+		setSelectedServiceForPrice(service);
+		setPriceDialogOpen(true);
+	};
+
+	const handlePriceSubmit = async (price: number) => {
+		if (!selectedServiceForPrice) return;
+
+		const existingPricing = pricingList.find((p: any) => p.service?._id === selectedServiceForPrice._id);
+
+		if (existingPricing) {
+			await updatePricing(existingPricing._id, { serviceId: selectedServiceForPrice._id, price });
+		} else {
+			await createPricing({ serviceId: selectedServiceForPrice._id, price });
+		}
+
+		await fecthServices();
+		setPriceDialogOpen(false);
+	};
 
 	const handleViewChange = (value: string) => {
 		setViewMode(value);
@@ -106,7 +158,7 @@ const ViewService: React.FC = () => {
 				cell: ({ row }) => (
 					<Badge
 						variant="outline"
-						className="rounded-full uppercase tracking-wider text-[10px]">
+						className={`rounded-full uppercase tracking-wider text-[10px] border shadow-none ${accessBadgeStyle(row.original.accessType)}`}>
 						{serviceTypeLabel(row.original.accessType)}
 					</Badge>
 				),
@@ -151,18 +203,18 @@ const ViewService: React.FC = () => {
 				cell: ({ row }) => {
 					const isActive = row.original.isActive;
 					return isActive ?
-							<div className="flex items-center gap-1.5 text-emerald-600 border border-emerald-500 rounded-full px-2 py-0.5">
-								<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-								<span className="text-[10px] font-bold uppercase tracking-wider">
-									Aktif
-								</span>
-							</div>
-						:	<div className="flex items-center gap-1.5 text-slate-500 border border-slate-500 rounded-full px-2 py-0.5">
-								<span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-								<span className="text-[10px] font-bold uppercase tracking-wider">
-									Nonaktif
-								</span>
-							</div>;
+						<div className="flex items-center gap-1.5 text-emerald-600 border border-emerald-500 rounded-full px-2 py-0.5">
+							<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+							<span className="text-[10px] font-bold uppercase tracking-wider">
+								Aktif
+							</span>
+						</div>
+						: <div className="flex items-center gap-1.5 text-slate-500 border border-slate-500 rounded-full px-2 py-0.5">
+							<span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+							<span className="text-[10px] font-bold uppercase tracking-wider">
+								Nonaktif
+							</span>
+						</div>;
 				},
 			},
 			{
@@ -237,94 +289,101 @@ const ViewService: React.FC = () => {
 									className="col-span-full">
 									<SectionLoading message="Memuat data service..." />
 								</motion.div>
-							: filteredData.length > 0 ?
-								filteredData.map((service) => (
-									<motion.div
-										key={service._id}
-										initial={{ opacity: 0, y: 20 }}
-										animate={{ opacity: 1, y: 0 }}
-										whileHover={{ scale: 1.02, y: -4 }}
-										transition={{ duration: 0.2, ease: "easeOut" }}>
-										<div
-											onClick={() =>
-												navigate(
-													`/dashboard/internal/services/detail/${service._id}`,
-												)
-											}
-											className=" group gap-2 flex flex-col h-full bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden hover:cursor-pointer">
-											<div className=" space-y-4">
-												{/* Header */}
-												<div className="border-b border-slate-200/70 ">
-													{/* Status Badge */}
-													{service.isActive ?
-														<div className="flex items-center gap-1.5 px-5 py-2  text-emerald-600 ">
-															<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-															<span className="text-[10px] font-bold uppercase tracking-wider">
-																Aktif
-															</span>
+								: filteredData.length > 0 ?
+									filteredData.map((service) => (
+										<motion.div
+											key={service._id}
+											initial={{ opacity: 0, y: 20 }}
+											animate={{ opacity: 1, y: 0 }}
+											whileHover={{ scale: 1.02, y: -4 }}
+											transition={{ duration: 0.2, ease: "easeOut" }}>
+											<div
+												onClick={() =>
+													navigate(
+														`/dashboard/internal/services/detail/${service._id}`,
+													)
+												}
+												className=" group gap-2 flex flex-col h-full bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden hover:cursor-pointer">
+												<div className=" space-y-4">
+													{/* Header */}
+													<div className="flex items-center justify-start border-b border-slate-100 px-5 py-3 gap-2">
+														<div>
+															{/* Status Badge */}
+															{service.isActive ?
+																<div className=" items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+																	<span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+																	Aktif
+																</div>
+																: <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+																	<span className="w-1 h-1 rounded-full bg-slate-400" />
+																	Nonaktif
+																</div>
+															}
 														</div>
-													:	<div className="flex items-center gap-1.5 px-5 py-2  text-slate-500 ">
-															<span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-															<span className="text-[10px] font-bold uppercase tracking-wider">
-																Nonaktif
-															</span>
-														</div>
-													}
-												</div>
-												{/* Baris Atas: Icon, Judul, dan Status */}
-												<div className="flex items-start justify-between gap-4 px-5 py-2">
-													<div className="flex items-center gap-3 min-w-0">
-														{/* Icon */}
-														<div className="shrink-0 p-2.5 rounded-xl bg-primary/5 text-primary  transition-colors">
-															<ClipboardList className="w-6 h-6" />
-														</div>
+														{/* type services */}
+														<Badge
+															variant="outline"
+															className={`text-[10px] font-semibold px-2.5 py-1 rounded-full border shadow-none ${accessBadgeStyle(service.accessType)}`}
+														>
+															{serviceTypeLabel(service.accessType)}
+														</Badge>
+													</div>
+													{/* Baris Atas: Icon, Judul, dan Status */}
+													<div className="flex items-start justify-between gap-4 px-5 py-2">
+														<div className="flex items-center gap-3 min-w-0">
+															{/* Icon */}
+															<div className="shrink-0 p-2.5 rounded-xl bg-primary/5 text-primary  transition-colors">
+																<ClipboardList className="w-6 h-6" />
+															</div>
 
-														{/* Judul dengan min-height agar sejajar antar card */}
-														<h3 className="text-base font-bold text-slate-900 leading-snug line-clamp-2 min-h-[2.5rem] flex items-center">
-															{service.title || "Untitled Form"}
-														</h3>
+															{/* Judul dengan min-height agar sejajar antar card */}
+															<h3 className="text-base font-bold text-slate-900 leading-snug line-clamp-2 min-h-[2.5rem] flex items-center">
+																{service.title || "Untitled Form"}
+															</h3>
+														</div>
+													</div>
+
+													{/* Deskripsi - Masuk dalam CardContent atau tetap di Header dengan padding yang pas */}
+													<div className="px-5 text-sm text-slate-500 leading-relaxed line-clamp-3 min-h-[6rem] text-justify">
+														{service.description ||
+															"Tidak ada deskripsi tersedia untuk layanan ini."}
 													</div>
 												</div>
 
-												{/* Deskripsi - Masuk dalam CardContent atau tetap di Header dengan padding yang pas */}
-												<div className="px-5 text-sm text-slate-500 leading-relaxed line-clamp-3 min-h-[3.75rem] text-justify">
-													{service.description ||
-														"Tidak ada deskripsi tersedia untuk layanan ini."}{" "}
-													Lorem ipsum dolor sit amet, consectetur adipisicing
-													elit. Voluptatum a quod quos consectetur minus sunt,
-													id voluptate voluptas, provident deserunt earum hic,
-													laboriosam sequi eum assumenda est! Dolore, eius amet!
-													Similique mollitia exercitationem consequuntur
-													cupiditate necessitatibus atque voluptate rem, autem
-													voluptatem! Ipsum, quibusdam asperiores, inventore in
-													architecto nobis provident modi, dolorum officia rerum
-													deserunt repellendus quo optio sequi iure aliquam.
-													Magnam mollitia vel nihil distinctio quas cumque
-													quisquam ea. Quisquam consectetur, expedita magni
-													assumenda quae vel, sequi blanditiis sed quia
-													similique ducimus nostrum molestiae dolore
-													reprehenderit dicta corporis beatae rerum.
-												</div>
-											</div>
+												<div className="text-xs py-5 px-5 border-t border-slate-200/70 p-0 flex items-center justify-between">
+													<div className="flex items-center gap-2">
+														<div className="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center">
+															<DollarSign className="w-3.5 h-3.5 text-amber-500" />
+														</div>
+														<div>
+															<p className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
+																Harga
+															</p>
+															<p className="text-base font-bold text-slate-900 leading-tight">
+																{service.price === 0 ? "Gratis" : service.price ? formatRupiah(service.price) : "Belum diatur"}
+															</p>
+														</div>
+													</div>
+													{/* Actions */}
+													<div className="flex items-center gap-1">
+														<button
+															onClick={(e) => handleEditPrice(e, service)}
+															className="p-2 rounded-lg hover:bg-primary/8 text-slate-400 hover:text-primary transition-colors hover:cursor-pointer">
+															<Pencil className="w-3.5 h-3.5" />
+														</button>
 
-											<div className="grid grid-cols-1 text-xs py-3 px-5 border-t border-slate-200/70 p-0">
-												<div className=" flex items-center justify-between text-xs text-slate-400 ">
-													<span className="tracking-wide uppercase">
-														<Badge variant="outline">
-															{serviceTypeLabel(service.accessType)}
-														</Badge>
-													</span>
+													</div>
 												</div>
+
 											</div>
-										</div>
+										</motion.div>
+									))
+									: <motion.div
+										initial={{ opacity: 0 }}
+										animate={{ opacity: 1 }}
+										className="col-span-full">
+										<EmptyData />
 									</motion.div>
-								))
-							:	<motion.div
-									initial={{ opacity: 0 }}
-									animate={{ opacity: 1 }}
-									className="col-span-full">
-									<EmptyData />
-								</motion.div>
 							}
 						</AnimatePresence>
 					</div>
@@ -341,46 +400,54 @@ const ViewService: React.FC = () => {
 								className="col-span-full">
 								<SectionLoading message="Memuat data layanan..." />
 							</motion.div>
-						: filteredData.length > 0 ?
-							<motion.div
-								initial={{ opacity: 0, y: 20 }}
-								animate={{ opacity: 1, y: 0 }}
-								transition={{ duration: 0.2, ease: "easeOut" }}>
-								<div className="bg-muted/20 rounded-xl border border-slate-200/70">
-									<div className="">
-										<div className="flex flex-row items-center justify-between px-5 py-5 border-b border-slate-200/70">
-											<div>
-												<h2 className="text-sm font-semibold">
-													Daftar Layanan
-												</h2>
+							: filteredData.length > 0 ?
+								<motion.div
+									initial={{ opacity: 0, y: 20 }}
+									animate={{ opacity: 1, y: 0 }}
+									transition={{ duration: 0.2, ease: "easeOut" }}>
+									<div className="bg-muted/20 rounded-xl border border-slate-200/70">
+										<div className="">
+											<div className="flex flex-row items-center justify-between px-5 py-5 border-b border-slate-200/70">
+												<div>
+													<h2 className="text-sm font-semibold">
+														Daftar Layanan
+													</h2>
+												</div>
+												<div className="flex items-center">
+													<ClipboardList className="w-4 h-4 mr-2" />
+												</div>
 											</div>
-											<div className="flex items-center">
-												<ClipboardList className="w-4 h-4 mr-2" />
-											</div>
-										</div>
 
-										<div className="p-0 sm:p-2">
-											<DataTable
-												columns={columns}
-												data={filteredData}
-												loading={loading}
-												loadingMessage="Memuat data layanan..."
-												searchKey="title"
-											/>
+											<div className="p-0 sm:p-2">
+												<DataTable
+													columns={columns}
+													data={filteredData}
+													loading={loading}
+													loadingMessage="Memuat data layanan..."
+													searchKey="title"
+												/>
+											</div>
 										</div>
 									</div>
-								</div>
-							</motion.div>
-						:	<motion.div
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-								className="col-span-full">
-								<EmptyData />
-							</motion.div>
+								</motion.div>
+								: <motion.div
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									className="col-span-full">
+									<EmptyData />
+								</motion.div>
 						}
 					</AnimatePresence>
 				</TabsContent>
 			</Tabs>
+
+			<EditPriceDialog
+				open={priceDialogOpen}
+				onClose={() => setPriceDialogOpen(false)}
+				service={selectedServiceForPrice}
+				onSubmit={handlePriceSubmit}
+				submitting={pricingSubmitting}
+			/>
 		</>
 	);
 };

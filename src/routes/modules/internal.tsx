@@ -73,6 +73,9 @@ const WoServicesDetail = lazy(
 	() => import("@/features/owner/wo-create/pages/services-detail"),
 );
 const ViewFaq = lazy(() => import("@/features/owner/faqs/pages/view-faq"));
+const ViewPricePage = lazy(
+	() => import("@/features/owner/pricing/pages/view-price"),
+);
 
 const InternalIndex = () => {
 	const { user } = useAuth();
@@ -169,6 +172,10 @@ export const internalRoutes: RouteObject[] = [
 	{
 		path: "faqs",
 		element: <ViewFaq />,
+	},
+	{
+		path: "pricing",
+		element: <ViewPricePage />,
 	},
 	{
 		path: "wo-create/services",
