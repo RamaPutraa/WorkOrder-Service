@@ -25,7 +25,7 @@ export default function MockExternalAuth() {
 
 				window.location.href = url.toString();
 			} catch (e) {
-				console.error("Invalid redirect URI");
+				console.error("Invalid redirect URI", e);
 				window.location.href = "/";
 			}
 		}, 1500);

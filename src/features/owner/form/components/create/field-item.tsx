@@ -71,7 +71,28 @@ export const FieldItem: React.FC<Props> = ({
 				<div className="w-full sm:w-44 shrink-0">
 					<Select
 						value={field.type}
-						onValueChange={(v) => onUpdate({ type: v as Field["type"] })}>
+						onValueChange={(v) => {
+							const newType = v as Field["type"];
+							const updates: Partial<Field> = { type: newType };
+
+							// Reset options if not choice/select types
+							if (newType !== "single_select" && newType !== "multi_select") {
+								updates.options = [];
+							}
+
+							// Reset min/max if not number
+							if (newType !== "number") {
+								updates.min = null;
+								updates.max = null;
+							}
+
+							// Reset placeholder if not text/textarea/date
+							if (newType !== "text" && newType !== "textarea" && newType !== "date") {
+								updates.placeholder = null;
+							}
+
+							onUpdate(updates);
+						}}>
 						<SelectTrigger className="h-10 rounded-lg w-full text-sm border-slate-200">
 							<SelectValue placeholder="Tipe" />
 						</SelectTrigger>
