@@ -327,55 +327,7 @@ const WorkOrderRowCard = ({
 							</div>
 						</div>
 
-						{/* Persetujuan Penugasan */}
-						<div className="space-y-4">
-							<Label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-								Persetujuan Penugasan
-							</Label>
-							<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-								{(
-									[
-										{
-											value: "auto",
-											label: "Otomatis",
-											desc: "Disetujui tanpa tindakan",
-										},
-										{
-											value: "staff_pic",
-											label: "Staff PIC",
-											desc: "Perlu konfirmasi staf",
-										},
-									] as const
-								).map((opt) => {
-									const isSelected = item.workOrderApprovalType === opt.value;
-									return (
-										<button
-											key={opt.value}
-											type="button"
-											onClick={() =>
-												updateWorkOrderConfig(
-													index,
-													"workOrderApprovalType",
-													opt.value,
-												)
-											}
-											className={`flex flex-col items-start gap-1 p-4 rounded-xl border-2 text-left transition-all duration-200 ${
-												isSelected ?
-													"border-primary bg-primary/5 shadow-sm"
-												:	"border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
-											}`}>
-											<span
-												className={`text-sm font-semibold ${
-													isSelected ? "text-primary" : "text-slate-700"
-												}`}>
-												{opt.label}
-											</span>
-											<span className="text-xs text-slate-500">{opt.desc}</span>
-										</button>
-									);
-								})}
-							</div>
-						</div>
+
 					</div>
 				)}
 

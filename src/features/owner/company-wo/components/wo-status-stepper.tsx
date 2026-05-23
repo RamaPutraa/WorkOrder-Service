@@ -14,11 +14,10 @@ type StepperProps = {
 };
 
 export const WoStatusStepper = ({ wo }: StepperProps) => {
-	// Status workflow: drafted -> sent -> approved -> on_progress -> completed
+	// Status workflow: drafted -> sent -> on_progress -> completed
 	const defaultSteps = [
 		{ key: "drafted", label: "Dirancang", date: wo.draftedAt || wo.createdAt },
-		{ key: "sent", label: "Dikirim", date: wo.sentAt },
-		{ key: "approved", label: "Disetujui", date: wo.approvedAt },
+		{ key: "sent", label: "Dikirim", date: wo.sentAt || wo.approvedAt },
 		{
 			key: "on_progress",
 			label: "Dikerjakan",
@@ -32,7 +31,9 @@ export const WoStatusStepper = ({ wo }: StepperProps) => {
 	const isCancelled = wo.status === "cancelled";
 	const steps = [...defaultSteps];
 
-	switch (wo.status) {
+	const status = wo.status === "approved" ? "sent" : wo.status;
+
+	switch (status) {
 		case "drafted":
 			currentIdx = 0;
 			break;
@@ -40,40 +41,37 @@ export const WoStatusStepper = ({ wo }: StepperProps) => {
 			currentIdx = 1;
 			break;
 		case "rejected":
-			currentIdx = 2;
+			currentIdx = 1;
 			isError = true;
-			steps[2] = {
+			steps[1] = {
 				key: "rejected",
 				label: "Ditolak",
 				date: wo.rejectedAt,
 			};
 			break;
-		case "approved":
-			currentIdx = 2;
-			break;
 		case "unprocessable":
-			currentIdx = 3;
+			currentIdx = 2;
 			isError = true;
-			steps[3] = {
+			steps[2] = {
 				key: "unprocessable",
 				label: "Gagal Proses",
 				date: wo.unprocessableAt,
 			};
 			break;
 		case "on_progress":
-			currentIdx = 3;
+			currentIdx = 2;
 			break;
 		case "failed":
-			currentIdx = 4;
+			currentIdx = 3;
 			isError = true;
-			steps[4] = {
+			steps[3] = {
 				key: "failed",
 				label: "Gagal",
 				date: wo.failedAt || wo.updatedAt,
 			};
 			break;
 		case "completed":
-			currentIdx = 4;
+			currentIdx = 3;
 			break;
 		case "cancelled":
 			// Cari index terakhir yang memiliki tanggal, jadikan itu sebagai titik berhenti

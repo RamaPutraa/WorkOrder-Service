@@ -207,10 +207,7 @@ export const useCreateService = () => {
 				positionId: c.positionId,
 				workOrderFormId: isAuto ? null : c.workOrderFormId,
 				workReportFormId: c.workReportFormId,
-				workOrderApprovalAccessType:
-					isAuto ? "auto" : (
-						(c.workOrderApprovalType as unknown as workOrderApprovalAccessType)
-					),
+				workOrderApprovalAccessType: "auto",
 				workReportApprovalAccessType:
 					isAuto ? "auto" : (
 						(c.workReportApprovalType as unknown as workReportApprovalAccessType)

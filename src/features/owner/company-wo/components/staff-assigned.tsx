@@ -49,18 +49,16 @@ const StaffRow = ({
 }) => (
 	<div
 		onClick={onClick}
-		className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${onClick ? "cursor-pointer" : ""} ${
-			highlight ?
-				"bg-amber-50 border-amber-200"
-			:	"bg-muted/20 border-border/50 hover:bg-muted/40"
-		}`}>
+		className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${onClick ? "cursor-pointer" : ""} ${highlight ?
+			"bg-amber-50 border-amber-200"
+			: "bg-muted/20 border-border/50 hover:bg-muted/40"
+			}`}>
 		{onClick && (
 			<Checkbox checked={highlight} className="pointer-events-none" />
 		)}
 		<div
-			className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
-				highlight ? "bg-amber-100 text-amber-700" : "bg-primary/10 text-primary"
-			}`}>
+			className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${highlight ? "bg-amber-100 text-amber-700" : "bg-primary/10 text-primary"
+				}`}>
 			{staff.name?.charAt(0)?.toUpperCase() ?? "?"}
 		</div>
 		<div className="flex-1 min-w-0">
@@ -228,7 +226,7 @@ export const StaffAssigned = ({
 								<Users className="w-10 h-10 mb-2 opacity-30" />
 								<p className="text-sm">Belum ada staff yang ditetapkan</p>
 							</div>
-						:	<div className="space-y-2">
+							: <div className="space-y-2">
 								{wo.assignedStaff.map((staff) => (
 									<StaffRow
 										key={staff._id}
@@ -241,11 +239,11 @@ export const StaffAssigned = ({
 												(currentStatus !== "drafted" && !canRecreateEdit)
 											) ?
 												undefined
-											:	() =>
+												: () =>
 													setSelectedStaffsToRemove((prev) =>
 														prev.includes(staff.email) ?
 															prev.filter((e) => e !== staff.email)
-														:	[...prev, staff.email],
+															: [...prev, staff.email],
 													)
 										}
 									/>
@@ -289,11 +287,10 @@ export const StaffAssigned = ({
 					</span>
 					<div className="flex items-center gap-1.5">
 						<span
-							className={`text-sm font-bold ${
-								wo.assignedStaff.length >= wo.minStaff ?
-									"text-green-600"
-								:	"text-amber-600"
-							}`}>
+							className={`text-sm font-bold ${wo.assignedStaff.length >= wo.minStaff ?
+								"text-green-600"
+								: "text-amber-600"
+								}`}>
 							{wo.assignedStaff.length}
 						</span>
 						<span className="text-xs text-muted-foreground">
@@ -305,11 +302,10 @@ export const StaffAssigned = ({
 				{/* Progress bar */}
 				<div className="w-full h-2 bg-muted rounded-full overflow-hidden mb-5">
 					<div
-						className={`h-full rounded-full transition-all duration-500 ${
-							wo.assignedStaff.length >= wo.minStaff ?
-								"bg-green-500"
-							:	"bg-amber-400"
-						}`}
+						className={`h-full rounded-full transition-all duration-500 ${wo.assignedStaff.length >= wo.minStaff ?
+							"bg-green-500"
+							: "bg-amber-400"
+							}`}
 						style={{
 							width: `${Math.min(
 								(wo.assignedStaff.length / wo.maxStaff) * 100,
@@ -401,7 +397,7 @@ export const StaffAssigned = ({
 													onClick={() => setPicEmail(emp.email)}
 													className={`hover:cursor-pointer shrink-0 inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-full font-bold border transition-colors ${isPic ? "bg-amber-100 text-amber-700 border-amber-300" : "bg-muted text-muted-foreground hover:bg-muted/80 border-transparent"}`}>
 													{isPic && <Star className="w-3.5 h-3.5" />}
-													{isPic ? "PIC Terpilih" : "Jadikan PIC"}
+													{/* {isPic ? "PIC Terpilih" : "Jadikan PIC"} */}
 												</button>
 											)}
 										</div>
@@ -424,7 +420,7 @@ export const StaffAssigned = ({
 							disabled={isAssigningState}>
 							{isAssigningState ?
 								<ButtonLoading message="Menyimpan..." />
-							:	<>
+								: <>
 									<Save className="w-4 h-4 mr-2" />
 									Simpan Konfigurasi
 								</>

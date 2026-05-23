@@ -125,14 +125,14 @@ const CompanyDetailWo = () => {
 							onFail={() => setIsFailDialogOpen(true)}
 							onComplete={() => setIsCompleteDialogOpen(true)}
 						/>
-					:	null
+						: null
 				}
 			/>
 
 			{/*  Loading  */}
 			{isPageLoading ?
 				<SectionLoading message="Memuat data perintah kerja..." />
-			:	null}
+				: null}
 
 			{/*  Content  */}
 			{wo && !isPageLoading && (
@@ -249,20 +249,20 @@ const CompanyDetailWo = () => {
 										{(wo.status === "on_progress" ||
 											wo.status === "completed" ||
 											wo.status === "failed") && (
-											<div className="pt-8 w-full">
-												<div className="rounded-xl border border-blue-200 px-5 py-4">
-													<div className="flex items-center gap-2 mb-3">
-														<div className="p-1.5 rounded-md bg-primary/5 text-primary">
-															<FileText className="w-3.5 h-3.5" />
+												<div className="pt-8 w-full">
+													<div className="rounded-xl border border-blue-200 px-5 py-4">
+														<div className="flex items-center gap-2 mb-3">
+															<div className="p-1.5 rounded-md bg-primary/5 text-primary">
+																<FileText className="w-3.5 h-3.5" />
+															</div>
+															<span className="text-xs font-semibold text-primary uppercase tracking-wide">
+																Laporan Pengerjaan Perintah Kerja
+															</span>
 														</div>
-														<span className="text-xs font-semibold text-primary uppercase tracking-wide">
-															Laporan Pengerjaan Perintah Kerja
-														</span>
+														<WoAlertsReport wo={wo} workReport={workReport} />
 													</div>
-													<WoAlertsReport wo={wo} workReport={workReport} />
 												</div>
-											</div>
-										)}
+											)}
 									</div>
 								</div>
 
@@ -271,11 +271,9 @@ const CompanyDetailWo = () => {
 									<div className="px-3 py-3 space-y-3">
 										<InfoRow
 											icon={ArrowLeftRight}
-											label="Tipe Persetujuan WO"
+											label="Departemen Bertugas"
 											value={
-												wo.workOrderApprovalAccessType === "auto" ?
-													"Otomatis"
-												:	"Staff PIC"
+												wo.positionsOnDuty.name
 											}
 										/>
 										<div className="border-b border-border/50" />
@@ -313,9 +311,9 @@ const CompanyDetailWo = () => {
 															</p>
 														</div>
 													</div>
-												: wo.workOrderApprovalAccessType === "auto" ?
-													"Otomatis disetujui"
-												:	"Belum disetujui"
+													: wo.workOrderApprovalAccessType === "auto" ?
+														"Otomatis disetujui"
+														: "Belum disetujui"
 											}
 										/>
 										<div className="border-b border-border/50" />
