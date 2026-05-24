@@ -10,7 +10,6 @@ import { WoAlertsReport } from "../components/wo-alerts-report";
 import { WoActionButtons } from "../components/wo-action-buttons";
 import {
 	Calendar,
-	Shield,
 	AlertTriangle,
 	FileText,
 	Settings2,
@@ -296,27 +295,7 @@ const CompanyDetailWo = () => {
 										/>
 										<div className="border-b border-border/50" />
 
-										<InfoRow
-											icon={Shield}
-											label="Disetujui Oleh"
-											value={
-												wo.approvedBy ?
-													<div className="flex items-center gap-2">
-														<div>
-															<p className="text-sm font-medium leading-tight">
-																{wo.approvedBy?.name}
-															</p>
-															<p className="text-xs text-muted-foreground">
-																{wo.approvedBy?.email}
-															</p>
-														</div>
-													</div>
-													: wo.workOrderApprovalAccessType === "auto" ?
-														"Otomatis disetujui"
-														: "Belum disetujui"
-											}
-										/>
-										<div className="border-b border-border/50" />
+
 									</div>
 									<div className="px-3 py-3 space-y-3">
 										<InfoRow

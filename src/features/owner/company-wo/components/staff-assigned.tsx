@@ -67,12 +67,12 @@ const StaffRow = ({
 			</p>
 			<p className="text-xs text-muted-foreground truncate">{staff.email}</p>
 		</div>
-		{isPIC && (
+		{/* {isPIC && (
 			<span className="shrink-0 inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-bold border border-amber-200">
 				<Star className="w-2.5 h-2.5" />
 				PIC
 			</span>
-		)}
+		)} */}
 	</div>
 );
 
@@ -396,7 +396,7 @@ export const StaffAssigned = ({
 													type="button"
 													onClick={() => setPicEmail(emp.email)}
 													className={`hover:cursor-pointer shrink-0 inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-full font-bold border transition-colors ${isPic ? "bg-amber-100 text-amber-700 border-amber-300" : "bg-muted text-muted-foreground hover:bg-muted/80 border-transparent"}`}>
-													{isPic && <Star className="w-3.5 h-3.5" />}
+													{/* {isPic && <Star className="w-3.5 h-3.5" />} */}
 													{/* {isPic ? "PIC Terpilih" : "Jadikan PIC"} */}
 												</button>
 											)}

@@ -62,7 +62,7 @@ const CompanyViewWo = () => {
 			case "approved":
 				return {
 					className: " text-green-600",
-					label: "Disetujui (Perlu dimulai)",
+					label: "Perlu dimulai",
 				};
 			case "unprocessable":
 				return {
@@ -122,130 +122,122 @@ const CompanyViewWo = () => {
 							className="col-span-full">
 							<SectionLoading message="Memuat data tugas kerja..." />
 						</motion.div>
-					: filteredData.length > 0 ?
-						filteredData.map((wo, index) => {
-							const statusConfig = getStatusConfig(wo.status);
+						: filteredData.length > 0 ?
+							filteredData.map((wo, index) => {
+								const statusConfig = getStatusConfig(wo.status);
 
-							const needsAction = wo._id ? submittedWoIds.has(wo._id) : false;
+								const needsAction = wo._id ? submittedWoIds.has(wo._id) : false;
 
-							return (
-								<motion.div
-									key={wo._id ? `${wo._id}-${index}` : index}
-									initial={{ opacity: 0, y: 20 }}
-									animate={{ opacity: 1, y: 0 }}
-									whileHover={{ scale: 1.02, y: -4 }}
-									transition={{ duration: 0.2, ease: "easeOut" }}>
-									<div
-										onClick={() =>
-											navigate(
-												`/dashboard/internal/workorders/detail/${wo._id}`,
-											)
-										}
-										className="flex flex-col h-full border shadow-md hover:shadow-lg rounded-lg transition-all duration-200 bg-gradient-to-br from-background to-muted/10 overflow-hidden hover:cursor-pointer">
-										{/* Header */}
-										<div className="p-5 ">
-											<div className="flex items-center justify-between gap-3">
-												<div className="shrink-0 p-3 bg-primary/5 text-primary rounded-xl">
-													<ScrollText className="w-6 h-6" />
-												</div>
-												<div className="flex-1 min-w-0">
-													<h3 className="text-lg font-bold leading-tight mb-1 truncate">
-														{wo.code || "-"}
-													</h3>
-													<p className="text-sm text-muted-foreground line-clamp-1 leading-relaxed">
-														{wo.service?.title || "-"}
-													</p>
-												</div>
-											</div>
-										</div>
-										<div className="border-b border-boder/50"></div>
-										{/* Content */}
-										<div className="flex-1 flex flex-col gap-4 p-5 ">
-											{/* Info Grid */}
-											<div className="space-y-3">
-												{/* Alert banner: perlu aksi */}
-												{needsAction && (
-													<div className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-amber-50  text-amber-700 text-xs font-semibold">
-														<AlertCircle className="w-3.5 h-3.5 shrink-0" />
-														Tugas kerja ini perlu aksi
-													</div>
-												)}
-												{/* status */}
-												<div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
-													<div className="p-2 rounded-md bg-background">
-														<Ticket className="w-4 h-4 text-primary" />
-													</div>
-													<div
-														className={`flex-1 min-w-0  py-2 rounded-lg ${statusConfig.className}`}>
-														{/* Label Header */}
-														<p className="text-xs font-medium opacity-80 mb-0.5">
-															Status Tugas Kerja
-														</p>
-
-														{/* Value Status */}
-														<p className="text-sm font-semibold truncate">
-															{statusConfig.label}
-														</p>
-													</div>
-												</div>
-
-												{/* Client Info */}
-												<div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
-													<div className="p-2 rounded-md bg-background">
-														<User className="w-4 h-4 text-primary" />
+								return (
+									<motion.div
+										key={wo._id ? `${wo._id}-${index}` : index}
+										initial={{ opacity: 0, y: 20 }}
+										animate={{ opacity: 1, y: 0 }}
+										whileHover={{ scale: 1.02, y: -4 }}
+										transition={{ duration: 0.2, ease: "easeOut" }}>
+										<div
+											onClick={() =>
+												navigate(
+													`/dashboard/internal/workorders/detail/${wo._id}`,
+												)
+											}
+											className="flex flex-col h-full border shadow-md hover:shadow-lg rounded-lg transition-all duration-200 bg-gradient-to-br from-background to-muted/10 overflow-hidden hover:cursor-pointer">
+											{/* Header */}
+											<div className="p-5 ">
+												<div className="flex items-center justify-between gap-3">
+													<div className="shrink-0 p-3 bg-primary/5 text-primary rounded-xl">
+														<ScrollText className="w-6 h-6" />
 													</div>
 													<div className="flex-1 min-w-0">
-														<p className="text-xs font-medium text-muted-foreground mb-0.5">
-															Disetujui Oleh
-														</p>
-														{wo.approvedBy ?
-															<p className="text-sm font-medium truncate">
-																{wo.approvedBy?.name || "-"}
-															</p>
-														: wo.workOrderApprovalAccessType === "auto" ?
-															<p className="text-sm font-medium truncate">
-																Otomatis disetujui
-															</p>
-														:	<p className="text-sm font-medium truncate">
-																Belum disetujui
-															</p>
-														}
-													</div>
-												</div>
-
-												{/* Date Info */}
-												<div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
-													<div className="p-2 rounded-md bg-background">
-														<Calendar className="w-4 h-4 text-primary" />
-													</div>
-													<div className="flex-1 min-w-0">
-														<p className="text-xs font-medium text-muted-foreground mb-0.5">
-															Dibuat Pada
-														</p>
-														<p className="text-sm font-medium">
-															{new Date(wo.createdAt).toLocaleDateString(
-																"id-ID",
-																{
-																	day: "2-digit",
-																	month: "short",
-																	year: "numeric",
-																},
-															)}
+														<h3 className="text-lg font-bold leading-tight mb-1 truncate">
+															{wo.code || "-"}
+														</h3>
+														<p className="text-sm text-muted-foreground line-clamp-1 leading-relaxed">
+															{wo.service?.title || "-"}
 														</p>
 													</div>
 												</div>
 											</div>
+											<div className="border-b border-boder/50"></div>
+											{/* Content */}
+											<div className="flex-1 flex flex-col gap-4 p-5 ">
+												{/* Info Grid */}
+												<div className="space-y-3">
+													{/* Alert banner: perlu aksi */}
+													{needsAction && (
+														<div className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-amber-50  text-amber-700 text-xs font-semibold">
+															<AlertCircle className="w-3.5 h-3.5 shrink-0" />
+															Tugas kerja ini perlu aksi
+														</div>
+													)}
+													{/* status */}
+													<div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
+														<div className="p-2 rounded-md bg-background">
+															<Ticket className="w-4 h-4 text-primary" />
+														</div>
+														<div
+															className={`flex-1 min-w-0  py-2 rounded-lg ${statusConfig.className}`}>
+															{/* Label Header */}
+															<p className="text-xs font-medium opacity-80 mb-0.5">
+																Status Tugas Kerja
+															</p>
+
+															{/* Value Status */}
+															<p className="text-sm font-semibold truncate">
+																{statusConfig.label}
+															</p>
+														</div>
+													</div>
+
+													{/* Client Info */}
+													<div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+														<div className="p-2 rounded-md bg-background">
+															<User className="w-4 h-4 text-primary" />
+														</div>
+														<div className="flex-1 min-w-0">
+															<p className="text-xs font-medium text-muted-foreground mb-0.5">
+																Departemen Bertugas
+															</p>
+															<p className="text-sm font-medium truncate">
+																{wo.positionsOnDuty.name}
+															</p>
+
+														</div>
+													</div>
+
+													{/* Date Info */}
+													<div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+														<div className="p-2 rounded-md bg-background">
+															<Calendar className="w-4 h-4 text-primary" />
+														</div>
+														<div className="flex-1 min-w-0">
+															<p className="text-xs font-medium text-muted-foreground mb-0.5">
+																Dibuat Pada
+															</p>
+															<p className="text-sm font-medium">
+																{new Date(wo.createdAt).toLocaleDateString(
+																	"id-ID",
+																	{
+																		day: "2-digit",
+																		month: "short",
+																		year: "numeric",
+																	},
+																)}
+															</p>
+														</div>
+													</div>
+												</div>
+											</div>
 										</div>
-									</div>
-								</motion.div>
-							);
-						})
-					:	<motion.div
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							className="col-span-full">
-							<EmptyData />
-						</motion.div>
+									</motion.div>
+								);
+							})
+							: <motion.div
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								className="col-span-full">
+								<EmptyData />
+							</motion.div>
 					}
 				</AnimatePresence>
 			</div>
