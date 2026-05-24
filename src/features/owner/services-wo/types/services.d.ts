@@ -40,7 +40,6 @@ type CreateServiceRequest = {
 	description: string;
 	accessType: serviceAccessType;
 	isActive: boolean;
-	// TODO: updated (not review yet)
 	draftingWorkOrderType: draftingWorkOrderType;
 	serviceRequestConfig: {
 		intakeFormId: string;

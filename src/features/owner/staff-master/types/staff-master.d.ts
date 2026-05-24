@@ -32,7 +32,6 @@ type CompanyEmployeesResponse = ApiResponse<Employee[]> & {
 	};
 };
 
-// TODO: global type
 type InvitationStatus = "pending" | "accepted" | "rejected" | "expired";
 
 type InvitationsHistory = {

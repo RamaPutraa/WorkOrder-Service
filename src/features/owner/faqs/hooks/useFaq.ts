@@ -37,7 +37,7 @@ export const useFaq = () => {
 				value ? "FAQ diaktifkan" : "FAQ dinonaktifkan",
 				value ?
 					"FAQ sekarang dapat dilihat publik."
-				:	"FAQ disembunyikan dari publik.",
+					: "FAQ disembunyikan dari publik.",
 			);
 		} catch {
 			notifyError("Gagal mengubah status FAQ.");
@@ -46,7 +46,6 @@ export const useFaq = () => {
 		}
 	}, []);
 
-	// TODO: DI PUBLIC TOMBOL FAQ JANGAN MUNCUL TERUS, CEK APAKAH isFaqActive
 	const handleAddText = useCallback(async (data: FaqTextRequest) => {
 		setSubmitting(true);
 		try {

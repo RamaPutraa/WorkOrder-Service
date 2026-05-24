@@ -174,9 +174,8 @@ const WorkReportCard = ({
 				<div className="flex items-center gap-3 shrink-0">
 					{hasFields && (
 						<ChevronDown
-							className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${
-								open ? "rotate-180" : ""
-							}`}
+							className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${open ? "rotate-180" : ""
+								}`}
 						/>
 					)}
 				</div>
@@ -411,7 +410,7 @@ const ServiceDetailSubmit = () => {
 					readOnly: !canFillReview,
 				},
 			].filter((item) => item.form)
-		:	[];
+			: [];
 
 	if (error) return <p className="text-red-500 p-4">{error}</p>;
 
@@ -425,7 +424,7 @@ const ServiceDetailSubmit = () => {
 							Detail Service{" "}
 							<TextLoading variant="dots" message="" className="w-40" />
 						</div>
-					:	`Detail — ${detail?.service?.title}`
+						: `Detail — ${detail?.service?.title}`
 				}
 				subtitle={
 					!detail ?
@@ -433,7 +432,7 @@ const ServiceDetailSubmit = () => {
 							Memuat detail layanan{" "}
 							<TextLoading variant="dots" message="" className="w-60" />
 						</div>
-					:	`Berikut merupakan detail service ${detail?.service?.title} yang Anda ajukan.`
+						: `Berikut merupakan detail service ${detail?.service?.title} yang Anda ajukan.`
 				}
 				backPath={true}
 			/>
@@ -441,7 +440,7 @@ const ServiceDetailSubmit = () => {
 			{/* Content */}
 			{loading || !detail ?
 				<SectionLoading message="Memuat detail pengajuan..." />
-			:	<div className="space-y-6">
+				: <div className="space-y-6">
 					{/* Summary Card */}
 					<Card className="relative overflow-hidden border border-border shadow-sm transition-all duration-200 hover:shadow-md">
 						<div className="p-5 sm:p-6 flex flex-col gap-6">
@@ -596,93 +595,92 @@ const ServiceDetailSubmit = () => {
 						srStatus === "completed" ||
 						srStatus === "partial_completed" ||
 						srStatus === "closed") && (
-						<div className="space-y-3">
-							{/* Section Header */}
-							<div className="flex items-center justify-between">
-								<div className="flex items-center gap-2.5">
-									<div className="p-1.5 rounded-lg bg-violet-100 text-violet-600">
-										<Hammer className="w-4 h-4" />
-									</div>
-									<div>
-										<h3 className="text-sm font-bold text-foreground tracking-tight">
-											Laporan Pengerjaan
-										</h3>
-										<p className="text-xs text-muted-foreground">
-											Hasil laporan dari setiap tahap pengerjaan oleh tim staf
-										</p>
-									</div>
-								</div>
-								<div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/60 px-2.5 py-1 rounded-full border border-border/40">
-									<Eye className="w-3.5 h-3.5" />
-									<span>{workReport?.workReportForms?.length || 0} tahap</span>
-								</div>
-							</div>
-
-							{/* Stage Cards */}
 							<div className="space-y-3">
-								{workReport?.workReportForms?.map((form, idx) => {
-									const submission = workReport.submissions?.find(
-										(s) => s.formId === form._id,
-									);
-									return (
-										<WorkReportCard
-											key={form._id}
-											form={form}
-											submission={submission}
-											index={idx}
-										/>
-									);
-								})}
-								{(!workReport?.workReportForms ||
-									workReport.workReportForms.length === 0) && (
-									<div className="py-6 text-center text-sm text-muted-foreground border border-dashed border-border/60 rounded-xl">
-										Belum ada laporan pengerjaan yang dibagikan.
-									</div>
-								)}
-							</div>
-
-							{/* Summary footer */}
-							{workReport?.workReportForms &&
-								workReport.workReportForms.length > 0 &&
-								(() => {
-									const submissions = workReport.submissions ?? [];
-									const approvedCount = workReport.workReportForms.filter((f) =>
-										submissions.some(
-											(s) => s.formId === f._id && s.status === "approved",
-										),
-									).length;
-									const submittedCount = workReport.workReportForms.filter((f) =>
-										submissions.some(
-											(s) => s.formId === f._id && s.status === "submitted",
-										),
-									).length;
-									const totalReports = workReport.workReportForms.length;
-									const inProgressCount =
-										totalReports - approvedCount - submittedCount;
-
-									return (
-										<div className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-border/40 text-xs text-muted-foreground">
-											<div className="flex flex-wrap items-center gap-3">
-												<span className="flex items-center gap-1.5">
-													<span className="w-2 h-2 rounded-full bg-emerald-400" />
-													{approvedCount} Disetujui
-												</span>
-												<span className="flex items-center gap-1.5">
-													<span className="w-2 h-2 rounded-full bg-blue-400" />
-													{submittedCount} Menunggu
-												</span>
-												<span className="flex items-center gap-1.5">
-													<span className="w-2 h-2 rounded-full bg-amber-400" />
-													{inProgressCount} Berlangsung
-												</span>
-											</div>
+								{/* Section Header */}
+								<div className="flex items-center justify-between">
+									<div className="flex items-center gap-2.5">
+										<div className="p-1.5 rounded-lg bg-violet-100 text-violet-600">
+											<Hammer className="w-4 h-4" />
 										</div>
-									);
-								})()}
-						</div>
-					)}
+										<div>
+											<h3 className="text-sm font-bold text-foreground tracking-tight">
+												Laporan Pengerjaan
+											</h3>
+											<p className="text-xs text-muted-foreground">
+												Hasil laporan dari setiap tahap pengerjaan oleh tim staf
+											</p>
+										</div>
+									</div>
+									<div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/60 px-2.5 py-1 rounded-full border border-border/40">
+										<Eye className="w-3.5 h-3.5" />
+										<span>{workReport?.workReportForms?.length || 0} tahap</span>
+									</div>
+								</div>
+
+								{/* Stage Cards */}
+								<div className="space-y-3">
+									{workReport?.workReportForms?.map((form, idx) => {
+										const submission = workReport.submissions?.find(
+											(s) => s.formId === form._id,
+										);
+										return (
+											<WorkReportCard
+												key={form._id}
+												form={form}
+												submission={submission}
+												index={idx}
+											/>
+										);
+									})}
+									{(!workReport?.workReportForms ||
+										workReport.workReportForms.length === 0) && (
+											<div className="py-6 text-center text-sm text-muted-foreground border border-dashed border-border/60 rounded-xl">
+												Belum ada laporan pengerjaan yang dibagikan.
+											</div>
+										)}
+								</div>
+
+								{/* Summary footer */}
+								{workReport?.workReportForms &&
+									workReport.workReportForms.length > 0 &&
+									(() => {
+										const submissions = workReport.submissions ?? [];
+										const approvedCount = workReport.workReportForms.filter((f) =>
+											submissions.some(
+												(s) => s.formId === f._id && s.status === "approved",
+											),
+										).length;
+										const submittedCount = workReport.workReportForms.filter((f) =>
+											submissions.some(
+												(s) => s.formId === f._id && s.status === "submitted",
+											),
+										).length;
+										const totalReports = workReport.workReportForms.length;
+										const inProgressCount =
+											totalReports - approvedCount - submittedCount;
+
+										return (
+											<div className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-border/40 text-xs text-muted-foreground">
+												<div className="flex flex-wrap items-center gap-3">
+													<span className="flex items-center gap-1.5">
+														<span className="w-2 h-2 rounded-full bg-emerald-400" />
+														{approvedCount} Disetujui
+													</span>
+													<span className="flex items-center gap-1.5">
+														<span className="w-2 h-2 rounded-full bg-blue-400" />
+														{submittedCount} Menunggu
+													</span>
+													<span className="flex items-center gap-1.5">
+														<span className="w-2 h-2 rounded-full bg-amber-400" />
+														{inProgressCount} Berlangsung
+													</span>
+												</div>
+											</div>
+										);
+									})()}
+							</div>
+						)}
 					{/* TODO: ini belum cek submission apakah yang sudah terbaru? */}
-					{/* FIXME: response daat report beda */}
 					{/* Accordion */}
 					<Accordion
 						type="multiple"
@@ -702,15 +700,14 @@ const ServiceDetailSubmit = () => {
 										<div className="flex items-center gap-4 flex-1 text-left">
 											{/* Icon */}
 											<div
-												className={`shrink-0 p-2 rounded-lg transition-colors ${
-													isSubmitted ? "bg-emerald-50 text-emerald-600"
-													: isReviewItem && canFillReview ?
-														"bg-blue-50 text-blue-600"
-													:	"bg-amber-50 text-amber-600"
-												}`}>
+												className={`shrink-0 p-2 rounded-lg transition-colors ${isSubmitted ? "bg-emerald-50 text-emerald-600"
+														: isReviewItem && canFillReview ?
+															"bg-blue-50 text-blue-600"
+															: "bg-amber-50 text-amber-600"
+													}`}>
 												{isSubmitted ?
 													<CheckCircle2 className="w-4 h-4" />
-												:	<Timer className="w-4 h-4" />}
+													: <Timer className="w-4 h-4" />}
 											</div>
 
 											{/* Info */}
@@ -734,24 +731,22 @@ const ServiceDetailSubmit = () => {
 
 											{/* Status pill */}
 											<div
-												className={`hidden sm:flex shrink-0 items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ${
-													isSubmitted ? "bg-emerald-50 text-emerald-700"
-													: isReviewItem && canFillReview ?
-														"bg-blue-50 text-blue-700"
-													:	"bg-amber-50 text-amber-700"
-												}`}>
+												className={`hidden sm:flex shrink-0 items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ${isSubmitted ? "bg-emerald-50 text-emerald-700"
+														: isReviewItem && canFillReview ?
+															"bg-blue-50 text-blue-700"
+															: "bg-amber-50 text-amber-700"
+													}`}>
 												<div
-													className={`w-1.5 h-1.5 rounded-full ${
-														isSubmitted ? "bg-emerald-500"
-														: isReviewItem && canFillReview ? "bg-blue-500"
-														: "bg-amber-400"
-													}`}
+													className={`w-1.5 h-1.5 rounded-full ${isSubmitted ? "bg-emerald-500"
+															: isReviewItem && canFillReview ? "bg-blue-500"
+																: "bg-amber-400"
+														}`}
 												/>
 												{isSubmitted ?
 													"Disubmit"
-												: isReviewItem && canFillReview ?
-													"Siap Diisi"
-												:	"Menunggu"}
+													: isReviewItem && canFillReview ?
+														"Siap Diisi"
+														: "Menunggu"}
 											</div>
 										</div>
 									</AccordionTrigger>
@@ -766,7 +761,7 @@ const ServiceDetailSubmit = () => {
 														const answer =
 															isReviewItem && !readOnly ?
 																(reviewFormData.get(field.order) ?? null)
-															:	((submission?.fieldsData?.find(
+																: ((submission?.fieldsData?.find(
 																	(fd: any) => fd.order === field.order,
 																)?.value ?? null) as AnswerValue);
 
@@ -783,7 +778,7 @@ const ServiceDetailSubmit = () => {
 																					field.order,
 																					value,
 																				)
-																		:	undefined
+																			: undefined
 																	}
 																/>
 															</div>
@@ -803,7 +798,7 @@ const ServiceDetailSubmit = () => {
 													</div>
 												)}
 											</div>
-										:	<div className="pt-4">
+											: <div className="pt-4">
 												<EmptyData />
 											</div>
 										}
@@ -862,7 +857,7 @@ const ServiceDetailSubmit = () => {
 									<Loader className="size-4 animate-spin" />
 									Mengirim...
 								</>
-							:	<>
+								: <>
 									<Send className="size-4" />
 									Ya, Kirim Ulasan
 								</>

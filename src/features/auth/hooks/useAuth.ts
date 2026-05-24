@@ -38,7 +38,6 @@ const useAuth = () => {
 			}
 
 			setAuth(token, user);
-			// FIXME: loading company name muncul
 			await getProfile();
 
 			notifySuccess("Login berhasil", `Selamat datang ${user.name}`);

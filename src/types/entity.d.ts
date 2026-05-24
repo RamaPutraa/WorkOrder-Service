@@ -85,7 +85,6 @@ type workReportApprovalAccessType = "auto" | "manager";
 
 type draftingWorkOrderType = "auto" | "manual";
 
-// TODO: updated (not review yet)
 type Service = {
 	_id: string;
 	serviceKey: string;
