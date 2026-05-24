@@ -24,6 +24,7 @@ type GetServiceByClient = {
 	description: string;
 	accessType: string;
 	isActive: boolean;
+	price: number;
 };
 type GetCompanyServiceByClient = {
 	services: GetServiceByClient[];
