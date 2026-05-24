@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
 	Building2,
 	MapPin,
@@ -14,6 +15,7 @@ import {
 	ChevronUp,
 	Save,
 	Loader2,
+	Ticket,
 } from "lucide-react";
 import { useCompanyProfile, useUpdateCompany } from "../hooks/companyHooks";
 import { useFaq } from "../../faqs/hooks/useFaq";
@@ -41,6 +43,7 @@ import PageHeader from "@/shared/atoms/header-content";
 import { EmptyData } from "@/shared/molecules/empty-data";
 
 const ProfileCompany = () => {
+	const navigate = useNavigate();
 	const { company, loading, error, refetch } = useCompanyProfile();
 	const { updateCompany, loading: updating } = useUpdateCompany(refetch);
 
@@ -64,6 +67,7 @@ const ProfileCompany = () => {
 		external_verify_url: "",
 		external_check_memberships_url: "",
 		secret_key: "",
+		integration_type: "external_system",
 		is_integration_active: false,
 	});
 	const [showIntegrationForm, setShowIntegrationForm] = useState(false);
@@ -78,6 +82,7 @@ const ProfileCompany = () => {
 				external_check_memberships_url:
 					config.external_check_memberships_url || "",
 				secret_key: config.secret_key || "",
+				integration_type: config.integration_type || "external_system",
 				is_integration_active: config.is_integration_active || false,
 			});
 			setIsDirty(false);
@@ -97,7 +102,10 @@ const ProfileCompany = () => {
 	};
 
 	const handleSaveIntegration = async () => {
-		const success = await updateIntegration(integrationForm);
+		const success = await updateIntegration({
+			...integrationForm,
+			integration_type: "external_system",
+		});
 		if (success) {
 			setIsDirty(false);
 		}
@@ -107,6 +115,8 @@ const ProfileCompany = () => {
 	const [openToggleConfirm, setOpenToggleConfirm] = useState(false);
 	const [openFaqToggleConfirm, setOpenFaqToggleConfirm] = useState(false);
 	const [openIntegrationToggleConfirm, setOpenIntegrationToggleConfirm] =
+		useState(false);
+	const [openClaimTokenToggleConfirm, setOpenClaimTokenToggleConfirm] =
 		useState(false);
 
 	if (loading) return <SectionLoading message="Memuat profil perusahaan.." />;
@@ -141,8 +151,16 @@ const ProfileCompany = () => {
 		setOpenFaqToggleConfirm(false);
 	};
 
+	const isExternalSystemActive =
+		integrationForm.is_integration_active &&
+		integrationForm.integration_type === "external_system";
+
+	const isClaimTokenActive =
+		integrationForm.is_integration_active &&
+		integrationForm.integration_type === "claim_token";
+
 	const handleConfirmToggleIntegration = async () => {
-		const newValue = !integrationForm.is_integration_active;
+		const newValue = !isExternalSystemActive;
 		if (newValue) {
 			const isFormIncomplete =
 				!integrationForm.external_login_url?.trim() ||
@@ -160,11 +178,32 @@ const ProfileCompany = () => {
 		await updateIntegration({
 			...integrationForm,
 			is_integration_active: newValue,
+			integration_type: "external_system",
 		});
 		setOpenIntegrationToggleConfirm(false);
 	};
 
-	const isIntegrationActive = integrationForm.is_integration_active;
+	const handleConfirmToggleClaimToken = async () => {
+		const newValue = !isClaimTokenActive;
+		if (newValue) {
+			await updateIntegration({
+				...integrationForm,
+				external_login_url: "",
+				external_verify_url: "",
+				external_check_memberships_url: "",
+				secret_key: "",
+				is_integration_active: true,
+				integration_type: "claim_token",
+			});
+		} else {
+			await updateIntegration({
+				...integrationForm,
+				is_integration_active: false,
+				integration_type: "claim_token",
+			});
+		}
+		setOpenClaimTokenToggleConfirm(false);
+	};
 
 	return (
 		<>
@@ -192,17 +231,15 @@ const ProfileCompany = () => {
 								</h1>
 								{/* Modern Badge */}
 								<span
-									className={`inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md ${
-										company.isActive ?
-											"text-emerald-700 bg-emerald-500/10 border border-emerald-500/20"
-										:	"text-destructive bg-destructive/10 border border-destructive/20"
-									}`}>
+									className={`inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md ${company.isActive ?
+										"text-emerald-700 bg-emerald-500/10 border border-emerald-500/20"
+										: "text-destructive bg-destructive/10 border border-destructive/20"
+										}`}>
 									<span
-										className={`w-1.5 h-1.5 rounded-full ${
-											company.isActive ?
-												"bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
-											:	"bg-destructive"
-										}`}
+										className={`w-1.5 h-1.5 rounded-full ${company.isActive ?
+											"bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
+											: "bg-destructive"
+											}`}
 									/>
 									{company.isActive ? "Aktif" : "Non-Aktif"}
 								</span>
@@ -236,7 +273,7 @@ const ProfileCompany = () => {
 										<p className="text-sm text-foreground leading-relaxed">
 											{company.description}
 										</p>
-									:	<p className="text-sm text-muted-foreground/50 italic">
+										: <p className="text-sm text-muted-foreground/50 italic">
 											Belum ada deskripsi.
 										</p>
 									}
@@ -254,7 +291,7 @@ const ProfileCompany = () => {
 									<MapPin className="w-4 h-4 text-muted-foreground/70 shrink-0" />
 									{company.address ?
 										<p className="text-sm text-foreground">{company.address}</p>
-									:	<p className="text-sm text-muted-foreground/50 italic">
+										: <p className="text-sm text-muted-foreground/50 italic">
 											Belum diatur
 										</p>
 									}
@@ -295,7 +332,7 @@ const ProfileCompany = () => {
 								<p className="text-sm text-muted-foreground leading-relaxed">
 									{company.isActive ?
 										"Perusahaan aktif dan dapat menerima penugasan pekerjaan."
-									:	"Semua operasi pekerjaan terhenti sementara."}
+										: "Semua operasi pekerjaan terhenti sementara."}
 								</p>
 								{company.isActive && (
 									<p className="text-xs font-medium text-emerald-600 flex items-center gap-1.5 mt-1.5">
@@ -307,7 +344,10 @@ const ProfileCompany = () => {
 						</div>
 
 						{/* Toggle Switch */}
-						<div className="pl-10 sm:pl-0 shrink-0">
+						<div className="pl-10 sm:pl-0 shrink-0 flex items-center gap-3">
+							<span className={`text-sm font-medium ${company.isActive ? "text-emerald-600" : "text-muted-foreground"}`}>
+								{company.isActive ? "Aktif" : "Non-Aktif"}
+							</span>
 							<Switch
 								checked={company.isActive}
 								disabled={updating}
@@ -327,7 +367,7 @@ const ProfileCompany = () => {
 								<p className="text-sm text-muted-foreground leading-relaxed">
 									{isFaqActive ?
 										"FAQ saat ini aktif dan dapat dilihat oleh pengguna publik di halaman utama."
-									:	"FAQ saat ini disembunyikan dari pengguna publik."}
+										: "FAQ saat ini disembunyikan dari pengguna publik."}
 								</p>
 								{isFaqActive && (
 									<p className="text-xs font-medium text-emerald-600 flex items-center gap-1.5 mt-1.5">
@@ -339,7 +379,10 @@ const ProfileCompany = () => {
 						</div>
 
 						{/* Toggle Switch */}
-						<div className="pl-10 sm:pl-0 shrink-0">
+						<div className="pl-10 sm:pl-0 shrink-0 flex items-center gap-3">
+							<span className={`text-sm font-medium ${isFaqActive ? "text-emerald-600" : "text-muted-foreground"}`}>
+								{isFaqActive ? "Aktif" : "Non-Aktif"}
+							</span>
 							<Switch
 								checked={isFaqActive}
 								disabled={faqSubmitting}
@@ -367,7 +410,7 @@ const ProfileCompany = () => {
 								agar pelanggan dapat mengaitkan akun mereka dan memperoleh akses
 								ke layanan khusus pelanggan secara otomatis
 							</p>
-							{isIntegrationActive && (
+							{isExternalSystemActive && (
 								<p className="text-xs font-medium text-emerald-600 flex items-center gap-1.5 mt-1.5">
 									<CheckCircle2 className="w-3.5 h-3.5" />
 									Sistem integrasi aktif
@@ -375,14 +418,17 @@ const ProfileCompany = () => {
 							)}
 						</div>
 
-						<div className="pl-10 sm:pl-0 shrink-0">
+						<div className="pl-10 sm:pl-0 shrink-0 flex items-center gap-3">
+							<span className={`text-sm font-medium ${isExternalSystemActive ? "text-emerald-600" : "text-muted-foreground"}`}>
+								{isExternalSystemActive ? "Aktif" : "Non-Aktif"}
+							</span>
 							{configLoading ?
 								<Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-							:	<Switch
-									checked={isIntegrationActive}
+								: <Switch
+									checked={isExternalSystemActive}
 									disabled={configSubmitting}
 									onCheckedChange={() => {
-										if (!isIntegrationActive) {
+										if (!isExternalSystemActive) {
 											const isFormIncomplete =
 												!integrationForm.external_login_url?.trim() ||
 												!integrationForm.external_verify_url?.trim() ||
@@ -427,7 +473,7 @@ const ProfileCompany = () => {
 							</div>
 							{showIntegrationForm ?
 								<ChevronUp className="w-4 h-4 text-muted-foreground shrink-0" />
-							:	<ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />
+								: <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />
 							}
 						</button>
 
@@ -441,7 +487,7 @@ const ProfileCompany = () => {
 											Memuat konfigurasi...
 										</span>
 									</div>
-								:	<>
+									: <>
 										{/* External Login URL */}
 										<div className="space-y-2">
 											<Label
@@ -554,7 +600,7 @@ const ProfileCompany = () => {
 														<Loader2 className="w-3.5 h-3.5 animate-spin" />
 														Menyimpan...
 													</>
-												:	<>
+													: <>
 														<Save className="w-3.5 h-3.5" />
 														Simpan Konfigurasi
 													</>
@@ -565,6 +611,52 @@ const ProfileCompany = () => {
 								}
 							</div>
 						)}
+					</div>
+
+					{/* ── Banner: Fallback Membercode ── */}
+					<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 p-5 border border-primary/20 bg-primary/5 rounded-2xl">
+						<div className="space-y-1.5">
+							<div className="text-sm font-bold text-foreground flex items-center gap-2">
+								{isClaimTokenActive ?
+									<>
+										<div className="flex items-center gap-2">
+											<CheckCircle2 className="w-4 h-4 text-green-500" />
+											Kode berlangganan sudah aktif
+										</div>
+									</>
+									: "Belum Punya Sistem Eksternal?"}
+							</div>
+							<p className="text-sm text-muted-foreground leading-relaxed">
+								{isClaimTokenActive ? "Fitur kode berlangganan sudah aktif, pelanggan anda dapat menggunakan kode berlangganan untuk mengakses layanan khusus langganan." : "Anda dapat menggunakan fitur integrasi sistem kami untuk mengelola akses layanan khusus bagi pelanggan Anda."}
+							</p>
+						</div>
+						<div className="shrink-0 w-full sm:w-auto flex items-center gap-4">
+							<div className="flex items-center gap-3">
+								<span className={`text-sm font-medium ${isClaimTokenActive ? "text-emerald-600" : "text-muted-foreground"}`}>
+									{isClaimTokenActive ? "Aktif" : "Non-Aktif"}
+								</span>
+								{configLoading ? (
+									<Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+								) : (
+									<Switch
+										checked={isClaimTokenActive}
+										disabled={configSubmitting}
+										onCheckedChange={() => setOpenClaimTokenToggleConfirm(true)}
+										className="data-[state=checked]:bg-emerald-600"
+									/>
+								)}
+							</div>
+
+							{isClaimTokenActive && (
+								<Button
+									onClick={() => navigate("/dashboard/internal/membercodes")}
+									className="w-full sm:w-auto rounded-xl gap-2 hover:cursor-pointer"
+								>
+									<Ticket className="w-4 h-4" />
+									Kelola Kode Berlangganan
+								</Button>
+							)}
+						</div>
 					</div>
 				</div>
 
@@ -584,12 +676,12 @@ const ProfileCompany = () => {
 							<AlertDialogTitle>
 								{company.isActive ?
 									"Nonaktifkan Perusahaan?"
-								:	"Aktifkan Perusahaan?"}
+									: "Aktifkan Perusahaan?"}
 							</AlertDialogTitle>
 							<AlertDialogDescription className="leading-relaxed">
 								{company.isActive ?
 									"Perusahaan akan dinonaktifkan. Seluruh akses operasional akan terhenti sementara."
-								:	"Perusahaan akan diaktifkan kembali. Semua staff dan akses operasional akan kembali berfungsi normal."
+									: "Perusahaan akan diaktifkan kembali. Semua staff dan akses operasional akan kembali berfungsi normal."
 								}
 							</AlertDialogDescription>
 						</AlertDialogHeader>
@@ -600,16 +692,15 @@ const ProfileCompany = () => {
 							<AlertDialogAction
 								disabled={updating}
 								onClick={handleToggleActive}
-								className={`rounded-xl ${
-									company.isActive ?
-										"bg-destructive hover:bg-destructive/90 text-white"
-									:	"bg-emerald-600 hover:bg-emerald-700 text-white"
-								}`}>
+								className={`rounded-xl ${company.isActive ?
+									"bg-destructive hover:bg-destructive/90 text-white"
+									: "bg-emerald-600 hover:bg-emerald-700 text-white"
+									}`}>
 								{updating ?
 									"Memproses..."
-								: company.isActive ?
-									"Ya, Nonaktifkan"
-								:	"Ya, Aktifkan"}
+									: company.isActive ?
+										"Ya, Nonaktifkan"
+										: "Ya, Aktifkan"}
 							</AlertDialogAction>
 						</AlertDialogFooter>
 					</AlertDialogContent>
@@ -623,12 +714,12 @@ const ProfileCompany = () => {
 							<AlertDialogTitle>
 								{isFaqActive ?
 									"Nonaktifkan FAQ Publik?"
-								:	"Aktifkan FAQ Publik?"}
+									: "Aktifkan FAQ Publik?"}
 							</AlertDialogTitle>
 							<AlertDialogDescription className="leading-relaxed">
 								{isFaqActive ?
 									"FAQ akan disembunyikan dari halaman publik dan tidak dapat diakses oleh umum."
-								:	"FAQ akan ditampilkan di halaman publik dan dapat dibaca oleh semua orang."
+									: "FAQ akan ditampilkan di halaman publik dan dapat dibaca oleh semua orang."
 								}
 							</AlertDialogDescription>
 						</AlertDialogHeader>
@@ -641,16 +732,56 @@ const ProfileCompany = () => {
 							<AlertDialogAction
 								disabled={faqSubmitting}
 								onClick={handleToggleFaqActive}
-								className={`rounded-xl ${
-									isFaqActive ?
-										"bg-destructive hover:bg-destructive/90 text-white"
-									:	"bg-emerald-600 hover:bg-emerald-700 text-white"
-								}`}>
+								className={`rounded-xl ${isFaqActive ?
+									"bg-destructive hover:bg-destructive/90 text-white"
+									: "bg-emerald-600 hover:bg-emerald-700 text-white"
+									}`}>
 								{faqSubmitting ?
 									"Memproses..."
-								: isFaqActive ?
-									"Ya, Nonaktifkan"
-								:	"Ya, Aktifkan"}
+									: isFaqActive ?
+										"Ya, Nonaktifkan"
+										: "Ya, Aktifkan"}
+							</AlertDialogAction>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialog>
+
+				{/* ── Dialog: Konfirmasi Toggle Claim Token ── */}
+				<AlertDialog
+					open={openClaimTokenToggleConfirm}
+					onOpenChange={setOpenClaimTokenToggleConfirm}>
+					<AlertDialogContent className="rounded-2xl">
+						<AlertDialogHeader>
+							<AlertDialogTitle>
+								{isClaimTokenActive ?
+									"Nonaktifkan Kode Berlangganan?"
+									: "Aktifkan Kode Berlangganan?"}
+							</AlertDialogTitle>
+							<AlertDialogDescription className="leading-relaxed">
+								{isClaimTokenActive ?
+									"Fitur kode berlangganan akan dinonaktifkan."
+									: "Fitur kode berlangganan akan diaktifkan. Pengaturan integrasi sistem eksternal (URL) sebelumnya akan dikosongkan."
+								}
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+						<AlertDialogFooter>
+							<AlertDialogCancel
+								disabled={configSubmitting}
+								className="rounded-xl">
+								Batal
+							</AlertDialogCancel>
+							<AlertDialogAction
+								disabled={configSubmitting}
+								onClick={handleConfirmToggleClaimToken}
+								className={`rounded-xl ${isClaimTokenActive ?
+									"bg-destructive hover:bg-destructive/90 text-white"
+									: "bg-emerald-600 hover:bg-emerald-700 text-white"
+									}`}>
+								{configSubmitting ?
+									"Memproses..."
+									: isClaimTokenActive ?
+										"Ya, Nonaktifkan"
+										: "Ya, Aktifkan"}
 							</AlertDialogAction>
 						</AlertDialogFooter>
 					</AlertDialogContent>
@@ -663,14 +794,14 @@ const ProfileCompany = () => {
 					<AlertDialogContent className="rounded-2xl">
 						<AlertDialogHeader>
 							<AlertDialogTitle>
-								{isIntegrationActive ?
+								{isExternalSystemActive ?
 									"Nonaktifkan Integrasi Sistem?"
-								:	"Aktifkan Integrasi Sistem?"}
+									: "Aktifkan Integrasi Sistem?"}
 							</AlertDialogTitle>
 							<AlertDialogDescription className="leading-relaxed">
-								{isIntegrationActive ?
+								{isExternalSystemActive ?
 									"Integrasi akan dinonaktifkan. Fitur pairing dan koneksi ke sistem eksternal akan terhenti."
-								:	"Integrasi akan diaktifkan. Sistem ini akan terhubung dengan layanan eksternal sesuai konfigurasi yang telah diatur."
+									: "Integrasi akan diaktifkan. Sistem ini akan terhubung dengan layanan eksternal sesuai konfigurasi yang telah diatur."
 								}
 							</AlertDialogDescription>
 						</AlertDialogHeader>
@@ -683,16 +814,15 @@ const ProfileCompany = () => {
 							<AlertDialogAction
 								disabled={configSubmitting}
 								onClick={handleConfirmToggleIntegration}
-								className={`rounded-xl ${
-									isIntegrationActive ?
-										"bg-destructive hover:bg-destructive/90 text-white"
-									:	"bg-emerald-600 hover:bg-emerald-700 text-white"
-								}`}>
+								className={`rounded-xl ${isExternalSystemActive ?
+									"bg-destructive hover:bg-destructive/90 text-white"
+									: "bg-emerald-600 hover:bg-emerald-700 text-white"
+									}`}>
 								{configSubmitting ?
 									"Memproses..."
-								: isIntegrationActive ?
-									"Ya, Nonaktifkan"
-								:	"Ya, Aktifkan"}
+									: isExternalSystemActive ?
+										"Ya, Nonaktifkan"
+										: "Ya, Aktifkan"}
 							</AlertDialogAction>
 						</AlertDialogFooter>
 					</AlertDialogContent>

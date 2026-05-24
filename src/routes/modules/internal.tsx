@@ -63,9 +63,6 @@ const HistoryStaffInvitations = lazy(
 const ViewMemberCodes = lazy(
 	() => import("@/features/owner/membercodes/pages/view-membercode"),
 );
-const CreateMembercode = lazy(
-	() => import("@/features/owner/membercodes/pages/create-membercode"),
-);
 const WoServicesList = lazy(
 	() => import("@/features/owner/wo-create/pages/services-list"),
 );
@@ -75,6 +72,9 @@ const WoServicesDetail = lazy(
 const ViewFaq = lazy(() => import("@/features/owner/faqs/pages/view-faq"));
 const ViewPricePage = lazy(
 	() => import("@/features/owner/pricing/pages/view-price"),
+);
+const ViewAccountPairing = lazy(
+	() => import("@/features/owner/pairing-company/pages/view-account-pairing"),
 );
 
 const InternalIndex = () => {
@@ -165,10 +165,7 @@ export const internalRoutes: RouteObject[] = [
 		path: "membercodes",
 		element: <ViewMemberCodes />,
 	},
-	{
-		path: "membercodes/create",
-		element: <CreateMembercode />,
-	},
+
 	{
 		path: "faqs",
 		element: <ViewFaq />,
@@ -176,6 +173,10 @@ export const internalRoutes: RouteObject[] = [
 	{
 		path: "pricing",
 		element: <ViewPricePage />,
+	},
+	{
+		path: "account-pairing",
+		element: <ViewAccountPairing />,
 	},
 	{
 		path: "wo-create/services",

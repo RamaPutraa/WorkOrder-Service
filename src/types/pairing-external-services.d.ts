@@ -4,6 +4,7 @@ type IntegrationConfig = {
 	external_check_memberships_url: string;
 	secret_key: string;
 	is_integration_active: boolean;
+	integration_type: "external_system" | "claim_token";
 };
 
 type ExternalAccount = {

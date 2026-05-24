@@ -1,26 +1,21 @@
 type Membercode = {
 	_id: string;
+	company_id: string;
+	externalCustomerEmail: string;
+	externalCustomerName: string;
+	token: string;
+};
+
+type getAllMembercodeResponse = ApiResponse<Membercode[]>
+
+type createMemberCodeRequest = {
+	file: File;
+}
+type createMemberCodeResponse = ApiResponse<Membercode[]>;
+
+type claimMembercodeRequest = {
 	code: string;
-	isClaimed: boolean;
-	claimedBy: {
-		_id: string;
-		name: string;
-		email: string;
-		role: string;
-	} | null;
-	companyId: string;
-	claimedAt: string | null;
-	deletedAt: string | null;
-	__v: number;
-	createdAt: string;
-	updatedAt: string;
-};
+}
+type claimMembercodeResponse = ApiResponse<ExternalAccount>;
 
-type GetMembercodesResponse = ApiResponse<Membercode[]>;
-
-type CreateMembercodeRequest = {
-	amount: number;
-	prefix: string;
-};
-
-type CreateMembercodesResponse = ApiResponse<Membercode[]>;
+type deleteMemberCodeResponse = ApiResponse<Membercode>;

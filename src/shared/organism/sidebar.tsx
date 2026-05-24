@@ -98,9 +98,20 @@ const data = {
 			],
 		},
 		{
-			title: "Kode Berlangganan",
-			url: "/dashboard/internal/membercodes",
+			title: "Pelanggan Aktif",
+			url: "#",
 			icon: Ticket,
+			items: [
+				{
+					title: "Via Kode Voucher",
+					url: "/dashboard/internal/membercodes",
+				},
+				{
+					title: "Via Pairing Akun",
+					url: "/dashboard/internal/account-pairing",
+				},
+
+			],
 		},
 	],
 	navBusiness: [

@@ -59,6 +59,7 @@ type CompanyMinimal = {
 type Company = CompanyMinimal & {
 	address: string;
 	description: string;
+	integrationConfig: IntegrationConfig | null;
 	managers: User[];
 	staffs: User[];
 	isActive: boolean;
