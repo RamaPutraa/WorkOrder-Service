@@ -6,15 +6,10 @@ import { useDialogStore } from "@/store/dialogStore";
 import PageHeader from "@/shared/atoms/header-content";
 import { TextLoading } from "@/shared/atoms/loading-state";
 import { Input } from "@/components/ui/input";
-import { Clock, CheckCircle, XCircle, Timer } from "lucide-react";
+import { CheckCircle, XCircle, Timer } from "lucide-react";
 import { EmptyData } from "@/shared/molecules/empty-data";
 
-const STATUS_SUMMARY = [
-	{ label: "Menunggu", icon: Timer, key: "pending" },
-	{ label: "Diterima", icon: CheckCircle, key: "accepted" },
-	{ label: "Ditolak", icon: XCircle, key: "rejected" },
-	{ label: "Kadaluarsa", icon: Clock, key: "expired" },
-];
+
 
 const HistoryStaffInvitations = () => {
 	const { history, loading, error, fetchHistory, removeInvitation } =
@@ -57,34 +52,52 @@ const HistoryStaffInvitations = () => {
 							Riwayat Undangan - Total{" "}
 							<TextLoading variant="dots" message="" className="w-40" />
 						</div>
-					:	`Daftar Undangan - Total ${history.length} undangan`
+						: `Daftar Undangan - Total ${history.length} undangan`
 				}
 				backPath={true}
 			/>
 
 			{/* Status summary chips */}
 			{!loading && history.length > 0 && (
-				<div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-					{STATUS_SUMMARY.map(({ label, icon: Icon, key }) => {
-						const count = history.filter((h) => h.status === key).length;
-						return (
-							<div
-								key={key}
-								className="bg-muted/30 rounded-xl border p-1.5 transition-all hover:bg-muted/50">
-								<div className="flex items-center justify-between py-2 px-3">
-									<p className="text-muted-foreground text-xs sm:text-sm font-medium">
-										{label}
-									</p>
-									<Icon size={16} className="text-muted-foreground" />
-								</div>
-								<div className="pt-6 sm:pt-8 px-3 pb-3 mt-1 rounded-lg border bg-white shadow-sm">
-									<p className="text-2xl sm:text-3xl font-bold text-foreground">
-										{count}
-									</p>
-								</div>
+				<div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-5">
+					{[
+						{
+							label: "Menunggu",
+							value: history.filter((h) => h.status === "pending").length,
+							icon: Timer,
+							color: "text-primary",
+							bg: "bg-primary/8",
+						},
+						{
+							label: "Diterima",
+							value: history.filter((h) => h.status === "accepted").length,
+							icon: CheckCircle,
+							color: "text-emerald-600",
+							bg: "bg-emerald-50",
+						},
+						{
+							label: "Ditolak",
+							value: history.filter((h) => h.status === "rejected").length,
+							icon: XCircle,
+							color: "text-rose-500",
+							bg: "bg-rose-50",
+						},
+
+					].map(({ label, value, icon: Icon, color, bg }) => (
+						<div
+							key={label}
+							className="flex items-center gap-3 p-4 rounded-2xl border bg-white shadow-sm">
+							<div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center shrink-0`}>
+								<Icon className={`w-4.5 h-4.5 ${color}`} />
 							</div>
-						);
-					})}
+							<div className="min-w-0">
+								<p className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
+									{label}
+								</p>
+								<p className="text-sm font-bold text-slate-900 truncate mt-0.5">{value}</p>
+							</div>
+						</div>
+					))}
 				</div>
 			)}
 

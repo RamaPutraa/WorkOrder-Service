@@ -31,11 +31,7 @@ const PositionView = () => {
 		setEditOpen(true);
 	};
 
-	const DEPARTEMENT_SUMMARY = [
-		{ label: "Total Departemen", icon: Users, key: "all" },
-		{ label: "Departemen Aktif", icon: Users, key: true },
-		{ label: "Departemen Non-Aktif", icon: Users, key: false },
-	];
+
 
 	const handleDelete = (position: Position) => {
 		showDialog({
@@ -86,30 +82,44 @@ const PositionView = () => {
 
 			{/* Summary Cards */}
 			{!loading && positions.length > 0 && (
-				<div className="grid gap-3 grid-cols-2 lg:grid-cols-3">
-					{DEPARTEMENT_SUMMARY.map(({ label, icon: Icon, key }) => {
-						const count =
-							key === "all" ?
-								positions.length
-							:	positions.filter((h) => h.isActive === key).length;
-						return (
-							<div
-								key={String(key)}
-								className="bg-muted/30 rounded-xl border p-1.5 transition-all hover:bg-muted/50">
-								<div className="flex items-center justify-between py-2 px-3">
-									<p className="text-muted-foreground text-xs sm:text-sm font-medium">
-										{label}
-									</p>
-									<Icon size={16} className="text-muted-foreground" />
-								</div>
-								<div className="pt-6 sm:pt-8 px-3 pb-3 mt-1 rounded-lg border bg-white shadow-sm">
-									<p className="text-2xl sm:text-3xl font-bold text-foreground">
-										{count}
-									</p>
-								</div>
+				<div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-5">
+					{[
+						{
+							label: "Total Departemen",
+							value: positions.length,
+							icon: Users,
+							color: "text-primary",
+							bg: "bg-primary/8",
+						},
+						{
+							label: "Departemen Aktif",
+							value: positions.filter((h) => h.isActive === true).length,
+							icon: Users,
+							color: "text-emerald-600",
+							bg: "bg-emerald-50",
+						},
+						{
+							label: "Departemen Non-Aktif",
+							value: positions.filter((h) => h.isActive === false).length,
+							icon: Users,
+							color: "text-rose-500",
+							bg: "bg-rose-50",
+						},
+					].map(({ label, value, icon: Icon, color, bg }) => (
+						<div
+							key={label}
+							className="flex items-center gap-3 p-4 rounded-2xl border bg-white shadow-sm">
+							<div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center shrink-0`}>
+								<Icon className={`w-4.5 h-4.5 ${color}`} />
 							</div>
-						);
-					})}
+							<div className="min-w-0">
+								<p className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
+									{label}
+								</p>
+								<p className="text-sm font-bold text-slate-900 truncate mt-0.5">{value}</p>
+							</div>
+						</div>
+					))}
 				</div>
 			)}
 

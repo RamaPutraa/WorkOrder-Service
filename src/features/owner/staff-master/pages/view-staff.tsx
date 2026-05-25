@@ -8,10 +8,12 @@ import { TextLoading } from "@/shared/atoms/loading-state";
 import { Input } from "@/components/ui/input";
 import { ShieldUser, User, Users } from "lucide-react";
 import { EmptyData } from "@/shared/molecules/empty-data";
+import { useProfileStore } from "@/store/profileStore";
 
 const ViewStaff = () => {
 	const { employees, loading, error, fetchEmployees } = useStaff();
 	const [openInvite, setOpenInvite] = useState(false);
+	const profile = useProfileStore((state) => state.profile);
 
 	// ── Filter state ───────────────────────────────────────────────────────────
 	const [searchValue, setSearchValue] = useState("");
@@ -24,12 +26,6 @@ const ViewStaff = () => {
 	if (error) {
 		return <EmptyData />;
 	}
-
-	const ROLE_SUMMARY = [
-		{ label: "Total Pegawai", icon: Users, key: "all" },
-		{ label: "Manager Perusahaan", icon: ShieldUser, key: "manager_company" },
-		{ label: "Pegawai Perusahaan", icon: User, key: "staff_company" },
-	];
 
 	return (
 		<div className="space-y-6 pb-8">
@@ -51,30 +47,49 @@ const ViewStaff = () => {
 
 			{/* Summary Cards */}
 			{!loading && employees.length > 0 && (
-				<div className="grid gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-					{ROLE_SUMMARY.map(({ label, icon: Icon, key }) => {
-						const count =
-							key === "all" ?
-								employees.length
-							:	employees.filter((h) => h.role === key).length;
-						return (
-							<div
-								key={key}
-								className="bg-muted/30 rounded-xl border p-1.5 transition-all hover:bg-muted/50">
-								<div className="flex items-center justify-between py-2 px-3">
-									<p className="text-muted-foreground text-xs sm:text-sm font-medium">
-										{label}
-									</p>
-									<Icon size={16} className="text-muted-foreground" />
-								</div>
-								<div className="pt-6 sm:pt-8 px-3 pb-3 mt-1 rounded-lg border bg-white shadow-sm">
-									<p className="text-2xl sm:text-3xl font-bold text-foreground">
-										{count}
-									</p>
-								</div>
+				<div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-5">
+					{[
+						{
+							label: "Total Pegawai",
+							value: employees.length,
+							icon: Users,
+							color: "text-primary",
+							bg: "bg-primary/8",
+							show: true,
+						},
+						{
+							label: "Manager Perusahaan",
+							value: employees.filter((h) => h.role === "manager_company").length,
+							icon: ShieldUser,
+							color: "text-violet-700",
+							bg: "bg-violet-50",
+							show: profile?.role !== "manager_company",
+						},
+						{
+							label: "Pegawai Perusahaan",
+							value: employees.filter((h) => h.role === "staff_company").length,
+							icon: User,
+							color: "text-emerald-600",
+							bg: "bg-emerald-50",
+							show: true,
+						},
+					]
+						.filter((item) => item.show)
+						.map(({ label, value, icon: Icon, color, bg }) => (
+						<div
+							key={label}
+							className="flex items-center gap-3 p-4 rounded-2xl border bg-white shadow-sm">
+							<div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center shrink-0`}>
+								<Icon className={`w-4.5 h-4.5 ${color}`} />
 							</div>
-						);
-					})}
+							<div className="min-w-0">
+								<p className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
+									{label}
+								</p>
+								<p className="text-sm font-bold text-slate-900 truncate mt-0.5">{value}</p>
+							</div>
+						</div>
+					))}
 				</div>
 			)}
 
