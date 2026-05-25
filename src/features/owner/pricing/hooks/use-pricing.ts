@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
 import { handleApi } from "@/lib/handle-api";
 import { useServiceStore } from "@/store/serviceStore";
+import { usePricingStore } from "@/store/pricingStore";
 import {
 	getAllServicePricingApi,
 	createServicePricingApi,
@@ -16,13 +17,17 @@ export const usePricing = () => {
 	const [submitting, setSubmitting] = useState(false);
 
 	// === Data ===
-	const [pricingList, setPricingList] = useState<pricing[]>([]);
+	const { pricingList, isPricingStale, setPricingList, clearCache: clearPricingCache } = usePricingStore();
 
 	// === Service Cache ===
 	const clearServiceCache = useServiceStore((state) => state.clearCache);
 
 	// === Fetch All ===
-	const fetchPricing = async () => {
+	const fetchPricing = async (force: boolean = false) => {
+		if (!force && !isPricingStale()) {
+			return; // use cache
+		}
+
 		setLoading(true);
 		setError(null);
 
@@ -53,7 +58,8 @@ export const usePricing = () => {
 
 		notifySuccess("Harga layanan berhasil ditambahkan");
 		clearServiceCache(); // invalidate service cache
-		await fetchPricing();
+		clearPricingCache(); // invalidate pricing cache
+		await fetchPricing(true);
 		return true;
 	};
 
@@ -76,7 +82,8 @@ export const usePricing = () => {
 
 		notifySuccess("Harga layanan berhasil diperbarui");
 		clearServiceCache(); // invalidate service cache
-		await fetchPricing();
+		clearPricingCache(); // invalidate pricing cache
+		await fetchPricing(true);
 		return true;
 	};
 
@@ -96,7 +103,8 @@ export const usePricing = () => {
 
 		notifySuccess("Harga layanan berhasil dihapus");
 		clearServiceCache(); // invalidate service cache
-		await fetchPricing();
+		clearPricingCache(); // invalidate pricing cache
+		await fetchPricing(true);
 		return true;
 	};
 
