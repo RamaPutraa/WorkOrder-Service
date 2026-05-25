@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import PageHeader from "@/shared/atoms/header-content";
 import {
 	FolderKanban,
@@ -25,57 +25,8 @@ import {
 	SheetDescription,
 } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { EmptyData } from "@/shared/molecules/empty-data";
 
-/* ─── Stat Card ──────────────────────────────────────────────────────────── */
-
-interface StatCardProps {
-	icon: React.ReactNode;
-	label: string;
-	value: number;
-	color: "blue" | "rose" | "slate";
-}
-
-const colorMap: Record<
-	StatCardProps["color"],
-	{ bg: string; icon: string; ring: string; value: string }
-> = {
-	blue: {
-		bg: "bg-blue-50",
-		icon: "text-blue-600",
-		ring: "ring-blue-100",
-		value: "text-blue-700",
-	},
-	rose: {
-		bg: "bg-rose-50",
-		icon: "text-rose-500",
-		ring: "ring-rose-100",
-		value: "text-rose-600",
-	},
-	slate: {
-		bg: "bg-slate-50",
-		icon: "text-slate-500",
-		ring: "ring-slate-100",
-		value: "text-slate-600",
-	},
-};
-
-const StatCard = ({ icon, label, value, color }: StatCardProps) => {
-	const c = colorMap[color];
-	return (
-		<div className="flex items-center gap-4 bg-white border border-slate-100 rounded-2xl px-5 py-4 shadow-sm">
-			<div
-				className={`shrink-0 w-11 h-11 rounded-xl ${c.bg} ring-1 ${c.ring} flex items-center justify-center ${c.icon}`}>
-				{icon}
-			</div>
-			<div>
-				<p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-					{label}
-				</p>
-				<p className={`text-2xl font-bold ${c.value} leading-tight`}>{value}</p>
-			</div>
-		</div>
-	);
-};
 
 /* ─── Filter Tabs ────────────────────────────────────────────────────────── */
 
@@ -101,18 +52,16 @@ const FilterTabs = ({ active, onChange, counts }: FilterTabsProps) => {
 					key={tab.key}
 					id={`faq-filter-${tab.key}`}
 					onClick={() => onChange(tab.key)}
-					className={`flex items-center gap-2 px-4 h-8 rounded-full text-xs font-semibold transition-all duration-150 hover:cursor-pointer ${
-						active === tab.key ?
-							"bg-primary text-white shadow-sm"
-						:	"bg-slate-100 text-slate-500 hover:bg-slate-200"
-					}`}>
+					className={`flex items-center gap-2 px-4 h-8 rounded-full text-xs font-semibold transition-all duration-150 hover:cursor-pointer ${active === tab.key ?
+						"bg-primary text-white shadow-sm"
+						: "bg-slate-100 text-slate-500 hover:bg-slate-200"
+						}`}>
 					{tab.label}
 					<Badge
-						className={`text-[10px] px-1.5 py-0 h-4 min-w-[1.25rem] border-0 rounded-full font-bold ${
-							active === tab.key ?
-								"bg-white/20 text-white"
-							:	"bg-slate-200 text-slate-500"
-						}`}>
+						className={`text-[10px] px-1.5 py-0 h-4 min-w-[1.25rem] border-0 rounded-full font-bold ${active === tab.key ?
+							"bg-white/20 text-white"
+							: "bg-slate-200 text-slate-500"
+							}`}>
 						{tab.count}
 					</Badge>
 				</button>
@@ -220,7 +169,7 @@ const ViewFaq = () => {
 							transition={{ duration: 0.2 }}>
 							<SectionLoading message="Memuat data FAQ..." />
 						</motion.div>
-					:	<motion.div
+						: <motion.div
 							key="content"
 							initial={{ opacity: 0 }}
 							animate={{ opacity: 1 }}
@@ -228,25 +177,44 @@ const ViewFaq = () => {
 							transition={{ duration: 0.3 }}
 							className="space-y-6">
 							{/* ── Stats ── */}
-							<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-								<StatCard
-									icon={<Hash className="w-5 h-5" />}
-									label="Total FAQ"
-									value={faqItems.length}
-									color="slate"
-								/>
-								<StatCard
-									icon={<FileText className="w-5 h-5" />}
-									label="Konten Teks"
-									value={textItems.length}
-									color="blue"
-								/>
-								<StatCard
-									icon={<File className="w-5 h-5" />}
-									label="Dokumen PDF"
-									value={pdfItems.length}
-									color="rose"
-								/>
+							<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+								{[
+									{
+										label: "Total FAQ",
+										value: faqItems.length,
+										icon: Hash,
+										color: "text-primary",
+										bg: "bg-primary/8",
+									},
+									{
+										label: "Konten Teks",
+										value: textItems.length,
+										icon: FileText,
+										color: "text-blue-600",
+										bg: "bg-blue-50",
+									},
+									{
+										label: "Dokumen PDF",
+										value: pdfItems.length,
+										icon: File,
+										color: "text-rose-500",
+										bg: "bg-rose-50",
+									},
+								].map(({ label, value, icon: Icon, color, bg }) => (
+									<div
+										key={label}
+										className="flex items-center gap-3 p-4 rounded-2xl border bg-white shadow-sm">
+										<div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center shrink-0`}>
+											<Icon className={`w-4.5 h-4.5 ${color}`} />
+										</div>
+										<div className="min-w-0">
+											<p className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
+												{label}
+											</p>
+											<p className="text-sm font-bold text-slate-900 truncate mt-0.5">{value}</p>
+										</div>
+									</div>
+								))}
 							</div>
 
 							{/* ── Filter + List ── */}
@@ -284,42 +252,33 @@ const ViewFaq = () => {
 													/>
 												))}
 											</motion.div>
-										:	<motion.div
+											: <motion.div
 												key="empty-filter"
 												initial={{ opacity: 0 }}
 												animate={{ opacity: 1 }}
 												exit={{ opacity: 0 }}
-												transition={{ duration: 0.3 }}
-												className="flex flex-col items-center py-16 text-center">
-												<div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mb-3">
-													<FolderKanban className="w-7 h-7 text-slate-400" />
-												</div>
-												<p className="text-sm font-semibold text-slate-600">
-													Tidak ada item {filter === "TEXT" ? "teks" : "PDF"}{" "}
-													ditemukan
-												</p>
-												<p className="text-xs text-slate-400 mt-1">
-													Coba ubah filter atau tambah item baru.
-												</p>
+												transition={{ duration: 0.3 }}>
+												<EmptyData
+													title={
+														<span>Tidak ada item {filter === "TEXT" ? "teks" : "PDF"}{" "}
+															ditemukan</span>
+													}
+													subtitle="Coba ubah filter atau tambah item baru."
+													icon={FolderKanban}
+												/>
 											</motion.div>
 										}
 									</AnimatePresence>
 								</div>
-							:	/* ── Empty State ── */
+								:	/* ── Empty State ── */
 								<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-									<div className="flex flex-col items-center py-20 text-center gap-4">
-										<div className="w-16 h-16 rounded-2xl shadow-sm bg-primary/5 border border-border flex items-center justify-center">
-											<FolderKanban className="w-8 h-8 text-primary" />
-										</div>
-										<div>
-											<p className="text-base font-bold text-slate-700">
-												Belum ada item FAQ
-											</p>
-											<p className="text-sm text-slate-400 mt-1">
-												Mulai dengan menambahkan konten teks atau dokumen PDF.
-											</p>
-										</div>
-									</div>
+									<EmptyData
+										title={
+											<span>Belum ada item FAQ</span>
+										}
+										subtitle="Mulai dengan menambahkan konten teks atau dokumen PDF."
+										icon={FolderKanban}
+									/>
 								</motion.div>
 							}
 						</motion.div>
