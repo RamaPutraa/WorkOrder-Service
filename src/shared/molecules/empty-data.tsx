@@ -1,4 +1,4 @@
-import { FileQuestionMark } from "lucide-react";
+import { FolderKanban } from "lucide-react";
 
 export interface EmptyDataProps {
 	title?: React.ReactNode;
@@ -9,7 +9,7 @@ export interface EmptyDataProps {
 export function EmptyData({
 	title = "Tidak ada data.",
 	subtitle = "Data yang anda cari belum tersedia.",
-	icon: Icon = FileQuestionMark,
+	icon: Icon = FolderKanban,
 }: EmptyDataProps) {
 	return (
 		<div className="flex flex-col items-center py-16 text-center border rounded-2xl border-dashed border-slate-200 border-1.5">
