@@ -299,7 +299,7 @@ const DsCompany = () => {
 			</div>
 
 			{/* ── Grid 4 Kolom Radial Charts ── */}
-			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
+			<div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 items-stretch">
 				<RadialChartCard
 					title="Statistik Formulir"
 					active={stat.forms_stat.active}

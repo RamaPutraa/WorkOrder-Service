@@ -1,96 +1,143 @@
-import { ArrowRight, CheckCircle2 } from "lucide-react";
-import { Link } from "react-router-dom";
-import heroImage from "../../../assets/images/hero_image.jpg";
-import { useAuthStore } from "@/store/authStore";
-import { redirectToRoleDashboard } from "@/lib/auth-helpers";
+import { Download, BookOpen } from "lucide-react";
+import bgVector from "../../../assets/images/bg-vector-svg.svg";
+import woLogo from "../../../assets/wo-logo-vector.svg";
 
 const HeroSection = () => {
-	const { isAuthenticated, user } = useAuthStore();
-
 	return (
-		<section className="relative min-h-screen flex items-center bg-white">
-			{/* Subtle background blobs */}
+		<section
+			className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+			{/* Background Vector — stretched across full section */}
 			<div
-				className="absolute inset-0 pointer-events-none overflow-hidden"
-				aria-hidden="true">
-				<div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-50 rounded-full opacity-60 translate-x-1/3 -translate-y-1/3" />
-				<div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-indigo-50 rounded-full opacity-50 -translate-x-1/3 translate-y-1/3" />
-			</div>
+				className="absolute inset-0 pointer-events-none"
+				aria-hidden="true"
+				style={{
+					backgroundImage: `url(${bgVector})`,
+					backgroundSize: "125%",
+					backgroundPosition: "center",
+					backgroundRepeat: "no-repeat",
+					opacity: 0.65,
+				}}
+			/>
 
-			<div className="relative max-w-7xl mx-auto px-6 py-20 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center w-full">
-				{/* ── Left: Text ── */}
-				<div>
-					<span className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6 border border-blue-100">
-						<span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-						Platform Work Order
-					</span>
 
-					<h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight tracking-tight mb-6">
-						Kelola Work Order{" "}
-						<span className="text-blue-600">Lebih Cerdas</span>, Lebih Efisien
-					</h1>
 
-					<p className="text-lg text-gray-500 leading-relaxed mb-10 max-w-lg">
-						Digitalisasi proses work order perusahaan Anda. Kurangi downtime,
-						tingkatkan produktivitas tim, dan dapatkan visibilitas penuh atas
-						setiap pekerjaan.
-					</p>
-
-					<div className="flex flex-wrap gap-4">
-						{!isAuthenticated ?
-							<>
-								<Link
-									to="/hero-regis"
-									className="inline-flex items-center gap-2 px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5 text-sm">
-									Daftarkan Akun Anda
-									<ArrowRight size={16} />
-								</Link>
-								<Link
-									to="/login"
-									className="inline-flex items-center gap-2 px-6 py-3.5 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-xl transition-all duration-200 border border-gray-200 hover:border-blue-300 text-sm">
-									Masuk ke Dasbor
-								</Link>
-							</>
-						:	<Link
-								to={user?.role ? redirectToRoleDashboard(user.role) : "/login"}
-								className="inline-flex items-center gap-2 px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5 text-sm">
-								Masuk ke Dasbor
-								<ArrowRight size={16} />
-							</Link>
-						}
-					</div>
-
-					<p className="mt-8 text-xs text-gray-400 flex items-center gap-1.5">
-						<CheckCircle2 size={14} className="text-green-500" />
-						Tidak perlu kartu kredit · Setup dalam 5 menit
-					</p>
-				</div>
-
-				{/* ── Right: Hero Image ── */}
-				<div className="relative hidden lg:flex justify-center items-center">
-					<div className="relative w-full max-w-lg aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border border-gray-100">
+			{/* Hero Content */}
+			<div className="relative z-10 flex flex-col items-center text-center px-6 max-w-6xl mx-auto -mt-20">
+				{/* Logo */}
+				<div className="mb-8 flex items-center justify-center">
+					<div
+						className="flex items-center justify-center">
 						<img
-							src={heroImage}
-							alt="WorkOrder Hero"
-							className="w-full h-full object-cover"
+							src={woLogo}
+							alt="Work Order Logo"
+							className="w-7 h-7 object-contain drop-shadow-md pr-2"
 						/>
-					</div>
-
-					{/* Floating badges */}
-					<div className="absolute -top-3 -right-3 bg-white border border-gray-100 rounded-xl shadow-lg px-4 py-2.5 flex items-center gap-2">
-						<div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-						<span className="text-xs font-medium text-gray-700">
-							Lorem Ipsum
-						</span>
-					</div>
-					<div className="absolute -bottom-3 -left-3 bg-white border border-gray-100 rounded-xl shadow-lg px-4 py-2.5 flex items-center gap-2">
-						<CheckCircle2 size={14} className="text-green-500" />
-						<span className="text-xs font-medium text-gray-700">
-							Lorem Ipsum
-						</span>
+						<span className="text-2xl font-semibold" style={{
+							color: "#0f172a",
+						}}>Work Order</span>
 					</div>
 				</div>
+
+
+
+				{/* Main Title */}
+				<h1
+					className="text-4xl sm:text-5xl lg:text-8xl font-light leading-tight tracking-tight mb-6"
+					style={{
+						color: "#0f172a",
+						letterSpacing: "-0.02em",
+					}}>
+					Sistem Manajemen{" "}
+					<br />
+					<span
+						style={{
+							background: "linear-gradient(90deg, #2563eb, #3b82f6)",
+							WebkitBackgroundClip: "text",
+							WebkitTextFillColor: "transparent",
+							backgroundClip: "text",
+						}}>
+						Work Order
+					</span>
+				</h1>
+
+
+
+				{/* CTA Buttons */}
+				<div className="flex flex-wrap items-center justify-center gap-4">
+					{/* Left: Download Android */}
+					<a
+						href="#"
+						id="btn-download-android"
+						className="inline-flex items-center gap-3 px-7 py-3.5 rounded-xl font-semibold text-sm text-white transition-all duration-200"
+						style={{
+							background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
+							boxShadow: "0 4px 18px rgba(37,99,235,0.45)",
+						}}
+						onMouseEnter={e => {
+							(e.currentTarget as HTMLAnchorElement).style.boxShadow =
+								"0 8px 28px rgba(37,99,235,0.55)";
+							(e.currentTarget as HTMLAnchorElement).style.transform =
+								"translateY(-2px)";
+						}}
+						onMouseLeave={e => {
+							(e.currentTarget as HTMLAnchorElement).style.boxShadow =
+								"0 4px 18px rgba(37,99,235,0.45)";
+							(e.currentTarget as HTMLAnchorElement).style.transform =
+								"translateY(0)";
+						}}>
+						<Download size={18} />
+						Unduh Versi Aplikasi Android
+					</a>
+
+					{/* Right: Documentation */}
+					<a
+						href="#"
+						id="btn-documentation"
+						className="inline-flex items-center gap-3 px-7 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200 border"
+						style={{
+							background: "rgba(255,255,255,0.85)",
+							borderColor: "rgba(59,130,246,0.25)",
+							color: "#1e40af",
+							backdropFilter: "blur(8px)",
+							boxShadow: "0 2px 12px rgba(59,130,246,0.1)",
+						}}
+						onMouseEnter={e => {
+							(e.currentTarget as HTMLAnchorElement).style.background =
+								"rgba(239,246,255,0.95)";
+							(e.currentTarget as HTMLAnchorElement).style.borderColor =
+								"rgba(59,130,246,0.45)";
+							(e.currentTarget as HTMLAnchorElement).style.transform =
+								"translateY(-2px)";
+							(e.currentTarget as HTMLAnchorElement).style.boxShadow =
+								"0 6px 20px rgba(59,130,246,0.18)";
+						}}
+						onMouseLeave={e => {
+							(e.currentTarget as HTMLAnchorElement).style.background =
+								"rgba(255,255,255,0.85)";
+							(e.currentTarget as HTMLAnchorElement).style.borderColor =
+								"rgba(59,130,246,0.25)";
+							(e.currentTarget as HTMLAnchorElement).style.transform =
+								"translateY(0)";
+							(e.currentTarget as HTMLAnchorElement).style.boxShadow =
+								"0 2px 12px rgba(59,130,246,0.1)";
+						}}>
+						<BookOpen size={18} />
+						Dokumentasi
+					</a>
+				</div>
+
+
 			</div>
+
+			{/* Bottom decorative fade */}
+			<div
+				className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none"
+				aria-hidden="true"
+				style={{
+					background:
+						"linear-gradient(to top, rgba(240,246,255,0.6) 0%, transparent 100%)",
+				}}
+			/>
 		</section>
 	);
 };

@@ -32,7 +32,7 @@ const Welcome = () => {
 					<div className="space-y-1">
 						<p className="text-sm font-medium">{getFormattedDate()}</p>
 						<h1 className="text-2xl font-bold tracking-tight">
-							{getGreeting()}, {user?.name?.split(" ")[0] ?? "Owner"} 👋
+							{getGreeting()}, {user?.name?.split(" ")[0] ?? "Owner"}
 						</h1>
 						<p className="text-sm ">
 							Selamat datang kembali di dashboard manajemen Work Order.
