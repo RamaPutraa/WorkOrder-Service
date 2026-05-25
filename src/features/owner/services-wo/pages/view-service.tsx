@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ClipboardList, LayoutGrid, List, Eye, DollarSign, Pencil } from "lucide-react";
+import { ClipboardList, LayoutGrid, List, Eye, DollarSign, Pencil, Tag, Globe, Building, Lock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SectionLoading } from "@/shared/atoms";
 import { useCreateService } from "../hooks/useCreateService";
@@ -45,7 +45,7 @@ const accessBadgeStyle = (type: any) => {
 			return "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-50";
 		case "member_only":
 		case "1":
-			return "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-50";
+			return "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-50";
 		default:
 			return "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-50";
 	}
@@ -123,6 +123,10 @@ const ViewService: React.FC = () => {
 		setIsCreateModalOpen(false);
 		navigate("/dashboard/internal/services/create/company-type");
 	};
+
+	const totalServices = filteredData.length;
+
+
 
 	const columns: ColumnDef<any>[] = useMemo(
 		() => [
@@ -260,6 +264,57 @@ const ViewService: React.FC = () => {
 				onSelectTemplate={handleSelectTemplate}
 			/>
 
+			{/* ── Stats ── */}
+			{!loading && filteredData.length > 0 && (
+				<div className="grid grid-cols-1 lg:grid-cols-4 gap-3 mb-5">
+					{[
+						{
+							label: "Total Layanan",
+							value: totalServices,
+							icon: Tag,
+							color: "text-primary",
+							bg: "bg-primary/8",
+						},
+						{
+							label: "Layanan Publik",
+							value: filteredData.filter((service) => service.accessType === "public").length,
+							icon: Globe,
+							color: "text-emerald-600",
+							bg: "bg-emerald-50",
+						},
+						{
+							label: "Layanan Internal",
+							value: filteredData.filter((service) => service.accessType === "internal").length,
+							icon: Building,
+							color: "text-violet-700",
+							bg: "bg-violet-50",
+						},
+						{
+							label: "Layanan Berlangganan",
+							value: filteredData.filter((service) => service.accessType === "member_only").length,
+							icon: Lock,
+							color: "text-amber-500",
+							bg: "bg-amber-50",
+
+						},
+					].map(({ label, value, icon: Icon, color, bg }) => (
+						<div
+							key={label}
+							className="flex items-center gap-3 p-4 rounded-2xl border bg-white shadow-sm">
+							<div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center shrink-0`}>
+								<Icon className={`w-4.5 h-4.5 ${color}`} />
+							</div>
+							<div className="min-w-0">
+								<p className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
+									{label}
+								</p>
+								<p className="text-sm font-bold text-slate-900 truncate mt-0.5">{value}</p>
+							</div>
+						</div>
+					))}
+				</div>
+			)}
+
 			<Tabs
 				value={viewMode}
 				onValueChange={handleViewChange}
@@ -352,7 +407,7 @@ const ViewService: React.FC = () => {
 
 												<div className="text-xs py-5 px-5 border-t border-slate-200/70 p-0 flex items-center justify-between">
 													<div className="flex items-center gap-2">
-														<div className="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center">
+														<div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center border border-amber-200">
 															<DollarSign className="w-3.5 h-3.5 text-amber-500" />
 														</div>
 														<div>

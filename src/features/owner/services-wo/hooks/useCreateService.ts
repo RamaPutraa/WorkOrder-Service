@@ -55,7 +55,7 @@ export const useCreateService = () => {
 	const [detailService, setDetailService] = useState<Service | null>(
 		id && !serviceStore.isDetailStale(id) ?
 			(serviceStore.detailCache[id]?.data ?? null)
-		:	null,
+			: null,
 	);
 
 	// === Base form fields ===
@@ -374,9 +374,9 @@ export const useCreateService = () => {
 				type: "select",
 				placeholder: "Semua Jenis Layanan",
 				options: [
-					{ label: "Internal", value: "internal" },
+					{ label: "Internal Perusahaan", value: "internal" },
 					{ label: "Publik", value: "public" },
-					{ label: "Member Only", value: "member_only" },
+					{ label: "Khusus Berlangganan", value: "member_only" },
 				],
 			},
 			{

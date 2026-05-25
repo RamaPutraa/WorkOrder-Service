@@ -8,6 +8,7 @@ export const useGenerateTemplate = () => {
 	const navigate = useNavigate();
 	const [submitting, setSubmitting] = useState(false);
 
+	// TODO:belum riset cachce yang affected
 	const generateService = async (ids: string[]) => {
 		if (ids.length === 0) {
 			notifyError("Peringatan", "Pilih setidaknya satu template");
