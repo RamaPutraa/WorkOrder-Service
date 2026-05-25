@@ -13,9 +13,4 @@ type createMemberCodeRequest = {
 }
 type createMemberCodeResponse = ApiResponse<Membercode[]>;
 
-type claimMembercodeRequest = {
-	code: string;
-}
-type claimMembercodeResponse = ApiResponse<ExternalAccount>;
-
 type deleteMemberCodeResponse = ApiResponse<Membercode>;

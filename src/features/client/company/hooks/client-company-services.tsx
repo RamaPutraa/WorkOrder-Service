@@ -17,6 +17,7 @@ const useClientCompanyServices = () => {
 	const [services, setServices] = useState<GetServiceByClient[]>([]);
 	const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
 	const [isIntegrationActive, setIsIntegrationActive] = useState<boolean>(false);
+	const [integrationType, setIntegrationType] = useState<"external_system" | "claim_token" | null>(null);
 	const [companies, setCompanies] = useState<Company[]>([]);
 	const [companyDetail, setCompanyDetail] = useState<CompanyDetailClient>();
 
@@ -79,6 +80,7 @@ const useClientCompanyServices = () => {
 			setCompanyDetail(res?.data);
 			setIsSubscribed(res?.meta.isSubscribed || false);
 			setIsIntegrationActive(res?.meta.isIntegrationActive || false);
+			setIntegrationType(res?.meta.integrationType || null);
 		}
 
 		setLoadingCompanies(false);
@@ -149,6 +151,7 @@ const useClientCompanyServices = () => {
 		services,
 		isSubscribed,
 		isIntegrationActive,
+		integrationType,
 		companies,
 		companyDetail,
 		loading,

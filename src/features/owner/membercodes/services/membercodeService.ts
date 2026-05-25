@@ -19,13 +19,6 @@ export const uploadMembercodeApi = async (data: createMemberCodeRequest) => {
 	return response.data;
 };
 
-export const claimMembercodeApi = async (data: claimMembercodeRequest) => {
-	const response = await apiClient.post<claimMembercodeResponse>(
-		"/memberships/codes/claim",
-		data,
-	);
-	return response.data;
-};
 
 export const deleteMembercodeApi = async (id: string) => {
 	const response = await apiClient.delete<deleteMemberCodeResponse>(

@@ -4,6 +4,7 @@ type GetAllCompanyResponse = ApiResponse<Company[]>;
 type MetaDetailCompany = {
 	isSubscribed: boolean;
 	isIntegrationActive: boolean;
+	integrationType: "external_system" | "claim_token";
 };
 type CompanyDetailClient = {
 	_id: string;

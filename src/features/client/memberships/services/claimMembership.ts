@@ -1,9 +1,7 @@
 import apiClient from "@/lib/api";
 
-export const claimMembershipCode = async (
-	data: ClaimMembershipsRequest,
-): Promise<CreateMembershipClaimResponse> => {
-	const response = await apiClient.post<CreateMembershipClaimResponse>(
+export const claimMembercodeApi = async (data: claimMembercodeRequest) => {
+	const response = await apiClient.post<claimMembercodeResponse>(
 		"/memberships/codes/claim",
 		data,
 	);

@@ -9,8 +9,8 @@ type IntegrationConfig = {
 
 type ExternalAccount = {
 	_id: string;
-	external_customer_email: string;
-	external_customer_name: string;
+	externalCustomerEmail: string;
+	externalCustomerName: string;
 	company: Company;
-	paired_at: Date;
+	pairedAt: Date;
 };

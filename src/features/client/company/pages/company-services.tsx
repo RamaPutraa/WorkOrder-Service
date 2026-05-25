@@ -18,8 +18,11 @@ import { SectionLoading, FullPageLoading } from "@/shared/atoms";
 import PageHeader from "@/shared/atoms/header-content";
 import { FaqChatbot } from "@/shared/organism/faq-chatbot";
 import { usePairingAccount } from "@/features/client/pairing-account/hooks/use-pairing-account";
+// FIXME: masih error kalo integrationTypenya "claim_token"
 import { getPairedAccountInCompany } from "@/features/client/pairing-account/services/pairing-account";
 import { useDialogStore } from "@/store/dialogStore";
+import ClaimMembershipDialog from "@/features/client/memberships/components/claim-membership-dialog";
+
 const ClientCompanyServices = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
@@ -37,6 +40,7 @@ const ClientCompanyServices = () => {
 		companyDetail: company,
 		isSubscribed,
 		isIntegrationActive,
+		integrationType,
 		loading,
 		error,
 		fetchCompanyServices,
@@ -45,6 +49,7 @@ const ClientCompanyServices = () => {
 	const [externalAccount, setExternalAccount] =
 		useState<ExternalAccount | null>(null);
 	const [localUnsubscribed, setLocalUnsubscribed] = useState(false);
+	const [claimDialogOpen, setClaimDialogOpen] = useState(false);
 
 	// Visual status: if it was already subscribed or newly paired in this session
 	const isPaired = (isSubscribed && !localUnsubscribed) || localPaired;
@@ -246,8 +251,8 @@ const ClientCompanyServices = () => {
 																	: "text-slate-800"
 																	}`}>
 																{isPaired ?
-																	"Akun Terhubung"
-																	: "Belum Terhubung"}
+																	(integrationType === "claim_token" ? "Token Aktif" : "Akun Terhubung")
+																	: integrationType === "claim_token" ? "Belum Klaim Token" : "Belum Terhubung"}
 															</p>
 															<p
 																className={`text-xs mt-0.5 ${isPaired ?
@@ -256,10 +261,11 @@ const ClientCompanyServices = () => {
 																	: "text-slate-400"
 																	}`}>
 																{isPaired ?
-																	isSubscribed ?
-																		"Langganan Premium Aktif"
-																		: "Koneksi Standar Aktif"
-																	: "Integrasi Sistem"}
+																	(integrationType === "claim_token" ? "Token Berlangganan Aktif" :
+																		isSubscribed ?
+																			"Langganan Premium Aktif"
+																			: "Koneksi Standar Aktif")
+																	: integrationType === "claim_token" ? "Token Berlangganan" : "Integrasi Sistem"}
 															</p>
 														</div>
 													</div>
@@ -315,14 +321,14 @@ const ClientCompanyServices = () => {
 																"text-blue-900"
 															)
 																}`}>
-															{externalAccount.external_customer_name}
+															{externalAccount.externalCustomerName}
 														</p>
 														<p
 															className={`text-xs truncate ${isSubscribed ? "text-[#A97C2F]/70" : (
 																"text-blue-500"
 															)
 																}`}>
-															{externalAccount.external_customer_email}
+															{externalAccount.externalCustomerEmail}
 														</p>
 													</div>
 													: <p
@@ -332,11 +338,15 @@ const ClientCompanyServices = () => {
 															: "text-slate-500"
 															}`}>
 														{isPaired ?
-															isSubscribed ?
-																"Anda memiliki akses penuh ke layanan eksklusif berkat integrasi akun premium."
-																: "Akun Anda terhubung dengan sistem eksternal secara sukses."
+															(integrationType === "claim_token" ?
+																"Anda memiliki akses ke layanan melalui token berlangganan yang telah diklaim."
+																: isSubscribed ?
+																	"Anda memiliki akses penuh ke layanan eksklusif berkat integrasi akun premium."
+																	: "Akun Anda terhubung dengan sistem eksternal secara sukses.")
 
-															: `Hubungkan akun Anda ke sistem ${company?.name ?? "perusahaan"} untuk akses layanan lebih lengkap.`
+															: integrationType === "claim_token" ?
+																`Klaim token berlangganan Anda untuk akses layanan lebih lengkap di ${company?.name ?? "perusahaan"}.`
+																: `Hubungkan akun Anda ke sistem ${company?.name ?? "perusahaan"} untuk akses layanan lebih lengkap.`
 														}
 													</p>
 												}
@@ -353,30 +363,34 @@ const ClientCompanyServices = () => {
 																	: "bg-gradient-to-r from-blue-500 to-indigo-600 text-white"
 																	}`}>
 																<CheckCircle2 className="w-4 h-4 mr-2" />
-																Sudah Terhubung
+																{integrationType === "claim_token" ? "Token Berhasil Diklaim" : "Sudah Terhubung"}
 															</Button>
-															<Button
-																size="sm"
-																variant="ghost"
-																disabled={isDetaching}
-																onClick={handleDetach}
-																className={`w-full border hover:cursor-pointer ${isSubscribed ?
-																	"text-[#A97C2F]/70 hover:text-red-600 hover:bg-red-50 border-[#E8D48B]/50 hover:border-red-100"
-																	: "text-blue-600 hover:text-red-600 hover:bg-red-50 border-blue-200 hover:border-red-100"
-																	}`}>
-																{isDetaching ?
-																	"Memproses..."
-																	: "Putuskan Hubungan"}
-															</Button>
+															{integrationType !== "claim_token" && (
+																<Button
+																	size="sm"
+																	variant="ghost"
+																	disabled={isDetaching}
+																	onClick={handleDetach}
+																	className={`w-full border hover:cursor-pointer ${isSubscribed ?
+																		"text-[#A97C2F]/70 hover:text-red-600 hover:bg-red-50 border-[#E8D48B]/50 hover:border-red-100"
+																		: "text-blue-600 hover:text-red-600 hover:bg-red-50 border-blue-200 hover:border-red-100"
+																		}`}>
+																	{isDetaching ?
+																		"Memproses..."
+																		: "Putuskan Hubungan"}
+																</Button>
+															)}
 														</>
 														: <Button
 															size="sm"
-															disabled={isPairing}
-															onClick={handlePairing}
+															disabled={integrationType === "claim_token" ? false : isPairing}
+															onClick={integrationType === "claim_token" ? () => setClaimDialogOpen(true) : handlePairing}
 															className="w-full hover: cursor-pointer">
-															{isPairing ?
-																"Menghubungkan..."
-																: "Hubungkan Akun"}
+															{integrationType === "claim_token" ?
+																"Klaim Token"
+																: (isPairing ?
+																	"Menghubungkan..."
+																	: "Hubungkan Akun")}
 														</Button>
 													}
 													<p
@@ -518,6 +532,15 @@ const ClientCompanyServices = () => {
 					companyId={company?._id || ""}
 				/>
 			)}
+
+			<ClaimMembershipDialog
+				open={claimDialogOpen}
+				onOpenChange={setClaimDialogOpen}
+				onSuccess={() => {
+					void fetchCompanyDetail();
+					void fetchCompanyServices();
+				}}
+			/>
 		</>
 	);
 };

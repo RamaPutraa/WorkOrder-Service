@@ -33,13 +33,13 @@ const ViewAccountPairing: React.FC = () => {
 
 	const filtered = memberships.filter((m) => {
 		if (m.integrationType !== "external_system") return false;
-		
+
 		const q = search.toLowerCase();
 		return (
 			m.user?.name?.toLowerCase().includes(q) ||
 			m.user?.email?.toLowerCase().includes(q) ||
-			m.external_account?.external_customer_name?.toLowerCase().includes(q) ||
-			m.external_account?.external_customer_email?.toLowerCase().includes(q)
+			m.externalAccount?.externalCustomerName?.toLowerCase().includes(q) ||
+			m.externalAccount?.externalCustomerEmail?.toLowerCase().includes(q)
 		);
 	});
 
@@ -148,7 +148,7 @@ const ViewAccountPairing: React.FC = () => {
 										className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden divide-y divide-slate-50">
 										{filtered.map((item) => (
 											<motion.div
-												key={item.external_account?._id ?? item.user?._id}
+												key={item.externalAccount?._id ?? item.user?._id}
 												variants={itemVariants}
 												className="flex flex-col sm:flex-row sm:items-center gap-4 px-4 py-4 hover:bg-slate-50/70 transition-colors duration-150">
 												{/* Internal User */}
@@ -179,17 +179,17 @@ const ViewAccountPairing: React.FC = () => {
 												{/* External Account */}
 												<div className="flex items-center gap-3 flex-1 min-w-0">
 													<div className="shrink-0 w-9 h-9 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 font-bold text-sm">
-														{item.external_account?.external_customer_name
+														{item.externalAccount?.externalCustomerName
 															?.charAt(0)
 															?.toUpperCase() ?? "E"}
 													</div>
 													<div className="min-w-0">
 														<p className="font-semibold text-sm text-slate-800 truncate">
-															{item.external_account?.external_customer_name ?? "–"}
+															{item.externalAccount?.externalCustomerName ?? "–"}
 														</p>
 														<p className="text-xs text-slate-500 truncate flex items-center gap-1">
 															<Mail className="w-3 h-3 shrink-0" />
-															{item.external_account?.external_customer_email ?? "–"}
+															{item.externalAccount?.externalCustomerEmail ?? "–"}
 														</p>
 													</div>
 												</div>
@@ -197,7 +197,7 @@ const ViewAccountPairing: React.FC = () => {
 												{/* Paired date */}
 												<div className="shrink-0 flex items-center gap-1.5 text-xs text-slate-400 sm:min-w-[90px] sm:justify-end">
 													<Calendar className="w-3.5 h-3.5" />
-													<span>{formatDate(item.external_account?.paired_at?.toString())}</span>
+													<span>{formatDate(item.externalAccount?.pairedAt?.toString())}</span>
 												</div>
 
 												{/* Badge */}
