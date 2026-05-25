@@ -3,12 +3,18 @@ import { handleApi } from "@/lib/handle-api";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
 import { generateServiceByTemplateApi } from "../services/template-services";
 import { useNavigate } from "react-router-dom";
+import { useServiceStore } from "@/store/serviceStore";
+import { useFormStore } from "@/store/formStore";
+import { usePositionStore } from "@/store/potisionStore";
 
 export const useGenerateTemplate = () => {
 	const navigate = useNavigate();
 	const [submitting, setSubmitting] = useState(false);
 
-	// TODO:belum riset cachce yang affected
+	const clearServiceCache = useServiceStore((state) => state.clearCache);
+	const clearFormCache = useFormStore((state) => state.clearCache);
+	const clearPositionCache = usePositionStore((state) => state.clearPositions);
+
 	const generateService = async (ids: string[]) => {
 		if (ids.length === 0) {
 			notifyError("Peringatan", "Pilih setidaknya satu template");
@@ -29,6 +35,9 @@ export const useGenerateTemplate = () => {
 		}
 
 		notifySuccess("Berhasil", "Layanan berhasil dibuat dari template");
+		clearServiceCache();
+		clearFormCache();
+		clearPositionCache();
 		navigate("/dashboard/internal/services");
 	};
 
