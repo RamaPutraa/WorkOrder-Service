@@ -2,9 +2,11 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+
 import {
 	Dialog,
 	DialogContent,
+	DialogHeader,
 	DialogTitle,
 	DialogDescription,
 } from "@/components/ui/dialog";
@@ -109,26 +111,26 @@ const EditCompanyDialog = ({
 			/>
 
 			<Dialog open={open} onOpenChange={handleOpenChange}>
-				<DialogContent className="sm:max-w-[460px] p-0 overflow-hidden rounded-2xl">
+				<DialogContent className="sm:max-w-[460px] max-h-[90vh] flex flex-col rounded-3xl border-none p-0 overflow-hidden shadow-2xl">
 					{/* Header */}
-					<div className="bg-gradient-to-br from-primary to-primary/80 px-6 pt-6 pb-5">
-						<div className="flex items-center gap-3 mb-1">
-							<div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
-								<Building2 className="w-4 h-4 text-white" />
-							</div>
-							<DialogTitle className="text-white text-lg font-semibold">
-								Edit Perusahaan
+					<div className="shrink-0 bg-gradient-to-b from-primary to-primary/70 p-6 text-white relative">
+						<DialogHeader className="relative z-10">
+							<DialogTitle className="flex items-center gap-3 text-white text-xl">
+								<div className="p-2 rounded-xl bg-white/20 backdrop-blur-sm shadow-xl">
+									<Building2 className="w-6 h-6" />
+								</div>
+								<span>Edit Perusahaan</span>
 							</DialogTitle>
-						</div>
-						<DialogDescription className="text-primary-foreground/70 text-sm pl-12">
-							Perbarui informasi dasar perusahaan Anda
-						</DialogDescription>
+							<DialogDescription className="text-white/90 mt-2 text-sm font-medium opacity-90">
+								Perbarui informasi dasar perusahaan Anda
+							</DialogDescription>
+						</DialogHeader>
 					</div>
 
 					{/* Form */}
 					<Form {...form}>
-						<form onSubmit={form.handleSubmit(onSubmit)}>
-							<div className="px-6 pt-5 pb-2 space-y-4">
+						<form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 overflow-hidden bg-white">
+							<div className="flex-1 overflow-y-auto px-6 pt-5 pb-6 space-y-4">
 								{/* Nama */}
 								<FormField
 									control={form.control}
@@ -206,25 +208,25 @@ const EditCompanyDialog = ({
 							</div>
 
 							{/* Footer */}
-							<div className="px-6 py-4 border-t flex justify-end gap-2">
+							<div className="shrink-0 px-6 py-4 border-t border-slate-100 bg-white flex justify-end gap-2">
 								<Button
 									type="button"
 									variant="ghost"
 									size="sm"
 									onClick={() => handleOpenChange(false)}
 									disabled={loading}
-									className="text-muted-foreground">
+									className="text-slate-500 rounded-xl hover:bg-slate-50 cursor-pointer">
 									Batal
 								</Button>
 								<Button
 									type="submit"
 									size="sm"
 									disabled={loading}
-									className="gap-1.5 px-4">
+									className="gap-1.5 px-5 rounded-xl bg-primary hover:bg-primary/90 text-white shadow-sm hover:shadow-md transition-all cursor-pointer">
 									{loading ?
 										<LoaderCircle className="w-3.5 h-3.5 animate-spin" />
-									:	<Save className="w-3.5 h-3.5" />}
-									{loading ? "Menyimpan..." : "Simpan"}
+										: <Save className="w-3.5 h-3.5" />}
+									{loading ? "Menyimpan..." : "Simpan Perubahan"}
 								</Button>
 							</div>
 						</form>

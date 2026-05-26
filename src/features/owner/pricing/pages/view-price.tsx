@@ -247,9 +247,7 @@ const ViewPricePage = () => {
 
                     {/* List */}
                     {filtered.length === 0 ? (
-                        <div className="py-20 flex justify-center">
-                            <EmptyData />
-                        </div>
+                        <EmptyData />
                     ) : (
                         <div className="flex flex-col border rounded-2xl overflow-hidden shadow-sm bg-white">
                             {filtered.map((item) => (

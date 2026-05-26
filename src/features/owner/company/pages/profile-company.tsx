@@ -27,16 +27,7 @@ import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { useDialogStore } from "@/store/dialogStore";
 import { SectionLoading } from "@/shared/atoms";
 import EditCompanyDialog from "../components/edit-company-dialog";
 import PageHeader from "@/shared/atoms/header-content";
@@ -111,13 +102,8 @@ const ProfileCompany = () => {
 		}
 	};
 
+	const { showDialog } = useDialogStore();
 	const [openEdit, setOpenEdit] = useState(false);
-	const [openToggleConfirm, setOpenToggleConfirm] = useState(false);
-	const [openFaqToggleConfirm, setOpenFaqToggleConfirm] = useState(false);
-	const [openIntegrationToggleConfirm, setOpenIntegrationToggleConfirm] =
-		useState(false);
-	const [openClaimTokenToggleConfirm, setOpenClaimTokenToggleConfirm] =
-		useState(false);
 
 	if (loading) return <SectionLoading message="Memuat profil perusahaan.." />;
 
@@ -136,21 +122,6 @@ const ProfileCompany = () => {
 		});
 	};
 
-	const handleToggleActive = async () => {
-		await updateCompany({
-			name: company.name,
-			address: company.address,
-			description: company.description ?? "",
-			isActive: !company.isActive,
-		});
-		setOpenToggleConfirm(false);
-	};
-
-	const handleToggleFaqActive = async () => {
-		await handleFaqToggle(!isFaqActive);
-		setOpenFaqToggleConfirm(false);
-	};
-
 	const isExternalSystemActive =
 		integrationForm.is_integration_active &&
 		integrationForm.integration_type === "external_system";
@@ -158,52 +129,6 @@ const ProfileCompany = () => {
 	const isClaimTokenActive =
 		integrationForm.is_integration_active &&
 		integrationForm.integration_type === "claim_token";
-
-	const handleConfirmToggleIntegration = async () => {
-		const newValue = !isExternalSystemActive;
-		if (newValue) {
-			const isFormIncomplete =
-				!integrationForm.external_login_url?.trim() ||
-				!integrationForm.external_verify_url?.trim() ||
-				!integrationForm.external_check_memberships_url?.trim() ||
-				!integrationForm.secret_key?.trim();
-			if (isFormIncomplete) {
-				notifyError(
-					"Gagal mengaktifkan integrasi",
-					"Harap isi semua konfigurasi URL dan Secret Key terlebih dahulu."
-				);
-				return;
-			}
-		}
-		await updateIntegration({
-			...integrationForm,
-			is_integration_active: newValue,
-			integration_type: "external_system",
-		});
-		setOpenIntegrationToggleConfirm(false);
-	};
-
-	const handleConfirmToggleClaimToken = async () => {
-		const newValue = !isClaimTokenActive;
-		if (newValue) {
-			await updateIntegration({
-				...integrationForm,
-				external_login_url: "",
-				external_verify_url: "",
-				external_check_memberships_url: "",
-				secret_key: "",
-				is_integration_active: true,
-				integration_type: "claim_token",
-			});
-		} else {
-			await updateIntegration({
-				...integrationForm,
-				is_integration_active: false,
-				integration_type: "claim_token",
-			});
-		}
-		setOpenClaimTokenToggleConfirm(false);
-	};
 
 	return (
 		<>
@@ -351,7 +276,24 @@ const ProfileCompany = () => {
 							<Switch
 								checked={company.isActive}
 								disabled={updating}
-								onCheckedChange={() => setOpenToggleConfirm(true)}
+								onCheckedChange={() => {
+									showDialog({
+										title: company.isActive ? "Nonaktifkan Perusahaan?" : "Aktifkan Perusahaan?",
+										description: company.isActive
+											? "Perusahaan akan dinonaktifkan. Seluruh akses operasional akan terhenti sementara."
+											: "Perusahaan akan diaktifkan kembali. Semua staff dan akses operasional akan kembali berfungsi normal.",
+										confirmText: company.isActive ? "Ya, Nonaktifkan" : "Ya, Aktifkan",
+										cancelText: "Batal",
+										onConfirm: async () => {
+											await updateCompany({
+												name: company.name,
+												address: company.address,
+												description: company.description ?? "",
+												isActive: !company.isActive,
+											});
+										},
+									});
+								}}
 								className="data-[state=checked]:bg-emerald-600"
 							/>
 						</div>
@@ -386,7 +328,19 @@ const ProfileCompany = () => {
 							<Switch
 								checked={isFaqActive}
 								disabled={faqSubmitting}
-								onCheckedChange={() => setOpenFaqToggleConfirm(true)}
+								onCheckedChange={() => {
+									showDialog({
+										title: isFaqActive ? "Nonaktifkan FAQ Publik?" : "Aktifkan FAQ Publik?",
+										description: isFaqActive
+											? "FAQ akan disembunyikan dari halaman publik dan tidak dapat diakses oleh umum."
+											: "FAQ akan ditampilkan di halaman publik dan dapat dibaca oleh semua orang.",
+										confirmText: isFaqActive ? "Ya, Nonaktifkan" : "Ya, Aktifkan",
+										cancelText: "Batal",
+										onConfirm: async () => {
+											await handleFaqToggle(!isFaqActive);
+										},
+									});
+								}}
 								className="data-[state=checked]:bg-emerald-600"
 							/>
 						</div>
@@ -428,7 +382,8 @@ const ProfileCompany = () => {
 									checked={isExternalSystemActive}
 									disabled={configSubmitting}
 									onCheckedChange={() => {
-										if (!isExternalSystemActive) {
+										const newValue = !isExternalSystemActive;
+										if (newValue) {
 											const isFormIncomplete =
 												!integrationForm.external_login_url?.trim() ||
 												!integrationForm.external_verify_url?.trim() ||
@@ -442,7 +397,21 @@ const ProfileCompany = () => {
 												return;
 											}
 										}
-										setOpenIntegrationToggleConfirm(true);
+										showDialog({
+											title: isExternalSystemActive ? "Nonaktifkan Integrasi Sistem?" : "Aktifkan Integrasi Sistem?",
+											description: isExternalSystemActive
+												? "Integrasi akan dinonaktifkan. Fitur pairing dan koneksi ke sistem eksternal akan terhenti."
+												: "Integrasi akan diaktifkan. Sistem ini akan terhubung dengan layanan eksternal sesuai konfigurasi yang telah diatur.",
+											confirmText: isExternalSystemActive ? "Ya, Nonaktifkan" : "Ya, Aktifkan",
+											cancelText: "Batal",
+											onConfirm: async () => {
+												await updateIntegration({
+													...integrationForm,
+													is_integration_active: newValue,
+													integration_type: "external_system",
+												});
+											},
+										});
 									}}
 									className="data-[state=checked]:bg-emerald-600"
 								/>
@@ -641,7 +610,36 @@ const ProfileCompany = () => {
 									<Switch
 										checked={isClaimTokenActive}
 										disabled={configSubmitting}
-										onCheckedChange={() => setOpenClaimTokenToggleConfirm(true)}
+										onCheckedChange={() => {
+											showDialog({
+												title: isClaimTokenActive ? "Nonaktifkan Kode Berlangganan?" : "Aktifkan Kode Berlangganan?",
+												description: isClaimTokenActive
+													? "Fitur kode berlangganan akan dinonaktifkan."
+													: "Fitur kode berlangganan akan diaktifkan. Pengaturan integrasi sistem eksternal (URL) sebelumnya akan dikosongkan.",
+												confirmText: isClaimTokenActive ? "Ya, Nonaktifkan" : "Ya, Aktifkan",
+												cancelText: "Batal",
+												onConfirm: async () => {
+													const newValue = !isClaimTokenActive;
+													if (newValue) {
+														await updateIntegration({
+															...integrationForm,
+															external_login_url: "",
+															external_verify_url: "",
+															external_check_memberships_url: "",
+															secret_key: "",
+															is_integration_active: true,
+															integration_type: "claim_token",
+														});
+													} else {
+														await updateIntegration({
+															...integrationForm,
+															is_integration_active: false,
+															integration_type: "claim_token",
+														});
+													}
+												},
+											});
+										}}
 										className="data-[state=checked]:bg-emerald-600"
 									/>
 								)}
@@ -668,165 +666,7 @@ const ProfileCompany = () => {
 					onSuccess={refetch}
 				/>
 
-				<AlertDialog
-					open={openToggleConfirm}
-					onOpenChange={setOpenToggleConfirm}>
-					<AlertDialogContent className="rounded-2xl">
-						<AlertDialogHeader>
-							<AlertDialogTitle>
-								{company.isActive ?
-									"Nonaktifkan Perusahaan?"
-									: "Aktifkan Perusahaan?"}
-							</AlertDialogTitle>
-							<AlertDialogDescription className="leading-relaxed">
-								{company.isActive ?
-									"Perusahaan akan dinonaktifkan. Seluruh akses operasional akan terhenti sementara."
-									: "Perusahaan akan diaktifkan kembali. Semua staff dan akses operasional akan kembali berfungsi normal."
-								}
-							</AlertDialogDescription>
-						</AlertDialogHeader>
-						<AlertDialogFooter>
-							<AlertDialogCancel disabled={updating} className="rounded-xl">
-								Batal
-							</AlertDialogCancel>
-							<AlertDialogAction
-								disabled={updating}
-								onClick={handleToggleActive}
-								className={`rounded-xl ${company.isActive ?
-									"bg-destructive hover:bg-destructive/90 text-white"
-									: "bg-emerald-600 hover:bg-emerald-700 text-white"
-									}`}>
-								{updating ?
-									"Memproses..."
-									: company.isActive ?
-										"Ya, Nonaktifkan"
-										: "Ya, Aktifkan"}
-							</AlertDialogAction>
-						</AlertDialogFooter>
-					</AlertDialogContent>
-				</AlertDialog>
 
-				<AlertDialog
-					open={openFaqToggleConfirm}
-					onOpenChange={setOpenFaqToggleConfirm}>
-					<AlertDialogContent className="rounded-2xl">
-						<AlertDialogHeader>
-							<AlertDialogTitle>
-								{isFaqActive ?
-									"Nonaktifkan FAQ Publik?"
-									: "Aktifkan FAQ Publik?"}
-							</AlertDialogTitle>
-							<AlertDialogDescription className="leading-relaxed">
-								{isFaqActive ?
-									"FAQ akan disembunyikan dari halaman publik dan tidak dapat diakses oleh umum."
-									: "FAQ akan ditampilkan di halaman publik dan dapat dibaca oleh semua orang."
-								}
-							</AlertDialogDescription>
-						</AlertDialogHeader>
-						<AlertDialogFooter>
-							<AlertDialogCancel
-								disabled={faqSubmitting}
-								className="rounded-xl">
-								Batal
-							</AlertDialogCancel>
-							<AlertDialogAction
-								disabled={faqSubmitting}
-								onClick={handleToggleFaqActive}
-								className={`rounded-xl ${isFaqActive ?
-									"bg-destructive hover:bg-destructive/90 text-white"
-									: "bg-emerald-600 hover:bg-emerald-700 text-white"
-									}`}>
-								{faqSubmitting ?
-									"Memproses..."
-									: isFaqActive ?
-										"Ya, Nonaktifkan"
-										: "Ya, Aktifkan"}
-							</AlertDialogAction>
-						</AlertDialogFooter>
-					</AlertDialogContent>
-				</AlertDialog>
-
-				{/* ── Dialog: Konfirmasi Toggle Claim Token ── */}
-				<AlertDialog
-					open={openClaimTokenToggleConfirm}
-					onOpenChange={setOpenClaimTokenToggleConfirm}>
-					<AlertDialogContent className="rounded-2xl">
-						<AlertDialogHeader>
-							<AlertDialogTitle>
-								{isClaimTokenActive ?
-									"Nonaktifkan Kode Berlangganan?"
-									: "Aktifkan Kode Berlangganan?"}
-							</AlertDialogTitle>
-							<AlertDialogDescription className="leading-relaxed">
-								{isClaimTokenActive ?
-									"Fitur kode berlangganan akan dinonaktifkan."
-									: "Fitur kode berlangganan akan diaktifkan. Pengaturan integrasi sistem eksternal (URL) sebelumnya akan dikosongkan."
-								}
-							</AlertDialogDescription>
-						</AlertDialogHeader>
-						<AlertDialogFooter>
-							<AlertDialogCancel
-								disabled={configSubmitting}
-								className="rounded-xl">
-								Batal
-							</AlertDialogCancel>
-							<AlertDialogAction
-								disabled={configSubmitting}
-								onClick={handleConfirmToggleClaimToken}
-								className={`rounded-xl ${isClaimTokenActive ?
-									"bg-destructive hover:bg-destructive/90 text-white"
-									: "bg-emerald-600 hover:bg-emerald-700 text-white"
-									}`}>
-								{configSubmitting ?
-									"Memproses..."
-									: isClaimTokenActive ?
-										"Ya, Nonaktifkan"
-										: "Ya, Aktifkan"}
-							</AlertDialogAction>
-						</AlertDialogFooter>
-					</AlertDialogContent>
-				</AlertDialog>
-
-				{/* ── Dialog: Konfirmasi Toggle Integrasi ── */}
-				<AlertDialog
-					open={openIntegrationToggleConfirm}
-					onOpenChange={setOpenIntegrationToggleConfirm}>
-					<AlertDialogContent className="rounded-2xl">
-						<AlertDialogHeader>
-							<AlertDialogTitle>
-								{isExternalSystemActive ?
-									"Nonaktifkan Integrasi Sistem?"
-									: "Aktifkan Integrasi Sistem?"}
-							</AlertDialogTitle>
-							<AlertDialogDescription className="leading-relaxed">
-								{isExternalSystemActive ?
-									"Integrasi akan dinonaktifkan. Fitur pairing dan koneksi ke sistem eksternal akan terhenti."
-									: "Integrasi akan diaktifkan. Sistem ini akan terhubung dengan layanan eksternal sesuai konfigurasi yang telah diatur."
-								}
-							</AlertDialogDescription>
-						</AlertDialogHeader>
-						<AlertDialogFooter>
-							<AlertDialogCancel
-								disabled={configSubmitting}
-								className="rounded-xl">
-								Batal
-							</AlertDialogCancel>
-							<AlertDialogAction
-								disabled={configSubmitting}
-								onClick={handleConfirmToggleIntegration}
-								className={`rounded-xl ${isExternalSystemActive ?
-									"bg-destructive hover:bg-destructive/90 text-white"
-									: "bg-emerald-600 hover:bg-emerald-700 text-white"
-									}`}>
-								{configSubmitting ?
-									"Memproses..."
-									: isExternalSystemActive ?
-										"Ya, Nonaktifkan"
-										: "Ya, Aktifkan"}
-							</AlertDialogAction>
-						</AlertDialogFooter>
-					</AlertDialogContent>
-				</AlertDialog>
 			</div>
 		</>
 	);
