@@ -6,20 +6,92 @@ const HeroSection = () => {
 	return (
 		<section
 			className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
-			{/* Background Vector — stretched across full section */}
+
+			{/* Animated Background Layers */}
+			<style>{`
+				@keyframes bgDrift1 {
+					0%   { transform: translate(0%, 0%) scale(1.25); }
+					25%  { transform: translate(2%, -1.5%) scale(1.27); }
+					50%  { transform: translate(-1%, 1%) scale(1.25); }
+					75%  { transform: translate(1.5%, 0.5%) scale(1.23); }
+					100% { transform: translate(0%, 0%) scale(1.25); }
+				}
+				@keyframes bgDrift2 {
+					0%   { transform: translate(0%, 0%) scale(1.35) rotate(0deg); }
+					33%  { transform: translate(-3%, 2%) scale(1.38) rotate(1deg); }
+					66%  { transform: translate(2%, -1%) scale(1.33) rotate(-0.5deg); }
+					100% { transform: translate(0%, 0%) scale(1.35) rotate(0deg); }
+				}
+				@keyframes bgDrift3 {
+					0%   { transform: translate(0%, 0%) scale(1.15) rotate(0deg); }
+					50%  { transform: translate(3%, 1.5%) scale(1.18) rotate(-1deg); }
+					100% { transform: translate(0%, 0%) scale(1.15) rotate(0deg); }
+				}
+
+				/* Mobile: gentler animation, fewer layers */
+				@keyframes bgDriftMobile {
+					0%   { transform: translate(0%, 0%) scale(1.6); }
+					50%  { transform: translate(1%, -0.5%) scale(1.62); }
+					100% { transform: translate(0%, 0%) scale(1.6); }
+				}
+
+				@media (max-width: 639px) {
+					.hero-bg-layer1 {
+						background-size: 280% !important;
+						animation: bgDriftMobile 30s ease-in-out infinite !important;
+						opacity: 0.45 !important;
+					}
+					.hero-bg-layer2,
+					.hero-bg-layer3 {
+						display: none !important;
+					}
+				}
+			`}</style>
+
+			{/* Layer 1 — Primary (main vector lines) */}
 			<div
-				className="absolute inset-0 pointer-events-none"
+				className="hero-bg-layer1 absolute inset-0 pointer-events-none"
 				aria-hidden="true"
 				style={{
 					backgroundImage: `url(${bgVector})`,
 					backgroundSize: "125%",
 					backgroundPosition: "center",
 					backgroundRepeat: "no-repeat",
-					opacity: 0.65,
+					opacity: 0.55,
+					animation: "bgDrift1 25s ease-in-out infinite",
+					willChange: "transform",
 				}}
 			/>
 
+			{/* Layer 2 — Slower, larger, subtle overlay */}
+			<div
+				className="hero-bg-layer2 absolute inset-0 pointer-events-none"
+				aria-hidden="true"
+				style={{
+					backgroundImage: `url(${bgVector})`,
+					backgroundSize: "135%",
+					backgroundPosition: "center",
+					backgroundRepeat: "no-repeat",
+					opacity: 0.15,
+					animation: "bgDrift2 35s ease-in-out infinite",
+					willChange: "transform",
+				}}
+			/>
 
+			{/* Layer 3 — Smallest drift, tightest scale */}
+			<div
+				className="hero-bg-layer3 absolute inset-0 pointer-events-none"
+				aria-hidden="true"
+				style={{
+					backgroundImage: `url(${bgVector})`,
+					backgroundSize: "115%",
+					backgroundPosition: "center",
+					backgroundRepeat: "no-repeat",
+					opacity: 0.1,
+					animation: "bgDrift3 20s ease-in-out infinite",
+					willChange: "transform",
+				}}
+			/>
 
 			{/* Hero Content */}
 			<div className="relative z-10 flex flex-col items-center text-center px-6 max-w-6xl mx-auto -mt-20">
@@ -37,8 +109,6 @@ const HeroSection = () => {
 						}}>Work Order</span>
 					</div>
 				</div>
-
-
 
 				{/* Main Title */}
 				<h1
@@ -59,8 +129,6 @@ const HeroSection = () => {
 						Work Order
 					</span>
 				</h1>
-
-
 
 				{/* CTA Buttons */}
 				<div className="flex flex-wrap items-center justify-center gap-4">
@@ -125,7 +193,6 @@ const HeroSection = () => {
 						Dokumentasi
 					</a>
 				</div>
-
 
 			</div>
 
