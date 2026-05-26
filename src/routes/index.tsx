@@ -190,6 +190,11 @@ const router = createBrowserRouter([
 	// ── Auth Routes (Guest Only) ──
 	{
 		element: <GuestRoute />,
+		errorElement: (
+			<SuspenseLayout>
+				<ErrorPage />
+			</SuspenseLayout>
+		),
 		children: [
 			{
 				element: (
@@ -217,6 +222,11 @@ const router = createBrowserRouter([
 			<RootLayout>
 				<PublicLayout />
 			</RootLayout>
+		),
+		errorElement: (
+			<SuspenseLayout>
+				<ErrorPage />
+			</SuspenseLayout>
 		),
 		children: [
 			{
