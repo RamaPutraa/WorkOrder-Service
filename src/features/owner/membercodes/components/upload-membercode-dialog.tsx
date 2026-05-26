@@ -110,8 +110,9 @@ export const UploadMembercodeDialog: React.FC<UploadMembercodeDialogProps> = ({
 						<div className="bg-primary/5 rounded-xl p-4 text-sm text-slate-600 border border-primary/10 leading-relaxed">
 							<p className="font-bold text-primary mb-1.5">Format CSV yang didukung:</p>
 							<ul className="list-disc list-inside space-y-1 ml-1 text-xs">
-								<li><span className="font-mono px-1 py-0.5 rounded text-slate-700 ">externalCustomerEmail</span></li>
-								<li><span className="font-mono px-1 py-0.5 rounded text-slate-700 ">externalCustomerName</span></li>
+								<li><span className="font-mono px-1 py-0.5 rounded text-slate-700 ">name</span></li>
+								<li><span className="font-mono px-1 py-0.5 rounded text-slate-700 ">email</span></li>
+								<li><span className="font-mono px-1 py-0.5 rounded text-slate-700 ">token</span></li>
 							</ul>
 						</div>
 

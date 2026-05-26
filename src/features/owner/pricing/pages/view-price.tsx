@@ -183,6 +183,7 @@ const ViewPricePage = () => {
                 onAddClick={handleAdd}
                 addLabel="Tambah Harga"
                 addIcon={<Plus className="w-4 h-4" />}
+                backPath={true}
             />
 
             {/* ── Stats ── */}

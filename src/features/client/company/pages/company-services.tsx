@@ -536,6 +536,7 @@ const ClientCompanyServices = () => {
 			<ClaimMembershipDialog
 				open={claimDialogOpen}
 				onOpenChange={setClaimDialogOpen}
+				companyId={id || ""}
 				onSuccess={() => {
 					void fetchCompanyDetail();
 					void fetchCompanyServices();

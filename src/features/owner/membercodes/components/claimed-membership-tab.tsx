@@ -74,26 +74,14 @@ export const ClaimedMembershipTab = () => {
 								</div>
 								<div>
 									<p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-										Total Token Diklaim
+										Total Voucer Diklaim
 									</p>
 									<p className="text-2xl font-bold text-blue-700 leading-tight">
 										{filtered.length}
 									</p>
 								</div>
 							</div>
-							<div className="flex items-center gap-4 bg-white border border-slate-100 rounded-2xl px-5 py-4 shadow-sm">
-								<div className="shrink-0 w-11 h-11 rounded-xl bg-emerald-50 ring-1 ring-emerald-100 flex items-center justify-center text-emerald-600">
-									<Link2 className="w-5 h-5" />
-								</div>
-								<div>
-									<p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-										Akun Aktif Terhubung
-									</p>
-									<p className="text-2xl font-bold text-emerald-700 leading-tight">
-										{filtered.length}
-									</p>
-								</div>
-							</div>
+
 						</div>
 
 						<div className="relative">

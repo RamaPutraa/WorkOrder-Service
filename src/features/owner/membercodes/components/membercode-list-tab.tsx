@@ -108,16 +108,11 @@ export const MembercodeListTab = () => {
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 							<StatCard
 								icon={<Users className="w-5 h-5" />}
-								label="Total Pelanggan"
+								label="Total Voucer"
 								value={totalCodes}
 								color="blue"
 							/>
-							<StatCard
-								icon={<Ticket className="w-5 h-5" />}
-								label="Total Voucer"
-								value={totalCodes}
-								color="emerald"
-							/>
+
 						</div>
 
 						<div className="space-y-3">
@@ -172,8 +167,8 @@ export const MembercodeListTab = () => {
 														onClick={() => handleCopy(item._id, item.token)}
 														title="Salin voucer"
 														className={`shrink-0 transition-all duration-200 rounded-md p-1 ${isCopied
-																? "text-emerald-500 bg-emerald-100"
-																: "text-slate-400 hover:text-blue-600 hover:bg-blue-100"
+															? "text-emerald-500 bg-emerald-100"
+															: "text-slate-400 hover:text-blue-600 hover:bg-blue-100"
 															}`}>
 														{isCopied ? (
 															<Check className="size-3.5" />
@@ -214,8 +209,8 @@ export const MembercodeListTab = () => {
 													onClick={() => handleCopy(item._id, item.token)}
 													title="Salin voucer"
 													className={`shrink-0 transition-all duration-200 rounded-md p-1 ${isCopied
-															? "text-emerald-500 bg-emerald-50"
-															: "text-slate-400 hover:text-blue-600 hover:bg-blue-50"
+														? "text-emerald-500 bg-emerald-50"
+														: "text-slate-400 hover:text-blue-600 hover:bg-blue-50"
 														}`}>
 													{isCopied ? (
 														<Check className="size-3" />

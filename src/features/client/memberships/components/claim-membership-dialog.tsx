@@ -28,12 +28,14 @@ interface ClaimMembershipDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	onSuccess?: () => void;
+	companyId: string;
 }
 
 const ClaimMembershipDialog = ({
 	open,
 	onOpenChange,
 	onSuccess,
+	companyId,
 }: ClaimMembershipDialogProps) => {
 	const handleSuccess = () => {
 		onOpenChange(false);
@@ -56,7 +58,7 @@ const ClaimMembershipDialog = ({
 	}, [open]);
 
 	const onSubmit = (data: ClaimMembershipFormValues) => {
-		claim(data);
+		claim({ ...data, company_id: companyId });
 	};
 
 	const handleOpenChange = (newOpen: boolean) => {
