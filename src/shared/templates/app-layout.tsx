@@ -64,7 +64,7 @@ const AppLayout = () => {
 									<BreadcrumbItem>
 										<BreadcrumbPage>Home</BreadcrumbPage>
 									</BreadcrumbItem>
-								:	mappedCrumbs.map((crumb, index) => {
+									: mappedCrumbs.map((crumb, index) => {
 										const isLast = index === mappedCrumbs.length - 1;
 										const decodedValue = decodeURIComponent(crumb.value);
 										const title =
@@ -77,9 +77,11 @@ const AppLayout = () => {
 													className={index === 0 ? "hidden md:block" : ""}>
 													{isLast ?
 														<BreadcrumbPage>{title}</BreadcrumbPage>
-													:	<BreadcrumbLink asChild>
-															<Link to={crumb.to}>{title}</Link>
-														</BreadcrumbLink>
+														: index === 0 && crumb.value.toLowerCase() === "dashboard" ?
+															<span className="font-normal text-muted-foreground">{title}</span>
+															: <BreadcrumbLink asChild>
+																<Link to={crumb.to}>{title}</Link>
+															</BreadcrumbLink>
 													}
 												</BreadcrumbItem>
 												{!isLast && (
