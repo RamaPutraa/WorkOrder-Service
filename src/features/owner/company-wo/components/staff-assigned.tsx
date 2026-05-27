@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Users, Settings, Save, Star, Trash2 } from "lucide-react";
+import { Users, Settings, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {

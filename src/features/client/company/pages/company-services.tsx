@@ -18,7 +18,6 @@ import { SectionLoading, FullPageLoading } from "@/shared/atoms";
 import PageHeader from "@/shared/atoms/header-content";
 import { FaqChatbot } from "@/shared/organism/faq-chatbot";
 import { usePairingAccount } from "@/features/client/pairing-account/hooks/use-pairing-account";
-// FIXME: masih error kalo integrationTypenya "claim_token"
 import { getPairedAccountInCompany } from "@/features/client/pairing-account/services/pairing-account";
 import { useDialogStore } from "@/store/dialogStore";
 import ClaimMembershipDialog from "@/features/client/memberships/components/claim-membership-dialog";
