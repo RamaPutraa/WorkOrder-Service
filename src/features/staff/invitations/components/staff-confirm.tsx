@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "@/store/authStore";
 import {
 	Empty,
 	EmptyContent,
@@ -9,7 +8,7 @@ import {
 	EmptyMedia,
 	EmptyTitle,
 } from "@/components/ui/empty";
-import { ArrowUpRightIcon, CheckCircle } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 
 const StaffConfirmPage = () => {
 	const navigate = useNavigate();
