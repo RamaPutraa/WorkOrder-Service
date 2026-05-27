@@ -1,8 +1,8 @@
-import { lazy } from "react";
+import { lazyWithRetry } from "@/shared/utils/lazy-with-retry";
 import { type RouteObject } from "react-router-dom";
 
-const ProfilePage = lazy(() => import("@/features/auth/pages/profile"));
-const SettingsPage = lazy(
+const ProfilePage = lazyWithRetry(() => import("@/features/auth/pages/profile"));
+const SettingsPage = lazyWithRetry(
 	() => import("@/features/settings/pages/settings-page"),
 );
 

@@ -1,79 +1,79 @@
 import CompanyTypeView from "@/features/owner/template/pages/company-type-view";
 import ServicesTypeView from "@/features/owner/template/pages/services-type-view";
-import { lazy } from "react";
+import { lazyWithRetry } from "@/shared/utils/lazy-with-retry";
 import { type RouteObject, Navigate } from "react-router-dom";
 import useAuth from "@/features/auth/hooks/useAuth";
 
 // Lazy Load Pages
-const DashboardOwner = lazy(
+const DashboardOwner = lazyWithRetry(
 	() => import("@/features/dashboard/pages/dashboard-owner"),
 );
-const FormPage = lazy(() => import("@/features/owner/form/pages/view-form"));
-const CreateFormPage = lazy(
+const FormPage = lazyWithRetry(() => import("@/features/owner/form/pages/view-form"));
+const CreateFormPage = lazyWithRetry(
 	() => import("@/features/owner/form/pages/create-form"),
 );
-const DetailFormPage = lazy(
+const DetailFormPage = lazyWithRetry(
 	() => import("@/features/owner/form/pages/detail-form"),
 );
-const EditFormPage = lazy(
+const EditFormPage = lazyWithRetry(
 	() => import("@/features/owner/form/pages/edit-form"),
 );
-const PositionPage = lazy(
+const PositionPage = lazyWithRetry(
 	() => import("@/features/owner/position/pages/view-position"),
 );
-const CreatePositionPage = lazy(
+const CreatePositionPage = lazyWithRetry(
 	() => import("@/features/owner/position/pages/create-position"),
 );
-const ProfileCompany = lazy(
+const ProfileCompany = lazyWithRetry(
 	() => import("@/features/owner/company/pages/profile-company"),
 );
-const ViewService = lazy(
+const ViewService = lazyWithRetry(
 	() => import("@/features/owner/services-wo/pages/view-service"),
 );
-const CreateService = lazy(
+const CreateService = lazyWithRetry(
 	() => import("@/features/owner/services-wo/pages/create-service"),
 );
-const EditService = lazy(
+const EditService = lazyWithRetry(
 	() => import("@/features/owner/services-wo/pages/edit-service"),
 );
-const DetailService = lazy(
+const DetailService = lazyWithRetry(
 	() => import("@/features/owner/services-wo/pages/detail-service"),
 );
-const ViewServiceRequest = lazy(
+const ViewServiceRequest = lazyWithRetry(
 	() => import("@/features/owner/business/pages/view-service-request"),
 );
-const DetailServiceRequest = lazy(
+const DetailServiceRequest = lazyWithRetry(
 	() => import("@/features/owner/business/pages/detail-service-request"),
 );
-const CompanyViewWo = lazy(
+const CompanyViewWo = lazyWithRetry(
 	() => import("@/features/owner/company-wo/pages/company-view-wo"),
 );
-const CompanyDetailWo = lazy(
+const CompanyDetailWo = lazyWithRetry(
 	() => import("@/features/owner/company-wo/pages/company-detail-wo"),
 );
-const CompanyReportWo = lazy(
+const CompanyReportWo = lazyWithRetry(
 	() => import("@/features/owner/company-wo/pages/company-report-wo"),
 );
-const ViewStaff = lazy(
+const ViewStaff = lazyWithRetry(
 	() => import("@/features/owner/staff-master/pages/view-staff"),
 );
-const HistoryStaffInvitations = lazy(
+const HistoryStaffInvitations = lazyWithRetry(
 	() => import("@/features/owner/staff-master/pages/history-staff-invitations"),
 );
-const ViewMemberCodes = lazy(
+const ViewMemberCodes = lazyWithRetry(
 	() => import("@/features/owner/membercodes/pages/view-membercode"),
 );
-const WoServicesList = lazy(
+const WoServicesList = lazyWithRetry(
 	() => import("@/features/owner/wo-create/pages/services-list"),
 );
-const WoServicesDetail = lazy(
+const WoServicesDetail = lazyWithRetry(
 	() => import("@/features/owner/wo-create/pages/services-detail"),
 );
-const ViewFaq = lazy(() => import("@/features/owner/faqs/pages/view-faq"));
-const ViewPricePage = lazy(
+const ViewFaq = lazyWithRetry(() => import("@/features/owner/faqs/pages/view-faq"));
+const ViewPricePage = lazyWithRetry(
 	() => import("@/features/owner/pricing/pages/view-price"),
 );
-const ViewAccountPairing = lazy(
+const ViewAccountPairing = lazyWithRetry(
 	() => import("@/features/owner/pairing-company/pages/view-account-pairing"),
 );
 

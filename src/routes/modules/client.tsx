@@ -1,25 +1,25 @@
-import { lazy } from "react";
+import { lazyWithRetry } from "@/shared/utils/lazy-with-retry";
 import { type RouteObject } from "react-router-dom";
 
-const DashboardClient = lazy(
+const DashboardClient = lazyWithRetry(
 	() => import("@/features/dashboard/pages/dashboard-client"),
 );
-const CompanyList = lazy(
+const CompanyList = lazyWithRetry(
 	() => import("@/features/client/company/pages/company-list"),
 );
-const ClientCompanyServices = lazy(
+const ClientCompanyServices = lazyWithRetry(
 	() => import("@/features/client/company/pages/company-services"),
 );
-const PublicServicePage = lazy(
+const PublicServicePage = lazyWithRetry(
 	() => import("@/features/client/services-wo/pages/service-request"),
 );
-const ServiceSubmitPage = lazy(
+const ServiceSubmitPage = lazyWithRetry(
 	() => import("@/features/client/services-wo/pages/services-submit"),
 );
-const ServiceDetailSubmit = lazy(
+const ServiceDetailSubmit = lazyWithRetry(
 	() => import("@/features/client/services-wo/pages/services-detail-submit"),
 );
-const PairingCallback = lazy(
+const PairingCallback = lazyWithRetry(
 	() => import("@/features/client/pairing-account/pages/pairing-callback")
 );
 

@@ -1,23 +1,23 @@
-import { lazy } from "react";
+import { lazyWithRetry } from "@/shared/utils/lazy-with-retry";
 import { type RouteObject } from "react-router-dom";
 
-const DashboardStaff = lazy(
+const DashboardStaff = lazyWithRetry(
 	() => import("@/features/dashboard/pages/dashboard-staff"),
 );
 
-const ListServices = lazy(
+const ListServices = lazyWithRetry(
 	() => import("@/features/staff/service-request/pages/list-services"),
 );
-const ServiceForm = lazy(
+const ServiceForm = lazyWithRetry(
 	() => import("@/features/staff/service-request/pages/services-form"),
 );
-const SrHistory = lazy(
+const SrHistory = lazyWithRetry(
 	() => import("@/features/staff/service-request/pages/sr-history"),
 );
-const SrDetailHistory = lazy(
+const SrDetailHistory = lazyWithRetry(
 	() => import("@/features/staff/service-request/pages/sr-detail-history"),
 );
-const InvitationsHistory = lazy(
+const InvitationsHistory = lazyWithRetry(
 	() => import("@/features/staff/invitations/pages/invitations-history"),
 );
 

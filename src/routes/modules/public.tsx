@@ -1,18 +1,18 @@
-import { lazy } from "react";
+import { lazyWithRetry } from "@/shared/utils/lazy-with-retry";
 import { type RouteObject } from "react-router-dom";
 
-const LandingPage = lazy(() => import("@/features/public/landing-page"));
-const LoginPage = lazy(() => import("@/features/auth/pages/login-page"));
-const HeroRegis = lazy(
+const LandingPage = lazyWithRetry(() => import("@/features/public/landing-page"));
+const LoginPage = lazyWithRetry(() => import("@/features/auth/pages/login-page"));
+const HeroRegis = lazyWithRetry(
 	() => import("@/features/auth/pages/hero-section-regis"),
 );
-const ClientRegisterPage = lazy(
+const ClientRegisterPage = lazyWithRetry(
 	() => import("@/features/auth/pages/client-reg-page"),
 );
-const InternalRegisterPage = lazy(
+const InternalRegisterPage = lazyWithRetry(
 	() => import("@/features/auth/pages/internal-reg-page"),
 );
-const MockExternalAuth = lazy(
+const MockExternalAuth = lazyWithRetry(
 	() => import("@/features/client/pairing-account/pages/mock-external-auth")
 );
 

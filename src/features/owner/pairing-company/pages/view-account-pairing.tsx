@@ -32,7 +32,7 @@ const ViewAccountPairing: React.FC = () => {
 	};
 
 	const filtered = memberships.filter((m) => {
-		if (m.integrationType !== "external_system") return false;
+		if (m.externalAccount.integrationType !== "external_system") return false;
 
 		const q = search.toLowerCase();
 		return (

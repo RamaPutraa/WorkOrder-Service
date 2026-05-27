@@ -167,45 +167,47 @@ export default function ClientContent() {
 									</div>
 
 									{/* Right — Action */}
-									<div className="flex items-center gap-2 shrink-0">
-										{isConfirming ? (
-											<>
-												<span className="text-xs text-slate-500 mr-1">Putuskan koneksi?</span>
-												<Button
-													size="sm"
-													variant="destructive"
-													className="h-7 text-xs px-3"
-													onClick={() => handleDisconnect(account._id)}
-													disabled={isDisconnecting}
-												>
-													{isDisconnecting ? (
-														<div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-													) : (
-														"Ya, Putuskan"
-													)}
-												</Button>
+									{account.integrationType === "external_system" && (
+										<div className="flex items-center gap-2 shrink-0">
+											{isConfirming ? (
+												<>
+													<span className="text-xs text-slate-500 mr-1">Putuskan koneksi?</span>
+													<Button
+														size="sm"
+														variant="destructive"
+														className="h-7 text-xs px-3"
+														onClick={() => handleDisconnect(account._id)}
+														disabled={isDisconnecting}
+													>
+														{isDisconnecting ? (
+															<div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+														) : (
+															"Ya, Putuskan"
+														)}
+													</Button>
+													<Button
+														size="sm"
+														variant="ghost"
+														className="h-7 text-xs px-3 text-slate-500"
+														onClick={() => setConfirmId(null)}
+													>
+														Batal
+													</Button>
+												</>
+											) : (
 												<Button
 													size="sm"
 													variant="ghost"
-													className="h-7 text-xs px-3 text-slate-500"
-													onClick={() => setConfirmId(null)}
+													className="h-7 text-xs gap-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"
+													onClick={() => setConfirmId(account._id)}
 												>
-													Batal
+													<LogOut className="w-3.5 h-3.5" />
+													Putuskan
+													<ChevronRight className="w-3 h-3 opacity-50" />
 												</Button>
-											</>
-										) : (
-											<Button
-												size="sm"
-												variant="ghost"
-												className="h-7 text-xs gap-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"
-												onClick={() => setConfirmId(account._id)}
-											>
-												<LogOut className="w-3.5 h-3.5" />
-												Putuskan
-												<ChevronRight className="w-3 h-3 opacity-50" />
-											</Button>
-										)}
-									</div>
+											)}
+										</div>
+									)}
 								</div>
 							);
 						})}

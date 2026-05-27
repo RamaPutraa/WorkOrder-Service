@@ -64,6 +64,9 @@ const ProfileCompany = () => {
 	const [showIntegrationForm, setShowIntegrationForm] = useState(false);
 	const [isDirty, setIsDirty] = useState(false);
 
+	const [uiExternalActive, setUiExternalActive] = useState(false);
+	const [uiClaimTokenActive, setUiClaimTokenActive] = useState(false);
+
 	// Sync form saat config berhasil di-load
 	useEffect(() => {
 		if (config) {
@@ -76,6 +79,8 @@ const ProfileCompany = () => {
 				integration_type: config.integration_type || "external_system",
 				is_integration_active: config.is_integration_active || false,
 			});
+			setUiExternalActive(config.integration_type === "external_system" && config.is_integration_active);
+			setUiClaimTokenActive(config.integration_type === "claim_token" && config.is_integration_active);
 			setIsDirty(false);
 		}
 	}, [config]);
@@ -93,10 +98,56 @@ const ProfileCompany = () => {
 	};
 
 	const handleSaveIntegration = async () => {
-		const success = await updateIntegration({
-			...integrationForm,
-			integration_type: "external_system",
-		});
+		// Validasi: jika aktif + external_system, semua field harus terisi
+		if (
+			integrationForm.is_integration_active &&
+			integrationForm.integration_type === "external_system"
+		) {
+			const isFormIncomplete =
+				!integrationForm.external_login_url?.trim() ||
+				!integrationForm.external_verify_url?.trim() ||
+				!integrationForm.external_check_memberships_url?.trim() ||
+				!integrationForm.secret_key?.trim();
+			if (isFormIncomplete) {
+				notifyError(
+					"Gagal menyimpan konfigurasi",
+					"Untuk mengaktifkan integrasi sistem eksternal, harap isi semua URL dan Secret Key."
+				);
+				return;
+			}
+		}
+
+		// Cek apakah sedang mengubah tipe integrasi yang sudah aktif
+		const isServerActive = config?.is_integration_active ?? false;
+		const serverType = config?.integration_type;
+		const isSwitchingType =
+			integrationForm.is_integration_active &&
+			isServerActive &&
+			serverType &&
+			serverType !== integrationForm.integration_type;
+
+		if (isSwitchingType) {
+			const fromLabel = serverType === "external_system" ? "Integrasi Sistem Eksternal" : "Kode Berlangganan";
+			const toLabel = integrationForm.integration_type === "external_system" ? "Integrasi Sistem Eksternal" : "Kode Berlangganan";
+
+			showDialog({
+				title: "Ubah Tipe Integrasi?",
+				description:
+					`Saat ini perusahaan Anda menggunakan ${fromLabel}. ` +
+					`Jika diubah ke ${toLabel}, seluruh data pelanggan membership ` +
+					`yang sudah tercatat melalui ${fromLabel} akan dihapus. ` +
+					`Apakah Anda yakin ingin melanjutkan?`,
+				confirmText: "Ya, Ubah & Simpan",
+				cancelText: "Batal",
+				onConfirm: async () => {
+					const success = await updateIntegration(integrationForm);
+					if (success) setIsDirty(false);
+				},
+			});
+			return;
+		}
+
+		const success = await updateIntegration(integrationForm);
 		if (success) {
 			setIsDirty(false);
 		}
@@ -121,14 +172,6 @@ const ProfileCompany = () => {
 			year: "numeric",
 		});
 	};
-
-	const isExternalSystemActive =
-		integrationForm.is_integration_active &&
-		integrationForm.integration_type === "external_system";
-
-	const isClaimTokenActive =
-		integrationForm.is_integration_active &&
-		integrationForm.integration_type === "claim_token";
 
 	return (
 		<>
@@ -353,73 +396,7 @@ const ProfileCompany = () => {
 						Integrasi Antar Sistem
 					</h2>
 
-					{/* Toggle Integrasi Aktif */}
-					<div className="shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-6 p-5 border border-border/40 rounded-2xl bg-card transition-all hover:border-primary/20">
-						<div className="space-y-1.5">
-							<p className="text-sm font-bold text-foreground">
-								Aktifkan Integrasi
-							</p>
-							<p className="text-sm text-muted-foreground leading-relaxed">
-								Hubungkan sisitem internal perusahaan anda dengan platform kami
-								agar pelanggan dapat mengaitkan akun mereka dan memperoleh akses
-								ke layanan khusus pelanggan secara otomatis
-							</p>
-							{isExternalSystemActive && (
-								<p className="text-xs font-medium text-emerald-600 flex items-center gap-1.5 mt-1.5">
-									<CheckCircle2 className="w-3.5 h-3.5" />
-									Sistem integrasi aktif
-								</p>
-							)}
-						</div>
-
-						<div className="pl-10 sm:pl-0 shrink-0 flex items-center gap-3">
-							<span className={`text-sm font-medium ${isExternalSystemActive ? "text-emerald-600" : "text-muted-foreground"}`}>
-								{isExternalSystemActive ? "Aktif" : "Non-Aktif"}
-							</span>
-							{configLoading ?
-								<Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-								: <Switch
-									checked={isExternalSystemActive}
-									disabled={configSubmitting}
-									onCheckedChange={() => {
-										const newValue = !isExternalSystemActive;
-										if (newValue) {
-											const isFormIncomplete =
-												!integrationForm.external_login_url?.trim() ||
-												!integrationForm.external_verify_url?.trim() ||
-												!integrationForm.external_check_memberships_url?.trim() ||
-												!integrationForm.secret_key?.trim();
-											if (isFormIncomplete) {
-												notifyError(
-													"Gagal mengaktifkan integrasi",
-													"Harap isi semua konfigurasi URL dan Secret Key terlebih dahulu."
-												);
-												return;
-											}
-										}
-										showDialog({
-											title: isExternalSystemActive ? "Nonaktifkan Integrasi Sistem?" : "Aktifkan Integrasi Sistem?",
-											description: isExternalSystemActive
-												? "Integrasi akan dinonaktifkan. Fitur pairing dan koneksi ke sistem eksternal akan terhenti."
-												: "Integrasi akan diaktifkan. Sistem ini akan terhubung dengan layanan eksternal sesuai konfigurasi yang telah diatur.",
-											confirmText: isExternalSystemActive ? "Ya, Nonaktifkan" : "Ya, Aktifkan",
-											cancelText: "Batal",
-											onConfirm: async () => {
-												await updateIntegration({
-													...integrationForm,
-													is_integration_active: newValue,
-													integration_type: "external_system",
-												});
-											},
-										});
-									}}
-									className="data-[state=checked]:bg-emerald-600"
-								/>
-							}
-						</div>
-					</div>
-
-					{/* Konfigurasi URL & Secret Key */}
+					{/* Konfigurasi Integrasi Sistem Eksternal */}
 					<div className="border border-border/40 rounded-2xl bg-card overflow-hidden shadow-sm">
 						{/* Header accordion */}
 						<button
@@ -432,18 +409,24 @@ const ProfileCompany = () => {
 								</div>
 								<div>
 									<p className="text-sm font-bold text-foreground">
-										Konfigurasi URL & Kunci Integrasi
+										Konfigurasi Integrasi Sistem Eksternal
 									</p>
 									<p className="text-xs text-muted-foreground mt-0.5">
-										Atur endpoint dan kunci rahasia untuk koneksi sistem
-										eksternal
+										Atur endpoint, kunci rahasia, dan status integrasi
 									</p>
 								</div>
 							</div>
-							{showIntegrationForm ?
-								<ChevronUp className="w-4 h-4 text-muted-foreground shrink-0" />
-								: <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />
-							}
+							<div className="flex items-center gap-3">
+								{uiExternalActive && (
+									<span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">
+										Aktif
+									</span>
+								)}
+								{showIntegrationForm ?
+									<ChevronUp className="w-4 h-4 text-muted-foreground shrink-0" />
+									: <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />
+								}
+							</div>
 						</button>
 
 						{/* Form collapse */}
@@ -457,6 +440,29 @@ const ProfileCompany = () => {
 										</span>
 									</div>
 									: <>
+										{/* Toggle Aktifkan Integrasi — di dalam form */}
+										<div className="flex items-center justify-between p-4 rounded-xl bg-muted/30 border border-border/30">
+											<div className="space-y-0.5">
+												<p className="text-sm font-medium text-foreground">Aktifkan Integrasi Sistem Eksternal</p>
+												<p className="text-xs text-muted-foreground">
+													Hubungkan sistem internal perusahaan agar pelanggan dapat mengaitkan akun mereka
+												</p>
+											</div>
+											<Switch
+												checked={uiExternalActive}
+												onCheckedChange={(checked) => {
+													setUiExternalActive(checked);
+													setIntegrationForm((prev) => ({
+														...prev,
+														is_integration_active: checked,
+														integration_type: "external_system",
+													}));
+													setIsDirty(true);
+												}}
+												className="data-[state=checked]:bg-emerald-600"
+											/>
+										</div>
+
 										{/* External Login URL */}
 										<div className="space-y-2">
 											<Label
@@ -582,11 +588,11 @@ const ProfileCompany = () => {
 						)}
 					</div>
 
-					{/* ── Banner: Fallback Membercode ── */}
+					{/* ── Banner: Kode Berlangganan ── */}
 					<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 p-5 border border-primary/20 bg-primary/5 rounded-2xl">
 						<div className="space-y-1.5">
 							<div className="text-sm font-bold text-foreground flex items-center gap-2">
-								{isClaimTokenActive ?
+								{uiClaimTokenActive ?
 									<>
 										<div className="flex items-center gap-2">
 											<CheckCircle2 className="w-4 h-4 text-green-500" />
@@ -596,47 +602,55 @@ const ProfileCompany = () => {
 									: "Belum Punya Sistem Eksternal?"}
 							</div>
 							<p className="text-sm text-muted-foreground leading-relaxed">
-								{isClaimTokenActive ? "Fitur kode berlangganan sudah aktif, pelanggan anda dapat menggunakan kode berlangganan untuk mengakses layanan khusus langganan." : "Anda dapat menggunakan fitur integrasi sistem kami untuk mengelola akses layanan khusus bagi pelanggan Anda."}
+								{uiClaimTokenActive ? "Fitur kode berlangganan sudah aktif, pelanggan anda dapat menggunakan kode berlangganan untuk mengakses layanan khusus langganan." : "Anda dapat menggunakan fitur kode berlangganan untuk mengelola akses layanan khusus bagi pelanggan Anda."}
 							</p>
 						</div>
 						<div className="shrink-0 w-full sm:w-auto flex items-center gap-4">
 							<div className="flex items-center gap-3">
-								<span className={`text-sm font-medium ${isClaimTokenActive ? "text-emerald-600" : "text-muted-foreground"}`}>
-									{isClaimTokenActive ? "Aktif" : "Non-Aktif"}
+								<span className={`text-sm font-medium ${uiClaimTokenActive ? "text-emerald-600" : "text-muted-foreground"}`}>
+									{uiClaimTokenActive ? "Aktif" : "Non-Aktif"}
 								</span>
 								{configLoading ? (
 									<Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
 								) : (
 									<Switch
-										checked={isClaimTokenActive}
+										checked={uiClaimTokenActive}
 										disabled={configSubmitting}
-										onCheckedChange={() => {
+										onCheckedChange={(checked) => {
+											const newClaimValue = checked;
+
+											// Cek apakah server sudah punya integrasi aktif dengan tipe external_system
+											const isServerActive = config?.is_integration_active ?? false;
+											const serverType = config?.integration_type;
+											const isSwitchingFromExternal =
+												newClaimValue &&
+												isServerActive &&
+												serverType === "external_system";
+
+											let claimDescription = "";
+											if (!newClaimValue) {
+												claimDescription = "Fitur kode berlangganan akan dinonaktifkan.";
+											} else if (isSwitchingFromExternal) {
+												claimDescription =
+													"Perhatian: Saat ini perusahaan Anda menggunakan Integrasi Sistem Eksternal. " +
+													"Jika Anda mengubah ke Kode Berlangganan, seluruh data pelanggan membership " +
+													"yang sudah tercatat melalui sistem eksternal akan dihapus. " +
+													"Apakah Anda yakin ingin melanjutkan?";
+											} else {
+												claimDescription = "Fitur kode berlangganan akan diaktifkan.";
+											}
+
 											showDialog({
-												title: isClaimTokenActive ? "Nonaktifkan Kode Berlangganan?" : "Aktifkan Kode Berlangganan?",
-												description: isClaimTokenActive
-													? "Fitur kode berlangganan akan dinonaktifkan."
-													: "Fitur kode berlangganan akan diaktifkan. Pengaturan integrasi sistem eksternal (URL) sebelumnya akan dikosongkan.",
-												confirmText: isClaimTokenActive ? "Ya, Nonaktifkan" : "Ya, Aktifkan",
+												title: !newClaimValue ? "Nonaktifkan Kode Berlangganan?" : "Aktifkan Kode Berlangganan?",
+												description: claimDescription,
+												confirmText: !newClaimValue ? "Ya, Nonaktifkan" : "Ya, Aktifkan",
 												cancelText: "Batal",
 												onConfirm: async () => {
-													const newValue = !isClaimTokenActive;
-													if (newValue) {
-														await updateIntegration({
-															...integrationForm,
-															external_login_url: "",
-															external_verify_url: "",
-															external_check_memberships_url: "",
-															secret_key: "",
-															is_integration_active: true,
-															integration_type: "claim_token",
-														});
-													} else {
-														await updateIntegration({
-															...integrationForm,
-															is_integration_active: false,
-															integration_type: "claim_token",
-														});
-													}
+													await updateIntegration({
+														...integrationForm,
+														is_integration_active: newClaimValue,
+														integration_type: "claim_token",
+													});
 												},
 											});
 										}}
@@ -645,7 +659,7 @@ const ProfileCompany = () => {
 								)}
 							</div>
 
-							{isClaimTokenActive && (
+							{uiClaimTokenActive && (
 								<Button
 									onClick={() => navigate("/dashboard/internal/membercodes")}
 									className="w-full sm:w-auto rounded-xl gap-2 hover:cursor-pointer"

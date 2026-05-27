@@ -12,5 +12,6 @@ type ExternalAccount = {
 	externalCustomerEmail: string;
 	externalCustomerName: string;
 	company: Company;
+	integrationType: "external_system" | "claim_token";
 	pairedAt: Date;
 };

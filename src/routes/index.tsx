@@ -1,4 +1,5 @@
-import { Suspense, lazy } from "react";
+import { Suspense } from "react";
+import { lazyWithRetry } from "@/shared/utils/lazy-with-retry";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import { AppLayout, PublicLayout, RootLayout } from "@/shared/templates";
 import { SectionLoading } from "@/shared/atoms/loading-state";
@@ -15,11 +16,11 @@ import { publicRoutes, authRoutes } from "./modules/public";
 import { accountRoutes } from "./modules/account";
 
 // Shared Lazy Components
-const ErrorPage = lazy(() => import("@/shared/errors/templates/error-page"));
-const NotFoundPage = lazy(
+const ErrorPage = lazyWithRetry(() => import("@/shared/errors/templates/error-page"));
+const NotFoundPage = lazyWithRetry(
 	() => import("@/shared/errors/templates/not-found-page"),
 );
-const DashboardManager = lazy(
+const DashboardManager = lazyWithRetry(
 	() => import("@/features/dashboard/pages/dashboard-manager"),
 );
 
