@@ -16,19 +16,6 @@ import {
 	detachPairedAccount,
 } from "@/features/client/pairing-account/services/pairing-account";
 
-type Company = {
-	_id: string;
-	name: string;
-};
-
-type ExternalAccount = {
-	_id: string;
-	external_customer_email: string;
-	external_customer_name: string;
-	company: Company;
-	paired_at: Date;
-};
-
 // ── Skeleton ────────────────────────────────────────────────────────────────
 function SkeletonRow() {
 	return (
@@ -164,14 +151,14 @@ export default function ClientContent() {
 												<div className="flex items-center gap-1 text-xs text-slate-400">
 													<AtSign className="w-3 h-3 shrink-0" />
 													<span className="truncate max-w-[180px]">
-														{account.external_customer_email || "-"}
+														{account.externalCustomerEmail || "-"}
 													</span>
 												</div>
 												<div className="flex items-center gap-1 text-xs text-slate-400">
 													<CalendarDays className="w-3 h-3 shrink-0" />
 													<span>
-														{account.paired_at
-															? format(new Date(account.paired_at), "dd MMM yyyy", { locale: localeId })
+														{account.pairedAt
+															? format(new Date(account.pairedAt), "dd MMM yyyy", { locale: localeId })
 															: "-"}
 													</span>
 												</div>

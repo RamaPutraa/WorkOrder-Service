@@ -38,7 +38,6 @@ export interface StaffAssignedProps {
 
 const StaffRow = ({
 	staff,
-	isPIC,
 	highlight = false,
 	onClick,
 }: {

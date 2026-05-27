@@ -1,5 +1,4 @@
 import LoginForm from "@/features/auth/components/form-schema/login-form";
-import { LogIn } from "lucide-react";
 
 const LoginPage = () => {
 	return (
