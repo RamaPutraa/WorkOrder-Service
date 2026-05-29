@@ -25,7 +25,7 @@ export const ClaimedMembershipTab = () => {
 	};
 
 	const filtered = memberships.filter((m) => {
-		if (m.integrationType !== "claim_token") return false;
+		if (m.externalAccount.integrationType !== "claim_token") return false;
 
 		const q = search.toLowerCase();
 		return (

@@ -306,21 +306,22 @@ export const useEditService = () => {
 			return;
 		}
 
-		// Hapus cache list agar halaman view-service refresh
-		// tapi langsung populate cache detail dengan data terbaru dari response
-		// supaya halaman detail tidak perlu fetch ulang
+		// Hapus seluruh cache karena backend membuat service baru dengan ID baru
 		serviceStore.clearCache();
-		// Cek apakah response berupa object { service: ... } atau langsung object Service
-		const updatedService = ((res?.data as any)?.service || res?.data) as
-			| Service
-			| undefined;
-		if (updatedService && id) {
-			serviceStore.setDetailService(id, updatedService);
-		}
 
 		(window as any).__isSubmittingSuccess = true;
 		notifySuccess("Layanan berhasil diupdate");
-		navigate(-1);
+
+		// Backend mengembalikan service baru dengan ID baru setelah update,
+		// jadi redirect ke detail service dengan ID baru (bukan navigate(-1) yang mengarah ke ID lama)
+		const updatedService = (res?.data as any)?.service || res?.data;
+		const newServiceId = updatedService?._id;
+		if (newServiceId) {
+			navigate(`/dashboard/internal/services/detail/${newServiceId}`, { replace: true });
+		} else {
+			// Fallback ke halaman list jika ID baru tidak ditemukan
+			navigate("/dashboard/internal/services", { replace: true });
+		}
 	};
 
 	// === Dirty Check Logic ===

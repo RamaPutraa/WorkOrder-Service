@@ -151,8 +151,8 @@ const WorkOrderRowCard = ({
 									<span className="truncate">
 										{item.positionId ?
 											(positions.find((p) => p._id === item.positionId)?.name ??
-											"Pilih posisi…")
-										:	"Pilih posisi…"}
+												"Pilih posisi…")
+											: "Pilih posisi…"}
 									</span>
 									<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 								</Button>
@@ -181,7 +181,7 @@ const WorkOrderRowCard = ({
 															"mr-2 h-4 w-4",
 															item.positionId === p._id ?
 																"opacity-100"
-															:	"opacity-0",
+																: "opacity-0",
 														)}
 													/>
 													{p.name}
@@ -197,7 +197,7 @@ const WorkOrderRowCard = ({
 								Manager departemen hanya dapat membuat konfigurasi perintah
 								kerja untuk departemennya sendiri
 							</p>
-						:	null}
+							: null}
 					</div>
 
 					<div className="space-y-2">
@@ -256,7 +256,7 @@ const WorkOrderRowCard = ({
 									Formulir Work Order <span className="text-red-500">*</span>
 								</Label>
 							</div>
-							<div className="flex flex-wrap gap-1.5 pb-1">
+							{/* <div className="flex flex-wrap gap-1.5 pb-1">
 								{formTypeOptions.map((opt) => (
 									<button
 										key={opt.value}
@@ -270,7 +270,7 @@ const WorkOrderRowCard = ({
 										{opt.label}
 									</button>
 								))}
-							</div>
+							</div> */}
 							<div className="relative">
 								<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
 								<Input
@@ -286,7 +286,7 @@ const WorkOrderRowCard = ({
 										<div className="text-sm text-slate-500 text-center py-8 bg-slate-50 rounded-xl border border-dashed border-slate-200">
 											<EmptyData />
 										</div>
-									:	filteredWoForms.map((f) => {
+										: filteredWoForms.map((f) => {
 											const isSelected = item.workOrderFormId === f._id;
 											return (
 												<button
@@ -299,11 +299,10 @@ const WorkOrderRowCard = ({
 															isSelected ? "" : f._id,
 														)
 													}
-													className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex flex-col gap-2 ${
-														isSelected ?
-															"border-primary bg-primary/5 shadow-sm"
-														:	"border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
-													}`}>
+													className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex flex-col gap-2 ${isSelected ?
+														"border-primary bg-primary/5 shadow-sm"
+														: "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+														}`}>
 													<div className="flex items-center justify-between w-full">
 														<div className="flex items-start gap-4">
 															<div className="shrink-0 p-3 bg-primary/5 text-primary rounded-xl">
@@ -340,21 +339,20 @@ const WorkOrderRowCard = ({
 								Formulir Work Report <span className="text-red-500">*</span>
 							</Label>
 						</div>
-						<div className="flex flex-wrap gap-1.5 pb-1">
+						{/* <div className="flex flex-wrap gap-1.5 pb-1">
 							{formTypeOptions.map((opt) => (
 								<button
 									key={opt.value}
 									type="button"
 									onClick={() => setWrTypeFilter(opt.value)}
-									className={`px-3 py-1 text-[10px] font-semibold rounded-full border transition-all duration-200 ${
-										wrTypeFilter === opt.value ?
+									className={`px-3 py-1 text-[10px] font-semibold rounded-full border transition-all duration-200 ${wrTypeFilter === opt.value ?
 											"bg-primary border-primary text-white"
-										:	"bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50"
-									}`}>
+											: "bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50"
+										}`}>
 									{opt.label}
 								</button>
 							))}
-						</div>
+						</div> */}
 						<div className="relative">
 							<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
 							<Input
@@ -370,7 +368,7 @@ const WorkOrderRowCard = ({
 									<div className="text-sm text-slate-500 text-center py-8 bg-slate-50 rounded-xl border border-dashed border-slate-200">
 										<EmptyData />
 									</div>
-								:	filteredWrForms.map((f) => {
+									: filteredWrForms.map((f) => {
 										const isSelected = item.workReportFormId === f._id;
 										return (
 											<button
@@ -383,11 +381,10 @@ const WorkOrderRowCard = ({
 														isSelected ? "" : f._id,
 													)
 												}
-												className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex flex-col gap-2 ${
-													isSelected ?
-														"border-primary bg-primary/5 shadow-sm"
-													:	"border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
-												}`}>
+												className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex flex-col gap-2 ${isSelected ?
+													"border-primary bg-primary/5 shadow-sm"
+													: "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+													}`}>
 												<div className="flex items-center justify-between w-full">
 													<div className="flex items-start gap-4">
 														<div className="shrink-0 p-3 bg-primary/5 text-primary rounded-xl">
@@ -444,15 +441,13 @@ const WorkOrderRowCard = ({
 													opt.value,
 												)
 											}
-											className={`flex flex-col items-start gap-1 p-4 rounded-xl border-2 text-left transition-all duration-200 ${
-												isSelected ?
-													"border-primary bg-primary/5 shadow-sm"
-												:	"border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
-											}`}>
-											<span
-												className={`text-sm font-semibold ${
-													isSelected ? "text-primary" : "text-slate-700"
+											className={`flex flex-col items-start gap-1 p-4 rounded-xl border-2 text-left transition-all duration-200 ${isSelected ?
+												"border-primary bg-primary/5 shadow-sm"
+												: "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
 												}`}>
+											<span
+												className={`text-sm font-semibold ${isSelected ? "text-primary" : "text-slate-700"
+													}`}>
 												{opt.label}
 											</span>
 											<span className="text-xs text-slate-500">{opt.desc}</span>
@@ -536,53 +531,53 @@ export const CardWorkOrdersConfig: React.FC<CardWorkOrdersConfigProps> = ({
 						<Loader2 className="w-5 h-5 animate-spin" />
 						<span className="text-sm">Memuat data…</span>
 					</div>
-				: workOrdersConfig.length === 0 ?
-					<div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 p-12 text-center">
-						<div className="p-3 rounded-full bg-slate-100 mb-4">
-							<Hammer className="w-6 h-6 text-slate-400" />
-						</div>
-						<p className="text-sm font-medium text-slate-700">
-							Belum ada konfigurasi
-						</p>
-						<p className="text-xs text-slate-500 mt-1 max-w-xs">
-							Klik "Tambah" untuk menambahkan konfigurasi work order pertama.
-						</p>
-						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							className="mt-4 gap-2"
-							onClick={addWorkOrderConfig}>
-							<Plus className="w-4 h-4" />
-							Tambah Konfigurasi
-						</Button>
-					</div>
-				:	<div className="space-y-5">
-						{workOrdersConfig.map((item, index) => (
-							<WorkOrderRowCard
-								key={index}
-								item={item}
-								index={index}
-								forms={forms}
-								positions={positions}
-								removeWorkOrderConfig={removeWorkOrderConfig}
-								updateWorkOrderConfig={updateWorkOrderConfig}
-								draftingWorkOrderType={draftingWorkOrderType}
-							/>
-						))}
-
-						{/* Add button below the loop */}
-						<div className="flex pt-4">
+					: workOrdersConfig.length === 0 ?
+						<div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 p-12 text-center">
+							<div className="p-3 rounded-full bg-slate-100 mb-4">
+								<Hammer className="w-6 h-6 text-slate-400" />
+							</div>
+							<p className="text-sm font-medium text-slate-700">
+								Belum ada konfigurasi
+							</p>
+							<p className="text-xs text-slate-500 mt-1 max-w-xs">
+								Klik "Tambah" untuk menambahkan konfigurasi work order pertama.
+							</p>
 							<Button
 								type="button"
-								onClick={addWorkOrderConfig}
 								variant="outline"
-								className="w-full gap-2 border-dashed border-2 py-6 text-slate-500 hover:text-primary hover:border-primary/50 hover:bg-primary/5">
-								<Plus className="w-5 h-5" />
-								Tambah Konfigurasi Work Order
+								size="sm"
+								className="mt-4 gap-2"
+								onClick={addWorkOrderConfig}>
+								<Plus className="w-4 h-4" />
+								Tambah Konfigurasi
 							</Button>
 						</div>
-					</div>
+						: <div className="space-y-5">
+							{workOrdersConfig.map((item, index) => (
+								<WorkOrderRowCard
+									key={index}
+									item={item}
+									index={index}
+									forms={forms}
+									positions={positions}
+									removeWorkOrderConfig={removeWorkOrderConfig}
+									updateWorkOrderConfig={updateWorkOrderConfig}
+									draftingWorkOrderType={draftingWorkOrderType}
+								/>
+							))}
+
+							{/* Add button below the loop */}
+							<div className="flex pt-4">
+								<Button
+									type="button"
+									onClick={addWorkOrderConfig}
+									variant="outline"
+									className="w-full gap-2 border-dashed border-2 py-6 text-slate-500 hover:text-primary hover:border-primary/50 hover:bg-primary/5">
+									<Plus className="w-5 h-5" />
+									Tambah Konfigurasi Work Order
+								</Button>
+							</div>
+						</div>
 				}
 			</div>
 		</div>

@@ -119,11 +119,18 @@ export const FormBuilderEdit = forwardRef<FormBuilderEditRef, Props>(
 			}
 			notifySuccess("Form berhasil diperbarui!");
 			setIsSuccess(true);
-			// Invalidate list cache, lalu set detail cache dengan data terbaru
-			// supaya saat navigate(-1) ke detail page, data langsung tersedia tanpa loading
+			// Hapus seluruh cache karena backend membuat form baru dengan ID baru
 			store.clearCache();
-			store.setDetailForm(formId, res.data);
-			navigate(-1);
+
+			// Redirect ke detail form dengan ID baru (bukan navigate(-1) yang mengarah ke ID lama)
+			const updatedForm = res.data as any;
+			const newFormId = updatedForm?._id;
+			if (newFormId) {
+				navigate(`/dashboard/internal/form/detail/${newFormId}`, { replace: true });
+			} else {
+				// Fallback ke halaman list forms jika ID baru tidak ditemukan
+				navigate("/dashboard/internal/forms", { replace: true });
+			}
 		};
 
 		useImperativeHandle(ref, () => ({

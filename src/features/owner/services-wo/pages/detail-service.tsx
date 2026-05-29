@@ -252,7 +252,7 @@ const DetailService = () => {
 						</div>
 						: `Berikut merupakan detail layanan ${detailService?.title} `
 				}
-				backPath={true}
+				backPath="/dashboard/internal/services"
 				addLabel="Edit Layanan"
 				addIcon={<Pencil className="size-4" />}
 				loading={loading}

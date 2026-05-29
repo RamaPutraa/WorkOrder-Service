@@ -12,7 +12,7 @@ interface PageHeaderProps {
 	addLabel?: string;
 	addIcon?: React.ReactNode; // Tambahan: Icon kustom
 	loading?: boolean; // Tambahan: Loading state
-	backPath?: boolean;
+	backPath?: boolean | string; // true = navigate(-1), string = navigate ke path tertentu
 	actionButtons?: React.ReactNode;
 	className?: string;
 }
@@ -46,7 +46,7 @@ const PageHeader = ({
 					<Button
 						variant="outline"
 						size="icon"
-						onClick={() => navigate(-1)}
+						onClick={() => typeof backPath === "string" ? navigate(backPath) : navigate(-1)}
 						className="h-10 w-10 shrink-0 rounded-xl border-slate-200 hover:bg-slate-50 hover:text-blue-600 transition-all shadow-none hover:cursor-pointer bg-white">
 						<ChevronLeft className="w-5 h-5" />
 					</Button>
