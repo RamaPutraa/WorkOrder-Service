@@ -55,8 +55,8 @@ const WorkOrderRowCard = ({
 }) => {
 	const [woFormSearch, setWoFormSearch] = useState("");
 	const [wrFormSearch, setWrFormSearch] = useState("");
-	const [woTypeFilter, setWoTypeFilter] = useState("work_order");
-	const [wrTypeFilter, setWrTypeFilter] = useState("report");
+	const [woTypeFilter] = useState("work_order");
+	const [wrTypeFilter] = useState("report");
 	const [posOpen, setPosOpen] = useState(false);
 
 	const { profile } = useProfileStore();
@@ -78,14 +78,6 @@ const WorkOrderRowCard = ({
 		index,
 		updateWorkOrderConfig,
 	]);
-
-	const formTypeOptions = [
-		{ label: "Semua", value: "all" },
-		{ label: "Pengajuan", value: "intake" },
-		{ label: "Ulasan", value: "review" },
-		{ label: "Perintah Kerja", value: "work_order" },
-		{ label: "Laporan", value: "report" },
-	];
 
 	const filteredWoForms = forms.filter((f) => {
 		const matchesSearch = f.title
