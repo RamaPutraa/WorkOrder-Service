@@ -34,7 +34,7 @@ const accessTypeOptions = [
 	},
 	{
 		value: "member_only",
-		label: "Member Only",
+		label: "Khusus Langganan",
 		description: "Hanya untuk pengguna terdaftar",
 		icon: Users,
 	},
@@ -121,11 +121,10 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 									key={opt.value}
 									type="button"
 									onClick={() => setAccessType(opt.value)}
-									className={`flex flex-col items-start gap-2 p-4 rounded-xl border-2 text-left transition-all duration-200 ${
-										isSelected ?
+									className={`flex flex-col items-start gap-2 p-4 rounded-xl border-2 text-left transition-all duration-200 ${isSelected ?
 											"border-primary bg-primary/5 shadow-sm"
-										:	"border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
-									}`}>
+											: "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+										}`}>
 									<div
 										className={`p-1.5 rounded-lg ${isSelected ? "bg-primary text-white" : "bg-slate-100 text-slate-500"}`}>
 										<Icon className="w-4 h-4" />
@@ -153,7 +152,7 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 							<p className="text-xs text-slate-500">
 								{isActive ?
 									"Layanan aktif dan tersedia"
-								:	"Layanan dinonaktifkan"}
+									: "Layanan dinonaktifkan"}
 							</p>
 						</div>
 						<Switch
@@ -198,15 +197,13 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 									key={opt.value}
 									type="button"
 									onClick={() => setDraftingWorkOrderType(opt.value)}
-									className={`flex flex-col items-start gap-1 p-4 rounded-xl border-2 text-left transition-all duration-200 ${
-										isSelected ?
+									className={`flex flex-col items-start gap-1 p-4 rounded-xl border-2 text-left transition-all duration-200 ${isSelected ?
 											"border-primary bg-primary/5 shadow-sm"
-										:	"border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
-									}`}>
-									<span
-										className={`text-sm font-semibold ${
-											isSelected ? "text-primary" : "text-slate-700"
+											: "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
 										}`}>
+									<span
+										className={`text-sm font-semibold ${isSelected ? "text-primary" : "text-slate-700"
+											}`}>
 										{opt.label}
 									</span>
 									<span className="text-xs text-slate-500">{opt.desc}</span>

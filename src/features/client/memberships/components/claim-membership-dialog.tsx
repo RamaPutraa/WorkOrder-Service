@@ -76,11 +76,11 @@ const ClaimMembershipDialog = ({
 							<Ticket className="w-4 h-4 text-white" />
 						</div>
 						<DialogTitle className="text-white text-lg font-semibold">
-							Klaim Membership
+							Klaim Voucer
 						</DialogTitle>
 					</div>
 					<DialogDescription className="text-blue-100 text-sm pl-12">
-						Masukkan kode membership yang Anda terima untuk berlangganan
+						Masukkan kode voucer yang Anda terima untuk berlangganan
 					</DialogDescription>
 				</div>
 
@@ -96,13 +96,13 @@ const ClaimMembershipDialog = ({
 									render={({ field }) => (
 										<FormItem>
 											<FormLabel className="text-xs font-medium text-gray-500">
-												Kode Membership
+												Kode Voucer
 											</FormLabel>
 											<FormControl>
 												<div className="relative">
 													<KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
 													<Input
-														placeholder="Masukkan kode membership..."
+														placeholder="Masukkan kode voucer..."
 														className="pl-8 h-9 rounded-lg border-gray-200 bg-white text-sm tracking-widest uppercase"
 														autoComplete="off"
 														{...field}
@@ -137,7 +137,7 @@ const ClaimMembershipDialog = ({
 								className="gap-1.5 bg-primary hover:bg-primary/90 text-white rounded-lg px-4">
 								{loading ?
 									<LoaderCircle className="w-3.5 h-3.5 animate-spin" />
-								:	<Ticket className="w-3.5 h-3.5" />}
+									: <Ticket className="w-3.5 h-3.5" />}
 								{loading ? "Memproses..." : "Klaim Sekarang"}
 							</Button>
 						</div>

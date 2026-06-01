@@ -386,7 +386,7 @@ const ClientCompanyServices = () => {
 															onClick={integrationType === "claim_token" ? () => setClaimDialogOpen(true) : handlePairing}
 															className="w-full hover: cursor-pointer">
 															{integrationType === "claim_token" ?
-																"Klaim Token"
+																"Klaim Voucer"
 																: (isPairing ?
 																	"Menghubungkan..."
 																	: "Hubungkan Akun")}

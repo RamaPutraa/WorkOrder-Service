@@ -3,6 +3,7 @@ import { lazyWithRetry } from "@/shared/utils/lazy-with-retry";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import { AppLayout, PublicLayout, RootLayout } from "@/shared/templates";
 import { SectionLoading } from "@/shared/atoms/loading-state";
+import RouteErrorBoundary from "@/shared/errors/components/route-error-boundary";
 
 // Guard Components
 import ProtectedRoute from "./ProtectedRoute";
@@ -16,7 +17,6 @@ import { publicRoutes, authRoutes } from "./modules/public";
 import { accountRoutes } from "./modules/account";
 
 // Shared Lazy Components
-const ErrorPage = lazyWithRetry(() => import("@/shared/errors/templates/error-page"));
 const NotFoundPage = lazyWithRetry(
 	() => import("@/shared/errors/templates/not-found-page"),
 );
@@ -42,11 +42,7 @@ const router = createBrowserRouter([
 				allowedRoles={["owner_company", "manager_company", "staff_company"]}
 			/>
 		),
-		errorElement: (
-			<SuspenseLayout>
-				<ErrorPage />
-			</SuspenseLayout>
-		),
+		errorElement: <RouteErrorBoundary />,
 		children: [
 			{
 				element: (
@@ -78,6 +74,7 @@ const router = createBrowserRouter([
 	{
 		path: "/dashboard/manager",
 		element: <ProtectedRoute allowedRoles={["manager_company"]} />,
+		errorElement: <RouteErrorBoundary />,
 		children: [
 			{
 				element: (
@@ -103,11 +100,7 @@ const router = createBrowserRouter([
 	{
 		path: "/dashboard/staff",
 		element: <ProtectedRoute allowedRoles={["staff_company"]} />,
-		errorElement: (
-			<SuspenseLayout>
-				<ErrorPage />
-			</SuspenseLayout>
-		),
+		errorElement: <RouteErrorBoundary />,
 		children: [
 			{
 				element: (
@@ -135,11 +128,7 @@ const router = createBrowserRouter([
 		element: (
 			<ProtectedRoute allowedRoles={["staff_unassigned", "staff_company"]} />
 		),
-		errorElement: (
-			<SuspenseLayout>
-				<ErrorPage />
-			</SuspenseLayout>
-		),
+		errorElement: <RouteErrorBoundary />,
 		children: [
 			{
 				element: (
@@ -167,6 +156,7 @@ const router = createBrowserRouter([
 	{
 		path: "/dashboard/client",
 		element: <ProtectedRoute allowedRoles={["client"]} />,
+		errorElement: <RouteErrorBoundary />,
 		children: [
 			{
 				element: (
@@ -191,11 +181,7 @@ const router = createBrowserRouter([
 	// ── Auth Routes (Guest Only) ──
 	{
 		element: <GuestRoute />,
-		errorElement: (
-			<SuspenseLayout>
-				<ErrorPage />
-			</SuspenseLayout>
-		),
+		errorElement: <RouteErrorBoundary />,
 		children: [
 			{
 				element: (
@@ -224,11 +210,7 @@ const router = createBrowserRouter([
 				<PublicLayout />
 			</RootLayout>
 		),
-		errorElement: (
-			<SuspenseLayout>
-				<ErrorPage />
-			</SuspenseLayout>
-		),
+		errorElement: <RouteErrorBoundary />,
 		children: [
 			{
 				element: (
@@ -255,11 +237,7 @@ const router = createBrowserRouter([
 				]}
 			/>
 		),
-		errorElement: (
-			<SuspenseLayout>
-				<ErrorPage />
-			</SuspenseLayout>
-		),
+		errorElement: <RouteErrorBoundary />,
 		children: [
 			{
 				element: (

@@ -659,8 +659,8 @@ const ServiceDetailSubmit = () => {
 					    ═══════════════════════════════════════════════════════ */}
 					{(srStatus === "completed" ||
 						srStatus === "partial_completed" ||
-						srStatus === "on_progress" ||
-						srStatus === "closed") && (
+						srStatus === "closed") && workReport && workReport.workReportForms.length > 0 && (
+							// TODO: cek kalau isi report
 							<div className="space-y-3">
 								<div className="flex items-center gap-2">
 									<div className="h-px flex-1 bg-border/60" />
@@ -735,9 +735,9 @@ const ServiceDetailSubmit = () => {
 										})}
 									</div>
 								) : (
-									<div className="py-8 text-center text-sm text-muted-foreground border border-dashed border-border/60 rounded-xl">
-										Belum ada laporan pengerjaan yang dibagikan.
-									</div>
+									<EmptyData
+										title="Belum Ada Tahap Pengerjaan"
+										subtitle="Perusahaan belum membagikan laporan tahap pengerjaan." />
 								)}
 							</div>
 						)}

@@ -77,6 +77,7 @@ export default function FormFieldViewer({
 		onChange?.(newValue);
 	};
 
+	// TODO: validsi pas nginput ternyata belum
 	const renderField = () => {
 		switch (field.type) {
 			case "text":
@@ -98,39 +99,39 @@ export default function FormFieldViewer({
 					<div className="mb-4 flex flex-col gap-1.5 w-full">
 						{/* 1. Main Input Field (Tetap jadi fokus utama) */}
 						<Input
-								type="number"
-								value={localValue !== null ? String(localValue) : ""}
-								onKeyDown={(e) => {
-									const isControlKey = [
-										"Backspace",
-										"Tab",
-										"Delete",
-										"Enter",
-										"Escape",
-										"ArrowLeft",
-										"ArrowRight",
-										"Home",
-										"End",
-									].includes(e.key);
+							type="number"
+							value={localValue !== null ? String(localValue) : ""}
+							onKeyDown={(e) => {
+								const isControlKey = [
+									"Backspace",
+									"Tab",
+									"Delete",
+									"Enter",
+									"Escape",
+									"ArrowLeft",
+									"ArrowRight",
+									"Home",
+									"End",
+								].includes(e.key);
 
-									const isModifierKey = e.ctrlKey || e.metaKey;
-									const isNumberOrDecimal = /^[0-9.]$/.test(e.key);
+								const isModifierKey = e.ctrlKey || e.metaKey;
+								const isNumberOrDecimal = /^[0-9.]$/.test(e.key);
 
-									if (!isControlKey && !isModifierKey && !isNumberOrDecimal) {
-										e.preventDefault();
-									}
-								}}
-								onChange={(e) => {
-									const val = e.target.value;
-									handleValueChange(val === "" ? null : Number(val));
-								}}
-								min={field.min ?? undefined}
-								max={field.max ?? undefined}
-								placeholder={field.placeholder || "Masukkan angka..."}
-								readOnly={readOnly}
-								disabled={readOnly}
-								className="w-full bg-background"
-							/>
+								if (!isControlKey && !isModifierKey && !isNumberOrDecimal) {
+									e.preventDefault();
+								}
+							}}
+							onChange={(e) => {
+								const val = e.target.value;
+								handleValueChange(val === "" ? null : Number(val));
+							}}
+							min={field.min ?? undefined}
+							max={field.max ?? undefined}
+							placeholder={field.placeholder || "Masukkan angka..."}
+							readOnly={readOnly}
+							disabled={readOnly}
+							className="w-full bg-background"
+						/>
 
 						{/* 2. Min/Max Information Text (Kecil, rapi, dan tidak menyerupai form) */}
 						{(field.min != null || field.max != null) && (
@@ -194,7 +195,7 @@ export default function FormFieldViewer({
 								<CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
 								{localValue ?
 									format(new Date(localValue as string), "PPP", { locale: id })
-								:	<span>{field.placeholder || "Pilih tanggal"}</span>}
+									: <span>{field.placeholder || "Pilih tanggal"}</span>}
 							</Button>
 						</PopoverTrigger>
 						<PopoverContent className="w-auto p-0" align="start">
@@ -228,17 +229,17 @@ export default function FormFieldViewer({
 										"flex items-center gap-3 px-3 py-2.5 rounded-md border text-sm transition-all",
 										checked ?
 											"border-primary/50 bg-primary/5 text-primary font-medium"
-										:	"border-border/60 bg-transparent text-foreground",
+											: "border-border/60 bg-transparent text-foreground",
 										readOnly ?
 											"cursor-default opacity-80"
-										:	"cursor-pointer hover:bg-muted/50",
+											: "cursor-pointer hover:bg-muted/50",
 									].join(" ")}>
 									<span
 										className={[
 											"flex-shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors",
 											checked ?
 												"border-primary bg-primary"
-											:	"border-muted-foreground/40",
+												: "border-muted-foreground/40",
 										].join(" ")}>
 										{checked && (
 											<span className="w-1.5 h-1.5 rounded-full bg-white block" />
@@ -294,7 +295,7 @@ export default function FormFieldViewer({
 								handleValueChange(
 									checked ?
 										arr.filter((v) => v !== val && String(v) !== String(val))
-									:	[...arr, val],
+										: [...arr, val],
 								);
 							};
 
@@ -305,17 +306,17 @@ export default function FormFieldViewer({
 										"flex items-center gap-3 px-3 py-2.5 rounded-md border text-sm transition-all",
 										checked ?
 											"border-primary/50 bg-primary/5 text-primary font-medium"
-										:	"border-border/60 bg-transparent text-foreground",
+											: "border-border/60 bg-transparent text-foreground",
 										readOnly ?
 											"cursor-default opacity-80"
-										:	"cursor-pointer hover:bg-muted/50",
+											: "cursor-pointer hover:bg-muted/50",
 									].join(" ")}>
 									<span
 										className={[
 											"flex-shrink-0 w-4 h-4 rounded border-2 flex items-center justify-center transition-colors",
 											checked ?
 												"border-primary bg-primary"
-											:	"border-muted-foreground/40",
+												: "border-muted-foreground/40",
 										].join(" ")}>
 										{checked && (
 											<svg
@@ -395,42 +396,42 @@ export default function FormFieldViewer({
 												<span className="text-muted-foreground">
 													{selectedFileName || "Mengunggah..."}
 												</span>
-											: (
-												uploadState === "success" ||
-												(uploadState === "idle" &&
-													((typeof localValue === "string" && localValue) ||
-														localValue instanceof File))
-											) ?
-												<>
-													<button
-														type="button"
-														onClick={() => setIsPreviewOpen(true)}
-														className="text-sm text-primary hover:underline font-medium inline-flex items-center cursor-pointer">
-														Lihat File Gambar
-													</button>
+												: (
+													uploadState === "success" ||
+													(uploadState === "idle" &&
+														((typeof localValue === "string" && localValue) ||
+															localValue instanceof File))
+												) ?
+													<>
+														<button
+															type="button"
+															onClick={() => setIsPreviewOpen(true)}
+															className="text-sm text-primary hover:underline font-medium inline-flex items-center cursor-pointer">
+															Lihat File Gambar
+														</button>
 
-													<Dialog
-														open={isPreviewOpen}
-														onOpenChange={setIsPreviewOpen}>
-														<DialogContent className="max-w-3xl p-1 overflow-hidden border-none bg-transparent shadow-none flex items-center justify-center">
-															<DialogHeader className="sr-only">
-																<DialogTitle>Preview Gambar</DialogTitle>
-															</DialogHeader>
-															<div className="relative w-full h-full flex items-center justify-center">
-																<img
-																	src={
-																		localValue instanceof File ?
-																			URL.createObjectURL(localValue)
-																		:	(localValue as string)
-																	}
-																	alt="Preview"
-																	className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl transition-transform"
-																/>
-															</div>
-														</DialogContent>
-													</Dialog>
-												</>
-											:	null}
+														<Dialog
+															open={isPreviewOpen}
+															onOpenChange={setIsPreviewOpen}>
+															<DialogContent className="max-w-3xl p-1 overflow-hidden border-none bg-transparent shadow-none flex items-center justify-center">
+																<DialogHeader className="sr-only">
+																	<DialogTitle>Preview Gambar</DialogTitle>
+																</DialogHeader>
+																<div className="relative w-full h-full flex items-center justify-center">
+																	<img
+																		src={
+																			localValue instanceof File ?
+																				URL.createObjectURL(localValue)
+																				: (localValue as string)
+																		}
+																		alt="Preview"
+																		className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl transition-transform"
+																	/>
+																</div>
+															</DialogContent>
+														</Dialog>
+													</>
+													: null}
 										</div>
 
 										{/* Ikon Status */}
@@ -499,13 +500,13 @@ export default function FormFieldViewer({
 										</div>
 									)}
 							</div>
-						:	<div className="space-y-1.5 w-full">
+							: <div className="space-y-1.5 w-full">
 								<div
 									className={[
 										"flex flex-col items-center justify-center gap-2 p-5 w-full rounded-xl border-2 border-dashed transition-all relative overflow-hidden",
 										isDragging ?
 											"border-primary bg-primary/5 scale-[0.99] shadow-sm"
-										:	"border-muted bg-muted/5 hover:bg-muted/10",
+											: "border-muted bg-muted/5 hover:bg-muted/10",
 									].join(" ")}
 									onDragOver={(e) => {
 										if (readOnly) return;
@@ -552,7 +553,7 @@ export default function FormFieldViewer({
 										className={`text-xs font-medium tracking-wider text-center ${isDragging ? "text-primary" : ""}`}>
 										{isDragging ?
 											"Lepaskan gambar di sini..."
-										:	"Klik untuk unggah atau seret & letakkan"}
+											: "Klik untuk unggah atau seret & letakkan"}
 									</span>
 									<span className="text-xs text-muted-foreground font-medium tracking-wider text-center">
 										JPG, JPEG, PNG (maksimal 5MB)
