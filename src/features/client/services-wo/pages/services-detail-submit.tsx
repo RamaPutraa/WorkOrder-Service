@@ -660,7 +660,6 @@ const ServiceDetailSubmit = () => {
 					{(srStatus === "completed" ||
 						srStatus === "partial_completed" ||
 						srStatus === "closed") && workReport && workReport.workReportForms.length > 0 && (
-							// TODO: cek kalau isi report
 							<div className="space-y-3">
 								<div className="flex items-center gap-2">
 									<div className="h-px flex-1 bg-border/60" />

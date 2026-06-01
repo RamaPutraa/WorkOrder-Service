@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { validateField } from "@/shared/utils/form-field-validation";
 import { useDialogStore } from "@/store/dialogStore";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -67,9 +68,26 @@ export default function FormFieldViewer({
 	const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 	const [isDragging, setIsDragging] = useState(false);
 
+	// ── Validation state ─────────────────────────────────────────────────────
+	const [touched, setTouched] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+
 	useEffect(() => {
 		setLocalValue(answer);
 	}, [answer]);
+
+	// Jalankan validasi setiap kali value berubah (hanya jika sudah touched)
+	useEffect(() => {
+		if (!readOnly && touched) {
+			setError(validateField(field, localValue));
+		}
+	}, [localValue, touched, readOnly, field]);
+
+	const handleBlur = useCallback(() => {
+		if (readOnly) return;
+		setTouched(true);
+		setError(validateField(field, localValue));
+	}, [readOnly, field, localValue]);
 
 	const handleValueChange = (newValue: AnswerValue) => {
 		if (readOnly) return;
@@ -77,7 +95,8 @@ export default function FormFieldViewer({
 		onChange?.(newValue);
 	};
 
-	// TODO: validsi pas nginput ternyata belum
+	const hasError = !readOnly && touched && !!error;
+
 	const renderField = () => {
 		switch (field.type) {
 			case "text":
@@ -87,10 +106,11 @@ export default function FormFieldViewer({
 						type="text"
 						value={(localValue as string) ?? ""}
 						onChange={(e) => handleValueChange(e.target.value)}
+						onBlur={handleBlur}
 						placeholder={field.placeholder || undefined}
 						readOnly={readOnly}
 						disabled={readOnly}
-						className="bg-background"
+						className={cn("bg-background", hasError && "border-red-300")}
 					/>
 				);
 
@@ -125,12 +145,13 @@ export default function FormFieldViewer({
 								const val = e.target.value;
 								handleValueChange(val === "" ? null : Number(val));
 							}}
+							onBlur={handleBlur}
 							min={field.min ?? undefined}
 							max={field.max ?? undefined}
 							placeholder={field.placeholder || "Masukkan angka..."}
 							readOnly={readOnly}
 							disabled={readOnly}
-							className="w-full bg-background"
+							className={cn("w-full bg-background", hasError && "border-red-300")}
 						/>
 
 						{/* 2. Min/Max Information Text (Kecil, rapi, dan tidak menyerupai form) */}
@@ -171,18 +192,22 @@ export default function FormFieldViewer({
 					<Textarea
 						value={(localValue as string) ?? ""}
 						onChange={(e) => handleValueChange(e.target.value)}
+						onBlur={handleBlur}
 						placeholder={field.placeholder || undefined}
 						readOnly={readOnly}
 						disabled={readOnly}
 						rows={4}
-						className={`min-h-[96px] bg-background ${readOnly ? "resize-none" : "resize-y"}`}
+						className={cn(
+							`min-h-[96px] bg-background ${readOnly ? "resize-none" : "resize-y"}`,
+							hasError && "border-red-300",
+						)}
 					/>
 				);
 
 			case "date":
 				if (readOnly && !localValue && !field.placeholder) return null;
 				return (
-					<Popover>
+					<Popover onOpenChange={(open) => { if (!open) handleBlur(); }}>
 						<PopoverTrigger asChild>
 							<Button
 								type="button"
@@ -191,6 +216,7 @@ export default function FormFieldViewer({
 								className={cn(
 									"w-full justify-start text-left font-normal bg-background h-10 px-3 py-2",
 									!localValue && "text-muted-foreground",
+									hasError && "border-red-300",
 								)}>
 								<CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
 								{localValue ?
@@ -208,6 +234,7 @@ export default function FormFieldViewer({
 									} else {
 										handleValueChange(null);
 									}
+									setTouched(true);
 								}}
 								initialFocus
 								locale={id}
@@ -218,7 +245,7 @@ export default function FormFieldViewer({
 
 			case "single_select":
 				return (
-					<div className="flex flex-col gap-1.5">
+					<div className="flex flex-col gap-1.5" onBlur={handleBlur}>
 						{field.options?.map((opt) => {
 							const val = opt.key ?? opt.value;
 							const checked = localValue === val;
@@ -229,7 +256,9 @@ export default function FormFieldViewer({
 										"flex items-center gap-3 px-3 py-2.5 rounded-md border text-sm transition-all",
 										checked ?
 											"border-primary/50 bg-primary/5 text-primary font-medium"
-											: "border-border/60 bg-transparent text-foreground",
+											: hasError ?
+												"border-red-500/50 bg-transparent text-foreground"
+												: "border-border/60 bg-transparent text-foreground",
 										readOnly ?
 											"cursor-default opacity-80"
 											: "cursor-pointer hover:bg-muted/50",
@@ -248,7 +277,10 @@ export default function FormFieldViewer({
 									<input
 										type="radio"
 										checked={checked}
-										onChange={() => handleValueChange(val)}
+										onChange={() => {
+											handleValueChange(val);
+											setTouched(true);
+										}}
 										disabled={readOnly}
 										className="sr-only"
 									/>
@@ -261,7 +293,7 @@ export default function FormFieldViewer({
 
 			case "multi_select":
 				return (
-					<div className="flex flex-col gap-1.5">
+					<div className="flex flex-col gap-1.5" onBlur={handleBlur}>
 						{field.options?.map((opt) => {
 							const val = opt.key ?? opt.value;
 							let arr: any[] = [];
@@ -306,7 +338,9 @@ export default function FormFieldViewer({
 										"flex items-center gap-3 px-3 py-2.5 rounded-md border text-sm transition-all",
 										checked ?
 											"border-primary/50 bg-primary/5 text-primary font-medium"
-											: "border-border/60 bg-transparent text-foreground",
+											: hasError ?
+												"border-red-500/50 bg-transparent text-foreground"
+												: "border-border/60 bg-transparent text-foreground",
 										readOnly ?
 											"cursor-default opacity-80"
 											: "cursor-pointer hover:bg-muted/50",
@@ -336,7 +370,10 @@ export default function FormFieldViewer({
 									<input
 										type="checkbox"
 										checked={checked}
-										onChange={toggle}
+										onChange={() => {
+											toggle();
+											setTouched(true);
+										}}
 										disabled={readOnly}
 										className="sr-only"
 									/>
@@ -609,13 +646,26 @@ export default function FormFieldViewer({
 		}
 	};
 
+	const fieldContent = renderField();
+
 	return (
-		<div className="rounded-xl shadow-sm border overflow-hidden transition-shadow ">
+		<div className={cn(
+			"rounded-xl shadow-sm border overflow-hidden transition-shadow",
+			hasError && "border-red-500/40",
+		)}>
 			{/* Header strip */}
-			<div className="flex items-center justify-between px-4 py-2.5 border-b border-border/60 bg-muted/20">
+			<div className={cn(
+				"flex items-center justify-between px-4 py-2.5 border-b border-border/60 bg-muted/20",
+				hasError && "border-b-red-500/30 bg-red-50/30",
+			)}>
 				<div className="flex items-center gap-2">
 					{index != null && (
-						<span className="flex items-center justify-center w-5 h-5 rounded-full bg-primary/10 text-primary text-[10px] font-bold shrink-0">
+						<span className={cn(
+							"flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold shrink-0",
+							hasError
+								? "bg-red-100 text-red-600"
+								: "bg-primary/10 text-primary",
+						)}>
 							{index}
 						</span>
 					)}
@@ -644,8 +694,17 @@ export default function FormFieldViewer({
 				</span>
 			</div>
 			{/* Field content — only shown if there's something to render */}
-			{renderField() != null && (
-				<div className="px-4 pb-3">{renderField()}</div>
+			{fieldContent != null && (
+				<div className="px-4 pb-3">
+					{fieldContent}
+					{/* Pesan error validasi */}
+					{hasError && (
+						<p className="mt-1.5 text-xs text-red-500 font-medium flex items-center gap-1">
+							<XCircle className="w-3.5 h-3.5 shrink-0" />
+							{error}
+						</p>
+					)}
+				</div>
 			)}
 		</div>
 	);
