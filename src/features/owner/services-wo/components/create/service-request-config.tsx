@@ -47,20 +47,20 @@ export const CardServiceRequestConfig: React.FC<
 }) => {
 		const [intakeSearch, setIntakeSearch] = useState("");
 		const [reviewSearch, setReviewSearch] = useState("");
-		const [intakeTypeFilter, setIntakeTypeFilter] = useState("intake");
-		const [reviewTypeFilter, setReviewTypeFilter] = useState("review");
+		const [intakeTypeFilter] = useState("intake");
+		const [reviewTypeFilter] = useState("review");
 
 		const { profile } = useProfileStore();
 		const isManager = profile?.role === "manager_company";
 		const managerPositionId = profile?.position?._id || "";
 
-		const formTypeOptions = [
-			{ label: "Semua", value: "all" },
-			{ label: "Pengajuan", value: "intake" },
-			{ label: "Ulasan", value: "review" },
-			{ label: "Perintah Kerja", value: "work_order" },
-			{ label: "Laporan", value: "report" },
-		];
+		// const formTypeOptions = [
+		// 	{ label: "Semua", value: "all" },
+		// 	{ label: "Pengajuan", value: "intake" },
+		// 	{ label: "Ulasan", value: "review" },
+		// 	{ label: "Perintah Kerja", value: "work_order" },
+		// 	{ label: "Laporan", value: "report" },
+		// ];
 
 		const filteredIntakeForms = forms.filter((f) => {
 			const matchesSearch = f.title
