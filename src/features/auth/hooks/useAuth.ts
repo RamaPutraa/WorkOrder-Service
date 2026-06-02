@@ -40,8 +40,8 @@ const useAuth = () => {
 			setAuth(token, user);
 			await getProfile();
 
-			notifySuccess("Login berhasil", `Selamat datang ${user.name}`);
 			navigate(redirectToRoleDashboard(user.role));
+			notifySuccess("Login berhasil", `Selamat datang ${user.name}`);
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				setError(error.response?.data.message || "Terjadi kesalahan");

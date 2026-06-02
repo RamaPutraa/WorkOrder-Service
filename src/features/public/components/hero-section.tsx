@@ -134,7 +134,7 @@ const HeroSection = () => {
 				<div className="flex flex-wrap items-center justify-center gap-4">
 					{/* Left: Download Android */}
 					<a
-						href="#"
+						href="https://github.com/LianggaRistiana/workorder_company_app/releases"
 						id="btn-download-android"
 						className="inline-flex items-center gap-3 px-7 py-3.5 rounded-xl font-semibold text-sm text-white transition-all duration-200"
 						style={{
@@ -159,7 +159,7 @@ const HeroSection = () => {
 
 					{/* Right: Documentation */}
 					<a
-						href="#"
+						href="https://docs.lianggaristiana.site/work-order-testing"
 						id="btn-documentation"
 						className="inline-flex items-center gap-3 px-7 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200 border"
 						style={{
@@ -190,7 +190,7 @@ const HeroSection = () => {
 								"0 2px 12px rgba(59,130,246,0.1)";
 						}}>
 						<BookOpen size={18} />
-						Dokumentasi
+						Dokumentasi Testing
 					</a>
 				</div>
 

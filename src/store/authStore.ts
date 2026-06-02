@@ -3,6 +3,16 @@ import { logoutApi } from "@/features/auth/services/authService";
 import { unregisterFcmTokenApi } from "@/features/notifications/services/notification-service";
 import { useNotificationStore } from "./notificationStore";
 import { useFaqChatStore } from "./faqChatStore";
+import { useStaffCompanyStore, useStaffHistoryStore } from "./staffStore";
+import { useFormStore } from "./formStore";
+import { useMembercodeStore } from "./membercodeStore";
+import { usePositionStore } from "./potisionStore";
+import { usePricingStore } from "./pricingStore";
+import { useProfileStore } from "./profileStore";
+import { useServiceStore } from "./serviceStore";
+import { useWoDetailStore } from "./wo-detail-store";
+import { useDialogStore } from "./dialogStore";
+import { queryClient } from "@/App";
 
 type AuthState = {
 	token: string | null;
@@ -73,7 +83,24 @@ export const useAuthStore = create<AuthState>((set) => ({
 			localStorage.removeItem("user");
 			localStorage.removeItem("profile-storage");
 			localStorage.removeItem("notification-storage");
+			localStorage.removeItem("faq-chat-storage");
+
+			// Clear semua Zustand store cache
 			useFaqChatStore.getState().clearChatHistory();
+			useStaffCompanyStore.getState().clearStaffCompany();
+			useStaffHistoryStore.getState().clearStaffHistorys();
+			useFormStore.getState().clearCache();
+			useMembercodeStore.getState().clearCache();
+			usePositionStore.getState().clearPositions();
+			usePricingStore.getState().clearCache();
+			useProfileStore.getState().clearProfile();
+			useServiceStore.getState().clearCache();
+			useWoDetailStore.setState({ cache: {} });
+			useDialogStore.getState().closeDialog();
+
+			// Clear React Query cache
+			queryClient.clear();
+
 			set({ token: null, user: null, isAuthenticated: false });
 		}
 	},

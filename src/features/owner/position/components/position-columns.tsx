@@ -9,17 +9,24 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-	CheckCircleIcon,
 	MoreHorizontal,
 	Pencil,
 	Trash2,
-	XCircleIcon,
 } from "lucide-react";
 
 interface PositionColumnActions {
 	onEdit: (position: Position) => void;
 	onDelete: (position: Position) => void;
 }
+
+const formatDate = (dateStr: string) => {
+	const date = new Date(dateStr);
+	return date.toLocaleDateString("id-ID", {
+		day: "numeric",
+		month: "short",
+		year: "numeric",
+	});
+};
 
 export const createPositionColumns = ({
 	onEdit,
@@ -46,20 +53,22 @@ export const createPositionColumns = ({
 		header: "Deskripsi Departemen",
 	},
 	{
-		id: "status",
-		header: "Status",
-		cell: ({ row }) => {
-			const { isActive } = row.original;
-			return isActive ?
-					<div className="flex w-fit items-center text-xs  border border-border px-2 py-1 rounded-full">
-						<CheckCircleIcon size={12} className="mr-1 text-green-500" />
-						Aktif
-					</div>
-				:	<div className="flex w-fit items-center text-xs  border border-border px-2 py-1 rounded-full">
-						<XCircleIcon size={12} className="mr-1 text-red-500" />
-						Nonaktif
-					</div>;
-		},
+		accessorKey: "createdAt",
+		header: "Dibuat",
+		cell: ({ row }) => (
+			<span className="text-sm text-muted-foreground">
+				{formatDate(row.original.createdAt)}
+			</span>
+		),
+	},
+	{
+		accessorKey: "updatedAt",
+		header: "Diperbarui",
+		cell: ({ row }) => (
+			<span className="text-sm text-muted-foreground">
+				{formatDate(row.original.updatedAt)}
+			</span>
+		),
 	},
 	{
 		id: "actions",

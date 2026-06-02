@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ChevronsUpDown, Plus } from "lucide-react";
+import { LucideEllipsisVertical, Plus } from "lucide-react";
 
 import {
 	DropdownMenu,
@@ -55,7 +55,7 @@ export function TeamManagement({
 									{user_profile.profile?.company?.name}
 								</span>
 							</div>
-							<ChevronsUpDown className="ml-auto" />
+							<LucideEllipsisVertical className="ml-auto" />
 						</SidebarMenuButton>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent

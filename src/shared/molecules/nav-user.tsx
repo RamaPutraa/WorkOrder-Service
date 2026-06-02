@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronsUpDown, LogOut, Settings, User } from "lucide-react";
+import { LogOut, Settings, User, LucideEllipsisVertical } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -52,7 +52,7 @@ export function NavUser() {
 								<span className="truncate font-medium">{userName}</span>
 								<span className="truncate text-xs">{userEmail}</span>
 							</div>
-							<ChevronsUpDown className="ml-auto size-4" />
+							<LucideEllipsisVertical className="ml-auto size-4" />
 						</SidebarMenuButton>
 					</DropdownMenuTrigger>
 

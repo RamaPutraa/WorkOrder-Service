@@ -1,24 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Building2, Loader2, Save } from "lucide-react";
 import usePosition from "../hooks/usePosition";
 import { useForm } from "react-hook-form";
 import { positionSchema } from "../schemas/positionSchema";
 import FormFields from "@/shared/molecules/form-fields";
 import z from "zod";
-import {
-	Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormLabel,
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import PageHeader from "@/shared/atoms/header-content";
-import { Switch } from "@/components/ui/switch";
 import { ConfirmLeaveDialog } from "@/shared/molecules/confirm-leave-dialog";
 
 const CreatePosition: React.FC = () => {
@@ -78,33 +68,6 @@ const CreatePosition: React.FC = () => {
 							</p>
 						</div>
 
-						<Separator />
-
-						<div className="space-y-2">
-							<p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-								Keterangan Status
-							</p>
-							<div className="flex items-center gap-2">
-								<Badge
-									variant="outline"
-									className="bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-									Aktif
-								</Badge>
-								<p className="text-xs text-muted-foreground">
-									Departemen akan tersedia dan dapat digunakan.
-								</p>
-							</div>
-							<div className="flex items-center gap-2">
-								<Badge
-									variant="outline"
-									className="bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300">
-									Tidak Aktif
-								</Badge>
-								<p className="text-xs text-muted-foreground">
-									Departemen disimpan namun tidak dapat bertugas.
-								</p>
-							</div>
-						</div>
 					</CardContent>
 				</Card>
 
@@ -117,32 +80,7 @@ const CreatePosition: React.FC = () => {
 								onSubmit={form.handleSubmit(onSubmit)}>
 								<FormFields fields={positionsFields} control={form.control} />
 
-								<Separator />
 
-								{/* isActive Switch */}
-								<FormField
-									control={form.control}
-									name="isActive"
-									render={({ field }) => (
-										<FormItem className="flex flex-row items-center justify-between rounded-xl border bg-muted/20 px-5 py-4">
-											<div className="space-y-0.5">
-												<FormLabel className="text-sm font-semibold">
-													Status Aktif
-												</FormLabel>
-												<FormDescription className="text-xs text-muted-foreground">
-													Aktifkan agar departemen ini dapat digunakan dalam
-													sistem.
-												</FormDescription>
-											</div>
-											<FormControl>
-												<Switch
-													checked={field.value}
-													onCheckedChange={field.onChange}
-												/>
-											</FormControl>
-										</FormItem>
-									)}
-								/>
 
 								<div className="flex justify-end pt-2">
 									<Button
@@ -154,7 +92,7 @@ const CreatePosition: React.FC = () => {
 												<Loader2 className="w-4 h-4 animate-spin" />
 												Menyimpan...
 											</>
-										:	<>
+											: <>
 												<Save className="w-4 h-4" />
 												Simpan Departemen
 											</>

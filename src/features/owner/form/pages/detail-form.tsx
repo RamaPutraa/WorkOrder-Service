@@ -8,12 +8,9 @@ import {
 	Clock,
 	FileText,
 	Pencil,
-	Trash2,
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useDialogStore } from "@/store/dialogStore";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { EmptyData } from "@/shared/molecules/empty-data";
 
 const formTypeMap: Record<string, { label: string; color: string }> = {
@@ -45,8 +42,9 @@ const formatDate = (dateString?: string) => {
 };
 
 const DetailForm = () => {
-	const { showDialog } = useDialogStore();
-	const { detailForm, loading, removeForm } = useForm();
+	// const { showDialog } = useDialogStore();
+	// const { detailForm, loading, removeForm } = useForm();
+	const { detailForm, loading } = useForm();
 	const navigate = useNavigate();
 	const { id } = useParams<{ id: string }>();
 
@@ -55,22 +53,22 @@ const DetailForm = () => {
 		color: "bg-slate-50 text-slate-700 border-slate-200",
 	};
 
-	const handleDelete = () => {
-		showDialog({
-			title: "Hapus Formulir",
-			description: `Apakah Anda yakin ingin menghapus formulir "${detailForm?.title}"?`,
-			confirmText: "Hapus",
-			cancelText: "Batal",
-			onConfirm: async () => {
-				if (id) {
-					const success = await removeForm(id);
-					if (success) {
-						navigate("/dashboard/internal/forms");
-					}
-				}
-			},
-		});
-	};
+	// const handleDelete = () => {
+	// 	showDialog({
+	// 		title: "Hapus Formulir",
+	// 		description: `Apakah Anda yakin ingin menghapus formulir "${detailForm?.title}"?`,
+	// 		confirmText: "Hapus",
+	// 		cancelText: "Batal",
+	// 		onConfirm: async () => {
+	// 			if (id) {
+	// 				const success = await removeForm(id);
+	// 				if (success) {
+	// 					navigate("/dashboard/internal/forms");
+	// 				}
+	// 			}
+	// 		},
+	// 	});
+	// };
 
 	return (
 		<>
@@ -126,14 +124,14 @@ const DetailForm = () => {
 										</div>
 									</div>
 
-									<Button
+									{/* <Button
 										variant="destructive"
 										size="icon"
 										className="h-9 w-9 shrink-0 rounded-lg"
 										title="Hapus Formulir"
 										onClick={handleDelete}>
 										<Trash2 className="w-4 h-4" />
-									</Button>
+									</Button> */}
 								</div>
 
 								{/* Meta chips */}
@@ -147,7 +145,7 @@ const DetailForm = () => {
 									<div className="flex items-center gap-1.5 text-xs text-slate-500 bg-slate-50 rounded-full px-3 py-1.5 border border-slate-100">
 										<Calendar className="w-3 h-3" />
 										<span className="font-medium">
-											Dibuat pada :
+											Dibuat pada : {" "}
 											{formatDate(detailForm.createdAt)}
 										</span>
 									</div>
@@ -155,7 +153,7 @@ const DetailForm = () => {
 									<div className="flex items-center gap-1.5 text-xs text-slate-500 bg-slate-50 rounded-full px-3 py-1.5 border border-slate-100">
 										<Clock className="w-3 h-3" />
 										<span className="font-medium">
-											Terakhir diperbarui :
+											Terakhir diperbarui : {" "}
 											{formatDate(detailForm.updatedAt)}
 										</span>
 									</div>

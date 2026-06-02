@@ -91,20 +91,6 @@ const PositionView = () => {
 							color: "text-primary",
 							bg: "bg-primary/8",
 						},
-						{
-							label: "Departemen Aktif",
-							value: positions.filter((h) => h.isActive === true).length,
-							icon: Users,
-							color: "text-emerald-600",
-							bg: "bg-emerald-50",
-						},
-						{
-							label: "Departemen Non-Aktif",
-							value: positions.filter((h) => h.isActive === false).length,
-							icon: Users,
-							color: "text-rose-500",
-							bg: "bg-rose-50",
-						},
 					].map(({ label, value, icon: Icon, color, bg }) => (
 						<div
 							key={label}

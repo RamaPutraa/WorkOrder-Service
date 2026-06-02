@@ -4,7 +4,7 @@ import AppRoutes from "./routes";
 import ConfirmDialog from "./shared/molecules/dialog-confirm";
 import { useFcm } from "@/hooks/use-fcm";
 
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
 	defaultOptions: {
 		queries: {
 			refetchOnWindowFocus: false,

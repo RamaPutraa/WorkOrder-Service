@@ -14,7 +14,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import { Briefcase, FileText, Save, LoaderCircle } from "lucide-react";
 import usePosition from "../hooks/usePosition";
 import { ConfirmLeaveDialog } from "@/shared/molecules/confirm-leave-dialog";
@@ -42,8 +41,6 @@ const EditPositionDialog = ({
 	position,
 	onSuccess,
 }: EditPositionDialogProps) => {
-	const [isActiveLocal, setIsActiveLocal] = useState(position.isActive);
-
 	const [showConfirmClose, setShowConfirmClose] = useState(false);
 
 	const { updatePosition, loading } = usePosition(() => {
@@ -66,7 +63,6 @@ const EditPositionDialog = ({
 				name: position.name,
 				description: position.description,
 			});
-			setIsActiveLocal(position.isActive);
 			setShowConfirmClose(false);
 		}
 	}, [open, position]);
@@ -76,16 +72,14 @@ const EditPositionDialog = ({
 		await updatePosition(position._id, {
 			name: values.name,
 			description: values.description,
-			isActive: isActiveLocal,
+			isActive: true,
 		});
 	};
 
 	const { isDirty: isFormDirty, isSubmitSuccessful } = form.formState;
 
-	const isSwitchDirty = isActiveLocal !== position.isActive;
-
 	const hasUnsavedChanges =
-		(isFormDirty || isSwitchDirty) && !isSubmitSuccessful;
+		isFormDirty && !isSubmitSuccessful;
 
 	const handleOpenChange = (newOpen: boolean) => {
 		if (!newOpen && hasUnsavedChanges) {
@@ -178,23 +172,7 @@ const EditPositionDialog = ({
 									)}
 								/>
 
-								{/* isActive Toggle */}
-								<div className="flex items-center justify-between rounded-lg border px-4 py-3 bg-muted/30">
-									<div className="space-y-0.5">
-										<p className="text-sm font-medium">Status Departemen</p>
-										<p className="text-xs text-muted-foreground">
-											{isActiveLocal ?
-												"Departemen ini sedang aktif dan dapat digunakan"
-											:	"Departemen ini nonaktif dan tidak dapat dipilih"}
-										</p>
-									</div>
-									<Switch
-										checked={isActiveLocal}
-										onCheckedChange={setIsActiveLocal}
-										disabled={loading}
-										className="data-[state=checked]:bg-green-500"
-									/>
-								</div>
+
 							</div>
 							{/* Footer Actions */}
 							<div className="px-6 pb-6 pt-4 bg-white border-t border-border/50">
