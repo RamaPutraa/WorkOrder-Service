@@ -16,6 +16,7 @@ import {
 	ArrowLeftRight,
 	Info,
 	User,
+	ChevronRight,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { SectionLoading } from "@/shared/atoms";
@@ -141,9 +142,9 @@ const CompanyDetailWo = () => {
 					transition={{ duration: 0.3 }}
 					className="space-y-6">
 					{/*  Row 2: 3-column grid  */}
-					<div className="grid grid-cols-1 md:grid-cols-1 xl:grid-cols-3 gap-5">
+					<div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
 						{/* Card 1: Info Umum */}
-						<div className="border shadow-sm rounded-xl md:col-span-2 px-7 py-3">
+						<div className="border shadow-sm rounded-xl xl:col-span-2 px-7 py-3">
 							<div className="space-y-2">
 								{/*  Row 1: Status Hero Banner  */}
 								<div className="overflow-hidden border-0 ">
@@ -152,7 +153,7 @@ const CompanyDetailWo = () => {
 									<div className="relative">
 										<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-7">
 											<div className="flex items-center gap-4">
-												<div className="shrink-0 p-3 rounded-xl bg-primary/10 text-primary">
+												<div className="shrink-0 p-3 rounded-xl bg-primary/5 text-primary">
 													<FileText className="w-6 h-6" />
 												</div>
 												<div>
@@ -361,21 +362,51 @@ const CompanyDetailWo = () => {
 						/>
 					</div>
 
+					{/* intake view */}
+					<motion.div
+						// key={._id}
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						whileHover={{ scale: 1, y: -4 }}
+						transition={{ duration: 0.2, ease: "easeOut" }}>
+						<div className="border shadow-sm rounded-xl p-4 hover:cursor-pointer" onClick={() => navigate(`/dashboard/internal/business/services/request/detail/${wo.serviceRequestId}`)}>
+							<div className="flex items-center gap-4">
+								<div className="shrink-0 p-3 rounded-xl bg-primary/5 text-primary">
+									<FileText className="w-6 h-6" />
+								</div>
+								<div>
+									<h2 className="text-md font-bold text-foreground leading-tight">
+										Formulir Permintaan Kustomer
+									</h2>
+									<p className="text-sm text-muted-foreground mt-0.5">
+										Berikut adalah detail formulir yang diisi oleh kustomer
+									</p>
+								</div>
+
+								<ChevronRight className="w-4 h-4 text-muted-foreground ml-auto" />
+							</div>
+						</div>
+					</motion.div>
+
 					{/*  Row 5: Work Order Form Info  */}
-					<WorkOrderForms
-						workOrderForm={wo.workOrderForm}
-						workOrderId={wo._id}
-						submissions={wo.submissions || []}
-						isReadOnly={isReadOnly || (!isDrafted && !canRecreateEdit)}
-						onSaveSuccess={async () => {
-							setIsFormDirty(false);
-							setIsCardRefreshing(true);
-							refreshBackground();
-							setIsCardRefreshing(false);
-						}}
-						isRefreshing={isCardRefreshing}
-						onDirtyChange={setIsFormDirty}
-					/>
+					{wo.workOrderForm === null ? (
+						null
+					) : (
+						<WorkOrderForms
+							workOrderForm={wo.workOrderForm}
+							workOrderId={wo._id}
+							submissions={wo.submissions || []}
+							isReadOnly={isReadOnly || (!isDrafted && !canRecreateEdit)}
+							onSaveSuccess={async () => {
+								setIsFormDirty(false);
+								setIsCardRefreshing(true);
+								refreshBackground();
+								setIsCardRefreshing(false);
+							}}
+							isRefreshing={isCardRefreshing}
+							onDirtyChange={setIsFormDirty}
+						/>
+					)}
 				</motion.div>
 			)}
 
