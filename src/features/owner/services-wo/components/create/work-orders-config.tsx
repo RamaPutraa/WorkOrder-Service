@@ -245,7 +245,7 @@ const WorkOrderRowCard = ({
 						<div className="space-y-3">
 							<div>
 								<Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-									Formulir Work Order <span className="text-red-500">*</span>
+									Formulir Perintah Kerja <span className="text-red-500">*</span>
 								</Label>
 							</div>
 							{/* <div className="flex flex-wrap gap-1.5 pb-1">
@@ -328,7 +328,7 @@ const WorkOrderRowCard = ({
 					<div className="space-y-3">
 						<div>
 							<Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-								Formulir Work Report <span className="text-red-500">*</span>
+								Formulir Laporan <span className="text-red-500">*</span>
 							</Label>
 						</div>
 						{/* <div className="flex flex-wrap gap-1.5 pb-1">
@@ -454,10 +454,10 @@ const WorkOrderRowCard = ({
 					<div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-white shadow-sm mt-4">
 						<div className="space-y-0.5">
 							<p className="text-sm font-medium text-slate-700">
-								Tampilkan Laporan ke Klien
+								Tampilkan Laporan ke Pemohon
 							</p>
 							<p className="text-xs text-slate-500">
-								Klien dapat melihat laporan pengerjaan pada tahap ini.
+								Pemohon dapat melihat laporan pengerjaan pada tahap ini.
 							</p>
 						</div>
 						<Switch

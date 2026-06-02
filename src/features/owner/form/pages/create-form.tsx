@@ -31,7 +31,7 @@ const FormCreatePage: React.FC = () => {
 			case "single_select":
 				return "Pilihan Tunggal";
 			case "image":
-				return "File";
+				return "Gambar";
 		}
 	};
 	return (
@@ -73,7 +73,7 @@ const FormCreatePage: React.FC = () => {
 										desc: "Digunakan staf untuk melaporkan hasil pekerjaan dan mengunggah bukti.",
 									},
 									{
-										title: "Pelanggan",
+										title: "Permintaan",
 										desc: "Formulir pendaftaran layanan yang akan diisi langsung oleh klien Anda.",
 									},
 									{
@@ -110,7 +110,7 @@ const FormCreatePage: React.FC = () => {
 										<Loader2 className="w-4 h-4 animate-spin shrink-0" />
 										Menyimpan...
 									</>
-								:	<>
+									: <>
 										<Save className="w-4 h-4 shrink-0" />
 										Simpan Form
 									</>
@@ -149,7 +149,7 @@ const FormCreatePage: React.FC = () => {
 													</span>
 												</div>
 											))
-										:	<div className="text-center py-8">
+											: <div className="text-center py-8">
 												<p className="text-xs text-muted-foreground">
 													Belum ada field
 												</p>

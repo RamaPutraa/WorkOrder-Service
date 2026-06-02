@@ -441,7 +441,7 @@ const ProfileCompany = () => {
 									</div>
 									: <>
 										{/* Toggle Aktifkan Integrasi — di dalam form */}
-										<div className="flex items-center justify-between p-4 rounded-xl bg-muted/30 border border-border/30">
+										<div className="flex items-center justify-between p-4 rounded-xl bg-primary/5 border border-primary/10">
 											<div className="space-y-0.5">
 												<p className="text-sm font-medium text-foreground">Aktifkan Integrasi Sistem Eksternal</p>
 												<p className="text-xs text-muted-foreground">

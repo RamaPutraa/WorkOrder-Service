@@ -144,7 +144,7 @@ export const WoActionButtons = ({
 
 			{/* IN-PROGRESS ACTIONS (Complete, Fail, Report) */}
 			{["on_progress", "completed", "failed"].includes(currentStatus) &&
-				(isOwner || isManager) && (
+				(isOwner || isManager) && (currentStatus !== "completed") && (
 					<>
 						<Button
 							className="bg-red-600 hover:bg-red-700 w-full md:w-auto text-white rounded-xl h-11 shadow-sm shadow-red-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"

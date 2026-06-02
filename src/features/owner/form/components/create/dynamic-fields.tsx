@@ -96,11 +96,10 @@ export const DynamicFields: React.FC<Props> = ({
 										exit={{ opacity: 0, y: -12 }}
 										transition={{ duration: 0.25, ease: "easeOut" }}>
 										<Card
-											className={`rounded-2xl shadow-sm border overflow-hidden transition-shadow py-0 ${
-												fieldErrors[index] ?
+											className={`rounded-2xl shadow-sm border overflow-hidden transition-shadow py-0 ${fieldErrors[index] ?
 													"border-red-300 shadow-red-100"
-												:	"border-slate-200/80 hover:shadow-md"
-											}`}>
+													: "border-slate-200/80 hover:shadow-md"
+												}`}>
 											{/* Drag handle strip */}
 											<div className="flex items-center justify-between px-4 py-2 border-b border-slate-100 bg-muted/20">
 												{/* Field number badge */}

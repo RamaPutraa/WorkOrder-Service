@@ -56,11 +56,10 @@ export const FieldItem: React.FC<Props> = ({
 				{/* Label input — takes most space */}
 				<div className="flex-1 min-w-0">
 					<Input
-						className={`h-10 rounded-lg text-sm font-medium ${
-							error ?
-								"border-red-400 focus-visible:ring-red-300"
-							:	"focus-visible:ring-primary/30 focus-visible:border-primary"
-						}`}
+						className={`h-10 rounded-lg text-sm font-medium ${error ?
+							"border-red-400 focus-visible:ring-red-300"
+							: "focus-visible:ring-primary/30 focus-visible:border-primary"
+							}`}
 						value={field.label}
 						onChange={(e) => onUpdate({ label: e.target.value })}
 						placeholder="Tulis pertanyaan di sini..."
@@ -103,7 +102,7 @@ export const FieldItem: React.FC<Props> = ({
 							<SelectItem value="date">Tanggal</SelectItem>
 							<SelectItem value="multi_select">Pilihan Ganda</SelectItem>
 							<SelectItem value="single_select">Pilihan Tunggal</SelectItem>
-							<SelectItem value="image">File</SelectItem>
+							<SelectItem value="image">Gambar</SelectItem>
 						</SelectContent>
 					</Select>
 				</div>

@@ -27,7 +27,7 @@ const CreatePosition: React.FC = () => {
 			name: "name",
 			label: "Nama Departemen",
 			type: "text",
-			placeholder: "Contoh: Manager, Staff, dll",
+			placeholder: "Contoh: HRD, IT, dll",
 		},
 		{
 			name: "description",

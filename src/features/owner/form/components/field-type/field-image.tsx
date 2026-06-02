@@ -10,11 +10,10 @@ type Props = {
 export const FieldImage: React.FC<Props> = ({ error }) => (
 	<div className="space-y-1.5">
 		<div
-			className={`flex flex-col  items-center justify-center gap-2 p-5 w-full rounded-xl border-2 border-dashed transition-colors ${
-				error ?
-					"border-red-200 bg-red-50/30 text-red-400"
-				:	"border-muted bg-muted/5"
-			}`}>
+			className={`flex flex-col  items-center justify-center gap-2 p-5 w-full rounded-xl border-2 border-dashed transition-colors ${error ?
+				"border-red-200 bg-red-50/30 text-red-400"
+				: "border-muted bg-muted/5"
+				}`}>
 			<div className="p-2 rounded-xl bg-muted text-muted-foreground">
 				<ImageIcon className="w-5 h-5" />
 			</div>
@@ -22,7 +21,7 @@ export const FieldImage: React.FC<Props> = ({ error }) => (
 				Upload Gambar
 			</span>
 			<span className="text-xs text-muted-foreground font-medium  tracking-wider ">
-				File maksimal 5MB (JPG/PNG/JPEG)
+				Gambar maksimal 5MB (JPG/PNG/JPEG)
 			</span>
 		</div>
 		{error && (

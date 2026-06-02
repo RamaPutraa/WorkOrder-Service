@@ -80,10 +80,33 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 					</div>
 				</div>
 
+				{/* Status */}
+				{!isEditMode && (
+					<div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-slate-50/50">
+						<div className="space-y-0.5">
+							<p className="text-sm font-medium text-slate-700">
+								Layanan Aktif
+							</p>
+							<p className="text-xs text-slate-500">
+								{isActive ?
+									"Layanan aktif dan tersedia"
+									: "Layanan dinonaktifkan"}
+							</p>
+						</div>
+						<Switch
+							checked={isActive}
+							onCheckedChange={(checked) => {
+								const match = statuses.find((s) => s.value === String(checked));
+								setSelectedStatus(match ?? null);
+							}}
+						/>
+					</div>
+				)}
+
 				{/* Title */}
 				<div className="space-y-2">
 					<Label className="text-sm font-medium text-slate-700">
-						Judul Layanan <span className="text-red-500">*</span>
+						Nama Layanan <span className="text-red-500">*</span>
 					</Label>
 					<Input
 						placeholder="Contoh: Cleaning Service"
@@ -122,8 +145,8 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 									type="button"
 									onClick={() => setAccessType(opt.value)}
 									className={`flex flex-col items-start gap-2 p-4 rounded-xl border-2 text-left transition-all duration-200 ${isSelected ?
-											"border-primary bg-primary/5 shadow-sm"
-											: "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+										"border-primary bg-primary/5 shadow-sm"
+										: "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
 										}`}>
 									<div
 										className={`p-1.5 rounded-lg ${isSelected ? "bg-primary text-white" : "bg-slate-100 text-slate-500"}`}>
@@ -142,28 +165,7 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 					</div>
 				</div>
 
-				{/* Status */}
-				{!isEditMode && (
-					<div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-slate-50/50">
-						<div className="space-y-0.5">
-							<p className="text-sm font-medium text-slate-700">
-								Status Layanan
-							</p>
-							<p className="text-xs text-slate-500">
-								{isActive ?
-									"Layanan aktif dan tersedia"
-									: "Layanan dinonaktifkan"}
-							</p>
-						</div>
-						<Switch
-							checked={isActive}
-							onCheckedChange={(checked) => {
-								const match = statuses.find((s) => s.value === String(checked));
-								setSelectedStatus(match ?? null);
-							}}
-						/>
-					</div>
-				)}
+
 
 				{/* Drafting Mode */}
 				<div className="space-y-3">
@@ -198,8 +200,8 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 									type="button"
 									onClick={() => setDraftingWorkOrderType(opt.value)}
 									className={`flex flex-col items-start gap-1 p-4 rounded-xl border-2 text-left transition-all duration-200 ${isSelected ?
-											"border-primary bg-primary/5 shadow-sm"
-											: "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+										"border-primary bg-primary/5 shadow-sm"
+										: "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
 										}`}>
 									<span
 										className={`text-sm font-semibold ${isSelected ? "text-primary" : "text-slate-700"

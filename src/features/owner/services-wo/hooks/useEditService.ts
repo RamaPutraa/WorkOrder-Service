@@ -262,6 +262,13 @@ export const useEditService = () => {
 			return;
 		}
 
+		const invalidStaffWO = workOrdersConfig.some((c) => c.minStaff > c.maxStaff);
+		if (invalidStaffWO) {
+			notifyError("Gagal mengupdate", "Minimal staf tidak boleh lebih besar dari maksimal staf");
+			setUpdating(false);
+			return;
+		}
+
 		const isAuto = draftingWorkOrderType === "auto";
 
 		const payload: CreateServiceRequest = {

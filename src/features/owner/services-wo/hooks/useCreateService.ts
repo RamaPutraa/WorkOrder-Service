@@ -186,6 +186,13 @@ export const useCreateService = () => {
 			return;
 		}
 
+		const invalidStaffWO = workOrdersConfig.some((c) => c.minStaff > c.maxStaff);
+		if (invalidStaffWO) {
+			notifyError("Gagal menyimpan", "Minimal staf tidak boleh lebih besar dari maksimal staf");
+			setCreating(false);
+			return;
+		}
+
 		const isAuto = draftingWorkOrderType === "auto";
 
 		const payload: CreateServiceRequest = {

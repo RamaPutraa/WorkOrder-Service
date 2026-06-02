@@ -175,11 +175,10 @@ export const FormBuilderEdit = forwardRef<FormBuilderEditRef, Props>(
 								value={formData.title}
 								onChange={(e) => validateAndSetField("title", e.target.value)}
 								placeholder="Contoh: Formulir Pendaftaran"
-								className={`h-10 rounded-lg ${
-									errors.title ?
+								className={`h-10 rounded-lg ${errors.title ?
 										"border-red-400 focus-visible:ring-red-300"
-									:	"focus-visible:ring-primary/30"
-								}`}
+										: "focus-visible:ring-primary/30"
+									}`}
 							/>
 							{errors.title && (
 								<p className="text-xs text-red-500 flex items-center gap-1">
@@ -203,11 +202,10 @@ export const FormBuilderEdit = forwardRef<FormBuilderEditRef, Props>(
 								}
 								placeholder="Tuliskan deskripsi singkat form ini..."
 								rows={3}
-								className={`rounded-lg resize-none ${
-									errors.description ?
+								className={`rounded-lg resize-none ${errors.description ?
 										"border-red-400 focus-visible:ring-red-300"
-									:	"focus-visible:ring-primary/30"
-								}`}
+										: "focus-visible:ring-primary/30"
+									}`}
 							/>
 							{errors.description && (
 								<p className="text-xs text-red-500 flex items-center gap-1">
@@ -230,16 +228,15 @@ export const FormBuilderEdit = forwardRef<FormBuilderEditRef, Props>(
 									validateAndSetField("formType", value)
 								}>
 								<SelectTrigger
-									className={`h-10 rounded-lg w-full ${
-										errors.formType ?
+									className={`h-10 rounded-lg w-full ${errors.formType ?
 											"border-red-400 focus:ring-red-300"
-										:	"focus:ring-primary/30"
-									}`}>
+											: "focus:ring-primary/30"
+										}`}>
 									<SelectValue placeholder="Pilih tipe form" />
 								</SelectTrigger>
 								<SelectContent>
 									<SelectItem value="work_order">Perintah Kerja</SelectItem>
-									<SelectItem value="intake">Pelanggan</SelectItem>
+									<SelectItem value="intake">Permintaan</SelectItem>
 									<SelectItem value="report">Laporan</SelectItem>
 									<SelectItem value="review">Ulasan</SelectItem>
 								</SelectContent>

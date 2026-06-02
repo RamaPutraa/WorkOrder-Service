@@ -180,26 +180,23 @@ const CreateService: React.FC = () => {
 								<button
 									key={step.id}
 									onClick={() => setActiveStep(step.id)}
-									className={`group flex items-start w-full p-4 rounded-xl text-left transition-all duration-200 border-2 ${
-										isActive ?
-											"bg-primary/5 border-primary shadow-sm"
-										:	"bg-card border-transparent hover:bg-accent/50 hover:border-border"
-									}`}>
-									<div
-										className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-sm font-medium transition-colors ${
-											isActive ?
-												"border-primary bg-primary text-primary-foreground"
-											:	"border-muted-foreground/30 bg-muted text-muted-foreground group-hover:border-primary/50 group-hover:text-primary"
+									className={`group flex items-start w-full p-4 rounded-xl text-left transition-all duration-200 border-2 ${isActive ?
+										"bg-primary/5 border-primary shadow-sm"
+										: "bg-card border-transparent hover:bg-accent/50 hover:border-border"
 										}`}>
+									<div
+										className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-sm font-medium transition-colors ${isActive ?
+											"border-primary bg-primary text-primary-foreground"
+											: "border-muted-foreground/30 bg-muted text-muted-foreground group-hover:border-primary/50 group-hover:text-primary"
+											}`}>
 										{index + 1}
 									</div>
 									<div className="ml-4 space-y-1">
 										<p
-											className={`text-sm font-medium leading-none ${
-												isActive ? "text-foreground" : (
-													"text-muted-foreground group-hover:text-foreground"
-												)
-											}`}>
+											className={`text-sm font-medium leading-none ${isActive ? "text-foreground" : (
+												"text-muted-foreground group-hover:text-foreground"
+											)
+												}`}>
 											{step.label}
 										</p>
 										<p className="text-sm text-muted-foreground line-clamp-2">
@@ -218,7 +215,7 @@ const CreateService: React.FC = () => {
 								dialogSubtitle="Ikuti 3 langkah utama untuk membangun alur kerja layanan Anda."
 								items={[
 									{
-										title: "Informasi Layanan",
+										title: "Konfigurasi Layanan",
 										desc: "Tentukan identitas layanan, deskripsi, serta siapa saja yang memiliki akses untuk memesan layanan ini.",
 									},
 									{

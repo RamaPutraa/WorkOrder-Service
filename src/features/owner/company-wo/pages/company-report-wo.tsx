@@ -71,13 +71,16 @@ const CompanyReportWo = () => {
 								</Button>
 							</>
 						)
-					:	<Button
-							className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
-							onClick={handleSendWorkReport}
-							disabled={isSaving}>
-							<Send className="h-4 w-4" />
-							{isSaving ? "Memproses..." : "Finalisasi Laporan"}
-						</Button>
+						:
+						reportData?.status !== "approved" && (
+							<Button
+								className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-white rounded-xl  h-11 shadow-sm shadow-blue-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
+								onClick={handleSendWorkReport}
+								disabled={isSaving}>
+								<Send className="h-4 w-4" />
+								{isSaving ? "Memproses..." : "Finalisasi Laporan"}
+							</Button>
+						)
 				}
 			/>
 
@@ -118,9 +121,9 @@ const CompanyReportWo = () => {
 										className={`text-sm font-bold truncate block ${reportData.approvedBy ? "text-gray-900" : "text-gray-400"}`}>
 										{reportData.approvedBy ?
 											reportData.approvedBy.name
-										: reportData.workReportApprovalAccessType === "auto" ?
-											"Disetujui Otomatis"
-										:	"Belum disetujui"}
+											: reportData.workReportApprovalAccessType === "auto" ?
+												"Disetujui Otomatis"
+												: "Belum disetujui"}
 									</span>
 								</div>
 							</div>
@@ -166,7 +169,7 @@ const CompanyReportWo = () => {
 													year: "numeric",
 												},
 											)
-										:	"Belum ada perubahan"}
+											: "Belum ada perubahan"}
 									</div>
 								</div>
 							</div>
@@ -193,8 +196,9 @@ const CompanyReportWo = () => {
 									</div>
 								</div>
 
+
 								{/* Action Buttons */}
-								{canEdit && (
+								{canEdit && reportData?.status !== "approved" && (
 									<div className="flex items-center gap-2 self-start bg-muted/30 p-1.5 rounded-xl border border-border/50">
 										{!isEditMode ?
 											// Tombol Edit Mode
@@ -206,7 +210,7 @@ const CompanyReportWo = () => {
 												<Pencil className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
 												Edit Form
 											</Button>
-										:	<>
+											: <>
 												<Button
 													variant="ghost"
 													onClick={handleCancel}
@@ -223,7 +227,7 @@ const CompanyReportWo = () => {
 															<div className="w-3.5 h-3.5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
 															Menyimpan...
 														</span>
-													:	<span className="flex items-center gap-1.5">
+														: <span className="flex items-center gap-1.5">
 															<Save className="w-3.5 h-3.5" />
 															Simpan
 														</span>
@@ -242,7 +246,7 @@ const CompanyReportWo = () => {
 								<div className="py-8 bg-muted/20 rounded-xl border border-dashed border-border/50">
 									<EmptyData />
 								</div>
-							:	<div className="space-y-6">
+								: <div className="space-y-6">
 									{formObject.fields && formObject.fields.length > 0 ?
 										<div className="flex flex-col gap-6">
 											{[...formObject.fields]
@@ -266,7 +270,7 @@ const CompanyReportWo = () => {
 													);
 												})}
 										</div>
-									:	<div className="py-8 bg-muted/20 rounded-xl border border-dashed border-border/50">
+										: <div className="py-8 bg-muted/20 rounded-xl border border-dashed border-border/50">
 											<EmptyData />
 										</div>
 									}

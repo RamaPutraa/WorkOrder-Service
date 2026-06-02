@@ -28,10 +28,9 @@ export const WoAlertsReport = ({ wo, workReport }: WoAlertsReportProps) => {
 		alerts.push(
 			<div
 				key="report-manager-submitted"
-				onClick={handleNavigate}
-				className="group cursor-pointer rounded-lg border border-amber-200 bg-amber-50 hover:bg-amber-100/80 hover:border-amber-300 transition-all duration-200 overflow-hidden">
+				className="group rounded-lg">
 				<div className="flex items-center gap-4 px-4 py-3.5">
-					<div className="shrink-0 p-2 rounded-lg bg-amber-100 text-amber-600 group-hover:bg-amber-200 transition-colors">
+					<div className="shrink-0 p-2 rounded-lg bg-amber-100 text-amber-600 transition-colors">
 						<Clock className="h-4 w-4" />
 					</div>
 					<div className="flex-1 min-w-0">
@@ -42,7 +41,14 @@ export const WoAlertsReport = ({ wo, workReport }: WoAlertsReportProps) => {
 							Laporan perintah kerja sedang menunggu persetujuan atasan
 						</p>
 					</div>
-					<ChevronRight className="h-4 w-4 text-amber-500 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+					<div
+						onClick={handleNavigate}
+						className="flex items-center gap-1 bg-primary px-3 py-3 shadow-sm rounded-2xl cursor-pointer hover:bg-primary/90 active:scale-95 transition-all">
+						<p className="text-sm font-medium text-white leading-tight">
+							Lihat Detail Laporan
+						</p>
+						<ChevronRight className="h-4 w-4 text-white shrink-0" />
+					</div>
 				</div>
 			</div>,
 		);
@@ -57,10 +63,9 @@ export const WoAlertsReport = ({ wo, workReport }: WoAlertsReportProps) => {
 		alerts.push(
 			<div
 				key="report-manager-rejected"
-				onClick={handleNavigate}
-				className="group cursor-pointer rounded-lg border border-red-200 bg-red-50 hover:bg-red-100/80 hover:border-red-300 transition-all duration-200 overflow-hidden">
+				className="group rounded-lg">
 				<div className="flex items-center gap-4 px-4 py-3.5">
-					<div className="shrink-0 p-2 rounded-lg bg-red-100 text-red-600 group-hover:bg-red-200 transition-colors">
+					<div className="shrink-0 p-2 rounded-lg bg-red-100 text-red-600 transition-colors">
 						<XCircle className="h-4 w-4" />
 					</div>
 					<div className="flex-1 min-w-0">
@@ -71,7 +76,14 @@ export const WoAlertsReport = ({ wo, workReport }: WoAlertsReportProps) => {
 							Laporan perintah kerja ditolak, silahkan periksa kembali
 						</p>
 					</div>
-					<ChevronRight className="h-4 w-4 text-red-500 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+					<div
+						onClick={handleNavigate}
+						className="flex items-center gap-1 bg-primary px-3 py-3 shadow-sm rounded-2xl cursor-pointer hover:bg-primary/90 active:scale-95 transition-all">
+						<p className="text-sm font-medium text-white leading-tight">
+							Lihat Detail Laporan
+						</p>
+						<ChevronRight className="h-4 w-4 text-white shrink-0" />
+					</div>
 				</div>
 			</div>,
 		);
@@ -86,10 +98,9 @@ export const WoAlertsReport = ({ wo, workReport }: WoAlertsReportProps) => {
 		alerts.push(
 			<div
 				key="report-manager-approved"
-				onClick={handleNavigate}
-				className="group cursor-pointer rounded-lg border border-green-200 bg-green-50 hover:bg-green-100/80 hover:border-green-300 transition-all duration-200 overflow-hidden">
+				className="group rounded-lg">
 				<div className="flex items-center gap-4 px-4 py-3.5">
-					<div className="shrink-0 p-2 rounded-lg bg-green-100 text-green-600 group-hover:bg-green-200 transition-colors">
+					<div className="shrink-0 p-2 rounded-lg bg-green-100 text-green-600">
 						<ShieldCheck className="h-4 w-4" />
 					</div>
 					<div className="flex-1 min-w-0">
@@ -100,7 +111,14 @@ export const WoAlertsReport = ({ wo, workReport }: WoAlertsReportProps) => {
 							Laporan perintah kerja sudah disetujui
 						</p>
 					</div>
-					<ChevronRight className="h-4 w-4 text-emerald-500 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+					<div
+						onClick={handleNavigate}
+						className="flex items-center gap-1 bg-primary px-3 py-3 shadow-sm rounded-2xl cursor-pointer hover:bg-primary/90 active:scale-95 transition-all">
+						<p className="text-sm font-medium text-white leading-tight">
+							Lihat Detail Laporan
+						</p>
+						<ChevronRight className="h-4 w-4 text-white shrink-0" />
+					</div>
 				</div>
 			</div>,
 		);
@@ -111,21 +129,27 @@ export const WoAlertsReport = ({ wo, workReport }: WoAlertsReportProps) => {
 		alerts.push(
 			<div
 				key="report-empty"
-				onClick={handleNavigate}
-				className="group cursor-pointer rounded-lg border border-border bg-muted/40 hover:bg-muted/70 hover:border-border/80 transition-all duration-200 overflow-hidden">
+				className="group rounded-lg">
 				<div className="flex items-center gap-4 px-4 py-3.5">
-					<div className="shrink-0 p-2 rounded-lg bg-muted text-muted-foreground group-hover:bg-muted/80 transition-colors">
+					<div className="shrink-0 p-2 rounded-lg bg-muted text-muted-foreground transition-colors">
 						<FileSearch className="h-4 w-4" />
 					</div>
 					<div className="flex-1 min-w-0">
 						<p className="text-sm font-semibold text-foreground leading-tight">
-							Lihat Detail Laporan
+							Laporan Pengerjaan
 						</p>
 						<p className="text-xs text-muted-foreground mt-0.5">
 							Laporan perintah kerja masih dalam tahap pengerjaan
 						</p>
 					</div>
-					<ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 group-hover:translate-x-0.5 transition-transform" />
+					<div
+						onClick={handleNavigate}
+						className="flex items-center gap-1 bg-primary px-3 py-3 shadow-sm rounded-2xl cursor-pointer hover:bg-primary/90 active:scale-95 transition-all">
+						<p className="text-sm font-medium text-white leading-tight">
+							Lihat Detail Laporan
+						</p>
+						<ChevronRight className="h-4 w-4 text-white shrink-0" />
+					</div>
 				</div>
 			</div>,
 		);

@@ -674,7 +674,7 @@ const ServiceDetailSubmit = () => {
 									<div className="flex items-center gap-2">
 										<Hammer className="w-4 h-4 text-violet-500" />
 										<h3 className="text-sm font-bold text-foreground tracking-tight">
-											Tahap Pengerjaan
+											Laporan Pekerjaan
 										</h3>
 									</div>
 									<Badge
