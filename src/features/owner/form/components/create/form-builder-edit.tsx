@@ -176,8 +176,8 @@ export const FormBuilderEdit = forwardRef<FormBuilderEditRef, Props>(
 								onChange={(e) => validateAndSetField("title", e.target.value)}
 								placeholder="Contoh: Formulir Pendaftaran"
 								className={`h-10 rounded-lg ${errors.title ?
-										"border-red-400 focus-visible:ring-red-300"
-										: "focus-visible:ring-primary/30"
+									"border-red-400 focus-visible:ring-red-300"
+									: "focus-visible:ring-primary/30"
 									}`}
 							/>
 							{errors.title && (
@@ -203,8 +203,8 @@ export const FormBuilderEdit = forwardRef<FormBuilderEditRef, Props>(
 								placeholder="Tuliskan deskripsi singkat form ini..."
 								rows={3}
 								className={`rounded-lg resize-none ${errors.description ?
-										"border-red-400 focus-visible:ring-red-300"
-										: "focus-visible:ring-primary/30"
+									"border-red-400 focus-visible:ring-red-300"
+									: "focus-visible:ring-primary/30"
 									}`}
 							/>
 							{errors.description && (
@@ -229,8 +229,8 @@ export const FormBuilderEdit = forwardRef<FormBuilderEditRef, Props>(
 								}>
 								<SelectTrigger
 									className={`h-10 rounded-lg w-full ${errors.formType ?
-											"border-red-400 focus:ring-red-300"
-											: "focus:ring-primary/30"
+										"border-red-400 focus:ring-red-300"
+										: "focus:ring-primary/30"
 										}`}>
 									<SelectValue placeholder="Pilih tipe form" />
 								</SelectTrigger>

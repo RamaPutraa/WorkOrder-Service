@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ClipboardList, LayoutGrid, List, Eye, DollarSign, Pencil, Tag, Globe, Building, Lock } from "lucide-react";
+import { ClipboardList, LayoutGrid, List, Eye, DollarSign, Pencil, Tag, Globe, Building, Lock, PlusCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SectionLoading } from "@/shared/atoms";
 import { useCreateService } from "../hooks/useCreateService";
@@ -255,6 +255,9 @@ const ViewService: React.FC = () => {
 				onAddClick={handleAddClick}
 				addLabel="Tambah Layanan"
 				backPath={true}
+				addIcon={
+					<PlusCircle className="h-4 w-4" />
+				}
 			/>
 
 			<CreateServiceModal

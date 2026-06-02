@@ -12,7 +12,7 @@ type Props = {
 export const FieldText: React.FC<Props> = ({ field, onUpdate, error }) => (
 	<div className="space-y-1.5">
 		<Label className={`text-xs font-medium ${error ? "text-red-500" : "text-muted-foreground"}`}>
-			Placeholder
+			Placeholder <span className="font-normal opacity-60">(Opsional)</span>
 		</Label>
 		<Input
 			value={field.placeholder ?? ""}

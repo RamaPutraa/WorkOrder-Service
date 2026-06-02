@@ -8,6 +8,7 @@ import { CardWorkOrdersConfig } from "../components/create/work-orders-config";
 import PageHeader from "@/shared/atoms/header-content";
 import { ConfirmLeaveDialog } from "@/shared/molecules/confirm-leave-dialog";
 import { HintDialog } from "@/shared/molecules/hint-dialog";
+import { SaveIcon } from "lucide-react";
 
 const CreateService: React.FC = () => {
 	const {
@@ -165,6 +166,9 @@ const CreateService: React.FC = () => {
 				subtitle="Konfigurasi layanan work order secara ringkas dan efisien."
 				backPath={true}
 				addLabel="Simpan Layanan"
+				addIcon={
+					<SaveIcon className="h-4 w-4" />
+				}
 				onAddClick={createService}
 				loading={creating}
 			/>

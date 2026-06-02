@@ -107,7 +107,7 @@ export default function FormFieldViewer({
 						value={(localValue as string) ?? ""}
 						onChange={(e) => handleValueChange(e.target.value)}
 						onBlur={handleBlur}
-						placeholder={field.placeholder || undefined}
+						placeholder={field.placeholder || "Input jawaban disini.."}
 						readOnly={readOnly}
 						disabled={readOnly}
 						className={cn("bg-background", hasError && "border-red-300")}
@@ -193,7 +193,7 @@ export default function FormFieldViewer({
 						value={(localValue as string) ?? ""}
 						onChange={(e) => handleValueChange(e.target.value)}
 						onBlur={handleBlur}
-						placeholder={field.placeholder || undefined}
+						placeholder={field.placeholder || "Input jawaban disini.."}
 						readOnly={readOnly}
 						disabled={readOnly}
 						rows={4}
