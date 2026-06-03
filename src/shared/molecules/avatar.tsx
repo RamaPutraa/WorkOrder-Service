@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -14,14 +14,18 @@ import { LogOutIcon } from "lucide-react";
 const AvatarDropdown = () => {
 	const { user, logout } = useAuth();
 	const { showDialog } = useDialogStore();
+	const userName = user?.name || "User";
+
 	return (
 		<div>
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<div className="flex items-center gap-2 cursor-pointer">
-						<Avatar className="cursor-pointer">
-							<AvatarImage src="https://i.pravatar.cc/40" alt={user?.name} />
-							<AvatarFallback>U</AvatarFallback>
+						<Avatar className="h-8 w-8 rounded-lg">
+							{/* <AvatarImage src={userAvatar} alt={userName} /> */}
+							<AvatarFallback className="rounded-lg">
+								{userName[0]?.toUpperCase()}
+							</AvatarFallback>
 						</Avatar>
 						{/* Nama user */}
 						<span className="text-sm font-medium">{user?.name || "User"}</span>
