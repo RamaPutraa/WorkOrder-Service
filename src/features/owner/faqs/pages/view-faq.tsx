@@ -7,16 +7,18 @@ import {
 	Hash,
 	File,
 	MessageCircleIcon,
-	Settings,
+	Power,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useFaq } from "../hooks/useFaq";
+import { useCompanyProfile } from "../../company/hooks/companyHooks";
 import { AddFaqDialog } from "../components/faq-add-dialogs";
 import { FaqItemCard } from "../components/faq-item-card";
-import { SectionLoading } from "@/shared/atoms/loading-state";
+import { ButtonLoading, SectionLoading } from "@/shared/atoms/loading-state";
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { useNavigate } from "react-router-dom";
+import { Switch } from "@/components/ui/switch";
+import { useDialogStore } from "@/store/dialogStore";
 import {
 	Sheet,
 	SheetContent,
@@ -75,6 +77,7 @@ const FilterTabs = ({ active, onChange, counts }: FilterTabsProps) => {
 const ViewFaq = () => {
 	const {
 		faqItems,
+		isActive: isFaqActive,
 		loading,
 		submitting,
 		error,
@@ -82,16 +85,27 @@ const ViewFaq = () => {
 		handleAddText,
 		handleAddPdf,
 		handleDelete,
+		handleToggleActive,
+		setIsActive,
 	} = useFaq();
 
-	const [showDialog, setShowDialog] = useState(false);
+	const { company } = useCompanyProfile();
+
+	const { showDialog } = useDialogStore();
+	const [showAddDialog, setShowAddDialog] = useState(false);
 	const [selectedTextItem, setSelectedTextItem] = useState<FaqItem | null>(null);
 	const [filter, setFilter] = useState<FilterType>("all");
-	const navigate = useNavigate();
 
 	useEffect(() => {
 		void fetchFaqList();
 	}, [fetchFaqList]);
+
+	// Sync FAQ active status dari company profile
+	useEffect(() => {
+		if (company && typeof (company as any).isFaqActive === "boolean") {
+			setIsActive((company as any).isFaqActive);
+		}
+	}, [company, setIsActive]);
 
 	const textItems = faqItems.filter((i) => i.type === "TEXT");
 	const pdfItems = faqItems.filter((i) => i.type === "PDF");
@@ -100,7 +114,6 @@ const ViewFaq = () => {
 
 	if (error) {
 		return (
-			// min-h-[75vh] memastikan konten berada di tengah layar secara vertikal
 			<div className="w-full min-h-[75vh] flex flex-col items-center justify-center p-6 animate-in fade-in zoom-in-95 duration-500">
 				{/* ── Ikon Dekoratif ───────────────────────────────────────── */}
 				<div className="relative mb-8">
@@ -121,17 +134,27 @@ const ViewFaq = () => {
 					Fitur FAQ Belum Aktif
 				</h2>
 				<p className="text-sm sm:text-base text-muted-foreground max-w-md text-center leading-relaxed mb-8">
-					{error}
+					Aktifkan fitur FAQ agar konten dapat dilihat oleh publik di halaman utama.
 				</p>
 
-				{/* ── Tombol Aksi (Untuk Navigasi Nanti) ───────────────────── */}
+				{/* ── Tombol Aktivasi Langsung ───────────────────── */}
 				<Button
 					onClick={() => {
-						navigate("/dashboard/internal/company");
+						showDialog({
+							title: "Aktifkan FAQ Publik?",
+							description: "FAQ akan ditampilkan di halaman publik dan dapat dibaca oleh semua orang.",
+							confirmText: "Ya, Aktifkan",
+							cancelText: "Batal",
+							onConfirm: async () => {
+								await handleToggleActive(true);
+								void fetchFaqList();
+							},
+						});
 					}}
+					disabled={submitting}
 					className="rounded-xl shadow-sm px-6 h-11 text-sm font-semibold transition-transform active:scale-95 hover:cursor-pointer">
-					<Settings className="w-4 h-4 mr-2" />
-					Buka Profil Perusahaan
+					<Power className="w-4 h-4 mr-2" />
+					{submitting ? "Mengaktifkan..." : "Aktifkan FAQ Sekarang"}
 				</Button>
 			</div>
 		);
@@ -146,10 +169,40 @@ const ViewFaq = () => {
 				backPath={true}
 				actionButtons={
 					<div className="flex items-center gap-3 w-full md:w-auto">
+						{/* Toggle FAQ Aktif/Nonaktif */}
+						{loading ?
+							<div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-border/60 bg-card">
+								<ButtonLoading />
+							</div>
+							: <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-border/60 bg-card">
+								<span className={`text-xs font-semibold ${isFaqActive ? "text-emerald-600" : "text-muted-foreground"}`}>
+									{isFaqActive ? "FAQ Aktif" : "FAQ Nonaktif"}
+								</span>
+								<Switch
+									checked={isFaqActive}
+									disabled={submitting}
+									onCheckedChange={() => {
+										showDialog({
+											title: isFaqActive ? "Nonaktifkan FAQ Publik?" : "Aktifkan FAQ Publik?",
+											description: isFaqActive
+												? "FAQ akan disembunyikan dari halaman publik dan tidak dapat diakses oleh umum."
+												: "FAQ akan ditampilkan di halaman publik dan dapat dibaca oleh semua orang.",
+											confirmText: isFaqActive ? "Ya, Nonaktifkan" : "Ya, Aktifkan",
+											cancelText: "Batal",
+											onConfirm: async () => {
+												await handleToggleActive(!isFaqActive);
+											},
+										});
+									}}
+									className="data-[state=checked]:bg-emerald-600"
+								/>
+							</div>
+						}
+
 						{/* Satu tombol tambah */}
 						<Button
 							id="btn-add-faq"
-							onClick={() => setShowDialog(true)}
+							onClick={() => setShowAddDialog(true)}
 							className="flex-1 md:flex-none h-10 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-sm shadow-sm hover:cursor-pointer transition-all active:scale-95 flex items-center gap-2">
 							<Plus className="w-4 h-4" />
 							<span>Tambah FAQ</span>
@@ -288,8 +341,8 @@ const ViewFaq = () => {
 
 			{/* ── Unified Dialog ── */}
 			<AddFaqDialog
-				open={showDialog}
-				onClose={() => setShowDialog(false)}
+				open={showAddDialog}
+				onClose={() => setShowAddDialog(false)}
 				onSubmitText={handleAddText}
 				onSubmitPdf={handleAddPdf}
 				submitting={submitting}

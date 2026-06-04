@@ -144,7 +144,7 @@ export const CardServiceRequestConfig: React.FC<
 											className="pl-9 h-8 bg-white rounded-xl"
 										/>
 									</div>
-									<div className="grid grid-cols-1 gap-2 2xl:grid-cols-3">
+									<div className="grid grid-cols-1 gap-2 3xl:grid-cols-3">
 										{filteredIntakeForms.length === 0 ?
 											<div className="col-span-1 2xl:col-span-3 text-sm text-slate-500 text-center py-8 bg-slate-50 rounded-xl border border-dashed border-slate-200">
 												<EmptyData />
@@ -226,7 +226,7 @@ export const CardServiceRequestConfig: React.FC<
 											className="pl-9 h-8 bg-white rounded-xl"
 										/>
 									</div>
-									<div className="grid grid-cols-1 gap-2 2xl:grid-cols-3">
+									<div className="grid grid-cols-1 gap-2 3xl:grid-cols-3">
 										{filteredReviewForms.length === 0 ?
 											<div className="col-span-1 2xl:col-span-3 text-sm text-slate-500 text-center py-8 bg-slate-50 rounded-xl border border-dashed border-slate-200">
 												<EmptyData />

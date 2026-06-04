@@ -6,7 +6,6 @@ import { SectionLoading } from "@/shared/atoms";
 import { EmptyData } from "@/shared/molecules/empty-data";
 
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
     Tag,
     Pencil,
@@ -27,16 +26,7 @@ const formatRupiah = (value: number) =>
         minimumFractionDigits: 0,
     }).format(value);
 
-const accessLabel: Record<string, string> = {
-    public: "Publik",
-    member_only: "Member",
-    internal: "Internal",
-};
-const accessColor: Record<string, string> = {
-    public: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    member_only: "bg-blue-50 text-blue-700 border-blue-200",
-    internal: "bg-violet-50 text-violet-700 border-violet-200",
-};
+
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
@@ -49,7 +39,6 @@ type PricingListItemProps = {
 const PricingListItem = ({ item, onEdit, onDelete }: PricingListItemProps) => {
     const service = item.service;
     if (!service) return null; // Fallback jika data kosong
-    const access = service.accessType as string;
 
     return (
         <div className="group relative flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white border-b last:border-0 hover:bg-slate-50 transition-colors gap-4">
@@ -62,16 +51,6 @@ const PricingListItem = ({ item, onEdit, onDelete }: PricingListItemProps) => {
                         <p className="text-sm font-semibold text-slate-900 truncate">
                             {service.title}
                         </p>
-                        <Badge
-                            variant="outline"
-                            className={`text-[10px] font-semibold px-2 py-0.5 border ${accessColor[access] ?? ""}`}>
-                            {accessLabel[access] ?? access}
-                        </Badge>
-                        <Badge
-                            variant="outline"
-                            className={`text-[10px] font-semibold px-2 py-0.5 ${service.isActive ? "bg-green-50 text-green-700 border-green-200" : "bg-slate-100 text-slate-500 border-slate-200"}`}>
-                            {service.isActive ? "Aktif" : "Nonaktif"}
-                        </Badge>
                     </div>
                     <div className="flex items-center gap-4 text-xs text-slate-500">
                         {service.description && (

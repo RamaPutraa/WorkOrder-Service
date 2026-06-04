@@ -161,10 +161,17 @@ export const useCreateService = () => {
 			return;
 		}
 		if (!intakeFormId) {
-			notifyError("Gagal menyimpan", "Pilih intake form untuk service request");
+			notifyError("Gagal menyimpan", "Pilih formulir pengajuan untuk layanan ini");
 			setCreating(false);
 			return;
 		}
+
+		if (!reviewFormId) {
+			notifyError("Gagal menyimpan", "Pilih formulir ulasan untuk layanan ini");
+			setCreating(false);
+			return;
+		}
+
 		if (workOrdersConfig.length === 0) {
 			notifyError(
 				"Gagal menyimpan",

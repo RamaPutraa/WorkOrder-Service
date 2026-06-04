@@ -273,7 +273,7 @@ const WorkOrderRowCard = ({
 								/>
 							</div>
 							<div className="max-h-[320px] overflow-y-auto p-5 space-y-3 border border-slate-200 rounded-md bg-white">
-								<div className="grid grid-cols-1 gap-2 2xl:grid-cols-3">
+								<div className="grid grid-cols-1 gap-2 3xl:grid-cols-3">
 									{filteredWoForms.length === 0 ?
 										<div className="text-sm text-slate-500 text-center py-8 bg-slate-50 rounded-xl border border-dashed border-slate-200">
 											<EmptyData />
@@ -355,7 +355,7 @@ const WorkOrderRowCard = ({
 							/>
 						</div>
 						<div className="max-h-[320px] overflow-y-auto p-5 space-y-3 border border-slate-200 rounded-md bg-white">
-							<div className="grid grid-cols-1 gap-2 2xl:grid-cols-3">
+							<div className="grid grid-cols-1 gap-2 3xl:grid-cols-3">
 								{filteredWrForms.length === 0 ?
 									<div className="text-sm text-slate-500 text-center py-8 bg-slate-50 rounded-xl border border-dashed border-slate-200">
 										<EmptyData />

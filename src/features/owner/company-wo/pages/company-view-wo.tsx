@@ -111,7 +111,7 @@ const CompanyViewWo = () => {
 			</div>
 
 			{/* Work Orders Grid */}
-			<div className="grid gap-4 sm:gap-5 grid-cols-1 xl:grid-cols-3">
+			<div className="grid gap-4 sm:gap-5 grid-cols-1 xl:grid-cols-2">
 				<AnimatePresence mode="wait">
 					{loading ?
 						<motion.div

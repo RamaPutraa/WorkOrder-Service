@@ -203,7 +203,7 @@ const ViewForm: React.FC = () => {
 
 				<TabsContent value="card" className="m-0 focus-visible:outline-none">
 					{/* Main Content - Forms Grid */}
-					<div className="grid gap-4 sm:gap-5 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+					<div className="grid gap-4 sm:gap-5 grid-cols-1  xl:grid-cols-2">
 						<AnimatePresence mode="wait">
 							{loading ?
 								<motion.div
@@ -231,7 +231,7 @@ const ViewForm: React.FC = () => {
 													}
 													className="hover:cursor-pointer p-5 group gap-2 flex flex-col h-full bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
 													<div className="py-3">
-														<div className="flex items-start gap-4">
+														<div className="flex items-center gap-4">
 															{/* Icon */}
 															<div className="shrink-0 p-3 bg-primary/5 text-primary rounded-xl">
 																<ScrollText className="w-6 h-6" />
@@ -239,7 +239,7 @@ const ViewForm: React.FC = () => {
 
 															{/* Text Content */}
 															<div className="flex-1 space-y-1">
-																<h3 className="text-base font-semibold text-slate-900 leading-snug line-clamp-1">
+																<h3 className="text-base font-semibold text-slate-900 leading-snug line-clamp-2">
 																	{form.title || "Untitled Form"}
 																</h3>
 

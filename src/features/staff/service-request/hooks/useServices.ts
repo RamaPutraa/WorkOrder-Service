@@ -6,6 +6,7 @@ import {
 	getSrIntakeFormStaffById,
 	submitSrIntakeStaffById,
 } from "../services/internal-sr-service";
+import { uploadFileApi } from "@/lib/file-service";
 import { useParams, useNavigate } from "react-router-dom";
 
 type FieldValue = string | number | File | string[] | null;
@@ -129,26 +130,43 @@ export const useServices = () => {
 		setSubmitting(true);
 		setError(null);
 
-		const submissions = [
-			{
-				formId: intakeForm._id,
-				fieldsData: Object.entries(formValues[intakeForm._id] || {}).map(
-					([fieldOrder, fieldValue]) => ({
-						order: Number(fieldOrder),
-						value: fieldValue,
-					}),
-				),
-			},
-		];
+		// Ambil field data dari form
+		const rawFieldsData = Object.entries(formValues[intakeForm._id] || {}).map(
+			([fieldOrder, fieldValue]) => ({
+				order: Number(fieldOrder),
+				value: fieldValue,
+			}),
+		);
+
+		// 1. Upload semua file gambar terlebih dahulu
+		for (const fd of rawFieldsData) {
+			if (fd.value instanceof File) {
+				const { error, data } = await handleApi(() =>
+					uploadFileApi(fd.value as File),
+				);
+				if (error || !data) {
+					setSubmitting(false);
+					notifyError(
+						"Gagal mengirim form",
+						"Gagal mengunggah gambar. Silakan coba lagi.",
+					);
+					return;
+				}
+				// Ganti File object dengan URL string hasil upload
+				fd.value = data.data.url;
+			}
+		}
 
 		const payload: RequesterSubmitRequest = {
-			submission: submissions[0],
+			submission: {
+				formId: intakeForm._id,
+				fieldsData: rawFieldsData as FieldData[],
+			},
 		};
 
 		const { data: res, error } = await handleApi(() =>
 			submitSrIntakeStaffById(id, payload),
 		);
-		console.log("Payload submitted:", payload);
 		setSubmitting(false);
 
 		if (error) {
@@ -159,7 +177,6 @@ export const useServices = () => {
 
 		if (res?.data) {
 			notifySuccess("Layanan berhasil diajukan!");
-			console.log("Response:", res.data);
 			navigate("/dashboard/staff/services-request/history");
 		} else {
 			notifyError("Gagal mengajukan layanan. Respon tidak valid.");

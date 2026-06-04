@@ -6,7 +6,10 @@ import {
 	Mail,
 	Calendar,
 	Search,
+	Settings,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { useMembership } from "../hooks/useMembership";
 import { SectionLoading } from "@/shared/atoms/loading-state";
 import { EmptyData } from "@/shared/molecules/empty-data";
@@ -15,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
 
 const ViewAccountPairing: React.FC = () => {
+	const navigate = useNavigate();
 	const { memberships, loading, error, fetchMemberships } = useMembership();
 	const [search, setSearch] = useState("");
 
@@ -58,9 +62,17 @@ const ViewAccountPairing: React.FC = () => {
 	return (
 		<div className="h-full flex flex-col">
 			<PageHeader
-				title="Pairing Akun"
+				title="Daftar Akun Pelanggan Terhubung"
 				subtitle="Daftar akun pelanggan yang telah terhubung dengan sistem eksternal perusahaan"
 				backPath={true}
+				actionButtons={
+					<Button
+						onClick={() => navigate("/dashboard/internal/company")}
+						className="h-10 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-sm shadow-sm transition-all active:scale-95 flex items-center gap-2 hover:cursor-pointer">
+						<Settings className="w-4 h-4" />
+						<span>Integrasi Sistem</span>
+					</Button>
+				}
 			/>
 
 			<div className="pb-8 space-y-6">

@@ -114,7 +114,7 @@ const ViewServiceRequest = () => {
 							Daftar Pengajuan Layanan - Total{" "}
 							<TextLoading variant="dots" message="" className="w-4" />{" "}
 						</div>
-					:	`Daftar Pengajuan Layanan - Total ${data?.length || 0} pengajuan layanan`
+						: `Daftar Pengajuan Layanan - Total ${data?.length || 0} pengajuan layanan`
 				}
 				backPath={true}
 			/>
@@ -125,7 +125,7 @@ const ViewServiceRequest = () => {
 
 			{/* Main Content */}
 			<div className="w-full">
-				<div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+				<div className="grid gap-4 grid-cols-1 xl:grid-cols-2">
 					<AnimatePresence mode="wait">
 						{loading ?
 							<motion.div
@@ -135,147 +135,133 @@ const ViewServiceRequest = () => {
 								className="col-span-full">
 								<SectionLoading message="Memuat data pengajuan layanan..." />
 							</motion.div>
-						: filteredData.length > 0 ?
-							filteredData.map((item) => (
-								<motion.div
-									key={item._id}
-									initial={{ opacity: 0, y: 20 }}
-									animate={{ opacity: 1, y: 0 }}
-									whileHover={{ scale: 1.02, y: -4 }}
-									transition={{ duration: 0.2, ease: "easeOut" }}>
-									<div
-										onClick={() =>
-											navigate(
-												`/dashboard/internal/business/services/request/detail/${item._id}`,
-											)
-										}
-										className="group flex flex-col h-full bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden cursor-pointer">
-										{/* Header */}
-										<div className="border-b border-slate-200/70 p-2">
-											{/* Status Badge */}
-											<div className="shrink-0">
-												{getStatusBadge(item.serviceRequestStatus)}
+							: filteredData.length > 0 ?
+								filteredData.map((item) => (
+									<motion.div
+										key={item._id}
+										initial={{ opacity: 0, y: 20 }}
+										animate={{ opacity: 1, y: 0 }}
+										whileHover={{ scale: 1.02, y: -4 }}
+										transition={{ duration: 0.2, ease: "easeOut" }}>
+										<div
+											onClick={() =>
+												navigate(
+													`/dashboard/internal/business/services/request/detail/${item._id}`,
+												)
+											}
+											className="group flex flex-col h-full bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden cursor-pointer">
+											{/* Header */}
+											<div className="border-b border-slate-200/70 p-2">
+												{/* Status Badge */}
+												<div className="shrink-0">
+													{getStatusBadge(item.serviceRequestStatus)}
+												</div>
 											</div>
-										</div>
-										{/* card content 1 */}
-										<div className="px-5 py-3 sm:px-6 pt-5 sm:pt-6 space-y-4">
-											<div className="flex items-center justify-between gap-3 min-w-0">
-												{/* Icon & Title Group */}
-												<div className="flex items-center gap-3 flex-1 min-w-0">
-													<div className="shrink-0 p-2.5 sm:p-3 bg-primary/5 text-primary rounded-xl">
-														<ClipboardPenLine className="w-5 h-5 sm:w-6 sm:h-6" />
-													</div>
-													<div className="flex-1 min-w-0">
-														<h3 className="text-lg font-bold leading-tight mb-1 truncate">
-															{item.code || "-"}
-														</h3>
-														<p className="text-sm text-muted-foreground line-clamp-1 leading-relaxed">
-															{item.service?.title || "-"}
-														</p>
+											{/* card content 1 */}
+											<div className="px-5 py-3 sm:px-6 pt-5 sm:pt-6 space-y-4">
+												<div className="flex items-center justify-between gap-3 min-w-0">
+													{/* Icon & Title Group */}
+													<div className="flex items-center gap-3 flex-1 min-w-0">
+														<div className="shrink-0 p-2.5 sm:p-3 bg-primary/5 text-primary rounded-xl">
+															<ClipboardPenLine className="w-5 h-5 sm:w-6 sm:h-6" />
+														</div>
+														<div className="flex-1 min-w-0">
+															<h3 className="text-lg font-bold leading-tight mb-1 truncate">
+																{item.code || "-"}
+															</h3>
+															<p className="text-sm text-muted-foreground line-clamp-1 leading-relaxed">
+																{item.service?.title || "-"}
+															</p>
+														</div>
 													</div>
 												</div>
+
+												<p className="text-xs sm:text-sm text-slate-500 leading-relaxed line-clamp-3 md:min-h-[3.75rem]">
+													{item.service?.description ||
+														"Tidak ada deskripsi tersedia untuk layanan ini."}
+												</p>
+											</div>
+											{/* card content 2 */}
+											<div className="px-6 pb-5 flex flex-col justify-end">
+												{/* Info Row (Client & Date) */}
+												<div className="flex flex-wrap items-center gap-x-4 text-sm text-muted-foreground">
+													<div className="flex items-center gap-1.5">
+														<User className="w-3.5 h-3.5 shrink-0" />
+														<span className="truncate max-w-[120px] sm:max-w-none">
+															{item.requestedBy?.name ?? "-"}
+														</span>
+													</div>
+													<div className="flex items-center gap-1.5">
+														<Calendar className="w-3.5 h-3.5 shrink-0" />
+														<span>
+															{new Date(item.createdAt).toLocaleDateString(
+																"id-ID",
+																{
+																	day: "2-digit",
+																	month: "short",
+																	year: "numeric",
+																},
+															)}
+														</span>
+													</div>
+												</div>
+												{/* Divider */}
 											</div>
 
-											<p className="text-xs sm:text-sm text-slate-500 leading-relaxed line-clamp-3 md:min-h-[3.75rem]">
-												{item.service?.description ||
-													"Tidak ada deskripsi tersedia untuk layanan ini."}{" "}
-												Lorem ipsum dolor sit amet consectetur adipisicing elit.
-												Velit debitis voluptatem molestiae voluptatibus
-												repellat? Dicta, minima a beatae voluptas nam eum
-												tempora aut enim inventore numquam similique consequatur
-												necessitatibus magnam. Porro labore dignissimos
-												obcaecati cum earum velit iusto qui adipisci aperiam
-												fugiat vel nam molestiae, saepe debitis amet maiores
-												tempore! Molestias omnis enim, eius dignissimos tenetur
-												quae. Accusantium, animi natus? Ipsam quos rerum
-												deleniti quaerat odit temporibus dignissimos quasi
-												deserunt quas totam perspiciatis laudantium veniam
-												quibusdam, nesciunt dolores aut esse eligendi veritatis
-												harum ratione ad minima dicta! Nam, obcaecati
-												consequatur.
-											</p>
-										</div>
-										{/* card content 2 */}
-										<div className="px-6 pb-5 flex flex-col justify-end">
-											{/* Info Row (Client & Date) */}
-											<div className="flex flex-wrap items-center gap-x-4 text-sm text-muted-foreground">
-												<div className="flex items-center gap-1.5">
-													<User className="w-3.5 h-3.5 shrink-0" />
-													<span className="truncate max-w-[120px] sm:max-w-none">
-														{item.requestedBy?.name ?? "-"}
-													</span>
-												</div>
-												<div className="flex items-center gap-1.5">
-													<Calendar className="w-3.5 h-3.5 shrink-0" />
-													<span>
-														{new Date(item.createdAt).toLocaleDateString(
-															"id-ID",
-															{
-																day: "2-digit",
-																month: "short",
-																year: "numeric",
-															},
-														)}
-													</span>
-												</div>
-											</div>
-											{/* Divider */}
-										</div>
-
-										{/* card footer */}
-										{item.serviceRequestStatus === "received" && (
-											<div className="px-5 sm:px-6 py-4 mt-auto border-t border-slate-200/70">
-												<div className="w-full flex flex-col lg:flex-row items-stretch lg:items-center gap-2">
-													{/* Tombol Terima & Tolak */}
-													<div className="flex gap-2 flex-1">
-														<Button
-															variant="outline"
-															size="sm"
-															className="flex-1 gap-1.5 font-semibold text-red-600 hover:bg-red-700 cursor-pointer hover:text-white rounded-xl px-3 h-9  transition-all flex items-center justify-center active:scale-95"
-															onClick={(e) => {
-																e.stopPropagation();
-																showDialog({
-																	title: "Konfirmasi Penolakan",
-																	description:
-																		"Apakah kamu yakin ingin menolak layanan ini?",
-																	confirmText: "Tolak",
-																	cancelText: "Batal",
-																	onConfirm: () => handleReject(item._id),
-																});
-															}}>
-															<XCircle className="w-4 h-4 shrink-0" />
-															<span>Tolak</span>
-														</Button>
-														<Button
-															size="sm"
-															className="flex-1 gap-1.5 font-semibold text-white bg-blue-600 hover:cursor-pointer hover:bg-blue-700 rounded-xl px-3 h-9 shadow-sm shadow-blue-200 transition-all flex items-center justify-center active:scale-95"
-															onClick={(e) => {
-																e.stopPropagation();
-																showDialog({
-																	title: "Konfirmasi Persetujuan",
-																	description:
-																		"Apakah kamu yakin ingin menyetujui layanan ini?",
-																	confirmText: "Setujui",
-																	cancelText: "Batal",
-																	onConfirm: () => handleApprove(item._id),
-																});
-															}}>
-															<Check className="w-4 h-4 shrink-0" />
-															<span>Terima</span>
-														</Button>
+											{/* card footer */}
+											{item.serviceRequestStatus === "received" && (
+												<div className="px-5 sm:px-6 py-4 mt-auto border-t border-slate-200/70">
+													<div className="w-full flex flex-col lg:flex-row items-stretch lg:items-center gap-2">
+														{/* Tombol Terima & Tolak */}
+														<div className="flex gap-2 flex-1">
+															<Button
+																variant="outline"
+																size="sm"
+																className="flex-1 gap-1.5 font-semibold text-red-600 hover:bg-red-700 cursor-pointer hover:text-white rounded-xl px-3 h-9  transition-all flex items-center justify-center active:scale-95"
+																onClick={(e) => {
+																	e.stopPropagation();
+																	showDialog({
+																		title: "Konfirmasi Penolakan",
+																		description:
+																			"Apakah kamu yakin ingin menolak layanan ini?",
+																		confirmText: "Tolak",
+																		cancelText: "Batal",
+																		onConfirm: () => handleReject(item._id),
+																	});
+																}}>
+																<XCircle className="w-4 h-4 shrink-0" />
+																<span>Tolak</span>
+															</Button>
+															<Button
+																size="sm"
+																className="flex-1 gap-1.5 font-semibold text-white bg-blue-600 hover:cursor-pointer hover:bg-blue-700 rounded-xl px-3 h-9 shadow-sm shadow-blue-200 transition-all flex items-center justify-center active:scale-95"
+																onClick={(e) => {
+																	e.stopPropagation();
+																	showDialog({
+																		title: "Konfirmasi Persetujuan",
+																		description:
+																			"Apakah kamu yakin ingin menyetujui layanan ini?",
+																		confirmText: "Setujui",
+																		cancelText: "Batal",
+																		onConfirm: () => handleApprove(item._id),
+																	});
+																}}>
+																<Check className="w-4 h-4 shrink-0" />
+																<span>Terima</span>
+															</Button>
+														</div>
 													</div>
 												</div>
-											</div>
-										)}
-									</div>
+											)}
+										</div>
+									</motion.div>
+								))
+								: <motion.div
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									className="col-span-full">
+									<EmptyData />
 								</motion.div>
-							))
-						:	<motion.div
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-								className="col-span-full">
-								<EmptyData />
-							</motion.div>
 						}
 					</AnimatePresence>
 				</div>

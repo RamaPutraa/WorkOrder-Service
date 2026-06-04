@@ -1,5 +1,6 @@
 import ApiClient from "@/lib/api";
 
+
 export const getSrHistory = async () => {
 	const response = await ApiClient.get<RequesterSRResponse>(
 		"/service-requests/sent",
@@ -27,6 +28,24 @@ export const submitSrIntakeStaffById = async (
 ) => {
 	const response = await ApiClient.post<RequesterSubmitResponse>(
 		`/service-requests/service/${id}`,
+		data,
+	);
+	return response.data;
+};
+
+export const getStaffWorkReport = async (id: string) => {
+	const response = await ApiClient.get<RequesterWorkReportResponse>(
+		`/service-requests/${id}/report`,
+	);
+	return response.data;
+};
+
+export const submitStaffReviewApi = async (
+	id: string,
+	data: RequesterSubmitRequest,
+) => {
+	const response = await ApiClient.post<RequesterSubmitResponse>(
+		`/service-requests/${id}/review`,
 		data,
 	);
 	return response.data;

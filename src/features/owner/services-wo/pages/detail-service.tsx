@@ -482,9 +482,10 @@ const DetailService = () => {
 												detailService.serviceRequestConfig.reviewForm.fields
 											}
 										/>
-										: <div className="rounded-xl border border-dashed p-4 flex items-center justify-center text-sm text-muted-foreground italic bg-muted/10 h-full min-h-[100px]">
-											Formulir ulasan tidak tersedia.
-										</div>
+										:
+										<EmptyData
+											title="Tidak ada formulir"
+											subtitle="Layanan ini tidak memiliki formulir ulasan." />
 									}
 								</div>
 							</div>
@@ -615,8 +616,10 @@ const DetailService = () => {
 																	formType={wo.workOrderForm.formType}
 																	fields={(wo.workOrderForm as any).fields}
 																/>
-																: <div className="rounded-xl border border-dashed p-4 flex items-center justify-center text-sm text-muted-foreground italic bg-muted/10 h-full min-h-[120px]">
-																	Tidak tersedia
+																: <div className=" p-4 flex items-center justify-center h-full min-h-[120px]">
+																	<EmptyData
+																		title="Tidak ada formulir"
+																		subtitle="Tipe layanan otomatis tidak memiliki formulir perintah kerja" />
 																</div>
 															}
 														</div>

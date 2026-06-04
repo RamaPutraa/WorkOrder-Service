@@ -11,6 +11,7 @@ import {
 } from "@/features/owner/services-wo/services/servicesWo";
 import { handleApi } from "@/lib/handle-api";
 import { useServiceStore } from "@/store/serviceStore";
+import { usePricingStore } from "@/store/pricingStore";
 
 // ===========================
 // === Types (local) ===
@@ -44,11 +45,12 @@ export const useEditService = () => {
 
 	// === Cache Store ===
 	const serviceStore = useServiceStore();
+	const pricingStore = usePricingStore();
 
 	const [detailService, setDetailService] = useState<Service | null>(
 		id && !serviceStore.isDetailStale(id) ?
 			(serviceStore.detailCache[id]?.data ?? null)
-		:	null,
+			: null,
 	);
 
 	// === Base form fields ===
@@ -234,13 +236,17 @@ export const useEditService = () => {
 			return;
 		}
 		if (!intakeFormId) {
-			notifyError(
-				"Gagal mengupdate",
-				"Pilih intake form untuk service request",
-			);
+			notifyError("Gagal menyimpan", "Pilih formulir pengajuan untuk layanan ini");
 			setUpdating(false);
 			return;
 		}
+
+		if (!reviewFormId) {
+			notifyError("Gagal menyimpan", "Pilih formulir ulasan untuk layanan ini");
+			setUpdating(false);
+			return;
+		}
+
 		if (workOrdersConfig.length === 0) {
 			notifyError(
 				"Gagal mengupdate",
@@ -315,6 +321,7 @@ export const useEditService = () => {
 
 		// Hapus seluruh cache karena backend membuat service baru dengan ID baru
 		serviceStore.clearCache();
+		pricingStore.clearCache();
 
 		(window as any).__isSubmittingSuccess = true;
 		notifySuccess("Layanan berhasil diupdate");

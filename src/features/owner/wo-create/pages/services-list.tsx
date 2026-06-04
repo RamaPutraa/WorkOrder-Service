@@ -86,7 +86,7 @@ const WoServicesList: React.FC = () => {
 			</div>
 
 			{/* Grid */}
-			<div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+			<div className="grid gap-4 sm:gap-5 grid-cols-1 xl:grid-cols-2">
 				<AnimatePresence mode="wait">
 					{loading ?
 						<motion.div
@@ -97,84 +97,84 @@ const WoServicesList: React.FC = () => {
 							className="col-span-full">
 							<SectionLoading message="Memuat data layanan..." />
 						</motion.div>
-					: filteredData.length > 0 ?
-						filteredData.map((service) => (
-							<motion.div
-								key={service._id}
-								initial={{ opacity: 0, y: 20 }}
-								animate={{ opacity: 1, y: 0 }}
-								whileHover={{ scale: 1.02, y: -4 }}
-								transition={{ duration: 0.2, ease: "easeOut" }}>
-								<div
-									onClick={() =>
-										navigate(
-											`/dashboard/internal/wo-create/services/detail/${service._id}`,
-										)
-									}
-									className="px-5 py-4 group gap-2 flex flex-col  bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden hover:cursor-pointer ">
-									<div className="space-y-4">
-										{/* Top row */}
-										<div className="flex items-start justify-between gap-4">
-											<div className="flex items-center gap-3 min-w-0">
-												{/* Icon */}
-												<div className="shrink-0 p-2.5 rounded-xl bg-primary/5 text-primary transition-colors">
-													<ClipboardList className="w-6 h-6" />
+						: filteredData.length > 0 ?
+							filteredData.map((service) => (
+								<motion.div
+									key={service._id}
+									initial={{ opacity: 0, y: 20 }}
+									animate={{ opacity: 1, y: 0 }}
+									whileHover={{ scale: 1.02, y: -4 }}
+									transition={{ duration: 0.2, ease: "easeOut" }}>
+									<div
+										onClick={() =>
+											navigate(
+												`/dashboard/internal/wo-create/services/detail/${service._id}`,
+											)
+										}
+										className="px-5 py-4 group gap-2 flex flex-col  bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden hover:cursor-pointer ">
+										<div className="space-y-4">
+											{/* Top row */}
+											<div className="flex items-start justify-between gap-4">
+												<div className="flex items-center gap-3 min-w-0">
+													{/* Icon */}
+													<div className="shrink-0 p-2.5 rounded-xl bg-primary/5 text-primary transition-colors">
+														<ClipboardList className="w-6 h-6" />
+													</div>
+													{/* Title */}
+													<h3 className="text-base font-bold text-slate-900 line-clamp-1">
+														{service.title || "Untitled"}
+													</h3>
 												</div>
-												{/* Title */}
-												<h3 className="text-base font-bold text-slate-900 line-clamp-1">
-													{service.title || "Untitled"}
-												</h3>
+												{/* Status badge */}
+												<div className="shrink-0 mt-1">
+													<div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
+														<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+														<span className="text-[10px] font-bold uppercase tracking-wider">
+															Aktif
+														</span>
+													</div>
+												</div>
 											</div>
-											{/* Status badge */}
-											<div className="shrink-0 mt-1">
-												<div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
-													<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-													<span className="text-[10px] font-bold uppercase tracking-wider">
-														Aktif
-													</span>
-												</div>
+
+											{/* Description */}
+											<div className="text-sm text-slate-500 leading-relaxed line-clamp-3 min-h-[3.75rem] text-justify">
+												{service.description ||
+													"Tidak ada deskripsi tersedia untuk layanan ini."}
 											</div>
 										</div>
 
-										{/* Description */}
-										<div className="text-sm text-slate-500 leading-relaxed line-clamp-3 min-h-[3.75rem] text-justify">
-											{service.description ||
-												"Tidak ada deskripsi tersedia untuk layanan ini."}
+										<div className="grid grid-cols-1 text-xs  border-t border-slate-200/70 p-0">
+											<div className="flex items-center justify-between text-xs text-slate-400 pt-3">
+												{/* Badge akses */}
+												<span>
+													<Badge variant="outline">
+														{serviceTypeLabel(service.accessType)}
+													</Badge>
+												</span>
+
+												{/* Actions */}
+												<div className="flex items-center gap-2">
+													{/* Buat Perintah Kerja */}
+													<Button
+														size="sm"
+														className="text-xs rounded-full gap-1.5 bg-primary hover:bg-primary/90 hover:cursor-pointer"
+														// Kirim event 'e' ke fungsi
+														onClick={(e) => handleCreateWoClick(e, service)}>
+														<Send className="h-3.5 w-3.5" />
+														Buat Perintah Kerja
+													</Button>
+												</div>
+											</div>
 										</div>
 									</div>
-
-									<div className="grid grid-cols-1 text-xs  border-t border-slate-200/70 p-0">
-										<div className="flex items-center justify-between text-xs text-slate-400 pt-3">
-											{/* Badge akses */}
-											<span>
-												<Badge variant="outline">
-													{serviceTypeLabel(service.accessType)}
-												</Badge>
-											</span>
-
-											{/* Actions */}
-											<div className="flex items-center gap-2">
-												{/* Buat Perintah Kerja */}
-												<Button
-													size="sm"
-													className="text-xs rounded-full gap-1.5 bg-primary hover:bg-primary/90 hover:cursor-pointer"
-													// Kirim event 'e' ke fungsi
-													onClick={(e) => handleCreateWoClick(e, service)}>
-													<Send className="h-3.5 w-3.5" />
-													Buat Perintah Kerja
-												</Button>
-											</div>
-										</div>
-									</div>
-								</div>
+								</motion.div>
+							))
+							: <motion.div
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								className="col-span-full">
+								<EmptyData />
 							</motion.div>
-						))
-					:	<motion.div
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							className="col-span-full">
-							<EmptyData />
-						</motion.div>
 					}
 				</AnimatePresence>
 			</div>
