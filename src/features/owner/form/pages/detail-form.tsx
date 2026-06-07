@@ -8,10 +8,14 @@ import {
 	Clock,
 	FileText,
 	Pencil,
+	Trash2,
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { EmptyData } from "@/shared/molecules/empty-data";
+import { Button } from "@/components/ui/button";
+import { useDialogStore } from "@/store/dialogStore";
+
 
 const formTypeMap: Record<string, { label: string; color: string }> = {
 	intake: {
@@ -42,9 +46,9 @@ const formatDate = (dateString?: string) => {
 };
 
 const DetailForm = () => {
-	// const { showDialog } = useDialogStore();
-	// const { detailForm, loading, removeForm } = useForm();
-	const { detailForm, loading } = useForm();
+	const { showDialog } = useDialogStore();
+	const { detailForm, loading, removeForm, canDelete } = useForm();
+	// const { detailForm, loading } = useForm();
 	const navigate = useNavigate();
 	const { id } = useParams<{ id: string }>();
 
@@ -53,22 +57,22 @@ const DetailForm = () => {
 		color: "bg-slate-50 text-slate-700 border-slate-200",
 	};
 
-	// const handleDelete = () => {
-	// 	showDialog({
-	// 		title: "Hapus Formulir",
-	// 		description: `Apakah Anda yakin ingin menghapus formulir "${detailForm?.title}"?`,
-	// 		confirmText: "Hapus",
-	// 		cancelText: "Batal",
-	// 		onConfirm: async () => {
-	// 			if (id) {
-	// 				const success = await removeForm(id);
-	// 				if (success) {
-	// 					navigate("/dashboard/internal/forms");
-	// 				}
-	// 			}
-	// 		},
-	// 	});
-	// };
+	const handleDelete = () => {
+		showDialog({
+			title: "Hapus Formulir",
+			description: `Apakah Anda yakin ingin menghapus formulir "${detailForm?.title}"?`,
+			confirmText: "Hapus",
+			cancelText: "Batal",
+			onConfirm: async () => {
+				if (id) {
+					const success = await removeForm(id);
+					if (success) {
+						navigate("/dashboard/internal/forms");
+					}
+				}
+			},
+		});
+	};
 
 	return (
 		<>
@@ -124,14 +128,15 @@ const DetailForm = () => {
 										</div>
 									</div>
 
-									{/* <Button
-										variant="destructive"
-										size="icon"
-										className="h-9 w-9 shrink-0 rounded-lg"
-										title="Hapus Formulir"
-										onClick={handleDelete}>
-										<Trash2 className="w-4 h-4" />
-									</Button> */}
+									{
+										canDelete && (
+											<Button
+												className="px-3 gap-2 shrink-0 rounded-xl bg-red-500 hover:bg-red-600 text-white hover:text-white transition-all duration-200 hover:cursor-pointer"
+												onClick={handleDelete}>
+												<Trash2 className="w-4 h-4" /> Hapus Formulir
+											</Button>
+										)
+									}
 								</div>
 
 								{/* Meta chips */}

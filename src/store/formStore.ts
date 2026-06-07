@@ -8,7 +8,7 @@ type FormCacheState = {
 	formsFetchedAt: number | null; // timestamp epoch (ms)
 
 	// ── Detail Form (per ID) ──
-	detailCache: Record<string, { data: Form; fetchedAt: number }>;
+	detailCache: Record<string, { data: Form; meta?: { canDelete: boolean }; fetchedAt: number }>;
 
 	// ── Helpers ──
 	isFormsStale: () => boolean;
@@ -16,7 +16,7 @@ type FormCacheState = {
 
 	// ── Setters ──
 	setForms: (forms: Form[]) => void;
-	setDetailForm: (id: string, form: Form) => void;
+	setDetailForm: (id: string, form: Form, meta?: { canDelete: boolean }) => void;
 	clearCache: () => void;
 };
 
@@ -46,11 +46,11 @@ export const useFormStore = create<FormCacheState>()((set, get) => ({
 	},
 
 	// Simpan detail form per ID beserta timestamp
-	setDetailForm: (id, form) => {
+	setDetailForm: (id, form, meta) => {
 		set((state) => ({
 			detailCache: {
 				...state.detailCache,
-				[id]: { data: form, fetchedAt: Date.now() },
+				[id]: { data: form, meta, fetchedAt: Date.now() },
 			},
 		}));
 	},

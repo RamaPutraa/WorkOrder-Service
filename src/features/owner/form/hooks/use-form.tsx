@@ -14,6 +14,7 @@ export const useForm = () => {
 	const store = useFormStore();
 	const { id } = useParams<{ id?: string }>();
 	const [detailForm, setDetailForm] = useState<Form | null>(null);
+	const [canDelete, setCanDelete] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [forms, setForms] = useState<Form[]>(
@@ -53,6 +54,7 @@ export const useForm = () => {
 			const cached = store.detailCache[id];
 			if (cached) {
 				setDetailForm(cached.data);
+				setCanDelete(cached.meta?.canDelete ?? false);
 				return;
 			}
 		}
@@ -72,8 +74,9 @@ export const useForm = () => {
 		}
 
 		setDetailForm(res?.data || null);
+		setCanDelete(res?.meta?.canDelete ?? false);
 		if (res?.data) {
-			store.setDetailForm(id, res.data);
+			store.setDetailForm(id, res.data, res.meta);
 		}
 	};
 
@@ -172,6 +175,7 @@ export const useForm = () => {
 		setForms,
 		detailForm,
 		setDetailForm,
+		canDelete,
 		loading,
 		error,
 		getDetailForm,

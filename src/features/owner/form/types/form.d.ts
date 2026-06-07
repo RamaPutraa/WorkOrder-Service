@@ -25,4 +25,8 @@ type FormResponse = ApiResponse<Form[]>;
 
 type GetAllPosition = ApiResponse<Position[]>;
 
-type GetFormByIdResponse = ApiResponse<Form>;
+type GetFormByIdResponse = ApiResponse<Form> & {
+	meta: {
+		canDelete: boolean;
+	}
+};
