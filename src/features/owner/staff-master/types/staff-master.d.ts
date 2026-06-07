@@ -15,7 +15,23 @@ type Employee = {
 	name: string;
 	email: string;
 	role: string;
+	companyId: string;
+	deletedAt: string | null;
+	createdAt: string;
+	updatedAt: string | null;
+	__v: number;
 	position?: Position;
+};
+
+type KickEmployeeRequest = {
+	email: string;
+};
+type KickEmployeeResponse = ApiResponse<User>;
+
+type DetailEmployeeResponse = ApiResponse<Employee> & {
+	meta: {
+		canKick: boolean;
+	}
 };
 
 type CompanyEmployeesData = {

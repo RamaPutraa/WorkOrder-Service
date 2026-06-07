@@ -60,6 +60,9 @@ const CompanyReportWo = lazyWithRetry(
 const ViewStaff = lazyWithRetry(
 	() => import("@/features/owner/staff-master/pages/view-staff"),
 );
+const DetailStaff = lazyWithRetry(
+	() => import("@/features/owner/staff-master/pages/detail-staff"),
+);
 const HistoryStaffInvitations = lazyWithRetry(
 	() => import("@/features/owner/staff-master/pages/history-staff-invitations"),
 );
@@ -127,6 +130,10 @@ export const internalRoutes: RouteObject[] = [
 	{
 		path: "staff/history-invitations",
 		element: <HistoryStaffInvitations />,
+	},
+	{
+		path: "staff/:id",
+		element: <DetailStaff />,
 	},
 	{
 		path: "company",

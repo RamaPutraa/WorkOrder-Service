@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { DataTable } from "@/components/ui/data-table";
-import { columns } from "../components/columns";
+import { createStaffColumns } from "../components/columns";
 import { useStaff } from "../hooks/use-staff";
 import InviteEmployeeDialog from "../components/invite-employee-dialog";
 import PageHeader from "@/shared/atoms/header-content";
@@ -14,9 +15,23 @@ const ViewStaff = () => {
 	const { employees, loading, error, fetchEmployees } = useStaff();
 	const [openInvite, setOpenInvite] = useState(false);
 	const profile = useProfileStore((state) => state.profile);
+	const navigate = useNavigate();
 
 	// ── Filter state ───────────────────────────────────────────────────────────
 	const [searchValue, setSearchValue] = useState("");
+
+	// ── Handlers ───────────────────────────────────────────────────────────────
+	const handleDetail = (employee: Employee) => {
+		navigate(`/dashboard/internal/staff/${employee._id}`);
+	};
+
+	const columns = useMemo(
+		() =>
+			createStaffColumns({
+				onDetail: handleDetail,
+			}),
+		[],
+	);
 
 	// ── Fetch data ───────────────────────────────────────────────────────────
 	useEffect(() => {
@@ -124,6 +139,7 @@ const ViewStaff = () => {
 						loading={loading}
 						searchValue={searchValue}
 						loadingMessage="Memuat data karyawan..."
+						onRowClick={handleDetail}
 					/>
 				</div>
 			</div>

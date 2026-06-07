@@ -21,6 +21,16 @@ export const getInvitationsHistory = async () => {
 	return response.data;
 };
 
+export const getDetailEmployeeApi = async (id: string) => {
+	const response = await apiClient.get<DetailEmployeeResponse>(`/company/employees/${id}`);
+	return response.data;
+};
+
+export const kickEmployeeApi = async (data: KickEmployeeRequest) => {
+	const response = await apiClient.delete<KickEmployeeResponse>(`/company/employees`, { data });
+	return response.data;
+};
+
 export const deleteInvitationApi = async (id: string) => {
 	const response = await apiClient.delete(`/invitations/${id}`);
 	return response.data;
