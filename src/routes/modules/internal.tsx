@@ -24,6 +24,9 @@ const PositionPage = lazyWithRetry(
 const CreatePositionPage = lazyWithRetry(
 	() => import("@/features/owner/position/pages/create-position"),
 );
+const DetailDepartementPage = lazyWithRetry(
+	() => import("@/features/owner/position/pages/detail-departement"),
+);
 const ProfileCompany = lazyWithRetry(
 	() => import("@/features/owner/company/pages/profile-company"),
 );
@@ -112,6 +115,10 @@ export const internalRoutes: RouteObject[] = [
 	{
 		path: "positions/create",
 		element: <CreatePositionPage />,
+	},
+	{
+		path: "positions/:id",
+		element: <DetailDepartementPage />,
 	},
 	{
 		path: "staff",

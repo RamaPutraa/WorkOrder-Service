@@ -115,7 +115,7 @@ const ViewMemberCodes = () => {
 				<Tabs defaultValue="membercodes" className="w-full">
 					<TabsList className="grid w-full sm:w-[500px] grid-cols-2 mb-6">
 						<TabsTrigger value="membercodes">
-							Daftar Voucer
+							Daftar Kode Unik
 						</TabsTrigger>
 						<TabsTrigger value="claimed">
 							Pelanggan Aktif (Terklaim)

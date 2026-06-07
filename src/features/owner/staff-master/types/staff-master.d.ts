@@ -4,9 +4,9 @@ type Position = {
 	description: string;
 	isActive: boolean;
 	companyId: string;
-	deletedAt: string;
+	deletedAt: string | null;
 	createdAt: string;
-	updatedAt: string;
+	updatedAt: string | null;
 	__v: number;
 };
 

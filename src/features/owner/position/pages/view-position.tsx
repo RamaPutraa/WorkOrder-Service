@@ -6,15 +6,13 @@ import { useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import EditPositionDialog from "../components/edit-position-dialog";
 import PageHeader from "@/shared/atoms/header-content";
-import { useDialogStore } from "@/store/dialogStore";
 import { TextLoading } from "@/shared/atoms/loading-state";
 import { Users } from "lucide-react";
 import ErrorPage from "@/shared/errors/templates/error-page";
 
 const PositionView = () => {
-	const { fetchPositions, positions, loading, error, removePosition } =
+	const { fetchPositions, positions, loading, error } =
 		usePosition();
-	const { showDialog } = useDialogStore();
 	const navigate = useNavigate();
 
 	// ── Filter state ───────────────────────────────────────────────────────────
@@ -31,25 +29,17 @@ const PositionView = () => {
 		setEditOpen(true);
 	};
 
-
-
-	const handleDelete = (position: Position) => {
-		showDialog({
-			title: "Hapus Departemen",
-			description: `Apakah Anda yakin ingin menghapus departemen ${position.name}?`,
-			confirmText: "Hapus",
-			cancelText: "Batal",
-			onConfirm: async () => {
-				await removePosition(position._id);
-			},
-		});
+	const handleDetail = (position: Position) => {
+		navigate(`/dashboard/internal/positions/${position._id}`);
 	};
+
+
 
 	const columns = useMemo(
 		() =>
 			createPositionColumns({
 				onEdit: handleEdit,
-				onDelete: handleDelete,
+				onDetail: handleDetail,
 			}),
 		[],
 	);
@@ -73,7 +63,7 @@ const PositionView = () => {
 							Daftar Departemen - Total{" "}
 							<TextLoading variant="dots" message="" className="w-40" />
 						</div>
-					:	`Daftar Departemen - Total ${positions.length} departemen`
+						: `Daftar Departemen - Total ${positions.length} departemen`
 				}
 				onAddClick={() => navigate("/dashboard/internal/positions/create")}
 				addLabel="Tambah Departemen"
@@ -139,6 +129,7 @@ const PositionView = () => {
 						searchValue={globalFilter}
 						loading={loading}
 						loadingMessage="Memuat data posisi..."
+						onRowClick={handleDetail}
 					/>
 				</div>
 			</div>

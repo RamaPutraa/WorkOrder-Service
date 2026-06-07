@@ -32,6 +32,7 @@ interface DataTableProps<TData, TValue> {
 	searchValue?: string;
 	loading?: boolean;
 	loadingMessage?: string;
+	onRowClick?: (row: TData) => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -41,6 +42,7 @@ export function DataTable<TData, TValue>({
 	searchValue,
 	loading = false,
 	loadingMessage = "Memuat data...",
+	onRowClick,
 }: DataTableProps<TData, TValue>) {
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -100,7 +102,9 @@ export function DataTable<TData, TValue>({
 							table.getRowModel().rows.map((row) => (
 								<TableRow
 									key={row.id}
-									data-state={row.getIsSelected() && "selected"}>
+									data-state={row.getIsSelected() && "selected"}
+									onClick={() => onRowClick?.(row.original)}
+									className={onRowClick ? "cursor-pointer" : undefined}>
 									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id}>
 											{flexRender(

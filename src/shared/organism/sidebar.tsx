@@ -103,7 +103,7 @@ const data = {
 			icon: Ticket,
 			items: [
 				{
-					title: "Via Kode Voucher",
+					title: "Via Kode Unik",
 					url: "/dashboard/internal/membercodes",
 				},
 				{

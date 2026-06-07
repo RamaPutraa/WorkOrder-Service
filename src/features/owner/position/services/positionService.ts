@@ -21,7 +21,13 @@ export const updatePositionApi = async (
 	return response.data;
 };
 
+export const getDetailPositionApi = async (id: string) => {
+	const response = await axios.get<DetailPositionResponse>(`/positions/${id}`);
+	return response.data;
+};
+
 export const deletePositionApi = async (id: string) => {
 	const response = await axios.delete(`/positions/${id}`);
 	return response.data;
 };
+
