@@ -250,8 +250,8 @@ const ClientCompanyServices = () => {
 																	: "text-slate-800"
 																	}`}>
 																{isPaired ?
-																	(integrationType === "claim_token" ? "Token Aktif" : "Akun Terhubung")
-																	: integrationType === "claim_token" ? "Belum Klaim Token" : "Belum Terhubung"}
+																	(integrationType === "claim_token" ? "Kode Berlangganan aktif" : "Akun Terhubung")
+																	: integrationType === "claim_token" ? "Belum Klaim Kode" : "Belum Terhubung"}
 															</p>
 															<p
 																className={`text-xs mt-0.5 ${isPaired ?
@@ -386,7 +386,7 @@ const ClientCompanyServices = () => {
 															onClick={integrationType === "claim_token" ? () => setClaimDialogOpen(true) : handlePairing}
 															className="w-full hover: cursor-pointer">
 															{integrationType === "claim_token" ?
-																"Klaim Voucer"
+																"Klaim Kode"
 																: (isPairing ?
 																	"Menghubungkan..."
 																	: "Hubungkan Akun")}
