@@ -15,6 +15,7 @@ const StaffRegForm = () => {
 			name: "",
 			email: "",
 			password: "",
+			confirmPassword: "",
 		},
 	});
 
@@ -37,10 +38,19 @@ const StaffRegForm = () => {
 			type: "password",
 			placeholder: "••••••••",
 		},
+		{
+			name: "confirmPassword",
+			label: "Konfirmasi Password",
+			type: "password",
+			placeholder: "••••••••",
+		},
 	];
 
-	const onSubmit = (data: z.infer<typeof registerStaffSchema>) =>
-		staffRegister({ ...data, role: "staff_unassigned" });
+	const onSubmit = (data: z.infer<typeof registerStaffSchema>) => {
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const { confirmPassword: _confirm, ...payload } = data;
+		staffRegister({ ...payload, role: "staff_unassigned" });
+	};
 
 	return (
 		<Form {...form}>

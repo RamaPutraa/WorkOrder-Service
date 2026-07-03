@@ -15,6 +15,7 @@ const CompanyRegForm = () => {
 			name: "",
 			email: "",
 			password: "",
+			confirmPassword: "",
 			companyName: "",
 		},
 	});
@@ -39,6 +40,12 @@ const CompanyRegForm = () => {
 			placeholder: "••••••••",
 		},
 		{
+			name: "confirmPassword",
+			label: "Konfirmasi Password",
+			type: "password",
+			placeholder: "••••••••",
+		},
+		{
 			name: "companyName",
 			label: "Nama Perusahaan",
 			type: "text",
@@ -46,8 +53,11 @@ const CompanyRegForm = () => {
 		},
 	];
 
-	const onSubmit = (data: z.infer<typeof registerCompanySchema>) =>
-		registerCompany(data);
+	const onSubmit = (data: z.infer<typeof registerCompanySchema>) => {
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const { confirmPassword: _confirm, ...payload } = data;
+		registerCompany(payload);
+	};
 
 	return (
 		<Form {...form}>
