@@ -101,7 +101,7 @@ const RadialChartCard = ({
 				</ChartContainer>
 			</CardContent>
 
-			<CardFooter className="flex items-center justify-center gap-5 text-xs text-muted-foreground pt-2 pb-4 px-5">
+			{/* <CardFooter className="flex items-center justify-center gap-5 text-xs text-muted-foreground pt-2 pb-4 px-5">
 				<div className="flex items-center gap-1.5">
 					<span className="inline-block w-2.5 h-2.5 rounded-full bg-[#2563eb] shrink-0" />
 					<span>Aktif</span>
@@ -112,7 +112,7 @@ const RadialChartCard = ({
 					<span>Nonaktif</span>
 					<span className="font-semibold text-foreground ml-1">{inActive}</span>
 				</div>
-			</CardFooter>
+			</CardFooter> */}
 		</Card>
 	);
 };
@@ -210,7 +210,7 @@ const EmployeeStackedChartCard = ({
 			</CardContent>
 
 			<CardFooter className="flex flex-col gap-1.5 pt-2 pb-4 px-5">
-				<div className="flex items-center justify-center gap-5 text-xs text-muted-foreground">
+				{/* <div className="flex items-center justify-center gap-5 text-xs text-muted-foreground">
 					<div className="flex items-center gap-1.5">
 						<span className="inline-block w-2 h-2 rounded-full bg-[#60a5fa] shrink-0" />
 						<span>Aktif</span>
@@ -223,7 +223,7 @@ const EmployeeStackedChartCard = ({
 							{inActive}
 						</span>
 					</div>
-				</div>
+				</div> */}
 				<div className="flex items-center justify-center gap-5 text-xs text-muted-foreground">
 					<div className="flex items-center gap-1.5">
 						<span className="inline-block w-2 h-2 rounded-full bg-[#1e40af] shrink-0" />
