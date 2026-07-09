@@ -83,7 +83,7 @@ export const createStaffColumns = ({
 	},
 	{
 		accessorKey: "position",
-		header: "Posisi",
+		header: "Departemen",
 		cell: ({ row }) => {
 			const position = row.original.position;
 			return position ?

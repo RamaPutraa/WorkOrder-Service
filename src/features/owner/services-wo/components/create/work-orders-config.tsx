@@ -126,7 +126,7 @@ const WorkOrderRowCard = ({
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 					<div className="space-y-2">
 						<Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-							Posisi Bertugas <span className="text-red-500">*</span>
+							Departemen Bertugas <span className="text-red-500">*</span>
 						</Label>
 						<Popover
 							open={posOpen}
@@ -143,8 +143,8 @@ const WorkOrderRowCard = ({
 									<span className="truncate">
 										{item.positionId ?
 											(positions.find((p) => p._id === item.positionId)?.name ??
-												"Pilih posisi…")
-											: "Pilih posisi…"}
+												"Pilih departemen…")
+											: "Pilih departemen…"}
 									</span>
 									<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 								</Button>
@@ -152,12 +152,12 @@ const WorkOrderRowCard = ({
 							<PopoverContent className="w-[--radix-popover-trigger-width] p-0">
 								<Command>
 									<CommandInput
-										placeholder="Cari posisi berdasarkan nama..."
+										placeholder="Cari departemen berdasarkan nama..."
 										className="h-9"
 									/>
 									<CommandList>
 										<CommandEmpty className="py-3 text-center text-sm text-slate-500">
-											Posisi tidak ditemukan.
+											Departemen tidak ditemukan.
 										</CommandEmpty>
 										<CommandGroup>
 											{positions.map((p) => (
@@ -512,7 +512,7 @@ export const CardWorkOrdersConfig: React.FC<CardWorkOrdersConfigProps> = ({
 								Konfigurasi Work Order
 							</h2>
 							<p className="text-sm text-slate-500">
-								Atur posisi, formulir, dan alur persetujuan setiap work order.
+								Atur departemen, formulir, dan alur persetujuan setiap work order.
 							</p>
 						</div>
 					</div>

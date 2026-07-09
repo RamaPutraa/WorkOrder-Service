@@ -270,7 +270,7 @@ const InviteEmployeeDialog = ({
 												render={({ field }) => (
 													<FormItem>
 														<FormLabel className="text-xs font-medium text-gray-500">
-															Posisi{" "}
+															Departemen{" "}
 															{form.watch(`invites.${index}.role`) ===
 																"manager_company" && (
 																<span className="text-[10px] text-gray-400 font-normal italic">
@@ -296,8 +296,8 @@ const InviteEmployeeDialog = ({
 																		{field.value ?
 																			(positions.find(
 																				(p) => p._id === field.value,
-																			)?.name ?? "Pilih posisi...")
-																		:	"Pilih posisi..."}
+																			)?.name ?? "Pilih departemen...")
+																		:	"Pilih departemen..."}
 																		<ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 text-gray-400" />
 																	</Button>
 																</FormControl>
@@ -305,12 +305,12 @@ const InviteEmployeeDialog = ({
 															<PopoverContent className="w-[--radix-popover-trigger-width] p-0">
 																<Command>
 																	<CommandInput
-																		placeholder="Cari posisi..."
+																		placeholder="Cari departemen..."
 																		className="text-sm"
 																	/>
 																	<CommandList>
 																		<CommandEmpty className="py-3 text-center text-sm text-gray-500">
-																			Posisi tidak ditemukan
+																			Departemen tidak ditemukan
 																		</CommandEmpty>
 																		<CommandGroup>
 																			{positions.map((pos) => (

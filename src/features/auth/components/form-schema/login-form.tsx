@@ -39,19 +39,6 @@ const LoginForm = () => {
 			<form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
 				<FormFields fields={loginFields} control={form.control} />
 
-				<div className="flex items-center justify-between text-xs text-gray-500 pt-1">
-					<label className="flex items-center gap-1.5 cursor-pointer select-none">
-						<input
-							type="checkbox"
-							className="rounded border-gray-300 accent-blue-600"
-						/>
-						Ingat Saya
-					</label>
-					<a href="/" className="text-blue-600 hover:underline font-medium">
-						Lupa Password?
-					</a>
-				</div>
-
 				<button
 					type="submit"
 					disabled={loading}

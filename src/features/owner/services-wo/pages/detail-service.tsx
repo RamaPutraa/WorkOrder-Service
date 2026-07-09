@@ -551,7 +551,7 @@ const DetailService = () => {
 																	</div>
 																	<div className="flex-1 min-w-0">
 																		<p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground/70">
-																			Posisi Penanggung Jawab
+																			Departemen Penanggung Jawab
 																		</p>
 																		<p className="font-bold text-base truncate text-foreground">
 																			{wo.positionsOnDuty?.name ?? "—"}
