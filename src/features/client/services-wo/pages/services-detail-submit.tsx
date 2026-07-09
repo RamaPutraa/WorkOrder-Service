@@ -6,6 +6,7 @@ import {
 	getDetailClientServiceRequestApi,
 	submitReviewApi,
 	getClientWorkReport,
+	cancelSRApi,
 } from "../services/public-services";
 import { uploadFileApi } from "@/lib/file-service";
 import { Card } from "@/components/ui/card";
@@ -25,6 +26,7 @@ import {
 	Lock,
 	Pencil,
 	ChevronRight,
+	XCircle,
 } from "lucide-react";
 import FormFieldViewer, {
 	type AnswerValue,
@@ -249,6 +251,26 @@ const ServiceDetailSubmit = () => {
 	>(new Map());
 	const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 	const [confirmOpen, setConfirmOpen] = useState(false);
+	const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
+	// ── Cancel state ──
+	const [isCancelling, setIsCancelling] = useState(false);
+
+	// ── Cancel SR handler ──
+	const handleCancelSR = async () => {
+		if (!id) return;
+		setIsCancelling(true);
+		const { data: res, error } = await handleApi(() => cancelSRApi(id));
+		setIsCancelling(false);
+		setCancelConfirmOpen(false);
+		if (error) {
+			notifyError("Gagal membatalkan pengajuan", error.message);
+			return;
+		}
+		if (res) {
+			notifySuccess("Pengajuan berhasil dibatalkan.");
+			await fetchDetail();
+		}
+	};
 
 	// ── Fetch ──
 	const fetchDetail = async () => {
@@ -296,6 +318,8 @@ const ServiceDetailSubmit = () => {
 	// ── Derived state ──
 	const srStatus = detail?.serviceRequestStatus;
 	const canFillReview = srStatus === "completed" && !detail?.reviewSubmission;
+	const canCancel = srStatus === "received";
+
 
 	// ── Drawer helpers ──
 	const selectedForm = workReport?.workReportForms?.[selectedReportIndex] ?? null;
@@ -420,10 +444,10 @@ const ServiceDetailSubmit = () => {
 				title={
 					!detail ?
 						<div className="flex items-center gap-1.5">
-							Detail Service{" "}
+							Detail Layanan{" "}
 							<TextLoading variant="dots" message="" className="w-40" />
 						</div>
-						: `Detail — ${detail?.service?.title}`
+						: `Detail Layanan ${detail?.service?.title}`
 				}
 				subtitle={
 					!detail ?
@@ -434,6 +458,18 @@ const ServiceDetailSubmit = () => {
 						: `Berikut merupakan detail service ${detail?.service?.title} yang Anda ajukan.`
 				}
 				backPath={true}
+				actionButtons={
+					canCancel ? (
+						<Button
+							size="sm"
+							onClick={() => setCancelConfirmOpen(true)}
+							className="bg-red-600 hover:bg-red-700 w-full md:w-auto text-white rounded-xl h-11 shadow-sm shadow-red-200 transition-all flex items-center active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed hover:cursor-pointer"
+						>
+							<XCircle className="size-4" />
+							Batalkan Pengajuan
+						</Button>
+					) : undefined
+				}
 			/>
 
 			{/* Content */}
@@ -864,6 +900,63 @@ const ServiceDetailSubmit = () => {
 				submission={selectedSubmission}
 				stageIndex={selectedReportIndex}
 			/>
+
+			{/* ─── Cancel Confirmation Dialog ─── */}
+			<Dialog open={cancelConfirmOpen} onOpenChange={setCancelConfirmOpen}>
+				<DialogContent className="max-w-md">
+					<DialogHeader>
+						<div className="flex items-center gap-3 mb-1">
+							<div className="p-2.5 rounded-xl bg-red-100 text-red-600 shrink-0">
+								<XCircle className="size-5" />
+							</div>
+							<DialogTitle className="text-base leading-snug">
+								Batalkan Pengajuan?
+							</DialogTitle>
+						</div>
+						<DialogDescription className="text-sm leading-relaxed">
+							Anda akan membatalkan pengajuan layanan{" "}
+							<span className="font-semibold text-foreground">
+								&quot;{detail?.service?.title}&quot;
+							</span>
+							. Tindakan ini tidak dapat dibatalkan.
+						</DialogDescription>
+					</DialogHeader>
+
+					{/* Info box */}
+					<div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-red-50 border border-red-100 text-red-700 text-xs leading-relaxed">
+						<Info className="size-4 shrink-0 mt-0.5" />
+						<p>
+							Setelah dibatalkan, pengajuan ini tidak dapat diproses kembali.
+							Anda perlu mengajukan layanan baru jika masih diperlukan.
+						</p>
+					</div>
+
+					<DialogFooter className="gap-2">
+						<Button
+							variant="outline"
+							onClick={() => setCancelConfirmOpen(false)}
+							disabled={isCancelling}
+							className="rounded-lg hover:cursor-pointer">
+							Tidak, Kembali
+						</Button>
+						<Button
+							onClick={handleCancelSR}
+							disabled={isCancelling}
+							className="rounded-lg gap-2 hover:cursor-pointer bg-red-600 hover:bg-red-700 text-white">
+							{isCancelling ?
+								<>
+									<Loader className="size-4 animate-spin" />
+									Membatalkan...
+								</>
+								: <>
+									<XCircle className="size-4" />
+									Ya, Batalkan Pengajuan
+								</>
+							}
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 
 			{/* ─── Confirmation Dialog ─── */}
 			<Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>

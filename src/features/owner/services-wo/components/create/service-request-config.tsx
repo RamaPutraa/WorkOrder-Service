@@ -291,8 +291,8 @@ export const CardServiceRequestConfig: React.FC<
 												},
 												{
 													value: "manager",
-													label: "Manager",
-													desc: "Perlu persetujuan manager",
+													label: "Manajer",
+													desc: "Perlu persetujuan manajer",
 												},
 											] as const
 										).map((opt) => {

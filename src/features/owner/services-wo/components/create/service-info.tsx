@@ -171,13 +171,12 @@ export const CardServiceInfo: React.FC<CardServiceInfoProps> = ({
 				<div className="space-y-3">
 					<div className="flex items-center gap-2">
 						<p className="text-sm font-medium text-slate-700">
-							Tipe Pengerjaan Layanan
+							Tipe Penyusunan Perintah Kerja
 						</p>
 					</div>
-					<p className="text-xs text-slate-500 mb-3">
-						Tentukan apakah instruksi kerja langsung diterbitkan atau disimpan
-						sebagai draf terlebih dahulu.
-					</p>
+					{/* <p className="text-xs text-slate-500 mb-3">
+						Tentukan tipe penyusunan perintah kerja 
+					</p> */}
 					<div className="grid grid-cols-2 gap-3">
 						{(
 							[

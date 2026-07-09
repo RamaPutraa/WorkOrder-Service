@@ -49,3 +49,10 @@ export const submitReviewApi = async (
 	);
 	return response.data;
 };
+
+export const cancelSRApi = async (id: string) => {
+	const response = await apiClient.patch<RequesterSRResponse>(
+		`/service-requests/${id}/cancel`,
+	);
+	return response.data;
+};

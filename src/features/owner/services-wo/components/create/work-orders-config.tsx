@@ -416,7 +416,7 @@ const WorkOrderRowCard = ({
 										},
 										{
 											value: "manager",
-											label: "Manager",
+											label: "Manajer",
 											desc: "Perlu telaah manajer",
 										},
 									] as const

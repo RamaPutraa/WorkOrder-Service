@@ -40,6 +40,11 @@ const approvalLabel: Record<string, string> = {
 	staff_pic: "Persetujuan Staff PIC",
 };
 
+const draftingWorkOrderTypeLabel: Record<string, string> = {
+	auto: "Otomatis",
+	manual: "Manual",
+};
+
 const formTypeLabel = (type: string) => {
 	switch (type?.toLowerCase()) {
 		case "report":
@@ -213,6 +218,22 @@ export const TemplatePreviewDialog = ({
 
 								<Separator className="bg-slate-100" />
 
+								{/* Tipe Penyusunan Perintah Kerja */}
+								<div className="flex items-center gap-3 p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-primary/5 border border-primary/10">
+									<div className="shrink-0 p-2 rounded-lg bg-primary/10 text-primary">
+										<Settings2 className="size-3.5 sm:size-4" />
+									</div>
+									<div className="flex-1 min-w-0">
+										<p className="text-[9px] sm:text-[10px] uppercase tracking-widest font-bold text-primary/70">
+											Tipe Penyusunan Perintah Kerja
+										</p>
+										<p className="text-xs sm:text-sm font-extrabold text-slate-800 mt-0.5">
+											{draftingWorkOrderTypeLabel[service.draftingWorkOrderType] ??
+												service.draftingWorkOrderType}
+										</p>
+									</div>
+								</div>
+
 								<div className="space-y-3 sm:space-y-4">
 									<div className="flex items-center gap-2">
 										<Settings2 className="size-3.5 sm:size-4 text-primary" />
@@ -326,27 +347,15 @@ export const TemplatePreviewDialog = ({
 														</div>
 													</div>
 
-													<div className="grid grid-cols-2 gap-3 sm:gap-4">
-														<div className="rounded-xl sm:rounded-2xl border border-slate-100 bg-slate-50/30 p-3 sm:p-4 space-y-1 sm:space-y-1.5">
-															<p className="text-[9px] sm:text-[10px] uppercase tracking-widest font-bold text-slate-500">
-																Persetujuan Tugas
-															</p>
-															<p className="text-[11px] sm:text-xs font-extrabold text-slate-800">
-																{approvalLabel[
-																	woc.workOrderApprovalAccessType
-																] ?? woc.workOrderApprovalAccessType}
-															</p>
-														</div>
-														<div className="rounded-xl sm:rounded-2xl border border-slate-100 bg-slate-50/30 p-3 sm:p-4 space-y-1 sm:space-y-1.5">
-															<p className="text-[9px] sm:text-[10px] uppercase tracking-widest font-bold text-slate-500">
-																Persetujuan Laporan
-															</p>
-															<p className="text-[11px] sm:text-xs font-extrabold text-slate-800">
-																{approvalLabel[
-																	woc.workReportApprovalAccessType
-																] ?? woc.workReportApprovalAccessType}
-															</p>
-														</div>
+													<div className="rounded-xl sm:rounded-2xl border border-slate-100 bg-slate-50/30 p-3 sm:p-4 space-y-1 sm:space-y-1.5">
+														<p className="text-[9px] sm:text-[10px] uppercase tracking-widest font-bold text-slate-500">
+															Persetujuan Laporan
+														</p>
+														<p className="text-[11px] sm:text-xs font-extrabold text-slate-800">
+															{approvalLabel[
+																woc.workReportApprovalAccessType
+															] ?? woc.workReportApprovalAccessType}
+														</p>
 													</div>
 
 													<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

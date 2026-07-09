@@ -2,6 +2,7 @@ import { handleApi } from "@/lib/handle-api";
 import { notifyError, notifySuccess } from "@/lib/toast-helper";
 import { useNavigate, useParams } from "react-router-dom";
 import {
+	cancelSRApi,
 	getDetailServiceByIdApi,
 	submitIntakeApi,
 } from "../services/public-services";
@@ -201,6 +202,36 @@ export const usePublicServices = () => {
 		}
 	};
 
+	const cancelServiceRequest = async () => {
+		if (!id) {
+			notifyError("ID layanan tidak ditemukan");
+			return;
+		}
+
+		setLoading(true);
+		setError(null);
+
+		const { data: res, error } = await handleApi(() =>
+			cancelSRApi(id),
+		);
+		setLoading(false);
+
+		if (error) {
+			console.error(error);
+			notifyError("Gagal membatalkan layanan", error.message);
+			return;
+		}
+
+		if (res?.data) {
+			notifySuccess("Layanan berhasil dibatalkan!");
+			console.log("Response:", res.data);
+			navigate("/dashboard/client/submissions");
+		} else {
+			notifyError("Gagal membatalkan layanan. Respon tidak valid.");
+			console.error("Response:", res);
+		}
+	};
+
 	return {
 		id,
 		data,
@@ -210,6 +241,7 @@ export const usePublicServices = () => {
 		submitting,
 		formValues,
 		handleChange,
+		cancelServiceRequest,
 		handleSubmit,
 		fetchRequesterSRIntakeForm,
 	};
