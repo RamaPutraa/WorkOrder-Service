@@ -322,10 +322,10 @@ const ServiceDetailSubmit = () => {
 
 
 	// ── Drawer helpers ──
-	const selectedForm = workReport?.workReportForms?.[selectedReportIndex] ?? null;
-	const selectedSubmission = selectedForm
-		? workReport?.submissions?.find((s) => s.formId === selectedForm._id) ?? null
-		: null;
+	// const selectedForm = workReport?.workReportForms?.[selectedReportIndex] ?? null;
+	// const selectedSubmission = selectedForm
+	// 	? workReport?.submissions?.find((s) => s.formId === selectedForm._id) ?? null
+	// 	: null;
 
 	const handleOpenDrawer = (index: number) => {
 		setSelectedReportIndex(index);
@@ -695,6 +695,7 @@ const ServiceDetailSubmit = () => {
 					    ═══════════════════════════════════════════════════════ */}
 					{(srStatus === "completed" ||
 						srStatus === "partial_completed" ||
+						srStatus === "on_progress" ||
 						srStatus === "closed") && workReport && workReport.workReportForms.length > 0 && (
 							<div className="space-y-3">
 								<div className="flex items-center gap-2">
@@ -896,9 +897,8 @@ const ServiceDetailSubmit = () => {
 			<WorkReportDrawer
 				open={drawerOpen}
 				onOpenChange={setDrawerOpen}
-				form={selectedForm}
-				submission={selectedSubmission}
-				stageIndex={selectedReportIndex}
+				workReport={workReport}
+				initialIndex={selectedReportIndex}
 			/>
 
 			{/* ─── Cancel Confirmation Dialog ─── */}

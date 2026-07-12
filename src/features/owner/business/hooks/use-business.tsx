@@ -7,7 +7,7 @@ import {
 	getDetailInternalBusinessServiceRequestApi,
 	rejectInternalBusinessServiceRequestApi,
 } from "../services/internal-business-services";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useMemo } from "react";
 import { type FilterConfig } from "@/shared/molecules/generic-filter";
 
@@ -19,6 +19,7 @@ export const useBusiness = () => {
 	);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const navigate = useNavigate();
 
 	// Fetch all internal business service requests
 	const fetchInternalServiceRequests = async () => {
@@ -107,7 +108,7 @@ export const useBusiness = () => {
 		);
 		setLoading(false);
 		notifySuccess("Layanan berhasil disetujui");
-
+		navigate(`/dashboard/internal/business/services/request`);
 		if (error) {
 			setError(error.message);
 			notifyError("Gagal menyetujui layanan", error.message);

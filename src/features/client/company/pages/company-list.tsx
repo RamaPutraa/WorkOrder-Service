@@ -80,20 +80,7 @@ const CompanyList = () => {
 												<div className="text-sm  text-slate-500 leading-relaxed line-clamp-3 text-justify">
 													{company.description ||
 														"Tidak ada deskripsi tersedia untuk layanan ini."}{" "}
-													Lorem ipsum dolor sit, amet consectetur adipisicing
-													elit. Non perspiciatis fuga laboriosam laborum
-													possimus ipsa velit aliquam nisi blanditiis,
-													voluptatum at dolore omnis animi voluptas eos beatae
-													quaerat. Impedit, perferendis. Ratione et reiciendis
-													eveniet magni cum quos minus mollitia? Quam dolores at
-													iure blanditiis incidunt quibusdam, voluptatum est
-													soluta ipsum dolorem, quia enim delectus perspiciatis
-													corporis inventore et. Vitae, unde! Architecto rem,
-													iure atque fugiat saepe nulla nihil autem sint ipsa
-													asperiores alias quasi doloribus inventore odit
-													repellat, magnam eligendi esse dolor quibusdam
-													expedita voluptates corrupti aliquid dolore. Dolorum,
-													harum.
+										
 												</div>
 											</div>
 											<div className="grid grid-cols-1 text-xs border-t border-slate-200/70 px-4 py-2">

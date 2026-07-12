@@ -1,5 +1,5 @@
 import { handleApi } from "@/lib/handle-api";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import {
 	getAllCompanyApi,
@@ -44,11 +44,13 @@ const useClientCompanyServices = () => {
 		setLoadingServices(false);
 	}, [id]);
 
-	const fetchCompanies = useCallback(async () => {
+	const fetchCompanies = useCallback(async (keyword?: string) => {
 		setLoadingCompanies(true);
 		setError(null);
 
-		const { data: res, error } = await handleApi(() => getAllCompanyApi());
+		const { data: res, error } = await handleApi(() =>
+			getAllCompanyApi(keyword),
+		);
 
 		if (error) {
 			setError(error.message);
@@ -98,15 +100,26 @@ const useClientCompanyServices = () => {
 
 	const loading = loadingServices || loadingCompanies;
 
-	// filterdata company
+	// Search company via API (server-side) dengan debounce
 	const [searchParams] = useSearchParams();
-	const searchQuery = (searchParams.get("search") || "").toLowerCase();
+	const searchQuery = searchParams.get("search") ?? "";
+	const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-	const filteredCompanies = useMemo(() => {
-		return companies.filter((company) =>
-			company.name.toLowerCase().includes(searchQuery),
-		);
-	}, [companies, searchQuery]);
+	useEffect(() => {
+		if (id) return; // hanya untuk halaman list company
+
+		if (debounceRef.current) clearTimeout(debounceRef.current);
+		debounceRef.current = setTimeout(() => {
+			void fetchCompanies(searchQuery || undefined);
+		}, 400);
+
+		return () => {
+			if (debounceRef.current) clearTimeout(debounceRef.current);
+		};
+	}, [searchQuery, id, fetchCompanies]);
+
+	// Hasil sudah difilter server-side, tidak perlu filter lagi di client
+	const filteredCompanies = companies;
 
 	const filterConfigCompanies: FilterConfig[] = useMemo(
 		() => [

@@ -1,8 +1,10 @@
 import apiClient from "@/lib/api";
 
-export const getAllCompanyApi = async () => {
-	const response =
-		await apiClient.get<GetAllCompanyResponse>("/public/companies");
+export const getAllCompanyApi = async (keyword?: string) => {
+	const response = await apiClient.get<GetAllCompanyResponse>(
+		"/public/companies",
+		{ params: keyword ? { keyword } : undefined },
+	);
 	return response.data;
 };
 
