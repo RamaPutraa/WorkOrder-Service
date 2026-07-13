@@ -60,20 +60,12 @@ const useAuth = () => {
 		setLoading(true);
 		setError(null);
 		try {
-			const ress: RegisterResponse = await clientRegisterApi(data);
-
-			// Validasi response dari API
-			if (!ress.data) {
-				notifyError("Gagal registrasi", "Tidak ada data dari server");
-				return;
-			}
-
-			// Tidak perlu menyimpan token, langsung redirect ke login
+			await clientRegisterApi(data);
 			notifySuccess(
 				"Registrasi berhasil",
-				"Silakan login menggunakan akun yang telah didaftarkan",
+				"Kode OTP telah dikirimkan ke email Anda",
 			);
-			navigate("/login");
+			navigate(`/verify-otp?email=${encodeURIComponent(data.email)}`);
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				setError(error.response?.data.message || "Terjadi kesalahan");
@@ -92,18 +84,12 @@ const useAuth = () => {
 		setLoading(true);
 		setError(null);
 		try {
-			const ress: RegisterCompanyResponse = await registerCompanyApi(data);
-
-			if (!ress.data) {
-				notifyError("Gagal registrasi", "Tidak ada data dari server");
-				return;
-			}
-
+			await registerCompanyApi(data);
 			notifySuccess(
 				"Registrasi berhasil",
-				"Silakan login menggunakan akun yang telah didaftarkan",
+				"Kode OTP telah dikirimkan ke email Anda",
 			);
-			navigate("/login");
+			navigate(`/verify-otp?email=${encodeURIComponent(data.email)}`);
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				setError(error.response?.data.message || "Terjadi kesalahan");
@@ -122,18 +108,12 @@ const useAuth = () => {
 		setLoading(true);
 		setError(null);
 		try {
-			const ress: RegisterStaffResponse = await staffRegisterApi(data);
-
-			if (!ress.data) {
-				notifyError("Gagal registrasi", "Tidak ada data dari server");
-				return;
-			}
-
+			await staffRegisterApi(data);
 			notifySuccess(
 				"Registrasi berhasil",
-				"Silakan login menggunakan akun yang telah didaftarkan",
+				"Kode OTP telah dikirimkan ke email Anda",
 			);
-			navigate("/login");
+			navigate(`/verify-otp?email=${encodeURIComponent(data.email)}`);
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
 				setError(error.response?.data.message || "Terjadi kesalahan");

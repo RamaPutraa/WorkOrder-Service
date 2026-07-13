@@ -50,3 +50,22 @@ type RegisterStaffResponse = ApiResponse<{
 }>;
 
 type GetProfileResponse = ApiResponse<User>;
+
+// OTP verify
+type VerifyOtpRequest = {
+	email: string;
+	otp: string;
+};
+
+type VerifyOtpResponse = ApiResponse<{
+	message: string;
+}>;
+
+// OTP resend
+type ResendOtpRequest = {
+	email: string;
+};
+
+type ResendOtpResponse = ApiResponse<{
+	message: string;
+}>;

@@ -35,3 +35,13 @@ export const getProfileApi = async () => {
 	const response = await axios.get<GetProfileResponse>("/auth/profile");
 	return response.data;
 };
+
+export const verifyOtpApi = async (data: VerifyOtpRequest) => {
+	const response = await axios.post<VerifyOtpResponse>("/auth/verify-otp", data);
+	return response.data;
+};
+
+export const resendOtpApi = async (data: ResendOtpRequest) => {
+	const response = await axios.post<ResendOtpResponse>("/auth/resend-otp", data);
+	return response.data;
+};

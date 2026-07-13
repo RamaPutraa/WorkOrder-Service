@@ -41,3 +41,14 @@ export const registerStaffSchema = z
 		message: "Konfirmasi password tidak sesuai",
 		path: ["confirmPassword"],
 	});
+
+export const otpSchema = z.object({
+	otp: z
+		.string()
+		.length(6, "OTP harus 6 digit")
+		.regex(/^\d+$/, "OTP harus berupa angka"),
+});
+
+export const resendOtpSchema = z.object({
+	email: z.string().email("Format email tidak valid"),
+});

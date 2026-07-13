@@ -15,6 +15,9 @@ const InternalRegisterPage = lazyWithRetry(
 const MockExternalAuth = lazyWithRetry(
 	() => import("@/features/client/pairing-account/pages/mock-external-auth")
 );
+const VerifyOtpPage = lazyWithRetry(
+	() => import("@/features/auth/pages/verify-otp-page"),
+);
 
 export const publicRoutes: RouteObject[] = [
 	{
@@ -44,4 +47,9 @@ export const authRoutes: RouteObject[] = [
 		path: "/company-regis",
 		element: <InternalRegisterPage />,
 	},
+	{
+		path: "/verify-otp",
+		element: <VerifyOtpPage />,
+	},
 ];
+
