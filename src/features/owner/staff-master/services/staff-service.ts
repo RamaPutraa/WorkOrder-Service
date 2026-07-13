@@ -35,3 +35,40 @@ export const deleteInvitationApi = async (id: string) => {
 	const response = await apiClient.delete(`/invitations/${id}`);
 	return response.data;
 };
+
+// ─── Invitation Code APIs ─────────────────────────────────────────────────
+
+export const createStaffInvitationCode = async (
+	data: CreateStaffInvitationCodeRequest,
+) => {
+	const response = await apiClient.post<StaffInvitationCodeResponse>(
+		"/company/invitation-codes",
+		data,
+	);
+	return response.data;
+};
+
+export const getStaffInvitationCodes = async () => {
+	const response = await apiClient.get<StaffInvitationCodeListResponse>(
+		"/company/invitation-codes",
+	);
+	return response.data;
+};
+
+export const updateStaffInvitationCode = async (
+	id: string,
+	data: UpdateStaffInvitationCodeRequest,
+) => {
+	const response = await apiClient.patch<StaffInvitationCodeResponse>(
+		`/company/invitation-codes/${id}`,
+		data,
+	);
+	return response.data;
+};
+
+export const revokeStaffInvitationCode = async (id: string) => {
+	const response = await apiClient.delete<ApiResponse<{ _id: string }>>(
+		`/company/invitation-codes/${id}`,
+	);
+	return response.data;
+};

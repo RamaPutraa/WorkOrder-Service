@@ -105,3 +105,56 @@ type InvitationEmployeeRequest = {
 };
 
 type InvitationEmployeeResponse = ApiResponse<InvitationEmployee>;
+
+// ─── Invitation Code (kode undangan pegawai) ──────────────────────────────
+
+type StaffInvitationCodeRole = "staff_company" | "manager_company";
+
+type StaffInvitationCodePosition = {
+	_id: string;
+	name: string;
+	description: string;
+};
+
+type StaffInvitationCodeCreatedBy = {
+	_id: string;
+	name: string;
+	email: string;
+};
+
+type StaffInvitationCode = {
+	_id: string;
+	code: string;
+	companyId: string;
+	role: StaffInvitationCodeRole;
+	position?: StaffInvitationCodePosition | null;
+	createdBy: StaffInvitationCodeCreatedBy;
+	isActive: boolean;
+	maxUses: number | null;
+	usedCount: number;
+	remainingUses: number | null;
+	expiresAt: string | null;
+	isClaimable: boolean;
+	claimedCount: number;
+	createdAt: string;
+	updatedAt: string;
+};
+
+type StaffInvitationCodeListResponse = ApiResponse<StaffInvitationCode[]>;
+type StaffInvitationCodeResponse = ApiResponse<StaffInvitationCode>;
+
+type CreateStaffInvitationCodeRequest = {
+	role: StaffInvitationCodeRole;
+	positionId?: string;
+	code?: string;
+	maxUses?: number;
+	expiresInDays?: number;
+};
+
+type UpdateStaffInvitationCodeRequest = {
+	isActive?: boolean;
+	maxUses?: number;
+	role?: StaffInvitationCodeRole;
+	positionId?: string;
+	expiresInDays?: number;
+};

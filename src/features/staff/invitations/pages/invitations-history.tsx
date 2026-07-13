@@ -4,10 +4,12 @@ import { useInvitations } from "../hooks/invitations";
 import StaffConfirmPage from "../components/staff-confirm";
 import { SectionLoading } from "@/shared/atoms";
 import PageHeader from "@/shared/atoms/header-content";
-import { Mail } from "lucide-react";
-import { useState } from "react";
+import { ClaimCodeDialog } from "../components/claim-code-dialog";
+import { Mail, QrCode } from "lucide-react";
+import { useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { TextLoading } from "@/shared/atoms/loading-state";
+import { useAuthStore } from "@/store/authStore";
 
 const STATUS_SUMMARY = [
 	{ label: "Total Undangan", icon: Mail, key: "all" },
@@ -25,13 +27,19 @@ const InvitationsHistory = () => {
 		handleReject,
 		actionLoadingId,
 	} = useInvitations();
+	const user = useAuthStore((state) => state.user);
 	const [globalFilter, setGlobalFilter] = useState("");
+	const [claimOpen, setClaimOpen] = useState(false);
 
-	const columns = getInvitationColumns({
-		onAccept: handleAccept,
-		onReject: handleReject,
-		actionLoadingId,
-	});
+	const columns = useMemo(
+		() =>
+			getInvitationColumns({
+				onAccept: handleAccept,
+				onReject: handleReject,
+				actionLoadingId,
+			}),
+		[handleAccept, handleReject, actionLoadingId],
+	);
 
 	if (loading) {
 		return (
@@ -67,6 +75,11 @@ const InvitationsHistory = () => {
 					:	`Daftar undangan - Total ${history.length} undangan`
 				}
 				backPath={true}
+				{...(user?.role === "staff_unassigned" && {
+					onAddClick: () => setClaimOpen(true),
+					addLabel: "Klaim Kode Pegawai",
+					addIcon: <QrCode className="w-4 h-4" />,
+				})}
 			/>
 
 			{/* Summary Cards */}
@@ -131,6 +144,8 @@ const InvitationsHistory = () => {
 					/>
 				</div>
 			</div>
+
+			<ClaimCodeDialog open={claimOpen} onOpenChange={setClaimOpen} />
 		</div>
 	);
 };
